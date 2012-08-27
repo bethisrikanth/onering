@@ -32,7 +32,8 @@ class PhysicalHost
   accepts_nested_attributes_for :pdus, :allow_destroy => true
   accepts_nested_attributes_for :child_hosts
 
-  validates_presence_of :name, :n, :u
+  validates_presence_of :n, :u
+  validates_presence_of :name, allow_blank: true
   validates_numericality_of :n, :only_integer => true
   validates_numericality_of :u, :only_integer => true
   validates_numericality_of :power_consumption, :greater_than_or_equal_to => 0, :allow_blank => true

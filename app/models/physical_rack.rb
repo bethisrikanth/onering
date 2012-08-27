@@ -28,4 +28,18 @@ class PhysicalRack
     (name.gsub('.', '-') if name) || id.to_s
   end
 
+  # This adds a list of empty hosts to the rack where the rack has gaps in the U's list
+  def add_missing_hosts
+    all_us = physical_hosts.asc(:u).map(&:u)
+    last_u = all_us.last
+    if last_u
+      (1..last_u).each do |u_index|
+        if not all_us.include?(u_index)
+          host = PhysicalHost.new(name: "", n: 0, u: u_index)
+          self.physical_hosts << host
+        end
+      end
+      save!
+    end
+  end
 end
