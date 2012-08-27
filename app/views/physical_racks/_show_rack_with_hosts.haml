@@ -1,10 +1,10 @@
 %table.table.table-striped.table-bordered.table-condensed
   %tr
+    %th U
+    %th N
     %th Outbrain Name
     %th Host Name
-    %th N
-    %th U
-  - physical_rack.physical_hosts.desc(:u).each do |physical_host|
+  - physical_rack.physical_hosts.asc(:u).each do |physical_host|
     = render partial: 'physical_racks/show_host', locals: {physical_host: physical_host, depth: 0}
   - if allow_modifications
     = render 'add_host'
