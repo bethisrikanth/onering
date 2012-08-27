@@ -57,3 +57,17 @@ Task management and bugs
 	- When you need feedback or help, or you think the branch is ready for merging, open a pull request
 	- After someone else has reviewed and signed off on the feature, you can merge it into master
 	- Once it is merged and pushed to ‘master’, you can and should deploy immediately
+
+
+Example of the github flow:
+
+	$ git co -b a-new-feature-im-working-on
+	# make stuff, commit
+	$ git ci
+	# push to remote
+	$ git push origin a-new-feature-im-working-on
+	
+	# now open a pull request on github and assign someone
+	
+	# now someone reviews your pull requests and either merges it or sends you feedback.
+	# in the meantime you are free to open up another branch and code in it
