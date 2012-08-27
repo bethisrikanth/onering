@@ -50,22 +50,27 @@ Task management and bugs
 -
 - For tasks we use Trello [https://trello.com/board/onering/50163a3c2112c4dc4ca29d40](https://trello.com/board/onering/50163a3c2112c4dc4ca29d40)
 - For bugs we (will) use github issues [https://github.com/outbrain/onering/issues](https://github.com/outbrain/onering/issues)
-- Workflow: We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html). In show:
-	- Anything in the master branch is deployable
-	- To work on something new, create a descriptively named branch off of master (ie: new-oauth2-scopes)
-	- Commit to that branch locally and regularly push your work to the same named branch on the server
-	- When you need feedback or help, or you think the branch is ready for merging, open a pull request
-	- After someone else has reviewed and signed off on the feature, you can merge it into master
-	- Once it is merged and pushed to ‘master’, you can and should deploy immediately
+
+GitHub Flow
+-
+
+Workflow: We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html). In show:
+
+- Anything in the master branch is deployable
+- To work on something new, create a descriptively named branch off of master (ie: new-oauth2-scopes)
+- Commit to that branch locally and regularly push your work to the same named branch on the server
+- When you need feedback or help, or you think the branch is ready for merging, open a pull request
+- After someone else has reviewed and signed off on the feature, you can merge it into master
+- Once it is merged and pushed to ‘master’, you can and should deploy immediately
 
 
 Example of the github flow:
 
-	$ git co -b a-new-feature-im-working-on
+	$ git co -b my-new-feature
 	# make stuff, commit
 	$ git ci
 	# push to remote
-	$ git push origin a-new-feature-im-working-on
+	$ git push origin my-new-feature
 	
 	# now open a pull request on github and assign someone
 	
