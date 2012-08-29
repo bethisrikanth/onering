@@ -1,5 +1,9 @@
 %p#notice= notice
 
+= link_to "#{physical_rack_path(@physical_rack)}.csv", :class => 'btn btn-primary', style: 'float:right' do
+  %i.icon-download-alt.icon-white
+  Download CSV
+
 %p
   %b Index:
   = @physical_rack.index

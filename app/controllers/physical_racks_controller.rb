@@ -24,6 +24,7 @@ class PhysicalRacksController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @physical_rack }
+      format.csv  {export_csv @physical_rack}
     end
   end
 
@@ -95,4 +96,19 @@ class PhysicalRacksController < ApplicationController
     EntitySchema.first(conditions: {name: 'physical_rack'})
   end
 
+  def export_csv(physical_rack)
+    filename = "#{@physical_rack.name}_#{@physical_rack.id}_#{Date.today.strftime('%d%b%y')}"
+    csv_data = FasterCSV.generate do |csv|
+      csv << PhysicalHost.csv_header
+      physical_rack.physical_hosts.desc(:u).each do |host|
+        pdu1 = host.pdus[0]
+        pdu2 = host.pdus[1]
+        csv << [host.id, host.u, host.n, host.ob_name, host.name, (pdu1.name if pdu1), (pdu1.voltage if pdu1), (pdu1.amps if pdu1), (pdu2.name if pdu2), (pdu2.voltage if pdu2), (pdu2.amps if pdu2)]
+      end
+    end
+
+    send_data csv_data,
+      :type => 'text/csv; charset=iso-8859-1; header=present',
+      :disposition => "attachment; filename=#{filename}.csv"
+  end
 end

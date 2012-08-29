@@ -38,6 +38,10 @@ class PhysicalHost
   validates_numericality_of :u, :only_integer => true
   validates_numericality_of :power_consumption, :greater_than_or_equal_to => 0, :allow_blank => true
 
+  def self.csv_header
+    [:id, :u, :n, :ob_name, :name, :pdu1_name, :pdu1_voltage, :pdu1_amps, :pdu2_name, :pdu2_voltage, :pdu2_amps]
+  end
+
   # Collects a cound of all glu modules (module_name => count)
   def self.collect_glu_modeuls
     modules = {}
