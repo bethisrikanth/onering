@@ -101,14 +101,23 @@ class PhysicalRacksController < ApplicationController
     csv_data = FasterCSV.generate do |csv|
       csv << PhysicalHost.csv_header
       physical_rack.physical_hosts.desc(:u).each do |host|
-        pdu1 = host.pdus[0]
-        pdu2 = host.pdus[1]
-        csv << [host.id, host.u, host.n, host.ob_name, host.name, (pdu1.name if pdu1), (pdu1.voltage if pdu1), (pdu1.amps if pdu1), (pdu2.name if pdu2), (pdu2.voltage if pdu2), (pdu2.amps if pdu2)]
+        csv << render_csv_row(host)
+        if host.child_hosts.exists?
+          host.child_hosts.asc(:n).each do |child|
+            csv << render_csv_row(child)
+          end
+        end
       end
     end
 
     send_data csv_data,
       :type => 'text/csv; charset=iso-8859-1; header=present',
       :disposition => "attachment; filename=#{filename}.csv"
+  end
+
+  def render_csv_row(host)
+    pdu1 = host.pdus[0]
+    pdu2 = host.pdus[1]
+    [host.id, host.u, host.n, host.ob_name, host.name, (host.parent_host.name if host.parent_host), (pdu1.name if pdu1), (pdu1.voltage if pdu1), (pdu1.amps if pdu1), (pdu2.name if pdu2), (pdu2.voltage if pdu2), (pdu2.amps if pdu2)]
   end
 end
