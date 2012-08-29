@@ -4,6 +4,13 @@
     %th N
     %th Outbrain Name
     %th Host Name
+    %th PDU1 Name
+    %th PDU1 Voltage
+    %th PDU1 Amps
+    %th PDU2 Name
+    %th PDU2 Voltage
+    %th PDU2 Amps
+
   - physical_rack.physical_hosts.desc(:u).each do |physical_host|
     = render partial: 'physical_racks/show_host', locals: {physical_host: physical_host, depth: 0}
   - if allow_modifications
