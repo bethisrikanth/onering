@@ -42,4 +42,32 @@ class PhysicalRack
       save!
     end
   end
+
+  # Updats this rack from the given row (updates one specific host)
+  def update_host_from_csv(row)
+    host_id = row[0]
+    host_u = row[1]
+    host_n = row[2]
+    host_ob_name = row[3]
+    host_name = row[4]
+    host_parent_host_name = row[5]
+    host_pdu1_name = row[6]
+    host_pdu1_voltage = row[7]
+    host_pdu1_amps = row[8]
+    host_pdu2_name = row[9]
+    host_pdu2_voltage = row[10]
+
+    host = host_id.nil? ? PhysicalHost.new : PhysicalHost.find(host_id)
+    physical_hosts << host unless physical_hosts.include?(host)
+    host.u = host_u
+    host.n = host_n
+    host.ob_name = host_ob_name
+    host.name = host_name
+
+    is_new = host.new?
+    changed = host.changed? and not is_new
+    success = host.save
+
+    {updates: changed ? 1 : 0, insertions: is_new ? 1 : 0, errors: success ? 0 : 1}
+  end
 end
