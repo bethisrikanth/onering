@@ -92,16 +92,33 @@ class PhysicalRacksController < ApplicationController
     end
   end
 
+  def upload
+    id = params[:id]
+    @physical_rack = PhysicalRack.any_of({_id: id}, {name: id.gsub('-', '.')}).first
+
+    if request.post? && params[:file].present?
+      infile = params[:file].read
+      result = import_csv(@physical_rack, infile)
+      flash[:info] = "Processed records: #{result[:n]}"
+      flash[:notice] = "New hosts: #{result[:insertions]}   " + 
+                       "Deleted hosts: #{result[:deletions]}   " + 
+                       "Updated hosts: #{result[:updates]}"
+      flash[:error] = "There were #{result[:errors]} errors :(" if result[:errors] > 0
+    end
+    redirect_to @physical_rack
+  end
+
   def schema
     EntitySchema.first(conditions: {name: 'physical_rack'})
   end
 
   def export_csv(physical_rack)
+    # http://www.funonrails.com/2012/01/csv-file-importexport-in-rails-3.html
     filename = "#{@physical_rack.name}_#{@physical_rack.id}_#{Date.today.strftime('%d%b%y')}"
     csv_data = FasterCSV.generate do |csv|
       csv << PhysicalHost.csv_header
       physical_rack.physical_hosts.desc(:u).each do |host|
-        csv << render_csv_row(host)
+        csv << render_csv_row(host) unless host.parent_host
         if host.child_hosts.exists?
           host.child_hosts.asc(:n).each do |child|
             csv << render_csv_row(child)
@@ -109,10 +126,41 @@ class PhysicalRacksController < ApplicationController
         end
       end
     end
-
     send_data csv_data,
       :type => 'text/csv; charset=iso-8859-1; header=present',
       :disposition => "attachment; filename=#{filename}.csv"
+  end
+
+  def import_csv(physical_rack, csv_string)
+    n = 0
+    updates = 0
+    errors = 0
+    deletions = 0
+    insertions = 0;
+    hosts_ids = []
+
+    # parse and add or update hosts
+    CSV.parse(csv_string) do |row|
+      n += 1
+      # SKIP: header i.e. first row OR blank row
+      next if n == 1 or row.join.blank?
+      host_id = row[0]
+      hosts_ids << host_id unless host_id.nil?
+      result = physical_rack.update_host_from_csv(row)
+      errors += result[:errors]
+      updates += result[:updates]
+      insertions += result[:insertions]
+    end
+
+    # delete hosts not in the file
+    physical_rack.physical_hosts.each do |host|
+      unless hosts_ids.include?(host.id.to_s)
+        physical_rack.physical_hosts.delete(host)
+        deletions += 1
+      end
+    end
+    physical_rack.save!
+    return {n: n, updates: updates, insertions: insertions, deletions: deletions, errors: errors}
   end
 
   def render_csv_row(host)

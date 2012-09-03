@@ -134,5 +134,30 @@ class PhysicalHost
     end
   end
 
+  def update_pdu(pdu_name, pdu_voltage, pdu_amps)
+    return unless pdu_name
+    pdu = find_pdu_by_name(pdu_name)
+    if pdu.nil?
+      pdu = Pdu.new
+      pdu.name = pdu_name
+      pdus << pdu
+    end
+    pdu.voltage = pdu_voltage
+    pdu.amps = pdu_amps
+  end
+
+  def remove_non_existing_pdus(pdu_names_to_keep)
+    pdus.each do |pdu|
+      pdus.delete(pdu) if not pdu_names_to_keep.include?(pdu.name)
+    end
+  end
+
+  def find_pdu_by_name(name)
+    pdus.each do |pdu|
+      return pdu if pdu.name == name
+    end
+    nil
+  end
+
   search_in :name, :make, :serial, :notes, :mac, :status, :ob_name, :model, :physical_rack => :name, :pdus => :name, :glu_modules => :name
 end

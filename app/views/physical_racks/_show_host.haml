@@ -1,5 +1,5 @@
 - unless depth == 0 and physical_host.parent_host
-  %tr
+  %tr{class: Time.now - physical_host.updated_at < 20 ? "tr-info" : ""}
     %td= physical_host.u
     %td= physical_host.n
     %td
@@ -15,6 +15,7 @@
     %td= physical_host.pdus[1].name if physical_host.pdus[1]
     %td= physical_host.pdus[1].voltage if physical_host.pdus[1]
     %td= physical_host.pdus[1].amps if physical_host.pdus[1]
+    %td= physical_host.updated_at
   - if physical_host.child_hosts.exists?
     - physical_host.child_hosts.asc(:n).each do |child_host|
       = render partial: 'physical_racks/show_host', locals: {physical_host: child_host, depth: depth + 1}

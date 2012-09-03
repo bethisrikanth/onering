@@ -11,7 +11,9 @@ Onering::Application.routes.draw do
   resources :audits
   resources :entity_schemas
   resources :dups, :only => :index
-  resources :physical_racks
+  resources :physical_racks do
+    post :upload, on: :member
+  end
   resources :datacenters
   match 'search' => 'physical_hosts#search'
   resources :physical_hosts do

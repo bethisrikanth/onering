@@ -1,8 +1,8 @@
-%p#notice= notice
+= render 'shared/notice'
 
-= link_to "#{physical_rack_path(@physical_rack)}.csv", :class => 'btn btn-primary', style: 'float:right' do
-  %i.icon-download-alt.icon-white
-  Download CSV
+%div{style: 'float:right'}
+  = render partial: 'download', locals: {physical_rack: @physical_rack}
+  = render partial: 'upload', locals: {physical_rack: @physical_rack}
 
 %p
   %b Index:

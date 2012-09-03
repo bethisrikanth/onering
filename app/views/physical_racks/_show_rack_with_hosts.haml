@@ -10,6 +10,7 @@
     %th PDU2 Name
     %th PDU2 Voltage
     %th PDU2 Amps
+    %th Updated At
 
   - physical_rack.physical_hosts.desc(:u).each do |physical_host|
     = render partial: 'physical_racks/show_host', locals: {physical_host: physical_host, depth: 0}
