@@ -68,8 +68,9 @@ class PhysicalRack
       parent_host = PhysicalHost.find_by_name(parent_host_name)
       if not parent_host.child_hosts.include?(host)
         parent_host.child_hosts << host
-        # ??? parent_host.save
       end
+    else
+      host.parent_host = nil
     end
 
     is_new = host.new?
