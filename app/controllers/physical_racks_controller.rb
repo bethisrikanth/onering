@@ -118,7 +118,7 @@ class PhysicalRacksController < ApplicationController
     csv_data = FasterCSV.generate do |csv|
       csv << PhysicalHost.csv_header
       physical_rack.physical_hosts.desc(:u).each do |host|
-        csv << render_csv_row(host)
+        csv << render_csv_row(host) unless host.parent_host
         if host.child_hosts.exists?
           host.child_hosts.asc(:n).each do |child|
             csv << render_csv_row(child)

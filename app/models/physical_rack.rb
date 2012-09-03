@@ -50,12 +50,12 @@ class PhysicalRack
     host_n = row[2]
     host_ob_name = row[3]
     host_name = row[4]
-    host_parent_host_name = row[5]
-    host_pdu1_name = row[6]
-    host_pdu1_voltage = row[7]
-    host_pdu1_amps = row[8]
-    host_pdu2_name = row[9]
-    host_pdu2_voltage = row[10]
+    parent_host_name = row[5]
+    pdu1_name = row[6]
+    pdu1_voltage = row[7]
+    pdu1_amps = row[8]
+    pdu2_name = row[9]
+    pdu2_voltage = row[10]
 
     host = host_id.nil? ? PhysicalHost.new : PhysicalHost.find(host_id)
     physical_hosts << host unless physical_hosts.include?(host)
@@ -63,6 +63,14 @@ class PhysicalRack
     host.n = host_n
     host.ob_name = host_ob_name
     host.name = host_name
+
+    if parent_host_name
+      parent_host = PhysicalHost.find_by_name(parent_host_name)
+      if not parent_host.child_hosts.include?(host)
+        parent_host.child_hosts << host
+        # ??? parent_host.save
+      end
+    end
 
     is_new = host.new?
     changed = host.changed? and not is_new
