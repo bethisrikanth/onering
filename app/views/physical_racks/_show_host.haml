@@ -1,5 +1,5 @@
 - unless depth == 0 and physical_host.parent_host
-  %tr
+  %tr{class: Time.now - physical_host.updated_at < 20 ? "tr-info" : ""}
     %td= physical_host.u
     %td= physical_host.n
     %td
