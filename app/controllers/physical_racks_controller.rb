@@ -92,11 +92,20 @@ class PhysicalRacksController < ApplicationController
     end
   end
 
+  def upload
+    id = params[:id]
+    @physical_rack = PhysicalRack.any_of({_id: id}, {name: id.gsub('-', '.')}).first
+
+    flash[:notice] = "Uploaded successfully"
+    redirect_to @physical_rack
+  end
+
   def schema
     EntitySchema.first(conditions: {name: 'physical_rack'})
   end
 
   def export_csv(physical_rack)
+    # http://www.funonrails.com/2012/01/csv-file-importexport-in-rails-3.html
     filename = "#{@physical_rack.name}_#{@physical_rack.id}_#{Date.today.strftime('%d%b%y')}"
     csv_data = FasterCSV.generate do |csv|
       csv << PhysicalHost.csv_header
@@ -113,6 +122,9 @@ class PhysicalRacksController < ApplicationController
     send_data csv_data,
       :type => 'text/csv; charset=iso-8859-1; header=present',
       :disposition => "attachment; filename=#{filename}.csv"
+  end
+
+  def import_csv(physical_rack)
   end
 
   def render_csv_row(host)
