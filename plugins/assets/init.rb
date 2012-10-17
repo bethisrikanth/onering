@@ -1,9 +1,12 @@
 require 'controller'
 require 'mongo_mapper'
+require 'assets/lib/helpers'
 require 'assets/models/device'
 
 module App
   class Base < Controller
+    include Helpers
+
     configure do
       MongoMapper.setup({
         'production' => {
@@ -44,42 +47,65 @@ module App
       end
     end
 
-  # path and tag query
+
+  # set device user properties
+    get '/devices/:id/set/*' do
+      device = Device.find(params[:id])
+      return 404 if not device
+
+      if not params[:splat].empty?
+        up = device.user_properties
+        pairs = params[:splat].first.split('/')
+
+      # set each property
+        pairs.evens.zip(pairs.odds).each do |pair|
+          up[pair.first] = pair.last
+        end
+
+      # set and save
+        device.user_properties = up
+        device.safe_save
+      end
+
+      device.to_json
+    end
+
+
+
+  # /devices/find
+  # search for devices by fields
+    get '/devices/find/*' do
+      q = (params[:splat].empty? ? {} : params[:splat].first)
+      Device.where(urlquerypath_to_mongoquery(q)).to_json
+    end
+
+
     %w{
-      /devices/tagged/*/?
-      /devices/in/:site/:rack/?
-      /devices/in/:site/:rack/*/?
-      /devices/in/:site/:rack/u:unit/?
-      /devices/in/:site/:rack/U:unit/?
-      /devices/in/:site/?
-    }.each do |route|
-      get route do
-        site = params[:site]
-        rack = params[:rack]
-        unit = params[:unit]
-        tags = (params[:splat].first || '').split('/')
-        q = {}
-
-        q['attributes.site'] = site if site
-        q['attributes.rack'] = rack if rack
-        q['attributes.unit'] = unit if unit
-
-      # if a single tag is specified, search for it as a scalar
-      # otherwise include all tags as required
-        q['tags'] = case tags.length
-          when 1 then tags.first
-          else        {'$all' => tags}
-        end if not tags.empty?
-
-      # run the query
-        rv = Device.where(q)
-
-      # collapse single-element arrays (if specified)
-        rv = rv.first if params[:collapse] and rv.length == 1
-
-        return 404 if not rv
-        rv.to_json
+      /devices/list/stale/?
+      /devices/list/stale/:age
+    }.each do |r|
+      get r do
+        Device.where({
+          'updated_at' => {
+            '$lte' => (params[:age] || 4).to_i.hours.ago
+          }
+        }).to_json
       end
     end
+
+  # /devices/list
+  # list field values
+    %w{
+      /devices/list/:field/?
+      /devices/list/:field/where/*
+    }.each do |r|
+      get r do
+        q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
+        Device.collection.distinct("properties.#{params[:field]}", q).sort{|a,b|
+          a <=> b
+        }.to_json
+      end
+    end
+
   end
 end

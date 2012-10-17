@@ -9,10 +9,10 @@ class Device < App::Model::Base
   many :devices
   timestamps!
   
-  key :name,       String
-  key :tags,       Array
-  key :properties, Hash
-
+  key :name,            String
+  key :tags,            Array
+  key :properties,      Hash
+  key :user_properties, Hash
 
   private
     def _mangle_id

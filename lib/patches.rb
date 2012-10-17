@@ -22,3 +22,13 @@ class Hash
     end
   end
 end
+
+class Array
+  def odds
+    values_at(*each_index.select{|i| i.odd?})
+  end
+
+  def evens
+    values_at(*each_index.select{|i| i.even?})
+  end
+end

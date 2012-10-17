@@ -10,3 +10,5 @@ public/assets/
 *.pem
 *.sublime-project
 *.sublime-workspace
+*.log
+*.lock
