@@ -7,105 +7,96 @@ module App
   class Base < Controller
     include Helpers
 
-    configure do
-      MongoMapper.setup({
-        'production' => {
-          'uri' => 'mongodb://localhost'
-        }
-      }, 'production')
+    namespace '/devices' do
+    # device by id
+      get '/:id' do
+        device = Device.find(params[:id])
+        return 404 if not device
+        device.to_json
+      end
 
-      MongoMapper.database = 'onering'
-    end
+      %w{
+        /?
+        /:id
+      }.each do |route|
+        any route, %w{post put} do
+          rv = []
+          json = JSON.parse(request.body.read)
+          json = [json] if json.is_a?(Hash)
 
-  # device by id
-    get '/devices/:id' do
-      device = Device.find(params[:id])
-      return 404 if not device
-      device.to_json
-    end
+          json.each do |o|
+            id = (params[:id] || o['id'])
 
-    %w{
-      /devices/?
-      /devices/:id
-    }.each do |route|
-      any route, %w{post put} do
-        rv = []
-        json = JSON.parse(request.body.read)
-        json = [json] if json.is_a?(Hash)
+            device = Device.find_or_create(id)
+            device.from_json(o)
+            device.safe_save
 
-        json.each do |o|
-          id = (params[:id] || o['id'])
+            rv << device
+          end
 
-          device = Device.find_or_create(id)
-          device.from_json(o)
+          rv.to_json
+        end
+      end
+
+
+    # set device user properties
+      get '/:id/set/*' do
+        device = Device.find(params[:id])
+        return 404 if not device
+
+        if not params[:splat].empty?
+          up = device.user_properties
+          pairs = params[:splat].first.split('/')
+
+        # set each property
+          pairs.evens.zip(pairs.odds).each do |pair|
+            up[pair.first] = pair.last
+          end
+
+        # set and save
+          device.user_properties = up
           device.safe_save
-
-          rv << device
         end
 
-        rv.to_json
+        device.to_json
       end
-    end
 
 
-  # set device user properties
-    get '/devices/:id/set/*' do
-      device = Device.find(params[:id])
-      return 404 if not device
 
-      if not params[:splat].empty?
-        up = device.user_properties
-        pairs = params[:splat].first.split('/')
+    # /devices/find
+    # search for devices by fields
+      get '/find/*' do
+        q = (params[:splat].empty? ? {} : params[:splat].first)
+        Device.where(urlquerypath_to_mongoquery(q)).to_json
+      end
 
-      # set each property
-        pairs.evens.zip(pairs.odds).each do |pair|
-          up[pair.first] = pair.last
+
+      %w{
+        /list/stale/?
+        /list/stale/:age
+      }.each do |r|
+        get r do
+          Device.where({
+            'updated_at' => {
+              '$lte' => (params[:age] || 4).to_i.hours.ago
+            }
+          }).to_json
         end
-
-      # set and save
-        device.user_properties = up
-        device.safe_save
       end
 
-      device.to_json
-    end
-
-
-
-  # /devices/find
-  # search for devices by fields
-    get '/devices/find/*' do
-      q = (params[:splat].empty? ? {} : params[:splat].first)
-      Device.where(urlquerypath_to_mongoquery(q)).to_json
-    end
-
-
-    %w{
-      /devices/list/stale/?
-      /devices/list/stale/:age
-    }.each do |r|
-      get r do
-        Device.where({
-          'updated_at' => {
-            '$lte' => (params[:age] || 4).to_i.hours.ago
-          }
-        }).to_json
+    # /devices/list
+    # list field values
+      %w{
+        /list/:field/?
+        /list/:field/where/*
+      }.each do |r|
+        get r do
+          q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
+          Device.collection.distinct("properties.#{params[:field]}", q).sort{|a,b|
+            a <=> b
+          }.to_json
+        end
       end
     end
-
-  # /devices/list
-  # list field values
-    %w{
-      /devices/list/:field/?
-      /devices/list/:field/where/*
-    }.each do |r|
-      get r do
-        q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
-        Device.collection.distinct("properties.#{params[:field]}", q).sort{|a,b|
-          a <=> b
-        }.to_json
-      end
-    end
-
   end
 end
