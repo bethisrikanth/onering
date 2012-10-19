@@ -1,17 +1,26 @@
 require 'sinatra/base'
 require 'sinatra/namespace'
+require 'sinatra/cross_origin'
 
 module App
   class Controller < Sinatra::Base
     register Sinatra::Namespace
+    register Sinatra::CrossOrigin
+
+    configure do
+      set :allow_origin, :any
+      set :allow_methods, [:get, :post, :options]
+      set :allow_credentials, true
+      enable :cross_origin
+    end
 
     before do
-      headers 'Access-Control-Allow-Origin' => '*'
+      headers 'Access-Control-Allow-Headers' => 'origin, x-requested-with, accept'
     end
 
     class<<self
       def get(url, opts={}, &block)
-        any(url, ['get'], opts, &block)
+        any(url, ['get', 'options'], opts, &block)
       end
 
       def post(url, opts={}, &block)

@@ -92,9 +92,8 @@ module App
       }.each do |r|
         get r do
           q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
-          Device.collection.distinct("properties.#{params[:field]}", q).sort{|a,b|
-            a <=> b
-          }.to_json
+          Device.sort("properties.#{params[:field]}".to_sym.asc)
+          Device.collection.distinct("properties.#{params[:field]}", q).compact.to_json
         end
       end
     end
