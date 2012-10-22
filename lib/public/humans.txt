@@ -1,0 +1,17 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    <name> -- <role> -- <twitter>
+    Ran Tavory -- deveoloer -- @rantav
+    Gary Hetzel -- developer -- @gargarxp
+
+# THANKS
+
+    God
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3
+    jQuery, Modernizr
