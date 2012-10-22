@@ -1,6 +1,7 @@
 source :rubygems
 
 gem "sinatra"
+gem "sinatra-contrib"
 gem "sinatra-cross_origin"
 gem "shotgun"
 gem "mongo"
