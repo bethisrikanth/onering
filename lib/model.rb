@@ -50,6 +50,24 @@ module App
 
           rv
         end
+
+        def summarize(group_by, properties=[], options=nil)
+          c = {
+            '$group' => {
+              :_id => "$properties.#{group_by}",
+              :total => {'$sum' => 1},
+            }
+          }
+
+          # if not properties.empty?
+          #   c[:properties] = {}
+          #   properties.each{|p| c[:properties].set("$#{p}", {
+          #     '$sum' => 1
+          #   })}
+          # end
+
+          collection.aggregate([c])
+        end
       end
     end
 

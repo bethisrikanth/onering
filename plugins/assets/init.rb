@@ -96,6 +96,19 @@ module App
           Device.collection.distinct("properties.#{params[:field]}", q).compact.to_json
         end
       end
+
+
+    # /devices/summary
+      %w{
+        /summary/by-:field/?
+        /summary/by-:field/*/?
+      }.each do |r|
+        get r do
+          fields = params[:splat].first || ''
+          rv = Device.summarize(params[:field], fields.split('/'))
+          rv.to_json
+        end
+      end
     end
   end
 end

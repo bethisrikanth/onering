@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <h1>Devices by {{ field }}</h1>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Primary IP</th>
+            <th>Location</th>
+            <th>Service Tag</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="device in devices">
+            <td>{{ device.id }}</td>
+            <td>{{ device.name }}</td>
+            <td>{{ device.properties.ip }}</td>
+            <td>{{ device.properties.site }}</td>
+            <td><a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">{{ device.properties.serial }}</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

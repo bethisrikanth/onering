@@ -11,17 +11,7 @@ module App
       end
 
       def get(path, default=nil)
-        root = @_config
-
-        begin
-          path.strip.split('/').each do |p|
-            root = root[p]
-          end
-
-          return root || default
-        rescue NoMethodError
-          return default
-        end
+        @_config.get(path, default)
       end
 
       def get!(path)

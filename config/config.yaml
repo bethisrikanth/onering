@@ -1,5 +1,5 @@
 database: 
-  dev:
+  onering:
     type: mongo
-    host: localhost
+    host: onering
     port: 27017

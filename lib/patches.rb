@@ -21,6 +21,32 @@ class Hash
       memo
     end
   end
+
+  def get(path, default=nil)
+    root = self
+
+    begin
+      path.strip.split(/[\/\.]/).each do |p|
+        root = root[p]
+      end
+
+      return root || default
+    rescue NoMethodError
+      return default
+    end
+  end
+
+  def set(path, value)
+    path = path.strip.split(/[\/\.]/)
+    root = self
+
+    path[0..-2].each do |p|
+      root[p] = {} unless root[p].is_a?(Hash)
+      root = root[p]
+    end
+
+    root[path.last] = value
+  end
 end
 
 class Array

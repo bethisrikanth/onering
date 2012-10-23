@@ -1,0 +1,11 @@
+html, body {
+  height: 100%;
+}
+
+.fill { 
+  min-height: 100%;
+}
+
+.content{
+  margin-top: 60px;
+}
