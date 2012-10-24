@@ -19,9 +19,9 @@ module App
         /?
         /:id
       }.each do |route|
-        any route, %w{post put} do
+        post route do
           rv = []
-          json = JSON.parse(request.body.read)
+          json = JSON.parse(request.env["rack.input"].read)
           json = [json] if json.is_a?(Hash)
 
           json.each do |o|

@@ -3,7 +3,7 @@ var app = angular.module('app', []);
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
     when('/inf', {
-      templateUrl: 'views/cards.html',
+      templateUrl: 'views/inf-overview.html',
       controller:  PhysicalDeviceSummary
     }).
     when('/inf/summary/:field', {
