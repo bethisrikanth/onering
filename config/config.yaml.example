@@ -1,0 +1,5 @@
+database:
+  dbname:
+    host: hostname
+    port: 27017
+    type: mongo

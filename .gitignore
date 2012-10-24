@@ -12,3 +12,4 @@ public/assets/
 *.sublime-workspace
 *.log
 *.lock
+config/*.yaml

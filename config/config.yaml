@@ -1,5 +1,0 @@
-database: 
-  onering:
-    type: mongo
-    host: onering
-    port: 27017
