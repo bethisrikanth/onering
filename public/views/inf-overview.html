@@ -4,26 +4,15 @@
       <h3>{{ rollup._id | uppercase }}</h3>
     </div>
     <div class="span9">
-      <table class="table">
-        <tbody>
-          <tr>
-            <th>Test</th>
-            <td>Value</td>
-          </tr>
-          <tr>
-            <th>Test</th>
-            <td>Value</td>
-          </tr>
-          <tr>
-            <th>Test</th>
-            <td>Value</td>
-          </tr>
-          <tr>
-            <th>Test</th>
-            <td>Value</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="emblem emblem-medium emblem-online">{{ rollup.total }}</div>
+
+      <div class="emblem emblem-medium emblem-fault">{{ rollup.total }}</div>
+
+      <div class="emblem emblem-medium emblem-maintenance">{{ rollup.total }}</div>
+
+      <div class="emblem emblem-medium emblem-unallocated">{{ rollup.total }}</div>
+
+      <div class="emblem emblem-medium emblem-unknown">{{ rollup.total }}</div>
     </div>
   </div>
 </div>

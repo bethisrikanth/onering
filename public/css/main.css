@@ -14,6 +14,71 @@ html, body {
   margin-top: 0;
 }
 
-.card p{
-  
+.card{
+  margin-bottom: 1em;
+}
+
+.emblem{
+  color: white;
+  float: left;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  margin: 4px;
+}
+
+.emblem-small{
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.emblem-medium{
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.emblem-large{
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+  font-size: 22px;
+}
+
+.emblem-huge{
+  width: 128px;
+  height: 128px;
+  margin: 8px;
+  font-size: 36px;
+  line-height: 128px;
+  text-shadow: -1 -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.emblem-online{
+  background-color: #468847;
+  -webkit-mask-box-image: url(/img/masks/online.svg);
+  clip-path: url(/img/masks/online.svg);
+}
+
+.emblem-fault{
+  background-color: #B94A48;
+  -webkit-mask-box-image: url(/img/masks/fault.svg);
+  clip-path: url(/img/masks/fault.svg);
+}
+
+.emblem-maintenance{
+  background-color: #F89406;
+  -webkit-mask-box-image: url(/img/masks/maintenance.svg);
+  clip-path: url(/img/masks/maintenance.svg);
+}
+
+.emblem-unallocated{
+  background-color: #3A87AD;
+}
+
+.emblem-unknown{
+  background-color: #999;
+  -webkit-mask-box-image: url(/img/masks/unknown.svg);
+  clip-path: url(/img/masks/unknown.svg);
 }
