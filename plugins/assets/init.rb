@@ -28,8 +28,7 @@ module App
             id = (params[:id] || o['id'])
 
             device = Device.find_or_create(id)
-            device.from_json(o)
-            device.safe_save
+            device.from_json(o).safe_save
 
             rv << device
           end
@@ -62,6 +61,25 @@ module App
       end
 
 
+    # tagging
+    # these are GETs because this should be a trivial user action
+      get '/:id/tag/*' do
+        tags = params[:splat].first.split(/\W/)
+        device = Device.find(params[:id])
+        tags.each{|t| device.tags.push_uniq(t) }
+        device.safe_save
+        device.to_json
+      end
+
+
+      get '/:id/untag/*' do
+        tags = params[:splat].first.split(/\W/)
+        device = Device.find(params[:id])
+        tags.each{|t| device.tags.delete(t) }
+        device.safe_save
+        device.to_json
+      end
+
 
     # /devices/find
     # search for devices by fields
@@ -71,6 +89,7 @@ module App
       end
 
 
+    # show devices that haven't been updated
       %w{
         /list/stale/?
         /list/stale/:age
@@ -79,7 +98,8 @@ module App
           Device.where({
             'updated_at' => {
               '$lte' => (params[:age] || 4).to_i.hours.ago
-            }
+            },
+            'tags' => 'auto'
           }).to_json
         end
       end

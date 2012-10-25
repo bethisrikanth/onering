@@ -1,3 +1,5 @@
+require 'deep_merge/rails_compat'
+
 class String
   def underscore
     self.gsub(/::/, '/').
@@ -5,6 +7,10 @@ class String
     gsub(/([a-z\d])([A-Z])/,'\1_\2').
     tr("-", "_").
     downcase
+  end
+
+  def to_bool
+    self.chomp.strip =~ /^(true|on|yes|y|1)$/i
   end
 end
 
@@ -56,5 +62,9 @@ class Array
 
   def evens
     values_at(*each_index.select{|i| i.even?})
+  end
+
+  def push_uniq(value)
+    self << value unless include?(value)
   end
 end

@@ -12,7 +12,8 @@ module App
           @connection = ::Mongo::Connection.new(
             (config['host'] || 'localhost'), 
             (config['port'] || 27017).to_i,
-            :logger => logger
+            :logger => logger,
+            :safe => config['safe'].to_s.to_bool
           )
 
           ::MongoMapper.connection = @connection

@@ -27,7 +27,10 @@ module App
 
     error do
       {
-        :errors => env['sinatra.error'].message
+        :errors => {
+          :type => env['sinatra.error'].class.to_s,
+          :message => env['sinatra.error'].message
+        }
       }.to_json
     end
   end

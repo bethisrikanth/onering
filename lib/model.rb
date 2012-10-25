@@ -7,18 +7,36 @@ module App
     end
 
     module Utils
-      def to_json
+      def to_h
         serializable_hash.reject{|k,v|
           ['_type'].include?(k)
-        }.to_json
+        }
       end
 
-      def from_json(json)
-        json = JSON.parse(json) if json.is_a?(String)
+      def to_json
+        to_h.to_json
+      end
 
-        json.each do |key, value|
-          send("#{key}=", value) if value
+
+      def from_h(hash, merge=true)
+        current = to_h
+        current.deeper_merge!(hash, {:merge_hash_arrays => true})
+        
+        current.each do |k,v|
+          send("#{k}=", v)
         end
+
+        self
+      end
+
+      def from_json(json, merge=true)
+        json = JSON.parse(json) if json.is_a?(String)
+        json = [json] if json.is_a?(Hash)
+
+        json.each do |j|
+          from_h(j, merge)
+        end
+        self
       end
 
       def safe_save
@@ -52,12 +70,12 @@ module App
         end
 
         def summarize(group_by, properties=[], options=nil)
-          c = {
+          c = [{
             '$group' => {
-              :_id => "$properties.#{group_by}",
+              :_id => "$#{group_by}",
               :total => {'$sum' => 1},
             }
-          }
+          }]
 
           # if not properties.empty?
           #   c[:properties] = {}
@@ -66,7 +84,7 @@ module App
           #   })}
           # end
 
-          collection.aggregate([c])
+          collection.aggregate(c)
         end
       end
     end

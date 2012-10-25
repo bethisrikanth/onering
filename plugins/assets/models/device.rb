@@ -14,6 +14,14 @@ class Device < App::Model::Base
   key :properties,      Hash
   key :user_properties, Hash
 
+  def tag(value)
+    [*value].each do |v|
+      add_to_set({:tags => v})
+    end
+    safe_save
+    self
+  end
+
   private
     def _mangle_id
       id = id.strip.downcase if id

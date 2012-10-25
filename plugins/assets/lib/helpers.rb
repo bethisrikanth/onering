@@ -21,8 +21,13 @@ module App
           v = get_rx_from_urlquery(v) if regex and v.is_a?(String)
 
         # list of places to search for a given value
-          criterion['$or'] << {"properties.#{p[0]}" => (v || {'$exists' => true})}
-          criterion['$or'] << {"user_properties.#{p[0]}" => (v || {'$exists' => true})}
+          case p[0]
+          when /name|tags/
+            criterion['$or'] << {p[0] => (v || {'$exists' => true})}
+          else
+            criterion['$or'] << {"properties.#{p[0]}" => (v || {'$exists' => true})}
+            criterion['$or'] << {"user_properties.#{p[0]}" => (v || {'$exists' => true})}
+          end
 
         # append this criterion to the correct boolean set (AND, OR)
           rv['$and'] << criterion
