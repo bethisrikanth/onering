@@ -125,7 +125,7 @@ module App
       }.each do |r|
         get r do
           fields = params[:splat].first || ''
-          rv = Device.summarize(params[:field], fields.split('/'))
+          rv = Device.summarize("properties.#{params[:field]}", fields.split('/'))
           rv.to_json
         end
       end

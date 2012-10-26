@@ -2,29 +2,68 @@ function DefaultController($scope){
 
 }
 
-function PhysicalDevices($scope, $http, $routeParams){
+function QueryController($scope, $http, $route, $routeParams){
   $scope.field = $routeParams.field;
   $scope.query = $routeParams.query || '';
+  $scope.params = $route.current.$route.params;
+
+  console.log('t', $routeParams)
 
   $http({
     method: 'GET',
-    url:    'http://192.168.82.222:9393/devices/find/'+$scope.field+'/'+$scope.query,
+    url:    'http://localhost:9393/devices/find/'+$scope.field+'/'+$scope.query,
 
   }).success(function(data){
     $scope.devices = data;
   });
 }
 
-function PhysicalDeviceSummary($scope, $http, $routeParams){
+function DeviceSummaryController($scope, $http, $routeParams){
   $scope.field = $routeParams.field || 'site';
 
   $http({
     method: 'GET',
-    url:    'http://192.168.82.222:9393/devices/summary/by-'+$scope.field,
+    url:    'http://localhost:9393/devices/summary/by-'+$scope.field,
 
   }).success(function(data){
     $scope.summary = data;
   });
 
   $scope.orderProp = 'total';
+}
+
+
+function SiteController($scope, $http, $routeParams){
+  $scope.site = $routeParams.site;
+
+  $http({
+    method: 'GET',
+    url:    'http://localhost:9393/devices/find/site/'+$scope.site,
+
+  }).success(function(data){
+    $scope.devices = data;
+  });
+}
+
+function RackController($scope, $http, $routeParams){
+  $scope.site = $routeParams.site;
+  $scope.rack = $routeParams.rack;
+
+  $http({
+    method: 'GET',
+    url:    'http://localhost:9393/devices/find/site/'+$scope.site+'/model/'+$scope.rack
+  }).success(function(data){
+    $scope.devices = data;
+  });
+}
+
+function NodeController($scope, $http, $routeParams){
+  $scope.id = $routeParams.id;
+
+  $http({
+    method: 'GET',
+    url:    'http://localhost:9393/devices/'+$scope.id
+  }).success(function(data){
+    $scope.device = data;
+  });
 }

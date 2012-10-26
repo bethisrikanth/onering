@@ -1,0 +1,40 @@
+<div class="container-fluid node">
+  <header class="row-fluid">
+    <h1><i>[{{ device.id }}]</i> {{ device.name }}</h1>
+  </header>
+
+  <div class="row-fluid">
+    <div class="span3 device.properties">
+      <h3>Details</h3>
+      <table class="table table-condensed">
+        <tbody>
+          <tr>
+            <th>Model</th>
+            <td>{{ device.properties.make }} {{ device.properties.model }}</td>
+          </tr>
+          <tr>
+            <th>Datacenter</th>
+            <td>{{ device.properties.site | uppercase }}</td>
+          </tr>
+          <tr>
+            <th>Rack</th>
+            <td>{{ device.properties.rack | uppercase }}</td>
+          </tr>
+          <tr>
+            <th>Chassis</th>
+            <td><a ng-show="device.parent" href="#/node/{{ device.parent.id }}">{{ device.properties.parent.name }} ({{ device.properties.parent.id }})</a></td>
+          </tr>
+          <tr ng-show="device.properties.slot">
+            <th>Slot</th>
+            <td>{{ device.properties.slot }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="span7">
+      INFO
+    </div>
+  </div>
+
+</div>
