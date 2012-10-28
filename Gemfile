@@ -17,5 +17,5 @@ gem 'rake'
 group :test do
   gem 'rspec'
   gem 'jasmine'
-  # gem 'jasmine-headless-webkit'
+  gem 'jasmine-headless-webkit', :git => 'git://github.com/johnbintz/jasmine-headless-webkit.git', :branch => 'travis-test'
 end
