@@ -1,6 +1,3 @@
-require 'jasmine-headless-webkit'
-
-Jasmine::Headless::Task.new
 
 begin
   require 'jasmine'
@@ -8,5 +5,14 @@ begin
 rescue LoadError
   task :jasmine do
     abort "Jasmine is not available. In order to run jasmine, you must: (sudo) gem install jasmine"
+  end
+end
+
+
+task :travis do
+  ["rspec spec", "rake jasmine:ci"].each do |cmd|
+    puts "Starting to run #{cmd}..."
+    system("bundle exec #{cmd}")
+    raise "#{cmd} failed!" unless $?.exitstatus == 0
   end
 end
