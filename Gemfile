@@ -13,3 +13,7 @@ gem "racksh"
 gem "haml"
 gem "oats"
 gem "thin"
+
+group :test do
+  gem 'rspec'
+end
