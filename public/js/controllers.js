@@ -11,8 +11,7 @@ function QueryController($scope, $http, $route, $routeParams){
 
   $http({
     method: 'GET',
-    url:    '/devices/find/'+$scope.field+'/'+$scope.query,
-
+    url:    '/devices/find/' + $scope.field + '/' + $scope.query
   }).success(function(data){
     $scope.devices = data;
   });
@@ -23,8 +22,7 @@ function DeviceSummaryController($scope, $http, $routeParams){
 
   $http({
     method: 'GET',
-    url:    '/devices/summary/by-'+$scope.field,
-
+    url:    '/devices/summary/by-' + $scope.field
   }).success(function(data){
     $scope.summary = data;
   });
@@ -38,8 +36,7 @@ function SiteController($scope, $http, $routeParams){
 
   $http({
     method: 'GET',
-    url:    '/devices/find/site/'+$scope.site,
-
+    url:    '/devices/find/site/' + $scope.site
   }).success(function(data){
     $scope.devices = data;
   });
@@ -51,7 +48,7 @@ function RackController($scope, $http, $routeParams){
 
   $http({
     method: 'GET',
-    url:    '/devices/find/site/'+$scope.site+'/model/'+$scope.rack
+    url:    '/devices/find/site/' + $scope.site+'/model/' + $scope.rack
   }).success(function(data){
     $scope.devices = data;
   });
@@ -62,7 +59,7 @@ function NodeController($scope, $http, $routeParams){
 
   $http({
     method: 'GET',
-    url:    '/devices/'+$scope.id
+    url:    '/devices/' + $scope.id
   }).success(function(data){
     $scope.device = data;
   });
