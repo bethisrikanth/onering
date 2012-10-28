@@ -1,6 +1,5 @@
 source :rubygems
 
-gem "rake"
 gem "sinatra"
 gem "sinatra-contrib"
 gem "sinatra-cross_origin"
