@@ -12,7 +12,10 @@ gem "racksh"
 gem "haml"
 gem "oats"
 gem "thin"
+gem 'rake'
 
 group :test do
   gem 'rspec'
+  gem 'jasmine'
+  # gem 'jasmine-headless-webkit'
 end
