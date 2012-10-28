@@ -9,7 +9,7 @@ rescue LoadError
 end
 
 
-task :travis do
+task :test do
   ["rspec spec", "rake jasmine:ci"].each do |cmd|
     puts "Starting to run #{cmd}..."
     system("bundle exec #{cmd}")
