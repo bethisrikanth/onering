@@ -1,3 +1,6 @@
+require 'jasmine-headless-webkit'
+
+Jasmine::Headless::Task.new
 
 begin
   require 'jasmine'
