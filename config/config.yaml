@@ -1,0 +1,5 @@
+database:
+  dev:
+    host: localhost
+    port: 27017
+    type: mongo

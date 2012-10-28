@@ -11,4 +11,4 @@ public/assets/
 *.sublime-project
 *.sublime-workspace
 *.log
-config/*.yaml
+#config/*.yaml
