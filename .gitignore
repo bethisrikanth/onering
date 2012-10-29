@@ -12,4 +12,3 @@ public/assets/
 *.sublime-workspace
 *.log
 config/*.yaml
-_gen
