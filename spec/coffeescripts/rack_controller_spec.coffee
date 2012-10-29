@@ -1,4 +1,4 @@
-describe 'DeviceSummaryController', ->
+describe 'RackController', ->
 
   controller = scope = http = routeParams = data = null
 
@@ -6,22 +6,20 @@ describe 'DeviceSummaryController', ->
   beforeEach inject ($controller) ->
     scope = {}
     routeParams =
-      field: 'f'
+      site: 's'
+      rack: 'r'
     data = '123'
     http = jasmine.createSpy('http').andReturn
       success: (callback) -> callback(data)
-    controller = $controller 'DeviceSummaryController',
+    controller = $controller 'RackController',
       $scope: scope,
       $http: http,
       $routeParams: routeParams
 
-  it 'should call the API /devices/summary/by-#{scope.field}', ->
+  it 'should call the API /devices/find/site/#{$scope.site}/model/#{$scope.rack}', ->
     expect(http).toHaveBeenCalledWith
       method: 'GET'
-      url: "/devices/summary/by-#{scope.field}"
+      url: "/devices/find/site/#{scope.site}/model/#{scope.rack}"
 
-  it 'should attach the summary to the $scope', ->
-    expect(scope.summary).toEqual data
-
-  it 'should set $scope.orderProp to total', ->
-    expect(scope.orderProp).toEqual 'total'
+  it 'should attach the devices to the $scope', ->
+    expect(scope.devices).toEqual data

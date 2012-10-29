@@ -1,12 +1,13 @@
 (function() {
 
-  describe('DeviceSummaryController', function() {
+  describe('RackController', function() {
     var controller, data, http, routeParams, scope;
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function($controller) {
       scope = {};
       routeParams = {
-        field: 'f'
+        site: 's',
+        rack: 'r'
       };
       data = '123';
       http = jasmine.createSpy('http').andReturn({
@@ -14,23 +15,20 @@
           return callback(data);
         }
       });
-      return controller = $controller('DeviceSummaryController', {
+      return controller = $controller('RackController', {
         $scope: scope,
         $http: http,
         $routeParams: routeParams
       });
     }));
-    it('should call the API /devices/summary/by-#{scope.field}', function() {
+    it('should call the API /devices/find/site/#{$scope.site}/model/#{$scope.rack}', function() {
       return expect(http).toHaveBeenCalledWith({
         method: 'GET',
-        url: "/devices/summary/by-" + scope.field
+        url: "/devices/find/site/" + scope.site + "/model/" + scope.rack
       });
     });
-    it('should attach the summary to the $scope', function() {
-      return expect(scope.summary).toEqual(data);
-    });
-    return it('should set $scope.orderProp to total', function() {
-      return expect(scope.orderProp).toEqual('total');
+    return it('should attach the devices to the $scope', function() {
+      return expect(scope.devices).toEqual(data);
     });
   });
 
