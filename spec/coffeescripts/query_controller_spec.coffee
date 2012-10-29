@@ -1,12 +1,3 @@
-describe 'DefaultController', ->
-  controller = null
-
-  beforeEach ->
-    controller = new DefaultController()
-
-  it 'should not be null', ->
-    expect(controller).not.toBe null
-
 describe 'QueryController', ->
 
   queryController = scope = http = route = routeParams = data = null
