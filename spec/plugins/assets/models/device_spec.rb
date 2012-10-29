@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../../../plugins/assets/models', 'device.rb')
+require "spec_helper"
 
 describe "device"  do
   before :each do
