@@ -1,0 +1,24 @@
+<table class="table table-condensed">
+  <tbody>
+    <tr>
+      <th>Model</th>
+      <td>{{ device.properties.make }} {{ device.properties.model }}</td>
+    </tr>
+    <tr>
+      <th>Datacenter</th>
+      <td>{{ device.properties.site | uppercase }}</td>
+    </tr>
+    <tr>
+      <th>Rack / U</th>
+      <td>{{ device.properties.rack | uppercase }}<span ng-show="device.properties.unit">, U{{ device.properties.unit }}</span></td>
+    </tr>
+    <tr>
+      <th>Chassis</th>
+      <td><a ng-show="device.parent" href="#/node/{{ device.parent.id }}">{{ device.properties.parent.name }} ({{ device.properties.parent.id }})</a></td>
+    </tr>
+    <tr ng-show="device.properties.slot">
+      <th>Slot</th>
+      <td>{{ device.properties.slot }}</td>
+    </tr>
+  </tbody>
+</table>

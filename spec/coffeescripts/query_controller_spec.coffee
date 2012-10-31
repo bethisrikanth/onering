@@ -3,6 +3,9 @@ describe 'QueryController', ->
   queryController = scope = http = route = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    config =
+      get: (attr) ->
+        {baseurl: ''}[attr]
     scope = $rootScope.$new()
     routeParams =
       field: 'f'
@@ -18,6 +21,7 @@ describe 'QueryController', ->
       $scope: scope,
       $route: route,
       $routeParams: routeParams
+      config: config
 
   it 'should attach the devices to the $scope', ->
     http.flush()

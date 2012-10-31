@@ -4,6 +4,14 @@
     var data, http, queryController, route, routeParams, scope;
     queryController = scope = http = route = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+      var config;
+      config = {
+        get: function(attr) {
+          return {
+            baseurl: ''
+          }[attr];
+        }
+      };
       scope = $rootScope.$new();
       routeParams = {
         field: 'f',
@@ -22,7 +30,8 @@
       return queryController = $controller(QueryController, {
         $scope: scope,
         $route: route,
-        $routeParams: routeParams
+        $routeParams: routeParams,
+        config: config
       });
     }));
     return it('should attach the devices to the $scope', function() {

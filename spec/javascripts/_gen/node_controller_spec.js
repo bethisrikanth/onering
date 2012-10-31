@@ -4,6 +4,14 @@
     var controller, data, http, routeParams, scope;
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+      var config;
+      config = {
+        get: function(attr) {
+          return {
+            baseurl: ''
+          }[attr];
+        }
+      };
       scope = $rootScope.$new();
       routeParams = {
         id: '5'
@@ -13,7 +21,8 @@
       http.expectGET("/devices/" + routeParams.id).respond(data);
       return controller = $controller(NodeController, {
         $scope: scope,
-        $routeParams: routeParams
+        $routeParams: routeParams,
+        config: config
       });
     }));
     return it('should attach the devices to the $scope', function() {

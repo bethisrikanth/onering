@@ -4,6 +4,8 @@
     <title>Onering</title>
 
     <meta charset="UTF-8">
+    
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
     <script type="text/javascript" src="/js/vendor/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular.min.js"></script>
@@ -16,10 +18,23 @@
     <link rel="stylesheet" href="/css/main.css"></link>
   </head>
   <body>
-    <header class="navbar navbar-inverse navbar-fixed-top">
+    <header class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavigationController">
       <div class="navbar-inner">
         <ul class="nav">
           <li><a href="#/inf">Infrastructure</a></li>
+          <li class="divider-vertical"></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle"
+             data-toggle="dropdown"
+             href="#">
+              Sites
+              <b class="caret"></b>
+            </a>
+
+            <ul class="dropdown-menu">
+              <li ng-repeat="site in sites"><a href="/#/inf/show/site/{{ site }}">{{ site | uppercase }}</a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </header>

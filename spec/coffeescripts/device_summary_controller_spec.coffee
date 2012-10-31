@@ -3,6 +3,9 @@ describe 'DeviceSummaryController', ->
   controller = scope = http = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    config =
+      get: (attr) ->
+        {baseurl: ''}[attr]
     scope = $rootScope.$new()
     routeParams =
       field: 'f'
@@ -11,7 +14,8 @@ describe 'DeviceSummaryController', ->
     http.expectGET("/devices/summary/by-#{routeParams.field}").respond(data);
     controller = $controller DeviceSummaryController,
       $scope: scope,
-      $routeParams: routeParams
+      $routeParams: routeParams,
+      config: config
 
   it 'should attach the summary to the $scope', ->
     http.flush()

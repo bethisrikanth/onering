@@ -3,6 +3,9 @@ describe 'NodeController', ->
   controller = scope = http = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    config =
+      get: (attr) ->
+        {baseurl: ''}[attr]
     scope = $rootScope.$new();
     routeParams =
       id: '5'
@@ -12,6 +15,7 @@ describe 'NodeController', ->
     controller = $controller NodeController,
       $scope: scope,
       $routeParams: routeParams
+      config: config
 
   it 'should attach the devices to the $scope', ->
     http.flush()
