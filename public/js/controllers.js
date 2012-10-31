@@ -2,27 +2,34 @@ function DefaultController($scope){
 
 }
 
-function QueryController($scope, $http, $route, $routeParams){
+function NavigationController($scope, $http, $route, $routeParams, config){
+  $http({
+    method: 'GET',
+    url:    config.get('baseurl') + '/devices/list/site'
+  }).success(function(data){
+    $scope.sites = data;
+  });
+}
+
+function QueryController($scope, $http, $route, $routeParams, config){
   $scope.field = $routeParams.field;
   $scope.query = $routeParams.query || '';
   $scope.params = $route.current.$route.params;
 
-  console.log('t', $routeParams)
-
   $http({
     method: 'GET',
-    url:    '/devices/find/' + $scope.field + '/' + $scope.query
+    url:    config.get('baseurl') + '/devices/find/' + $scope.field + '/' + $scope.query
   }).success(function(data){
     $scope.devices = data;
   });
 }
 
-function DeviceSummaryController($scope, $http, $routeParams){
+function DeviceSummaryController($scope, $http, $routeParams, config){
   $scope.field = $routeParams.field || 'site';
 
   $http({
     method: 'GET',
-    url:    '/devices/summary/by-' + $scope.field
+    url:    config.get('baseurl') + '/devices/summary/by-' + $scope.field
   }).success(function(data){
     $scope.summary = data;
   });
@@ -31,35 +38,35 @@ function DeviceSummaryController($scope, $http, $routeParams){
 }
 
 
-function SiteController($scope, $http, $routeParams){
+function SiteController($scope, $http, $routeParams, config){
   $scope.site = $routeParams.site;
 
   $http({
     method: 'GET',
-    url:    '/devices/find/site/' + $scope.site
+    url:    config.get('baseurl') + '/devices/find/site/' + $scope.site
   }).success(function(data){
     $scope.devices = data;
   });
 }
 
-function RackController($scope, $http, $routeParams){
+function RackController($scope, $http, $routeParams, config){
   $scope.site = $routeParams.site;
   $scope.rack = $routeParams.rack;
 
   $http({
     method: 'GET',
-    url:    '/devices/find/site/' + $scope.site+'/model/' + $scope.rack
+    url:    config.get('baseurl') + '/devices/find/site/' + $scope.site+'/model/' + $scope.rack
   }).success(function(data){
     $scope.devices = data;
   });
 }
 
-function NodeController($scope, $http, $routeParams){
+function NodeController($scope, $http, $routeParams, config){
   $scope.id = $routeParams.id;
 
   $http({
     method: 'GET',
-    url:    '/devices/' + $scope.id
+    url:    config.get('baseurl') + '/devices/' + $scope.id
   }).success(function(data){
     $scope.device = data;
   });

@@ -12,6 +12,7 @@ require 'app'
 
 App::Base::PROJECT_ROOT = PROJECT_ROOT
 
+
 Dir[File.join(PROJECT_ROOT,'plugins', '*')].each do |p|
   name = File.basename(p)
   require "#{name}/init"

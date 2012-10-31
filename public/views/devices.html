@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <div class="span12">
-      <h1>Devices by {{ field }}</h1>
+      <h1>Devices by {{ field }}<span ng-show="query"> in {{ query }}</span></h1>
 
       <table class="table">
         <thead>
@@ -16,7 +16,7 @@
 
         <tbody>
           <tr ng-repeat="device in devices">
-            <td>{{ device.id }}</td>
+            <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
             <td>{{ device.name }}</td>
             <td>{{ device.properties.ip }}</td>
             <td>{{ device.properties.site }}</td>
