@@ -3,30 +3,21 @@
   describe('NodeController', function() {
     var controller, data, http, routeParams, scope;
     controller = scope = http = routeParams = data = null;
-    beforeEach(inject(function($controller) {
-      scope = {};
+    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+      scope = $rootScope.$new();
       routeParams = {
         id: '5'
       };
       data = '7';
-      http = jasmine.createSpy('http').andReturn({
-        success: function(callback) {
-          return callback(data);
-        }
-      });
-      return controller = $controller('NodeController', {
+      http = _$httpBackend_;
+      http.expectGET("/devices/" + routeParams.id).respond(data);
+      return controller = $controller(NodeController, {
         $scope: scope,
-        $http: http,
         $routeParams: routeParams
       });
     }));
-    it('should call the API /devices/#{scope.id}', function() {
-      return expect(http).toHaveBeenCalledWith({
-        method: 'GET',
-        url: "/devices/" + scope.id
-      });
-    });
     return it('should attach the devices to the $scope', function() {
+      http.flush();
       return expect(scope.device).toEqual(data);
     });
   });

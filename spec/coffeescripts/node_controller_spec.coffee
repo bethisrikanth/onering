@@ -2,23 +2,19 @@ describe 'NodeController', ->
 
   controller = scope = http = routeParams = data = null
 
-  # Initialize the controller and a mock scope
-  beforeEach inject ($controller) ->
-    scope = {}
+  beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    scope = $rootScope.$new();
     routeParams =
       id: '5'
     data = '7'
-    http = jasmine.createSpy('http').andReturn
-      success: (callback) -> callback(data)
-    controller = $controller 'NodeController',
+    http = _$httpBackend_
+    http.expectGET("/devices/#{routeParams.id}").respond(data);
+    controller = $controller NodeController,
       $scope: scope,
-      $http: http,
       $routeParams: routeParams
 
-  it 'should call the API /devices/#{scope.id}', ->
-    expect(http).toHaveBeenCalledWith
-      method: 'GET'
-      url: "/devices/#{scope.id}"
-
   it 'should attach the devices to the $scope', ->
+    http.flush()
     expect(scope.device).toEqual data
+
+

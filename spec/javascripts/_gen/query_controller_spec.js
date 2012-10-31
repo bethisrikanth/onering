@@ -3,8 +3,8 @@
   describe('QueryController', function() {
     var data, http, queryController, route, routeParams, scope;
     queryController = scope = http = route = routeParams = data = null;
-    beforeEach(inject(function($controller) {
-      scope = {};
+    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+      scope = $rootScope.$new();
       routeParams = {
         field: 'f',
         query: 'q'
@@ -17,25 +17,16 @@
         }
       };
       data = '123';
-      http = jasmine.createSpy('http').andReturn({
-        success: function(callback) {
-          return callback(data);
-        }
-      });
-      return queryController = $controller('QueryController', {
+      http = _$httpBackend_;
+      http.expectGET("/devices/find/" + routeParams.field + "/" + routeParams.query).respond(data);
+      return queryController = $controller(QueryController, {
         $scope: scope,
-        $http: http,
         $route: route,
         $routeParams: routeParams
       });
     }));
-    it('should call the API /devices/find/', function() {
-      return expect(http).toHaveBeenCalledWith({
-        method: 'GET',
-        url: "/devices/find/" + scope.field + "/" + scope.query
-      });
-    });
     return it('should attach the devices to the $scope', function() {
+      http.flush();
       return expect(scope.devices).toEqual(data);
     });
   });
