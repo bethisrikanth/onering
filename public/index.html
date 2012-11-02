@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html>
   <head>
     <title>Onering</title>
 
@@ -27,12 +27,14 @@
             <a class="dropdown-toggle"
              data-toggle="dropdown"
              href="#">
-              Sites
+              Datacenters
               <b class="caret"></b>
             </a>
 
             <ul class="dropdown-menu">
-              <li ng-repeat="site in sites"><a href="/#/inf/show/site/{{ site }}">{{ site | uppercase }}</a></li>
+              <li ng-repeat="site in sites | orderBy:'-count'">
+                <a href="#site/{{ site.id }}">{{ (site.id | uppercase) || '(empty)' }} <span class="badge">{{ site.count }}</span></a>
+              </li>
             </ul>
           </li>
         </ul>

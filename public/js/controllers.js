@@ -5,7 +5,7 @@ function DefaultController($scope){
 function NavigationController($scope, $http, $route, $routeParams, config){
   $http({
     method: 'GET',
-    url:    config.get('baseurl') + '/devices/list/site'
+    url:    config.get('baseurl') + '/devices/summary/by-site'
   }).success(function(data){
     $scope.sites = data;
   });
@@ -40,12 +40,21 @@ function DeviceSummaryController($scope, $http, $routeParams, config){
 
 function SiteController($scope, $http, $routeParams, config){
   $scope.site = $routeParams.site;
+  $scope.rollup = ['rack','model'];
+
+  $scope.compact = function(i){
+    return (i && i['id']);
+  };
+
+  $scope.empty = function(i){
+    return (i && i['id']);
+  };
 
   $http({
     method: 'GET',
-    url:    config.get('baseurl') + '/devices/find/site/' + $scope.site
+    url:    config.get('baseurl') + '/devices/summary/by-site/where/site/' + $scope.site + '/?rollup=' + $scope.rollup.join(',')
   }).success(function(data){
-    $scope.devices = data;
+    $scope.summary = data[0];
   });
 }
 
@@ -55,7 +64,7 @@ function RackController($scope, $http, $routeParams, config){
 
   $http({
     method: 'GET',
-    url:    config.get('baseurl') + '/devices/find/site/' + $scope.site+'/model/' + $scope.rack
+    url:    config.get('baseurl') + '/devices/find/site/' + $scope.site+'/rack/' + $scope.rack
   }).success(function(data){
     $scope.devices = data;
   });

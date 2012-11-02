@@ -88,6 +88,42 @@ html, body {
 }
 
 
+
+
+header .nav .dropdown-menu li a span{
+  float: right;
+  padding: 0 6px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  line-height: 16px;
+  color: #888;
+  font-weight: normal;
+  background-color: rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  margin-top: 2px;
+  text-shadow: none;
+}
+
+header .nav .dropdown-menu li a:hover span{
+  color: white;
+}
+
+
+.site .rack{
+  min-height: 250px;
+}
+
+.site .rack .nav li{
+  font-size: 12px;
+}
+
+.site .rack .nav li .badge{
+  float: right;
+}
+
 .node header h1{
   font-size: 26px;
   margin-right: 0.5em;

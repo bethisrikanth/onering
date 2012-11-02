@@ -13,7 +13,7 @@
           type="pie"
           width="64"
           height="64"
-          rows="[disk.used, disk.available]"
+          rows="[disk.percent_used, (100-disk.percent_used)]"
           columns="['Used', 'Free']"
           legend-position="none"
           label-style="none"

@@ -44,16 +44,16 @@ module App
         return 404 if not device
 
         if not params[:splat].empty?
-          up = device.user_properties
+          prop = device.properties
           pairs = params[:splat].first.split('/')
 
         # set each property
           pairs.evens.zip(pairs.odds).each do |pair|
-            up[pair.first] = pair.last
+            prop[pair.first] = pair.last
           end
 
         # set and save
-          device.user_properties = up
+          device.properties = prop
           device.safe_save
         end
 
@@ -112,8 +112,14 @@ module App
       }.each do |r|
         get r do
           q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
-          Device.sort("properties.#{params[:field]}".to_sym.asc)
-          Device.collection.distinct("properties.#{params[:field]}", q).compact.to_json
+          field = case params[:field]
+          when 'id' then '_' + params[:field]
+          when /name|tags/ then params[:field]
+          else "properties.#{params[:field]}"
+          end
+
+          Device.sort(field.to_sym.asc)
+          Device.collection.distinct(field, q).compact.to_json
         end
       end
 
@@ -121,11 +127,11 @@ module App
     # /devices/summary
       %w{
         /summary/by-:field/?
-        /summary/by-:field/*/?
+        /summary/by-:field/where/*/?
       }.each do |r|
         get r do
-          fields = params[:splat].first || ''
-          rv = Device.summarize("properties.#{params[:field]}", fields.split('/'))
+          q = urlquerypath_to_mongoquery(params[:splat].first)
+          rv = Device.summarize(params[:field], (params[:rollup].split(/,/).reverse rescue []), q)
           rv.to_json
         end
       end

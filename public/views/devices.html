@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
     <div class="span12">
-      <h1>Devices by {{ field }}<span ng-show="query"> in {{ query }}</span></h1>
+      <h1>Devices by {{ field }}<span ng-show="query"> in {{ query }}</span><span ng-show="devices"> ({{ devices.length }} results)</span></h1>
 
       <table class="table">
         <thead>
@@ -19,8 +19,17 @@
             <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
             <td>{{ device.name }}</td>
             <td>{{ device.properties.ip }}</td>
-            <td>{{ device.properties.site }}</td>
-            <td><a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">{{ device.properties.serial }}</a></td>
+            <td>
+              <span>{{ device.properties.site | uppercase }}</span>
+              <span ng-show="device.properties.rack"> - R{{ device.properties.rack | uppercase }}</span>
+              <span ng-show="device.properties.unit">/ U{{ device.properties.unit }}<span ng-show="device.properties.slot"> /</span></span>
+              <span ng-show="device.properties.slot">S{{ device.properties.slot }}</span>
+            </td>
+            <td>
+              <a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">
+                {{ device.properties.serial }}
+              </a>
+            </td>
           </tr>
         </tbody>
       </table>

@@ -169,7 +169,7 @@ app.factory('config', function(){
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
     when('/inf', {
-      templateUrl: 'views/inf-overview.html',
+      templateUrl: 'views/sites.html',
       controller:  DeviceSummaryController
     }).
     when('/inf/summary/:field', {
@@ -206,5 +206,5 @@ app.config(['$routeProvider', function($routeProvider) {
 // manual bootstrap, when google api is loaded
 google.load('visualization', '1.0', {'packages':['corechart']});
 google.setOnLoadCallback(function() {
-  angular.bootstrap(document.body, ['app']);
+  angular.bootstrap(document, ['app']);
 });

@@ -4,21 +4,25 @@
       <th>Model</th>
       <td>{{ device.properties.make }} {{ device.properties.model }}</td>
     </tr>
+    <tr ng-show="device.properties.serial">
+      <th>Service Tag</th>
+      <td>{{ device.properties.serial }} [<a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">Support</a>]</td>
+    </tr>
     <tr>
       <th>Datacenter</th>
       <td>{{ device.properties.site | uppercase }}</td>
     </tr>
     <tr>
-      <th>Rack / U</th>
-      <td>{{ device.properties.rack | uppercase }}<span ng-show="device.properties.unit">, U{{ device.properties.unit }}</span></td>
+      <th>Location</th>
+      <td>
+        <span ng-show="device.properties.rack">Rack {{ device.properties.rack | uppercase }}</span>
+        <span ng-show="device.properties.unit">/ U{{ device.properties.unit }}<span ng-show="device.properties.slot"> /</span></span>
+        <span ng-show="device.properties.slot">Slot {{ device.properties.slot }}</span>
+      </td>
     </tr>
-    <tr>
+    <tr ng-show="device.properties.chassis_label">
       <th>Chassis</th>
-      <td><a ng-show="device.parent" href="#/node/{{ device.parent.id }}">{{ device.properties.parent.name }} ({{ device.properties.parent.id }})</a></td>
-    </tr>
-    <tr ng-show="device.properties.slot">
-      <th>Slot</th>
-      <td>{{ device.properties.slot }}</td>
+      <td>{{ device.properties.chassis_label }}</td>
     </tr>
   </tbody>
 </table>
