@@ -2,9 +2,11 @@ describe 'QueryController', ->
 
   queryController = scope = http = route = routeParams = data = null
 
-  # Initialize the controller and a mock scope
-  beforeEach inject ($controller) ->
-    scope = {}
+  beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    config =
+      get: (attr) ->
+        {baseurl: ''}[attr]
+    scope = $rootScope.$new()
     routeParams =
       field: 'f'
       query: 'q'
@@ -13,18 +15,14 @@ describe 'QueryController', ->
         $route:
           params: {}
     data = '123'
-    http = jasmine.createSpy('http').andReturn
-      success: (callback) -> callback(data)
-    queryController = $controller 'QueryController',
+    http = _$httpBackend_
+    http.expectGET("/devices/find/#{routeParams.field}/#{routeParams.query}").respond(data);
+    queryController = $controller QueryController,
       $scope: scope,
-      $http: http,
       $route: route,
       $routeParams: routeParams
-
-  it 'should call the API /devices/find/', ->
-    expect(http).toHaveBeenCalledWith
-      method: 'GET'
-      url: "/devices/find/#{scope.field}/#{scope.query}"
+      config: config
 
   it 'should attach the devices to the $scope', ->
+    http.flush()
     expect(scope.devices).toEqual data

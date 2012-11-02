@@ -2,24 +2,22 @@ describe 'RackController', ->
 
   controller = scope = http = routeParams = data = null
 
-  # Initialize the controller and a mock scope
-  beforeEach inject ($controller) ->
-    scope = {}
+  beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
+    config =
+      get: (attr) ->
+        {baseurl: ''}[attr]
+    scope = $rootScope.$new()
     routeParams =
       site: 's'
       rack: 'r'
     data = '123'
-    http = jasmine.createSpy('http').andReturn
-      success: (callback) -> callback(data)
-    controller = $controller 'RackController',
+    http = _$httpBackend_
+    http.expectGET("/devices/find/site/#{routeParams.site}/model/#{routeParams.rack}").respond(data);
+    controller = $controller RackController,
       $scope: scope,
-      $http: http,
       $routeParams: routeParams
-
-  it 'should call the API /devices/find/site/#{$scope.site}/model/#{$scope.rack}', ->
-    expect(http).toHaveBeenCalledWith
-      method: 'GET'
-      url: "/devices/find/site/#{scope.site}/model/#{scope.rack}"
+      config: config
 
   it 'should attach the devices to the $scope', ->
+    http.flush()
     expect(scope.devices).toEqual data

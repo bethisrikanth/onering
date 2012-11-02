@@ -12,7 +12,7 @@ app.directive('chart', function() {
     link: function(scope, elm, attr) {
       var chart = new google.visualization.PieChart(elm[0]);
       var columns = scope.$eval(attr.columns);
-      
+
       scope.$watch(attr.rows, function(rows) {
         scope.$eval(rows);
         var dataMaster = new google.visualization.DataTable();
@@ -51,7 +51,7 @@ app.directive('chart', function() {
           dataMaster.addRow([columns[i], rows[i]]);
         }
 
-        
+
 
         //console.log(options)
         chart.draw(dataMaster, options);
@@ -203,8 +203,14 @@ app.config(['$routeProvider', function($routeProvider) {
 }]);
 
 
-// manual bootstrap, when google api is loaded
-google.load('visualization', '1.0', {'packages':['corechart']});
-google.setOnLoadCallback(function() {
-  angular.bootstrap(document, ['app']);
-});
+try {
+  // manual bootstrap, when google api is loaded
+  google.load('visualization', '1.0', {'packages':['corechart']});
+  google.setOnLoadCallback(function() {
+    angular.bootstrap(document.body, ['app']);
+  });
+} catch(e) {
+  if (console && console.log) {
+    console.log("Unable to load google: " + e);
+  }
+}
