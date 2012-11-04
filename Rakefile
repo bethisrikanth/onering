@@ -16,3 +16,9 @@ task :test do
     raise "#{cmd} failed!" unless $?.exitstatus == 0
   end
 end
+
+namespace :db do
+  desc "Seeds the db with test/mock data"
+  task :seed do
+  end
+end
