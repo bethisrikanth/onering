@@ -16,9 +16,9 @@
       routeParams = {
         site: 's'
       };
-      data = '123';
+      data = ['123'];
       http = _$httpBackend_;
-      http.expectGET("/devices/find/site/" + routeParams.site).respond(data);
+      http.expectGET("/devices/summary/by-site/rack/model/?where=site/" + routeParams.site).respond(data);
       return controller = $controller(SiteController, {
         $scope: scope,
         $routeParams: routeParams,
@@ -27,7 +27,7 @@
     }));
     return it('should attach the devices to the $scope', function() {
       http.flush();
-      return expect(scope.devices).toEqual(data);
+      return expect(scope.summary).toEqual(data[0]);
     });
   });
 
