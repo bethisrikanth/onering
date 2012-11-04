@@ -169,7 +169,7 @@ app.factory('config', function(){
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
     when('/inf', {
-      templateUrl: 'views/inf-overview.html',
+      templateUrl: 'views/sites.html',
       controller:  DeviceSummaryController
     }).
     when('/inf/summary/:field', {

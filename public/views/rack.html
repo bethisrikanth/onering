@@ -1,19 +1,26 @@
-<div class="container">
-  <div class="row">
-    <div class="span3 rack front">
-      <i ng-repeat="device in devices" class="h{{ device.properties.height }}">
-        <label>{{ device.properties.model }}</label>
-        <span>
-          <b ng-repeat="node in device.children" class="{{ node.status }}">&#x2022;</b>
-        </span>
-        <u>{{ device.properties.unit }}</u>
-      </i>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h3>{{ site | uppercase }}: Rack {{ rack }}</h3>
     </div>
   </div>
 
-  <div class="span7 deviceInfo">
-    <div class="container-fluid">
-      INFO
+  <div class="row-fluid">
+    <div class="span3">
+      <table class="table table-condensed">
+        <tbody>
+          <tr ng-repeat="device in devices" rowspan="{{ device.properties.height || '1' }}">
+            <td>{{ device.id }}</td>
+            <td>{{ device.count }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="span7">
+      <div class="container">
+        INFO
+      </div>
     </div>
   </div>
 </div>

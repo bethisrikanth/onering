@@ -1,0 +1,18 @@
+<div class="container">
+  <div class="row card" ng-repeat="rollup in summary | orderBy:'-id'">
+    <div class="span3">
+      <h3><a href="/#/site/{{ rollup.id }}">{{ (rollup.id | uppercase) || '(empty)' }}</a></h3>
+    </div>
+    <div class="span9">
+      <div class="emblem emblem-medium emblem-online">{{ rollup.count }}</div>
+
+      <div class="emblem emblem-medium emblem-fault">{{ rollup.count }}</div>
+
+      <div class="emblem emblem-medium emblem-maintenance">{{ rollup.count }}</div>
+
+      <div class="emblem emblem-medium emblem-unallocated">{{ rollup.count }}</div>
+
+      <div class="emblem emblem-medium emblem-unknown">{{ rollup.count }}</div>
+    </div>
+  </div>
+</div>

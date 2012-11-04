@@ -14,23 +14,19 @@ module App
         pairs.each do |p|
           rv['$and'] = [] if not rv['$and']
 
-          criterion = {'$or' => []}
-
           # autodetect type for p[1] := v
           v = p[1]
           v = get_rx_from_urlquery(v) if regex and v.is_a?(String)
 
         # list of places to search for a given value
           case p[0]
+          when /id/
+            rv['$and'] << {'_'+p[0] => (v || {'$exists' => true})}
           when /name|tags/
-            criterion['$or'] << {p[0] => (v || {'$exists' => true})}
+            rv['$and'] << {p[0] => (v || {'$exists' => true})}
           else
-            criterion['$or'] << {"properties.#{p[0]}" => (v || {'$exists' => true})}
-            criterion['$or'] << {"user_properties.#{p[0]}" => (v || {'$exists' => true})}
+            rv['$and'] << {"properties.#{p[0]}" => (v || {'$exists' => true})}
           end
-
-        # append this criterion to the correct boolean set (AND, OR)
-          rv['$and'] << criterion
         end
 
         return rv
