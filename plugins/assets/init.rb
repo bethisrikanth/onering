@@ -127,11 +127,11 @@ module App
     # /devices/summary
       %w{
         /summary/by-:field/?
-        /summary/by-:field/where/*/?
+        /summary/by-:field/*/?
       }.each do |r|
         get r do
-          q = urlquerypath_to_mongoquery(params[:splat].first)
-          rv = Device.summarize(params[:field], (params[:rollup].split(/,/).reverse rescue []), q)
+          q = urlquerypath_to_mongoquery(params[:where])
+          rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
           rv.to_json
         end
       end

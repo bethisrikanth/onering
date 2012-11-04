@@ -36,7 +36,7 @@ function DeviceSummaryController($scope, $http, $routeParams, config){
 
 function SiteController($scope, $http, $routeParams, config){
   $scope.site = $routeParams.site;
-  $scope.rollup = ['rack','model'];
+  $scope.drilldown = ['rack','model'];
 
   $scope.compact = function(i){
     return (i && i['id']);
@@ -46,7 +46,7 @@ function SiteController($scope, $http, $routeParams, config){
     return (i && i['id']);
   };
 
-  $http.get(config.get('baseurl') + '/devices/summary/by-site/where/site/' + $scope.site + '/?rollup=' + $scope.rollup.join(',')
+  $http.get(config.get('baseurl') + '/devices/summary/by-site/' + $scope.drilldown.join('/') + '/?where=site/' + $scope.site
   ).success(function(data){
     $scope.summary = data[0];
   });
@@ -56,7 +56,7 @@ function RackController($scope, $http, $routeParams, config){
   $scope.site = $routeParams.site;
   $scope.rack = $routeParams.rack;
 
-  $http.get(config.get('baseurl') + '/devices/find/site/' + $scope.site+'/rack/' + $scope.rack
+  $http.get(config.get('baseurl') + '/devices/summary/by-unit/fqdn/?where=site/' + $scope.site + '/rack/' + $scope.rack
   ).success(function(data){
     $scope.devices = data;
   });
