@@ -25,6 +25,17 @@ describe "App::Model"  do
         @m.to_json.should == {"id" => @m.id, "x" => 7}.to_json
       end
     end
+    describe "from_h" do
+      before :each do
+        @m = TestModel.new
+      end
+      it "should merge cleanly with empty hash {}" do
+        @m.from_h({}).to_h.should == {"id" => @m.id}
+      end
+      it "should merge new properties onto the object" do
+        @m.from_h({:x => 5}).to_h.should == {"id" => @m.id, "x" => 5}
+      end
+    end
   end
 end
 
