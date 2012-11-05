@@ -47,6 +47,25 @@ describe "App::Model"  do
         @m.from_json('{"x": 5}').to_h.should == {"id" => @m.id, "x" => 5}
       end
     end
+    # TODO
+    # describe "- (diff)" do
+    #   it "diff should be empty when diffing with self" do
+    #     m = TestModel.new
+    #     m.-(m).should == {}
+    #   end
+    # end
+  end
+  describe "Base" do
+    # TODO
+    # describe "find_or_create" do
+    #   it "should create a new object(s) when the object doesn't exist" do
+    #     m = TestModel.find_or_create(['111111', '222222'])
+    #     m.length.should == 2
+    #     m.each do |m|
+    #       m.delete
+    #     end
+    #   end
+    # end
   end
 end
 
