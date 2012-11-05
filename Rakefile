@@ -18,7 +18,17 @@ task :test do
 end
 
 namespace :db do
+  load "irb.ru"
+  require "db/seed"
+
   desc "Seeds the db with test/mock data"
   task :seed do
+    puts "Seeding database..."
+    App::Database::Seed.seed
+  end
+  task :clean do
+    puts "Cleaning DB..."
+    App::Database::Seed.clean
+    puts "done"
   end
 end
