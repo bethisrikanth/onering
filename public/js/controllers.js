@@ -2,24 +2,16 @@ function DefaultController($scope){
 
 }
 
-function NavigationController($scope, $http, $route, $routeParams, config){
-  $http({
-    method: 'GET',
-    url:    config.get('baseurl') + '/devices/summary/by-site'
-  }).success(function(data){
-    $scope.sites = data;
-  });
+function NavigationController($scope, $http, $route, $routeParams, config, DeviceSummary){
+  $scope.sites = DeviceSummary.query({field: 'site'});
 }
 
-function QueryController($scope, $http, $route, $routeParams, config){
+function QueryController($scope, $http, $route, $routeParams, config, Device) {
   $scope.field = $routeParams.field;
   $scope.query = $routeParams.query || '';
-  $scope.params = $route.current.$route.params;
+  // $scope.params = $route.current.$route.params;
 
-  $http.get(config.get('baseurl') + '/devices/find/' + $scope.field + '/' + $scope.query
-  ).success(function(data){
-    $scope.devices = data;
-  });
+  $scope.devices = Device.find({field: $scope.field, query: $scope.query});
 }
 
 function DeviceSummaryController($scope, $http, $routeParams, config, DeviceSummary){
