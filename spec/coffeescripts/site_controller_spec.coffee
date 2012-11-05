@@ -1,5 +1,7 @@
 describe 'SiteController', ->
 
+  beforeEach module 'app'
+
   controller = scope = http = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->

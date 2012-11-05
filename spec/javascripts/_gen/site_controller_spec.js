@@ -2,6 +2,7 @@
 
   describe('SiteController', function() {
     var controller, data, http, routeParams, scope;
+    beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       var config;
