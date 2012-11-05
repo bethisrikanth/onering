@@ -15,7 +15,9 @@ src_files:
   - public/js/vendor/modernizr-2.6.1.min.js
   - public/js/vendor/bootstrap.js
   - public/js/vendor/angular.js
+  - public/js/vendor/angular-resource.min.js
   - public/js/main.js
+  - public/js/services.js
   - public/js/controllers.js
 
 # stylesheets

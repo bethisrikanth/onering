@@ -2,6 +2,7 @@
 
   describe('NodeController', function() {
     var controller, data, http, routeParams, scope;
+    beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       var config;
@@ -16,7 +17,7 @@
       routeParams = {
         id: '5'
       };
-      data = '7';
+      data = '{"id":"5","properties":{"site":"chidc1"}}';
       http = _$httpBackend_;
       http.expectGET("/devices/" + routeParams.id).respond(data);
       return controller = $controller(NodeController, {
@@ -27,7 +28,7 @@
     }));
     return it('should attach the devices to the $scope', function() {
       http.flush();
-      return expect(scope.device).toEqual(data);
+      return expect(JSON.stringify(scope.device)).toEqual(data);
     });
   });
 

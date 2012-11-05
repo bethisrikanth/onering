@@ -4,7 +4,7 @@ String.prototype.toTitleCase = function(){
   });
 };
 
-var app = angular.module('app', ['filters']);
+var app = angular.module('app', ['filters', 'oneringServices']);
 
 app.directive('chart', function() {
   return {

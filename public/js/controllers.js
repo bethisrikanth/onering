@@ -62,11 +62,6 @@ function RackController($scope, $http, $routeParams, config){
   });
 }
 
-function NodeController($scope, $http, $routeParams, config){
-  $scope.id = $routeParams.id;
-
-  $http.get(config.get('baseurl') + '/devices/' + $scope.id
-  ).success(function(data){
-    $scope.device = data;
-  });
+function NodeController($scope, $http, $routeParams, config, Device){
+  $scope.device = Device.get({id: $routeParams.id});
 }
