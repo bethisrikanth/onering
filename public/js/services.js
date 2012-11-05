@@ -20,7 +20,7 @@ app.factory('Device', function($resource) {
 });
 
 /*
-query: /devices/summary/by-field
+query: /devices/summary/by-:field
 */
 app.factory('DeviceSummary', function($resource) {
   return $resource('/devices/summary/by-:field', {field: 'site'});
