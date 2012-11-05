@@ -22,14 +22,8 @@ function QueryController($scope, $http, $route, $routeParams, config){
   });
 }
 
-function DeviceSummaryController($scope, $http, $routeParams, config){
-  $scope.field = $routeParams.field || 'site';
-
-  $http.get(config.get('baseurl') + '/devices/summary/by-' + $scope.field
-  ).success(function(data){
-    $scope.summary = data;
-  });
-
+function DeviceSummaryController($scope, $http, $routeParams, config, DeviceSummary){
+  $scope.summary = DeviceSummary.query({field: $routeParams.field || 'site'});
   $scope.orderProp = 'total';
 }
 

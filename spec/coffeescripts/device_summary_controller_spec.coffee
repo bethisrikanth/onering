@@ -1,5 +1,7 @@
 describe 'DeviceSummaryController', ->
 
+  beforeEach module 'app'
+
   controller = scope = http = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
@@ -9,7 +11,7 @@ describe 'DeviceSummaryController', ->
     scope = $rootScope.$new()
     routeParams =
       field: 'f'
-    data = '123'
+    data = '[{"id":"ladc1","count":3,"children":[{"id":null,"count":3,"children":[{"id":null,"count":3}]}]}]'
     http = _$httpBackend_
     http.expectGET("/devices/summary/by-#{routeParams.field}").respond(data);
     controller = $controller DeviceSummaryController,
@@ -19,7 +21,7 @@ describe 'DeviceSummaryController', ->
 
   it 'should attach the summary to the $scope', ->
     http.flush()
-    expect(scope.summary).toEqual data
+    expect(JSON.stringify(scope.summary)).toEqual data
 
   it 'should set $scope.orderProp to total', ->
     expect(scope.orderProp).toEqual 'total'
