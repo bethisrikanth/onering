@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'utils'
 require 'patches'
 require 'json'
@@ -16,6 +17,7 @@ module App
     
     configure do 
       set :root, ENV['PROJECT_ROOT']
+      set :environment, ENV['RACK_ENV']      
 
       enable  :logging
       #enable  :raise_errors

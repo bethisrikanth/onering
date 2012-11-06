@@ -1,10 +1,12 @@
+require 'rubygems'
+require 'json'
+
 ENV['PROJECT_ROOT'] = File.dirname(File.expand_path(__FILE__))
 
 $: << File.join(ENV['PROJECT_ROOT'], 'lib')
 $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 
-require 'rubygems'
 require 'mongo_patches'
 require 'config'
 require 'db'

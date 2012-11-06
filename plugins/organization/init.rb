@@ -3,8 +3,6 @@ require 'organization/models/contact'
 
 module App
   class Base < Controller
-    include Helpers
-
     namespace '/api/org' do
       namespace '/contacts' do
         get '/:id' do

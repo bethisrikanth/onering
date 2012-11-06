@@ -88,7 +88,7 @@ module App
         /find/*
       }.each do |r|
         get r do
-          q = ([*params[:splat]].empty? ? (params[:q] || {}) : params[:splat].first)
+          q = (!params[:splat] || params[:splat].empty? ? (params[:q] || {}) : params[:splat].first)
           Device.where(urlquerypath_to_mongoquery(q)).to_json
         end
       end

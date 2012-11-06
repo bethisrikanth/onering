@@ -12,7 +12,8 @@ gem "racksh"
 gem "haml"
 gem "oats"
 gem "thin"
-gem 'rake'
+gem "rake"
+gem "json"
 
 group :test, :development do
   gem 'rspec'
