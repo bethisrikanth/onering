@@ -2,6 +2,7 @@
 
   describe('DeviceSummaryController', function() {
     var controller, data, http, routeParams, scope;
+    beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       var config;
@@ -16,7 +17,7 @@
       routeParams = {
         field: 'f'
       };
-      data = '123';
+      data = '[{"id":"ladc1","count":3,"children":[{"id":null,"count":3,"children":[{"id":null,"count":3}]}]}]';
       http = _$httpBackend_;
       http.expectGET("/devices/summary/by-" + routeParams.field).respond(data);
       return controller = $controller(DeviceSummaryController, {
@@ -27,7 +28,7 @@
     }));
     it('should attach the summary to the $scope', function() {
       http.flush();
-      return expect(scope.summary).toEqual(data);
+      return expect(JSON.stringify(scope.summary)).toEqual(data);
     });
     return it('should set $scope.orderProp to total', function() {
       return expect(scope.orderProp).toEqual('total');

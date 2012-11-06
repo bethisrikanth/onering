@@ -2,6 +2,7 @@
 
   describe('QueryController', function() {
     var data, http, queryController, route, routeParams, scope;
+    beforeEach(module('app'));
     queryController = scope = http = route = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       var config;
@@ -24,7 +25,7 @@
           }
         }
       };
-      data = '123';
+      data = '[{"id":"chidc1","count":2},{"id":"ladc1","count":3},{"id":"nydc1","count":1}]';
       http = _$httpBackend_;
       http.expectGET("/devices/find/" + routeParams.field + "/" + routeParams.query).respond(data);
       return queryController = $controller(QueryController, {
@@ -36,7 +37,7 @@
     }));
     return it('should attach the devices to the $scope', function() {
       http.flush();
-      return expect(scope.devices).toEqual(data);
+      return expect(JSON.stringify(scope.devices)).toEqual(data);
     });
   });
 

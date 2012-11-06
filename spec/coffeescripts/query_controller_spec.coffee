@@ -1,5 +1,7 @@
 describe 'QueryController', ->
 
+  beforeEach module 'app'
+
   queryController = scope = http = route = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
@@ -14,7 +16,7 @@ describe 'QueryController', ->
       current:
         $route:
           params: {}
-    data = '123'
+    data = '[{"id":"chidc1","count":2},{"id":"ladc1","count":3},{"id":"nydc1","count":1}]'
     http = _$httpBackend_
     http.expectGET("/devices/find/#{routeParams.field}/#{routeParams.query}").respond(data);
     queryController = $controller QueryController,
@@ -25,4 +27,4 @@ describe 'QueryController', ->
 
   it 'should attach the devices to the $scope', ->
     http.flush()
-    expect(scope.devices).toEqual data
+    expect(JSON.stringify(scope.devices)).toEqual data
