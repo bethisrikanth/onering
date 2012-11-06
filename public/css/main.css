@@ -111,6 +111,19 @@ header .nav .dropdown-menu li a:hover span{
   color: white;
 }
 
+.logo{
+  padding: 0px !important;
+  text-align: center;
+}
+
+.logo i{
+  background: transparent center center no-repeat url('/img/logo.png');
+  display: inline-block;
+  height: 32px;
+  width: 32px;
+  margin: 4px;
+  margin-left: 12px;
+}
 
 .site .rack{
   min-height: 250px;
@@ -152,4 +165,4 @@ header .nav .dropdown-menu li a:hover span{
 
 .stat h6{
   margin-top: 4px;
-}
+} 
