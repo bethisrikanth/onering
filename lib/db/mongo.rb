@@ -7,7 +7,7 @@ module App
 
       class<<self
         def load(name, config)
-          logger = Logger.new(File.join(App::Base::PROJECT_ROOT, "mongo-#{name}.log"))
+          logger = Logger.new(File.join(ENV['PROJECT_ROOT'], "mongo-#{name}.log"))
           @database = name
           @connection = ::Mongo::Connection.new(
             (config['host'] || 'localhost'), 

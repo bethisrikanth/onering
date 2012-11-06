@@ -2,66 +2,82 @@ function DefaultController($scope){
 
 }
 
-function NavigationController($scope, $http, $route, $routeParams, config){
-  $http({
-    method: 'GET',
-    url:    config.get('baseurl') + '/devices/summary/by-site'
-  }).success(function(data){
+function NavigationController($scope, $http, $route, $routeParams, Summary){
+//get site summary
+  Summary.query({
+    field: 'site'
+  }, function(data){
     $scope.sites = data;
   });
 }
 
-function QueryController($scope, $http, $route, $routeParams, config){
-  $scope.field = $routeParams.field;
-  $scope.query = $routeParams.query || '';
+function QueryController($scope, $http, $route, $routeParams, Query){
+  $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
-  $http.get(config.get('baseurl') + '/devices/find/' + $scope.field + '/' + $scope.query
-  ).success(function(data){
-    $scope.devices = data;
-  });
+//run arbitrary query
+  if($scope.query){
+    Query.query({
+      query: $scope.query
+    }, function(data){
+      $scope.devices = data;
+    });
+  }
 }
 
-function DeviceSummaryController($scope, $http, $routeParams, config){
-  $scope.field = $routeParams.field || 'site';
+function SummaryController($scope, $http, $routeParams, $route, Summary){
+  $scope.params = ($route.current.$route.params || {});
+  $scope.field = $routeParams.field || $scope.params.field;
+  $scope.orderProp = 'total';
 
-  $http.get(config.get('baseurl') + '/devices/summary/by-' + $scope.field
-  ).success(function(data){
+  Summary.query({
+    field: $scope.field
+  }, function(data){
     $scope.summary = data;
   });
-
-  $scope.orderProp = 'total';
 }
 
 
-function SiteController($scope, $http, $routeParams, config){
+function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
-  $scope.drilldown = ['rack','model'];
 
-  $scope.compact = function(i){
-    return (i && i['id']);
-  };
-
-  $scope.empty = function(i){
-    return (i && i['id']);
-  };
-
-  $http.get(config.get('baseurl') + '/devices/summary/by-site/' + $scope.drilldown.join('/') + '/?where=site/' + $scope.site
-  ).success(function(data){
+  Site.query({
+    site: $scope.site
+  }, function(data){
     $scope.summary = data[0];
+  });
+
+  SiteContact.query({
+    site: $scope.site
+  }, function(data){
+    $scope.contact = data[0];
+  });
+
+  Query.query({
+    query: 'site/'+$scope.site+'/^rack',
+  }, function(data){
+    $scope.unracked = data;
   });
 }
 
-function RackController($scope, $http, $routeParams, config){
+function RackController($scope, $http, $routeParams, Rack){
   $scope.site = $routeParams.site;
   $scope.rack = $routeParams.rack;
 
-  $http.get(config.get('baseurl') + '/devices/summary/by-unit/fqdn/?where=site/' + $scope.site + '/rack/' + $scope.rack
-  ).success(function(data){
+  Rack.query({
+    site: $scope.site,
+    rack: $scope.rack
+  }, function(data){
     $scope.devices = data;
   });
 }
 
-function NodeController($scope, $http, $routeParams, config, Device){
-  $scope.device = Device.get({id: $routeParams.id});
+function NodeController($scope, $http, $routeParams, Device){
+  $scope.id = $routeParams.id;
+
+  Device.get({
+    id: $scope.id
+  }, function(data){
+    $scope.device = data;
+  });
 }

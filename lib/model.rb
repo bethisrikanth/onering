@@ -7,17 +7,20 @@ module App
     end
 
     module Utils
+    # serialize to a Hash
       def to_h
         serializable_hash.reject{|k,v|
           ['_type'].include?(k)
         }
       end
 
+    # serialize to json
       def to_json
         to_h.to_json
       end
 
 
+    # populate the document from a Hash
       def from_h(hash, merge=true)
         current = to_h
         current.deeper_merge!(hash, {:merge_hash_arrays => true})
@@ -29,6 +32,7 @@ module App
         self
       end
 
+    # populate the document from a JSON string
       def from_json(json, merge=true)
         json = JSON.parse(json) if json.is_a?(String)
         json = [json] if json.is_a?(Hash)
@@ -39,10 +43,12 @@ module App
         self
       end
 
+    # save, but throw an error if not valid
       def safe_save
         save or raise Errors::ValidationError, errors.collect{|k,v| v }.join("; ")
       end
 
+    # provide a difference between two documents (useful for audit history)
       def -(other)
         diff = (serializable_hash - other.serializable_hash)
       end
@@ -69,6 +75,15 @@ module App
           rv
         end
 
+      # summarize
+      #   this method provides arbitrary-depth aggregate rollups of a MongoDB
+      #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)
+      #
+      #   group_by:   the top-level field to group by
+      #   properties: additional fields to drill down into
+      #   query:      a query Hash to filter the collection by
+      #               (defaults to a summary of the whole collection)
+      #
         def summarize(group_by, properties=[], query=nil, options={})
           group_by = "properties.#{group_by}"
           group_root = group_by.split('.').last.to_sym
@@ -103,8 +118,6 @@ module App
               :count => i['count'].to_i
             }
           }
-
-          puts "FIELD #{properties.to_json}"
 
         # ------------------------------------------
         # run subqueries for providing field rollups
@@ -184,6 +197,16 @@ module App
     class Embedded
       include MongoMapper::EmbeddedDocument
       include Utils
+    end
+
+    module Taggable      
+      def tag(value)
+        [*value].each do |v|
+          add_to_set({:tags => v})
+        end
+        safe_save
+        self
+      end
     end
   end
 end

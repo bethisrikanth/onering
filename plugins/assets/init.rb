@@ -7,7 +7,7 @@ module App
   class Base < Controller
     include Helpers
 
-    namespace '/devices' do
+    namespace '/api/devices' do
     # device by id
       get '/:id' do
         device = Device.find(params[:id])
@@ -81,11 +81,16 @@ module App
       end
 
 
-    # /devices/find
-    # search for devices by fields
-      get '/find/*' do
-        q = (params[:splat].empty? ? {} : params[:splat].first)
-        Device.where(urlquerypath_to_mongoquery(q)).to_json
+      # /devices/find
+      # search for devices by fields
+      %w{
+        /find/?
+        /find/*
+      }.each do |r|
+        get r do
+          q = ([*params[:splat]].empty? ? (params[:q] || {}) : params[:splat].first)
+          Device.where(urlquerypath_to_mongoquery(q)).to_json
+        end
       end
 
 

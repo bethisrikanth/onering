@@ -13,6 +13,7 @@ module App
 
         pairs.each do |p|
           rv['$and'] = [] if not rv['$and']
+          fieldExists = (p[0].gsub!(/^\^/,'') == nil)
 
           # autodetect type for p[1] := v
           v = p[1]
@@ -21,11 +22,11 @@ module App
         # list of places to search for a given value
           case p[0]
           when /id/
-            rv['$and'] << {'_'+p[0] => (v || {'$exists' => true})}
+            rv['$and'] << {'_'+p[0] => (v || {'$exists' => fieldExists})}
           when /name|tags/
-            rv['$and'] << {p[0] => (v || {'$exists' => true})}
+            rv['$and'] << {p[0] => (v || {'$exists' => fieldExists})}
           else
-            rv['$and'] << {"properties.#{p[0]}" => (v || {'$exists' => true})}
+            rv['$and'] << {"properties.#{p[0]}" => (v || {'$exists' => fieldExists})}
           end
         end
 

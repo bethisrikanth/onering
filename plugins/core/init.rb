@@ -3,14 +3,24 @@ require 'controller'
 module App
   class Base < Controller
     get '/' do
-      {
-        :status => 'ok',
-        :local_root => PROJECT_ROOT,
-        :environment => settings.environment
-      }.to_json
+      index = File.join(settings.public_folder, 'index.html')
+      File.read(index) if File.exists?(index)
     end
-    get '/config/web.json' do
-      {}.to_json # TODO: Added this just so the html won't error. Garry, what did you mean by that $.getJSON('/config/web.json' ?
+
+  # anything in the /api namespace will be JSON (for now, other types pending)
+    namespace '/api' do
+      before do
+        content_type 'application/json'
+      end
+
+      get '/' do
+        {
+          :status => 'ok',
+          :local_root => ENV['PROJECT_ROOT'],
+          :environment => settings.environment
+        }.to_json
+      end
     end
+
   end
 end

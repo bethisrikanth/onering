@@ -1,15 +1,31 @@
 <div ng-show="summary" class="site">
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12">
-        <h3>Site {{ site | uppercase }} &mdash; {{ summary.count }} nodes [<a href="#/inf/show/site/{{ site }}">Show All</a>]</h3>
+  <div class="container">
+    <div class="row">
+      <div class="span5">
+        <h3>Site {{ site | uppercase }} &mdash; {{ summary.count }} nodes [<a href="#/inf/show/site/{{ site }}">List All</a>]</h3>
+      </div>
+      <address ng-show="contact" class="span4">
+        <br>
+        <strong>{{ contact.name }}<span ng-show="contact.vendor_site"> &ndash; {{ contact.vendor_site }}</span></strong><br>
+        {{ contact.address | join:', ' }}
+        (<a href="https://maps.google.com/?q={{ contact.address | join:',' }},{{ contact.city }},{{ contact.state }}" target="_blank">map</a>)<br>
+        {{ contact.city }}, {{ contact.state }}&nbsp;&nbsp;{{ contact.postal }}<br>
+        <br>
+      </address>
+      <div ng-show="contact" class="span3">
+        <br>
+        <div ng-show="contact.mail">
+          <div ng-repeat="(type, value) in contact.mail"><i class="icon-envelope"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+          <div ng-repeat="(type, value) in contact.phones"><i class="icon-user"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+        </div>
+
       </div>
     </div>  
   </div>
 
   <div class="container">
     <div class="row">
-      <div class="span2 well rack" ng-repeat="rack in summary.children | filter:compact | orderBy:'id'">
+      <div class="span2 well rack" ng-repeat="rack in summary.children | compact:'id' | orderBy:'id'">
         <ul class="nav nav-list">
           <li class="nav-header"><a href="#/site/{{ site }}/{{ rack.id }}">Rack {{ rack.id }}</a> ({{ rack.count }} devices)</li>
           <li ng-repeat="model in rack.children | orderBy:'-count'">{{ model.id }} <span class="badge">{{ model.count }}</span></li>
@@ -17,13 +33,24 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="row" ng-show="unracked">
       <div class="span12">
-        <h4>Dislocated Devices</h4>
+        <h4>Unracked Devices ({{ unracked.length }})</h4>
         <table class="table table-condensed">
-          <tbody>
+          <thead>
             <tr>
-
+              <th>ID</th>
+              <th>Name</th>
+              <th>Primary IP</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="device in unracked">
+              <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+              <td>{{ device.name }}</td>
+              <td>{{ device.properties.ip }}</td>
+              <td>{{ device.updated_at | timeAgo }}</td>
             </tr>
           </tbody>
         </table>

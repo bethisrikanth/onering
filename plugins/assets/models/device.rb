@@ -1,6 +1,8 @@
 require 'model'
 
 class Device < App::Model::Base
+  include App::Model::Taggable
+
   set_collection_name "devices"
 
   before_validation :_mangle_id
@@ -10,17 +12,9 @@ class Device < App::Model::Base
   timestamps!
   
   key :name,            String
-  key :tags,            Array
   key :properties,      Hash
   key :user_properties, Hash
-
-  def tag(value)
-    [*value].each do |v|
-      add_to_set({:tags => v})
-    end
-    safe_save
-    self
-  end
+  key :tags,            Array
 
   private
     def _mangle_id
