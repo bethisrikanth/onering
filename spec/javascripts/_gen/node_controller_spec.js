@@ -19,7 +19,7 @@
       };
       data = '{"id":"5","properties":{"site":"chidc1"}}';
       http = _$httpBackend_;
-      http.expectGET("/devices/" + routeParams.id).respond(data);
+      http.expectGET("/api/devices/" + routeParams.id).respond(data);
       return controller = $controller(NodeController, {
         $scope: scope,
         $routeParams: routeParams,

@@ -13,7 +13,7 @@ describe 'NodeController', ->
       id: '5'
     data = '{"id":"5","properties":{"site":"chidc1"}}'
     http = _$httpBackend_
-    http.expectGET("/devices/#{routeParams.id}").respond(data);
+    http.expectGET("/api/devices/#{routeParams.id}").respond(data);
     controller = $controller NodeController,
       $scope: scope,
       $routeParams: routeParams

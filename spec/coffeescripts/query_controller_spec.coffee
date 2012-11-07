@@ -10,15 +10,14 @@ describe 'QueryController', ->
         {baseurl: ''}[attr]
     scope = $rootScope.$new()
     routeParams =
-      field: 'f'
-      query: 'q'
+      query: 'f/q'
     route =
       current:
         $route:
           params: {}
     data = '[{"id":"chidc1","count":2},{"id":"ladc1","count":3},{"id":"nydc1","count":1}]'
     http = _$httpBackend_
-    http.expectGET("/devices/find/#{routeParams.field}/#{routeParams.query}").respond(data);
+    http.expectGET("/api/devices/find/").respond(data);
     queryController = $controller QueryController,
       $scope: scope,
       $route: route,

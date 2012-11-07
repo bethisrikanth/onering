@@ -1,10 +1,10 @@
 ####################################
-## TODO(ran): This section is just a poor copy-paste of config.ru with a slight modification of PROJECT_ROOT
+## TODO(ran): This section is just a poor copy-paste of config.ru with a slight modification of ENV['PROJECT_ROOT']
 ## Should just reuse config.ru.
-PROJECT_ROOT = File.join(File.dirname(File.expand_path(__FILE__)), '..')
+ENV['PROJECT_ROOT'] = File.join(File.dirname(File.expand_path(__FILE__)), '..')
 
-$: << File.join(PROJECT_ROOT, 'lib')
-$: << File.join(PROJECT_ROOT, 'plugins')
+$: << File.join(ENV['PROJECT_ROOT'], 'lib')
+$: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 
 require 'rubygems'
@@ -13,9 +13,7 @@ require 'config'
 require 'db'
 require 'app'
 
-App::Base::PROJECT_ROOT = PROJECT_ROOT
-
-Dir[File.join(PROJECT_ROOT,'plugins', '*')].each do |p|
+Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
   name = File.basename(p)
   require "#{name}/init"
 end

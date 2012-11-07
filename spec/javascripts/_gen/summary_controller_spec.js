@@ -1,6 +1,6 @@
 (function() {
 
-  describe('DeviceSummaryController', function() {
+  describe('SummaryController', function() {
     var controller, data, http, routeParams, scope;
     beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
@@ -19,8 +19,8 @@
       };
       data = '[{"id":"ladc1","count":3,"children":[{"id":null,"count":3,"children":[{"id":null,"count":3}]}]}]';
       http = _$httpBackend_;
-      http.expectGET("/devices/summary/by-" + routeParams.field).respond(data);
-      return controller = $controller(DeviceSummaryController, {
+      http.expectGET("/api/devices/summary/by-" + routeParams.field).respond(data);
+      return controller = $controller(SummaryController, {
         $scope: scope,
         $routeParams: routeParams,
         config: config

@@ -20,7 +20,7 @@
       };
       data = '123';
       http = _$httpBackend_;
-      http.expectGET("/devices/summary/by-unit/fqdn/?where=site/" + routeParams.site + "/rack/" + routeParams.rack).respond(data);
+      http.expectGET("/api/devices/summary/by-unit/fqdn/?where=site/" + routeParams.site + "/rack/" + routeParams.rack).respond(data);
       return controller = $controller(RackController, {
         $scope: scope,
         $routeParams: routeParams,
