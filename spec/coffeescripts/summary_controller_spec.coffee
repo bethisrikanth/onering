@@ -1,4 +1,4 @@
-describe 'DeviceSummaryController', ->
+describe 'SummaryController', ->
 
   beforeEach module 'app'
 
@@ -13,8 +13,8 @@ describe 'DeviceSummaryController', ->
       field: 'f'
     data = '[{"id":"ladc1","count":3,"children":[{"id":null,"count":3,"children":[{"id":null,"count":3}]}]}]'
     http = _$httpBackend_
-    http.expectGET("/devices/summary/by-#{routeParams.field}").respond(data);
-    controller = $controller DeviceSummaryController,
+    http.expectGET("/api/devices/summary/by-#{routeParams.field}").respond(data);
+    controller = $controller SummaryController,
       $scope: scope,
       $routeParams: routeParams,
       config: config

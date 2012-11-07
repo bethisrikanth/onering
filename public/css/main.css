@@ -166,3 +166,10 @@ header .nav .dropdown-menu li a:hover span{
 .stat h6{
   margin-top: 4px;
 } 
+
+.dragging{
+  display: block;
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  width: 100%;
+}

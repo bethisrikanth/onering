@@ -13,7 +13,7 @@ describe 'SiteController', ->
       site: 's'
     data = ['123']
     http = _$httpBackend_
-    http.expectGET("/devices/summary/by-site/rack/model/?where=site/#{routeParams.site}").respond(data);
+    http.expectGET("/api/devices/summary/by-site/rack/model/?where=site/#{routeParams.site}").respond(data);
     controller = $controller SiteController,
       $scope: scope,
       $routeParams: routeParams

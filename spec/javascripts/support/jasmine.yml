@@ -16,6 +16,7 @@ src_files:
   - public/js/vendor/bootstrap.js
   - public/js/vendor/angular.js
   - public/js/vendor/angular-resource.min.js
+  - public/js/filters.js
   - public/js/main.js
   - public/js/services.js
   - public/js/controllers.js

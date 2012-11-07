@@ -106,3 +106,13 @@ try {
     console.log("Unable to load google: " + e);
   }
 }
+
+$(document).ready(function(){
+  $(document).on('mouseover', '*[data-sortable]', function(i){
+    $(i.toElement).sortable({
+      placeholder: 'dragging',
+      connectWith: '.drop',
+      forcePlaceholderSize: true
+    });
+  });
+});

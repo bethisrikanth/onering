@@ -30,6 +30,8 @@
           <li class="nav-header"><a href="#/site/{{ site }}/{{ rack.id }}">Rack {{ rack.id }}</a> ({{ rack.count }} devices)</li>
           <li ng-repeat="model in rack.children | orderBy:'-count'">{{ model.id }} <span class="badge">{{ model.count }}</span></li>
         </ul>
+        <ul class="drop">
+        </ul>
       </div>
     </div>
 
@@ -46,8 +48,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="device in unracked">
-              <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+            <tr ng-repeat="device in unracked" data-sortable>
+              <td><a class="handle" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
               <td>{{ device.name }}</td>
               <td>{{ device.properties.ip }}</td>
               <td>{{ device.updated_at | timeAgo }}</td>
