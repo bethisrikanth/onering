@@ -46,7 +46,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="device in unracked">
+            <tr ng-repeat="device in unracked | orderBy:'updated_at'">
               <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
               <td>{{ device.name }}</td>
               <td>{{ device.properties.ip }}</td>
