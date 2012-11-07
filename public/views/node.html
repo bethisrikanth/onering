@@ -2,6 +2,7 @@
   <header class="row-fluid">
     <div class="span12">
       <h1>Node: {{ device.name }}<i>[{{ device.id }}]</i></h1>
+      <h6>Last Seen: {{ device.updated_at | timeAgo }}</h6>
     </div>
   </header>
 

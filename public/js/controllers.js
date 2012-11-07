@@ -12,13 +12,14 @@ function NavigationController($scope, $http, $route, $routeParams, Summary){
 }
 
 function QueryController($scope, $http, $route, $routeParams, Query){
+  if($routeParams.field) $scope.field = $routeParams.field;
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
 //run arbitrary query
   if($scope.query){
     Query.query({
-      query: $scope.query
+      query: [$scope.field, $scope.query].compact().join('/')
     }, function(data){
       $scope.devices = data;
     });
@@ -41,23 +42,37 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
 function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
 
+//site summary
   Site.query({
     site: $scope.site
   }, function(data){
     $scope.summary = data[0];
+
+    if($scope.summary){
+      $scope.racks = $scope.summary.children;
+    }
   });
 
+//racked devices
   SiteContact.query({
     site: $scope.site
   }, function(data){
     $scope.contact = data[0];
   });
 
+//unracked devices
   Query.query({
     query: 'site/'+$scope.site+'/^rack',
   }, function(data){
     $scope.unracked = data;
   });
+
+
+  $scope.addRack = function(){
+    $scope.racks.push({
+      'id': 'Untitled'
+    })
+  }
 }
 
 function RackController($scope, $http, $routeParams, Rack){

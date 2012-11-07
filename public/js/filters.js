@@ -4,6 +4,12 @@ String.prototype.toTitleCase = function(){
   });
 };
 
+Array.prototype.compact = function(){
+  return this.filter(function(i){
+    return i;
+  });
+}
+
 angular.module('filters', ['ng']).
 filter('titleize', function(){
   return function(text){

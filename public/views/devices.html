@@ -10,12 +10,12 @@
             <th>Name</th>
             <th>Primary IP</th>
             <th>Location</th>
-            <th>Service Tag</th>
+            <th>Last Seen</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr ng-repeat="device in devices">
+          <tr ng-repeat="device in devices | orderBy:'updated_at'">
             <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
             <td>{{ device.name }}</td>
             <td>{{ device.properties.ip }}</td>
@@ -26,9 +26,7 @@
               <span ng-show="device.properties.slot">S{{ device.properties.slot }}</span>
             </td>
             <td>
-              <a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">
-                {{ device.properties.serial }}
-              </a>
+                {{ device.updated_at | timeAgo }}
             </td>
           </tr>
         </tbody>

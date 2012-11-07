@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="span5">
-        <h3>Site {{ site | uppercase }} &mdash; {{ summary.count }} nodes [<a href="#/inf/show/site/{{ site }}">List All</a>]</h3>
+        <h3>Site {{ site | uppercase }} &mdash; {{ summary.count }} nodes</h3>
       </div>
       <address ng-show="contact" class="span4">
         <br>
@@ -25,9 +25,24 @@
 
   <div class="container">
     <div class="row">
-      <div class="span2 well rack" ng-repeat="rack in summary.children | compact:'id' | orderBy:'id'">
+      <div class="span12">
+        <a class="btn" href="#/inf/show/site/{{ site }}"><i class="icon-list"></i> List All</a>
+        <a class="btn btn-primary" ng-click="addRack()"><i class="icon-plus icon-white"></i> Add Rack</a>
+        <br>
+        <br>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="span2 well rack" ng-repeat="rack in racks | compact:'id' | orderBy:'id'">
         <ul class="nav nav-list">
-          <li class="nav-header"><a href="#/site/{{ site }}/{{ rack.id }}">Rack {{ rack.id }}</a> ({{ rack.count }} devices)</li>
+          <li class="nav-header">
+            <a class="pull-left" ng-hide="rack.editing" href="#/site/{{ site }}/{{ rack.id }}" ng-model="rack">Rack {{ rack.id }}</a>
+            <span class="pull-left editing" ng-show="rack.editing">Rack <input ng-model="rack.id"></span>
+            <a class="pull-right" ng-click="rack.editing = true"><i class="pull-right icon-edit"></i>&nbsp;</a>
+            <br>
+          </li>
+          <li class="nav-header">({{ rack.count || 0 }} devices)</li>
           <li ng-repeat="model in rack.children | orderBy:'-count'">{{ model.id }} <span class="badge">{{ model.count }}</span></li>
         </ul>
         <ul class="drop">
@@ -37,7 +52,7 @@
 
     <div class="row" ng-show="unracked">
       <div class="span12">
-        <h4>Unracked Devices ({{ unracked.length }})</h4>
+        <h4>Unracked ({{ unracked.length }})</h4>
         <table class="table table-condensed">
           <thead>
             <tr>

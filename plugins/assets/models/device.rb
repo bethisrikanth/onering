@@ -2,6 +2,7 @@ require 'model'
 
 class Device < App::Model::Base
   include App::Model::Taggable
+  plugin MongoMapper::Plugins::IdentityMap
 
   set_collection_name "devices"
 
