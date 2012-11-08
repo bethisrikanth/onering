@@ -19,7 +19,7 @@ factory('Device', function($resource){
   });
 }).
 factory('Site', function($resource){
-  return $resource('/api/devices/summary/by-site/rack/model/?where=site/:site', {
+  return $resource('/api/devices/summary/by-site/rack/model/fqdn/?where=site/:site', {
     site: '@site'
   });
 }).

@@ -23,7 +23,7 @@ module App
     # populate the document from a Hash
       def from_h(hash, merge=true)
         current = to_h
-        current.deeper_merge!(hash, {:merge_hash_arrays => true})
+        current = current.deeper_merge!(hash, {:merge_hash_arrays => true})
         
         current.each do |k,v|
           send("#{k}=", v)

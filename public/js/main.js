@@ -1,59 +1,4 @@
-var app = angular.module('app', ['filters', 'apiService']);
-
-app.directive('chart', function() {
-  return {
-    restrict: 'EAC',
-    link: function(scope, elm, attr) {
-      var chart = new google.visualization.PieChart(elm[0]);
-      var columns = scope.$eval(attr.columns);
-
-      scope.$watch(attr.rows, function(rows) {
-        scope.$eval(rows);
-        var dataMaster = new google.visualization.DataTable();
-        var options = {
-          width: parseInt(attr.width || 400),
-          height: parseInt(attr.height || 200),
-          enableInteractivity: (attr.interactive || false),
-
-          legend: {
-            position: attr.legendPosition
-          },
-          tooltip: {
-            trigger: attr.tooltipTrigger
-          }
-        };
-
-        if(attr.title) options['title'] = attr.title;
-
-
-    //  PIE CHART OPTIONS
-        options['pieSliceText'] = attr.labelStyle;
-        options['sliceVisibilityThreshold'] = 0.01;
-
-        if(attr.hideLastSlice){
-          options['slices'] = {};
-          options['slices'][columns.length-1] = {
-            color: '#D9E6FF'
-          };
-        }
-
-    //  Add data
-        dataMaster.addColumn('string', 'Series');
-        dataMaster.addColumn('number', 'Number');
-
-        for(var i = 0; i < columns.length; i++){
-          dataMaster.addRow([columns[i], rows[i]]);
-        }
-
-
-
-        //console.log(options)
-        chart.draw(dataMaster, options);
-      }, true);
-
-    }
-  };
-});
+var app = angular.module('app', ['filters', 'directives', 'apiService']);
 
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
@@ -106,13 +51,3 @@ try {
     console.log("Unable to load google: " + e);
   }
 }
-
-$(document).ready(function(){
-  $(document).on('mouseover', '*[data-sortable]', function(i){
-    $(i.toElement).sortable({
-      placeholder: 'dragging',
-      connectWith: '.drop',
-      forcePlaceholderSize: true
-    });
-  });
-});

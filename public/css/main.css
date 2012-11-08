@@ -26,9 +26,9 @@ html, body {
   color: white;
   float: left;
   font-weight: bold;
+  margin: 4px;
   text-align: center;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  margin: 4px;
 }
 
 .emblem-small{
@@ -38,42 +38,42 @@ html, body {
 }
 
 .emblem-medium{
-  width: 32px;
   height: 32px;
   line-height: 32px;
+  width: 32px;
 }
 
 .emblem-large{
-  width: 64px;
+  font-size: 22px;
   height: 64px;
   line-height: 64px;
-  font-size: 22px;
+  width: 64px;
 }
 
 .emblem-huge{
-  width: 128px;
-  height: 128px;
-  margin: 8px;
   font-size: 36px;
+  height: 128px;
   line-height: 128px;
+  margin: 8px;
   text-shadow: -1 -2px 0 rgba(0, 0, 0, 0.25);
+  width: 128px;
 }
 
 .emblem-online{
-  background-color: #468847;
   -webkit-mask-box-image: url(/img/masks/online.svg);
+  background-color: #468847;
   clip-path: url(/img/masks/online.svg);
 }
 
 .emblem-fault{
-  background-color: #B94A48;
   -webkit-mask-box-image: url(/img/masks/fault.svg);
+  background-color: #B94A48;
   clip-path: url(/img/masks/fault.svg);
 }
 
 .emblem-maintenance{
-  background-color: #F89406;
   -webkit-mask-box-image: url(/img/masks/maintenance.svg);
+  background-color: #F89406;
   clip-path: url(/img/masks/maintenance.svg);
 }
 
@@ -82,8 +82,8 @@ html, body {
 }
 
 .emblem-unknown{
-  background-color: #999;
   -webkit-mask-box-image: url(/img/masks/unknown.svg);
+  background-color: #999;
   clip-path: url(/img/masks/unknown.svg);
 }
 
@@ -91,19 +91,19 @@ html, body {
 
 
 header .nav .dropdown-menu li a span{
-  float: right;
-  padding: 0 6px;
-  -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
-  border-radius: 8px;
-  line-height: 16px;
-  color: #888;
-  font-weight: normal;
-  background-color: rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
   -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.2);
+  -webkit-border-radius: 8px;
+  -webkit-box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
   box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #888;
+  float: right;
+  font-weight: normal;
+  line-height: 16px;
   margin-top: 2px;
+  padding: 0 6px;
   text-shadow: none;
 }
 
@@ -120,12 +120,12 @@ header .nav .dropdown-menu li a:hover span{
   background: transparent center center no-repeat url('/img/logo.png');
   display: inline-block;
   height: 32px;
-  width: 32px;
-  margin: 4px;
   margin-left: 12px;
+  margin: 4px;
+  width: 32px;
 }
 
-.site .rack{
+.site div.rack{
   min-height: 250px;
 }
 
@@ -172,4 +172,21 @@ header .nav .dropdown-menu li a:hover span{
   background-color: #EEE;
   border: 1px solid #DDD;
   width: 100%;
+}
+
+.site .rack .editing input{
+  height: 16px;
+  width: 64px;
+}
+
+.drop {
+  border: 1px solid #DDD;
+  height: 48px;
+}
+
+table.table td input{
+  height: 16px;
+  padding: 4px 1px;
+  margin-bottom: 0px;
+  width: 64px;
 }

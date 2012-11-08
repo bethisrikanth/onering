@@ -20,7 +20,6 @@ module App
         /:id
       }.each do |route|
         post route do
-          rv = []
           json = JSON.parse(request.env["rack.input"].read)
           json = [json] if json.is_a?(Hash)
 
@@ -29,11 +28,7 @@ module App
 
             device = Device.find_or_create(id)
             device.from_json(o).safe_save
-
-            rv << device
           end
-
-          rv.to_json
         end
       end
 
@@ -58,6 +53,14 @@ module App
         end
 
         device.to_json
+      end
+
+    # set device user properties
+      get '/:id/get/:field' do
+        content_type 'text/plain'
+        device = Device.find(params[:id])
+        return 404 if not device
+        return device.properties[params[:field]].to_s.strip
       end
 
 
@@ -90,6 +93,15 @@ module App
         get r do
           q = (!params[:splat] || params[:splat].empty? ? (params[:q] || {}) : params[:splat].first)
           Device.where(urlquerypath_to_mongoquery(q)).to_json
+        end
+
+        post r do
+          q = (!params[:splat] || params[:splat].empty? ? (params[:q] || {}) : params[:splat].first)
+          q = urlquerypath_to_mongoquery(q)
+          set = params[:set].split(';').collect{|i| i=i.split(':'); ["properties.#{i.first}", i.last] }
+
+          Device.set(q, Hash[set])
+          #Device.where(q).to_json
         end
       end
 

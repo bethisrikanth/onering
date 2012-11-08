@@ -1,0 +1,27 @@
+<table class="table table-condensed" editable-columns>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Primary IP</th>
+      <th>Site</th>
+      <th>Rack</th>
+      <th>Unit</th>
+      <th>Slot</th>
+      <th>Last Seen</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="device in devices | orderBy:'name'">
+      <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+      <td>{{ device.name }}</td>
+      <td>{{ device.properties.ip }}</td>
+      <td>{{ device.properties.site | uppercase }}</td>
+      <td><input class="rack" type="text" ng-model="device.properties.rack"></td>
+      <td><input class="unit" type="text" ng-model="device.properties.unit"></td>
+      <td>{{ device.properties.slot }}</td>
+      <td>{{ device.updated_at | timeAgo }}</td>
+    </tr>
+  </tbody>
+</table>

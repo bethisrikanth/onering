@@ -33,44 +33,29 @@
       </div>
     </div>
     <div class="row">
-
       <div class="span2 well rack" ng-repeat="rack in racks | compact:'id' | orderBy:'id'">
+
         <ul class="nav nav-list">
           <li class="nav-header">
             <a class="pull-left" ng-hide="rack.editing" href="#/site/{{ site }}/{{ rack.id }}" ng-model="rack">Rack {{ rack.id }}</a>
-            <span class="pull-left editing" ng-show="rack.editing">Rack <input ng-model="rack.id"></span>
-            <a class="pull-right" ng-click="rack.editing = true"><i class="pull-right icon-edit"></i>&nbsp;</a>
+            <span class="pull-left editing" ng-show="rack.editing">Rack <input type="text" on-enter="saveRack(rack)" ng-model="rack.id" ng-model-onenter></span>
+            <a class="pull-right" ng-hide="rack.editing" ng-click="rack.editing = true; rack.old = rack.id"><i class="pull-right icon-edit"></i>&nbsp;</a>
             <br>
           </li>
           <li class="nav-header">({{ rack.count || 0 }} devices)</li>
           <li ng-repeat="model in rack.children | orderBy:'-count'">{{ model.id }} <span class="badge">{{ model.count }}</span></li>
         </ul>
-        <ul class="drop">
-        </ul>
       </div>
     </div>
 
-    <div class="row" ng-show="unracked">
+    <div class="row" ng-show="devices" class="unracked">
       <div class="span12">
-        <h4>Unracked ({{ unracked.length }})</h4>
-        <table class="table table-condensed">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Primary IP</th>
-              <th>Last Seen</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="device in unracked | orderBy:'updated_at'" data-sortable>
-              <td><a class="handle" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
-              <td>{{ device.name }}</td>
-              <td>{{ device.properties.ip }}</td>
-              <td>{{ device.updated_at | timeAgo }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <form name="unrackedForm">
+          <h4>Unracked ({{ devices.length }})</h4>
+          <input type="submit" class="btn btn-primary pull-right" value="Save" ng-click="saveUnracked()"></input>
+
+          <div ng-include="'views/devices-list.html'"></div>
+        </form>
       </div>
     </div>
   </div>

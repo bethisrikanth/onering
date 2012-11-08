@@ -156,4 +156,20 @@ config(['$provide', function($provide) {
       return rv;
     }
   });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('propertyFilter', function(){
+    return function(array,key,exclude){
+      if (!(array instanceof Array)) return array;
+      rv = array.filter(function(i){
+        if($.isPlainObject(i)){
+          return (exclude ? !i.hasOwnProperty(key) : i.hasOwnProperty(key));
+        }else{
+          return array;
+        }
+      });
+      return rv;
+    }
+  });
 }]);
+

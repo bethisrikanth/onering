@@ -3,34 +3,7 @@
     <div class="span12">
       <h1>Devices by {{ field }}<span ng-show="query"> in {{ query }}</span><span ng-show="devices"> ({{ devices.length }} results)</span></h1>
 
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Primary IP</th>
-            <th>Location</th>
-            <th>Last Seen</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr ng-repeat="device in devices | orderBy:'updated_at'">
-            <td><a href="#/node/{{ device.id }}">{{ device.id }}</a></td>
-            <td>{{ device.name }}</td>
-            <td>{{ device.properties.ip }}</td>
-            <td>
-              <span>{{ device.properties.site | uppercase }}</span>
-              <span ng-show="device.properties.rack"> - R{{ device.properties.rack | uppercase }}</span>
-              <span ng-show="device.properties.unit">/ U{{ device.properties.unit }}<span ng-show="device.properties.slot"> /</span></span>
-              <span ng-show="device.properties.slot">S{{ device.properties.slot }}</span>
-            </td>
-            <td>
-                {{ device.updated_at | timeAgo }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div ng-include="'views/devices-list.html'"></div>
     </div>
   </div>
 </div>
