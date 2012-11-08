@@ -21,7 +21,7 @@ module App
 
         # list of places to search for a given value
           case p[0]
-          when /id/
+          when /^id$/
             rv['$and'] << {'_'+p[0] => (v || {'$exists' => fieldExists})}
           when /name|tags/
             rv['$and'] << {p[0] => (v || {'$exists' => fieldExists})}

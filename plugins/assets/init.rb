@@ -33,7 +33,7 @@ module App
       end
 
 
-    # set device user properties
+    # set devices properties
       get '/:id/set/*' do
         device = Device.find(params[:id])
         return 404 if not device
@@ -55,7 +55,7 @@ module App
         device.to_json
       end
 
-    # set device user properties
+    # get device property
       get '/:id/get/:field' do
         content_type 'text/plain'
         device = Device.find(params[:id])
