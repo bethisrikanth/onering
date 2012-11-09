@@ -56,11 +56,16 @@ module App
       end
 
     # get device property
-      get '/:id/get/:field' do
+      get '/:id/get/*' do
         content_type 'text/plain'
         device = Device.find(params[:id])
         return 404 if not device
-        return device.properties[params[:field]].to_s.strip
+        rv = []
+        params[:splat].first.split('/').each do |key|
+          rv << (device.properties[key] || ' ').to_s
+        end
+
+        return rv.join("\n")
       end
 
 
