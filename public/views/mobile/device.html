@@ -1,0 +1,26 @@
+<div class="container-fluid racker">
+  <div class="row-fluid">
+    <div class="span12" ng-show="device">
+      <h1>ID {{ device.id }}</h1>
+      <h4>{{ device.properties.site }} - {{ device.name }}</h4>
+      <form>
+        <div>
+          <h1>Rack</h1>
+          <input ng-click="editing = true" type="text" ng-model="device.properties.rack">
+
+          <br>
+          <h1>U</h1>
+          <input ng-click="editing = true" type="text" ng-model="device.properties.unit">
+
+          <br>
+          <br>
+
+          <input type="submit" class="btn btn-primary" value="Save" ng-click="save()">
+        </div>
+      </form>
+    </div>
+    <div class="span12" ng-hide="device">
+      Waiting for device to identify...
+    </div>
+  </div>
+</div>

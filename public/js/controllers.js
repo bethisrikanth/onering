@@ -117,3 +117,18 @@ function NodeController($scope, $http, $routeParams, Device){
     $scope.device = data;
   });
 }
+
+function RackerController($scope, $window, Query){
+  $scope.recheck = function(){
+    if(!$scope.editing){
+      Query.query({
+        query: 'identify/on'
+      }, function(data){
+        $scope.device = data[0];
+      });
+    }
+  };
+
+  $scope.recheck();
+  $window.setInterval($scope.recheck, 2000);
+}
