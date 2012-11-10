@@ -1,0 +1,7 @@
+network --device eth0 --onboot yes --bootproto static --ip 10.25.42.139 --netmask 255.255.0.0 --gateway 10.25.0.1 --nameserver 10.25.0.5
+#network --device eth1 --onboot no --bootproto dhcp
+#network --device eth2 --onboot no --bootproto dhcp
+#network --device eth3 --onboot no --bootproto dhcp
+
+firstboot --disable
+reboot

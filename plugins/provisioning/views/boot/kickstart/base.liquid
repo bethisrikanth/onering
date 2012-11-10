@@ -1,0 +1,52 @@
+# Kickstart provided by Onering
+
+# =============================================================================
+# INSTALL PARAMETERS
+install
+text
+skipx
+url --url http://repo.{{ device.properties.site | or: 'lcl' }}.outbrain.com/CentOS/5.8/os/x86_64/
+
+
+# =============================================================================
+# LOCALE
+lang en_US.UTF-8
+keyboard us
+timezone --utc {{ device.properties.timezone | or: 'America/New_York' }}
+
+
+# =============================================================================
+# SECURITY
+rootpw --iscrypted {{ config.roothash }}
+authconfig --enableshadow --enablemd5 --enableldap --enableldapauth --enablelocauthorize --enablecache --enablemkhomedir --updateall --ldapserver=ldap --ldapbasedn=dc=outbrain,dc=com
+firewall --disabled
+selinux --disabled
+
+
+# =============================================================================
+# NETWORK
+{% include 'boot/kickstart/network' %}
+
+# =============================================================================
+# DISK CONFIGURATION
+{% include 'boot/kickstart/disk' %}
+
+# =============================================================================
+# PACKAGE MANIFEST
+{% include 'boot/kickstart/packages' %}
+
+# =============================================================================
+# POST-INSTALL SCRIPTS
+%post
+
+
+{% include 'boot/kickstart/post/init' %}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# include: 'boot/kickstart/post/network'
+
+{% include 'boot/kickstart/post/chef' %}
+
+{% include 'boot/kickstart/post/yum' %}
+
+{% include 'boot/kickstart/post/done' %}

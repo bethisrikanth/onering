@@ -1,0 +1,41 @@
+# -----------------------------------------------------------------------------
+# post: chef
+
+# configure NTP (pre-flight)
+cat <<EOF_NTP >> /etc/ntp/step-tickers
+0.centos.pool.ntp.org
+1.centos.pool.ntp.org
+2.centos.pool.ntp.org
+EOF_NTP
+
+# enable prerequisite services
+/sbin/chkconfig crond on
+/sbin/chkconfig ntpd on
+
+# start prerequisite services
+/sbin/service ntpd start
+/sbin/service crond start
+
+# install packages
+/usr/bin/yum clean all
+/usr/bin/yum -y install gcc chef-full
+/opt/opscode/embedded/bin/gem install mongrel --pre
+/opt/opscode/embedded/bin/gem install ruby-shadow
+
+# configure chef
+mkdir /etc/chef
+cd /etc/chef
+/usr/bin/curl -O http://repo.ladc1.outbrain.com/Misc/Chef/validation.pem
+/usr/bin/curl -O http://repo.ladc1.outbrain.com/Misc/Chef/client.rb
+/usr/bin/chef-client
+
+# build initial run-list (!! THIS WILL EVENTUALL NOT BE HERE !!)
+cat <<EOF > /var/tmp/ob-roles.json
+{ "run_list": [ "role[OB-Base]" ] }
+EOF
+chef-client -j /var/tmp/ob-roles.json
+
+cat <<EOF > /var/tmp/ob-roles.json
+{ "run_list": [ "role[OB-Base]" ] }
+EOF
+chef-client -j /var/tmp/ob-roles.json

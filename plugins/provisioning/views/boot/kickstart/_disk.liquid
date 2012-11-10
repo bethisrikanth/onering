@@ -1,0 +1,82 @@
+clearpart --all --initlabel
+
+{% case device.properties.provisioning.disk_strategy %}
+ {% when 'mirror' %}
+# Disk Strategy: mirror
+bootloader --location=mbr --driveorder=sda,sdb
+part raid.01 --size=300 --asprimary --ondisk=sda
+part raid.11 --size=300 --asprimary --ondisk=sdb
+part raid.02 --size=1 --grow --asprimary --ondisk=sda
+part raid.12 --size=1 --grow --asprimary --ondisk=sdb
+
+raid /boot       --fstype=ext3 --device md0 --level=RAID1 raid.01 raid.11
+raid pv.01       --fstype ext3 --device md1 --level=RAID1 raid.02 raid.12  
+
+volgroup outbrain pv.01
+
+logvol /         --fstype ext3 --name=root     --vgname=outbrain --size=10240
+logvol /var      --fstype ext3 --name=var      --vgname=outbrain --size=10240
+logvol /home     --fstype ext3 --name=home     --vgname=outbrain --size=5120
+logvol /opt      --fstype ext3 --name=opt      --vgname=outbrain --size=5120
+logvol /outbrain --fstype ext3 --name=outbrain --vgname=outbrain --size=5120
+logvol swap      --fstype swap --name=swap     --vgname=outbrain --size=4096
+
+{% when 'hadoop' %}
+# Disk Strategy: hadoop
+bootloader   --location=mbr     --driveorder=sda,sdb,sdc
+part /boot   --fstype ext3      --size=300               --asprimary  --ondisk=sda
+part /       --fstype ext3      --size=10240             --asprimary
+part /var    --fstype ext3      --size=51200                          --ondisk=sda
+part /home   --fstype ext3      --size=4096                           --ondisk=sda
+part /tmp    --fstype ext3      --size=4096                           --ondisk=sda
+part /data/a --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sda
+part /data/b --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sdb
+part /data/c --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sdc
+
+{% when 'single-vm' %}
+# Disk Strategy: single-vm
+bootloader       --location=mbr --driveorder=hda
+part /boot       --fstype ext3  --size=33                 --asprimary  --ondisk=hda
+part pv.01       --size=31                                --grow       --ondisk=hda
+
+volgroup outbrain pv.01
+
+logvol /         --fstype ext3  --name=root      --vgname=outbrain     --size=5120
+logvol /var      --fstype ext3  --name=var       --vgname=outbrain     --size=2120
+logvol /home     --fstype ext3  --name=home      --vgname=outbrain     --size=2120
+logvol /opt      --fstype ext3  --name=opt       --vgname=outbrain     --size=2120
+logvol /outbrain --fstype ext3  --name=outbrain  --vgname=outbrain     --size=10240
+logvol swap      --fstype swap  --name=swap      --vgname=outbrain     --size=2120
+
+{% when 'single-vm-xen' %}
+# Disk Strategy: single-vm-xen
+bootloader       --location=mbr --driveorder=xvda
+part /boot       --fstype ext3  --size=33         --asprimary       --ondisk=xvda
+part pv.01       --size=31      --grow                              --ondisk=hda
+
+volgroup outbrain pv.01
+
+logvol /         --fstype ext3  --name=root       --vgname=outbrain --size=5120
+logvol /var      --fstype ext3  --name=var        --vgname=outbrain --size=2120
+logvol /home     --fstype ext3  --name=home       --vgname=outbrain --size=2120
+logvol /opt      --fstype ext3  --name=opt        --vgname=outbrain --size=2120
+logvol /outbrain --fstype ext3  --name=outbrain   --vgname=outbrain --size=10240
+logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
+
+
+{% else %}
+# Disk Strategy: single
+bootloader       --location=mbr --driveorder=sda
+part /boot       --fstype ext3  --size=300       --asprimary       --ondisk=sda
+part pv.01       --size=150     --grow                             --ondisk=sda
+
+volgroup outbrain pv.01
+
+logvol /         --fstype ext3  --name=root      --vgname=outbrain --size=10240
+logvol /var      --fstype ext3  --name=var       --vgname=outbrain --size=10240
+logvol /home     --fstype ext3  --name=home      --vgname=outbrain --size=5120
+logvol /opt      --fstype ext3  --name=opt       --vgname=outbrain --size=5120
+logvol /outbrain --fstype ext3  --name=outbrain  --vgname=outbrain --size=51200
+logvol swap      --fstype swap  --name=swap      --vgname=outbrain --size=8096
+
+{% endcase %}

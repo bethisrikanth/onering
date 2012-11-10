@@ -14,6 +14,7 @@ gem "oats"
 gem "thin"
 gem "rake"
 gem "json"
+gem "liquid"
 
 group :test, :development do
   gem 'rspec'
