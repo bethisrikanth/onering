@@ -43,6 +43,7 @@ GEM
     json (1.7.5)
     libwebsocket (0.1.5)
       addressable
+    liquid (2.4.1)
     log4r (1.1.10)
     mongo (1.7.0)
       bson (~> 1.7.0)
@@ -112,6 +113,7 @@ DEPENDENCIES
   haml
   jasmine
   json
+  liquid
   mongo
   mongo_mapper
   oats
