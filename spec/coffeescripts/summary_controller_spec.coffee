@@ -5,9 +5,6 @@ describe 'SummaryController', ->
   controller = scope = http = routeParams = data = null
 
   beforeEach inject (_$httpBackend_, $rootScope, $controller) ->
-    config =
-      get: (attr) ->
-        {baseurl: ''}[attr]
     scope = $rootScope.$new()
     routeParams =
       field: 'f'
@@ -17,7 +14,9 @@ describe 'SummaryController', ->
     controller = $controller SummaryController,
       $scope: scope,
       $routeParams: routeParams,
-      config: config
+      $route: current:
+        $route:
+          params: {}
 
   it 'should attach the summary to the $scope', ->
     http.flush()

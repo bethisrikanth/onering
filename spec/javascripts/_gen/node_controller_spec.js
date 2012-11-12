@@ -5,14 +5,6 @@
     beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      var config;
-      config = {
-        get: function(attr) {
-          return {
-            baseurl: ''
-          }[attr];
-        }
-      };
       scope = $rootScope.$new();
       routeParams = {
         id: '5'
@@ -22,8 +14,7 @@
       http.expectGET("/api/devices/" + routeParams.id).respond(data);
       return controller = $controller(NodeController, {
         $scope: scope,
-        $routeParams: routeParams,
-        config: config
+        $routeParams: routeParams
       });
     }));
     return it('should attach the devices to the $scope', function() {

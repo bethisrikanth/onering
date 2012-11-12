@@ -5,14 +5,6 @@
     beforeEach(module('app'));
     queryController = scope = http = route = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      var config;
-      config = {
-        get: function(attr) {
-          return {
-            baseurl: ''
-          }[attr];
-        }
-      };
       scope = $rootScope.$new();
       routeParams = {
         query: 'f/q'
@@ -26,12 +18,11 @@
       };
       data = '[{"id":"chidc1","count":2},{"id":"ladc1","count":3},{"id":"nydc1","count":1}]';
       http = _$httpBackend_;
-      http.expectGET("/api/devices/find/").respond(data);
+      http.expectGET("/api/devices/find/?q=" + (encodeURIComponent(routeParams.query))).respond(data);
       return queryController = $controller(QueryController, {
         $scope: scope,
         $route: route,
-        $routeParams: routeParams,
-        config: config
+        $routeParams: routeParams
       });
     }));
     return it('should attach the devices to the $scope', function() {

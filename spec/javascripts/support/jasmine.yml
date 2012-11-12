@@ -19,6 +19,7 @@ src_files:
   - public/js/filters.js
   - public/js/main.js
   - public/js/services.js
+  - public/js/directives.js
   - public/js/controllers.js
 
 # stylesheets

@@ -5,14 +5,6 @@
     beforeEach(module('app'));
     controller = scope = http = routeParams = data = null;
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-      var config;
-      config = {
-        get: function(attr) {
-          return {
-            baseurl: ''
-          }[attr];
-        }
-      };
       scope = $rootScope.$new();
       routeParams = {
         field: 'f'
@@ -23,7 +15,13 @@
       return controller = $controller(SummaryController, {
         $scope: scope,
         $routeParams: routeParams,
-        config: config
+        $route: {
+          current: {
+            $route: {
+              params: {}
+            }
+          }
+        }
       });
     }));
     it('should attach the summary to the $scope', function() {
