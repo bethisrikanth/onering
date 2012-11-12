@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# onering:     Starts the onering thin cluster
+#
+# description:
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# source daemon config
+FILENAME=/etc/sysconfig/onering
+[ -f $FILENAME ] && . $FILENAME
+
+# attempt to find thin binary
+which thin >/dev/null 2>&1 || (echo "Cannot find thin command, please run 'gem install thin'" && exit 126)
+
+# attempt to find config file
+ONERING_ROOT=${ONERING_ROOT:-/opt/onering}
+ONERING_CONFIG=$ONERING_ROOT/config/server.yaml
+[ -f $ONERING_CONFIG ] || (echo "Cannot find config file at: $ONERING_CONFIG" && exit 127)
+
+thin -c $ONERING_ROOT -C $ONERING_CONFIG $1
