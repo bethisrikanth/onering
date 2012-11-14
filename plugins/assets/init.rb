@@ -29,6 +29,8 @@ module App
             device = Device.find_or_create(id)
             device.from_json(o).safe_save
           end
+
+          200
         end
       end
 
