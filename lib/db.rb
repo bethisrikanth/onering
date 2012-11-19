@@ -9,10 +9,12 @@ module App
           raise "Database driver required for #{name}" unless config['type']
           @_db = {} unless @_db
 
-          if require "db/#{config['type']}"
-            @_db[name] = App::Database.const_get(config['type'].capitalize).load(name, config)
-          else
-            raise DatabaseNotFound, name
+          if not @_db[name] # load only if it's the first time
+            if require "db/#{config['type']}"
+              @_db[name] = App::Database.const_get(config['type'].capitalize).load(name, config)
+            else
+              raise DatabaseNotFound, name
+            end
           end
         end
 
