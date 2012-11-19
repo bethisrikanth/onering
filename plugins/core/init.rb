@@ -3,8 +3,7 @@ require 'controller'
 module App
   class Base < Controller
     get '/' do
-      index = File.join(settings.public_folder, 'index.html')
-      File.read(index) if File.exists?(index)
+      haml '../../../views/index'.to_sym
     end
 
   # anything in the /api namespace will be JSON (for now, other types pending)

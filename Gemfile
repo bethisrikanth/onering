@@ -15,6 +15,7 @@ gem "thin"
 gem "rake"
 gem "json"
 gem "liquid"
+gem 'sinatra-assetpack', :require => 'sinatra/assetpack'
 
 group :test, :development do
   gem 'rspec'

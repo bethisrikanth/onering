@@ -1,0 +1,32 @@
+!!!
+%html
+  %head
+    %title Onering
+    %meta{:charset => "UTF-8"}
+      %script{:src => "https://www.google.com/jsapi", :type => "text/javascript"}
+      =js :app
+      !=css :app, :madia => 'screen'
+  %body
+    %header.navbar.navbar-inverse.navbar-fixed-top{"ng-controller" => "NavigationController"}
+      .navbar-inner
+        %ul.nav
+          %li
+            %a.logo{:href => "/"}
+              %i  
+          %li.divider-vertical
+          %li
+            %a{:href => "#/inf"}
+              %i.icon-cog.icon-white
+              Infrastructure
+          %li.divider-vertical
+          %li.dropdown
+            %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+              Datacenters
+              %b.caret
+            %ul.dropdown-menu
+              %li{"ng-repeat" => "site in sites | orderBy:'-count'"}
+                %a{:href => "#site/"}
+                  (empty)
+                  %span.badge
+    %section.content{"ng-view" => ""}
+      %footer.container-fluid
