@@ -10,6 +10,10 @@ html, body {
   min-height: 100%;
 }
 
+.show{
+  display: inherit !important;
+}
+
 .content{
   margin-top: 60px;
 }
@@ -109,6 +113,14 @@ header .nav .dropdown-menu li a span{
 
 header .nav .dropdown-menu li a:hover span{
   color: white;
+}
+
+.navbar-search{
+  margin-right: 48px;
+}
+
+.navbar-search .autocomplete{
+  margin-right: 20px;
 }
 
 .logo{

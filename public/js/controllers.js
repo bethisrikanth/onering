@@ -11,6 +11,37 @@ function NavigationController($scope, $http, $route, $routeParams, Summary){
   });
 }
 
+function SearchController($scope, $http, Query){
+  $scope.results = null;
+
+  $scope.$watch('query', function(){
+    $scope.runQuery();
+  });
+
+
+  $scope.runQuery = function(query){
+    if(query) $scope.query = query;
+
+    if($scope.query && $scope.query.length > 2){
+      var q = $scope.query.split(':');
+      var field = (q.length > 1 ? q[0] : 'name');
+      q = (q[1] || q[0]).trim();
+
+      Query.query({
+        query: field+'/'+q
+      }, function(data){
+        $scope.results = (data.length > 0 ? data : null);
+      });
+    }else{
+      $scope.clearResults();
+    }
+  };
+
+  $scope.clearResults = function(){
+    $scope.results = null;
+  };
+}
+
 function QueryController($scope, $http, $route, $routeParams, Query){
   if($routeParams.field) $scope.field = $routeParams.field;
   $scope.query = $routeParams.query;

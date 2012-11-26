@@ -2,12 +2,12 @@
   <h4>Active Alerts</h4>
 </div>
 
-<div class="container-fluid stats" ng-show="device.properties.stats">
+<div class="container-fluid stats" ng-show="stats">
   <div class="row-fluid">
     <div class="span8">
       <h3>Disk</h3>
 
-      <div class="stat disk" ng-repeat="disk in device.properties.stats.disk | orderBy:'mount' ">
+      <div class="stat disk" ng-repeat="disk in stats.disk | orderBy:'mount' ">
         <chart
           class="chart"
           type="pie"
@@ -34,7 +34,7 @@
         <h3>Memory</h3>
 
         <div class="stat memory">
-          <h5>{{ device.properties.stats.memory.total | autosize }} total</h5>
+          <h5>{{ stats.memory.total | autosize }} total</h5>
         </div>
       </div>
 
@@ -42,8 +42,8 @@
         <h3>CPU</h3>
 
         <div class="stat cpu">
-          <h5>{{ device.properties.stats.cpu.count }} cores
-            <span ng-show="device.properties.stats.cpu.speed"> @ {{ device.properties.stats.cpu.speed | autospeed:'M' }}</span>
+          <h5>{{ stats.cpu.count }} cores
+            <span ng-show="stats.cpu.speed"> @ {{ stats.cpu.speed | autospeed:'M' }}</span>
           </h5>
 
           <div>

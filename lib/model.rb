@@ -7,6 +7,7 @@ module App
     end
 
     module Utils
+
     # serialize to a Hash
       def to_h
         serializable_hash.reject{|k,v|
@@ -14,19 +15,13 @@ module App
         }
       end
 
-    # serialize to json
-      def to_json
-        to_h.to_json
-      end
-
-
     # populate the document from a Hash
       def from_h(hash, merge=true)
         current = to_h
         current = current.deeper_merge!(hash, {:merge_hash_arrays => true})
-        
+
         current.each do |k,v|
-          send("#{k}=", v)
+          send("#{k}=", v) rescue nil
         end
 
         self
@@ -52,6 +47,9 @@ module App
       def -(other)
         diff = (serializable_hash - other.serializable_hash)
       end
+
+
+      alias_method :to_hash, :to_h
     end
 
     class Base
@@ -199,7 +197,7 @@ module App
       include Utils
     end
 
-    module Taggable      
+    module Taggable
       def tag(value)
         [*value].each do |v|
           add_to_set({:tags => v})

@@ -2,16 +2,14 @@ require 'model'
 
 class Device < App::Model::Base
   include App::Model::Taggable
-  plugin MongoMapper::Plugins::IdentityMap
 
   set_collection_name "devices"
 
   before_validation :_mangle_id
   validate :_id_pattern_valid?
 
-  many :devices
   timestamps!
-  
+
   key :name,            String
   key :properties,      Hash
   key :user_properties, Hash

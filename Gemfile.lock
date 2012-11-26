@@ -48,6 +48,7 @@ GEM
     log4r (1.1.10)
     mongo (1.7.0)
       bson (~> 1.7.0)
+    mongo_ext (0.19.3)
     mongo_mapper (0.12.0)
       activemodel (~> 3.0)
       activesupport (~> 3.0)
@@ -121,6 +122,7 @@ DEPENDENCIES
   json
   liquid
   mongo
+  mongo_ext
   mongo_mapper
   oats
   racksh

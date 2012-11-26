@@ -1,10 +1,10 @@
 require 'rubygems'
 require 'utils'
 require 'patches'
-require 'json'
 require 'model'
 require 'controller'
 require 'sinatra/assetpack'
+require 'perftools'
 
 module App
   class Base < Controller
@@ -25,12 +25,13 @@ module App
       #enable  :raise_errors
       disable :raise_errors
       disable :debug
-      register Sinatra::AssetPack
-      assets {
 
-        serve '/js', from: 'public/js'
-        serve '/css/', from: 'public/css'
-        serve '/img', from: 'public/img'
+      register Sinatra::AssetPack
+
+      assets {
+        serve '/js',   :from => 'public/js'
+        serve '/css/', :from => 'public/css'
+        serve '/img',  :from => 'public/img'
 
         js :app, '/js/app.js', [
           "/js/vendor/jquery-1.8.2.min.js",
