@@ -29,5 +29,25 @@
       <th>Chassis</th>
       <td>{{ device.properties.chassis_label }}</td>
     </tr>
+
+    <tr ng-show="device.properties.ip">
+      <th>IP</th>
+      <td>{{ device.properties.ip }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.mac">
+      <th>MAC</th>
+      <td>{{ device.properties.mac }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.kernel">
+      <th>Kernel</th>
+      <td>{{ device.properties.kernel }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.bios_version">
+      <th>BIOS Version</th>
+      <td>{{ device.properties.bios_version }}</td>
+    </tr>
   </tbody>
 </table>
