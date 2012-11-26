@@ -4,7 +4,6 @@ require 'patches'
 require 'model'
 require 'controller'
 require 'sinatra/assetpack'
-require 'perftools'
 
 module App
   class Base < Controller
