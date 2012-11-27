@@ -72,6 +72,7 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
 
 function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
+  $scope.sortField = 'name';
 
 //site summary
   Site.query({
@@ -91,9 +92,9 @@ function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteCo
     $scope.contact = data[0];
   });
 
-//unracked devices
+//all devices
   Query.query({
-    query: 'site/'+$scope.site+'/^rack',
+    query: 'site/'+$scope.site,
   }, function(data){
     $scope.devices = data;
   });
@@ -112,7 +113,7 @@ function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteCo
     $http.post('/api/devices/find/site/'+$scope.site+'/rack/'+rack.old+'/?set=rack:'+rack.id);
   };
 
-  $scope.saveUnracked = function(){
+  $scope.save = function(){
     $.each($scope.devices, function(idx, i){
       if(i.properties)
         if(i.properties.rack)
