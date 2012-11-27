@@ -42,7 +42,7 @@
 
     <tr ng-show="device.properties.ipmi_ip">
       <th>IPMI Address</th>
-      <td>{{ device.properties.ipmi_ip }}</td>
+      <td><a target="_blank" href="http://{{ device.properties.ipmi_ip }}">{{ device.properties.ipmi_ip }}</a></td>
     </tr>
 
     <tr ng-show="device.properties.kernel">
