@@ -14,7 +14,7 @@ class Device < App::Model::Base
   key :properties,      Hash
   key :user_properties, Hash
   key :tags,            Array
-  key :collected_at,    Date
+  key :collected_at,    Time
 
   def add_note(body, id=nil)
     id = Time.now.to_i if not id or (id.to_i == 0)

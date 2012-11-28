@@ -27,6 +27,10 @@ module App
             id = (params[:id] || o['id'])
 
             device = Device.find_or_create(id)
+
+          # update the collected_at timestamp if this is an inventory run
+            device['collected_at'] = Time.now if o.delete('inventory')
+
             device.from_json(o).safe_save
           end
 
