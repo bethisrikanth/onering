@@ -18,6 +18,11 @@ factory('Device', function($resource){
     id: '@id'
   });
 }).
+factory('DeviceNote', function($resource){
+  return $resource('/api/devices/:id/notes', {
+    id: '@id'
+  });
+}).
 factory('Site', function($resource){
   return $resource('/api/devices/summary/by-site/rack/model/fqdn/?where=site/:site', {
     site: '@site'

@@ -10,8 +10,10 @@ html, body {
   min-height: 100%;
 }
 
-.show{
-  display: inherit !important;
+body .modal {
+  width: 774px;
+  margin-left: -357px;
+  margin-right: -387px;
 }
 
 .content{

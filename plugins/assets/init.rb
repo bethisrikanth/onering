@@ -20,7 +20,7 @@ module App
         /:id
       }.each do |route|
         post route do
-          json = JSON.parse(request.env["rack.input"].read)
+          json = JSON.parse(request.env['rack.input'].read)
           json = [json] if json.is_a?(Hash)
 
           json.each do |o|
@@ -28,6 +28,33 @@ module App
 
             device = Device.find_or_create(id)
             device.from_json(o).safe_save
+          end
+
+          200
+        end
+      end
+
+      %w{
+        /:id/notes/?
+        /:id/notes/:note_id/?
+      }.each do |route|
+        post route do
+          device = Device.find(params[:id])
+          return 404 if not device
+          device.add_note(request.env['rack.input'].read)
+          device.safe_save
+
+          200
+        end
+
+        delete route do
+          device = Device.find(params[:id])
+          return 404 if not device
+
+          if device.properties and device.properties['notes']
+            device.properties['notes'].delete(params[:note_id])
+            device.properties.delete('notes') if device.properties['notes'].empty?
+            device.safe_save
           end
 
           200
@@ -120,7 +147,7 @@ module App
       }.each do |r|
         get r do
           Device.where({
-            'updated_at' => {
+            'collected_at' => {
               '$lte' => (params[:age] || 4).to_i.hours.ago
             },
             'tags' => 'auto'

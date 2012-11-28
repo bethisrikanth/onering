@@ -140,14 +140,44 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $routeParams, Device){
+function NodeController($scope, $http, $routeParams, Device, DeviceNote){
   $scope.id = $routeParams.id;
+  $scope.note = null;
 
-  Device.get({
-    id: $scope.id
-  }, function(data){
-    $scope.device = data;
-  });
+  $scope.reload = function(){
+    Device.get({
+      id: $scope.id
+    }, function(data){
+      $scope.device = data;
+    });
+  };
+
+  $scope.saveNote = function(){
+    if($scope.note){
+      if($scope.device && $scope.device.properties){
+        if(!$scope.device.properties.notes)
+          $scope.device.properties.notes = [];
+
+        DeviceNote.save({
+          id:      $scope.device.id
+        }, $scope.note, function(){
+          $scope.reload();
+          $scope.note = null;
+        });
+      }
+    }
+  }
+
+  $scope.deleteNote = function(note_id){
+    DeviceNote.delete({
+      id: $scope.device.id,
+      note_id: note_id
+    }, function(){
+      $scope.reload();
+    })
+  };
+
+  $scope.reload();
 }
 
 function RackerController($scope, $window, Query){

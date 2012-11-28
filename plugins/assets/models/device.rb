@@ -14,6 +14,33 @@ class Device < App::Model::Base
   key :properties,      Hash
   key :user_properties, Hash
   key :tags,            Array
+  key :collected_at,    Date
+
+  def add_note(body, id=nil)
+    id = Time.now.to_i if not id or (id.to_i == 0)
+    id = id.to_s
+
+    if properties
+      properties['notes'] = {} unless properties['notes']
+      now = Time.now
+
+      if properties['notes'][id]
+        note = properties['notes'][id]
+      else
+        note = {
+          'created_at' => now
+        }
+      end
+
+      note['body'] = body
+      note['updated_at'] = now
+
+      properties['notes'][id] = note
+      return true
+    end
+
+    false
+  end
 
   private
     def _mangle_id

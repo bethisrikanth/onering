@@ -8,7 +8,7 @@
       <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
       <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
       <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
-      <th ng-click="sortField='updated_at'; sortReverse=!sortReverse">Last Seen</th>
+      <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
     </tr>
   </thead>
 
@@ -21,7 +21,7 @@
       <td><input class="rack" type="text" ng-model="device.properties.rack"></td>
       <td><input class="unit" type="text" ng-model="device.properties.unit"></td>
       <td>{{ device.properties.slot }}</td>
-      <td>{{ device.updated_at | timeAgo }}</td>
+      <td>{{ device.collected_at | timeAgo }}</td>
     </tr>
   </tbody>
 </table>

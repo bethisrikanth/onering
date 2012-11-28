@@ -2,7 +2,7 @@
   <header class="row-fluid">
     <div class="span12">
       <h1>Node: {{ device.name }}<i>[{{ device.id }}]</i></h1>
-      <h6>Last Seen: {{ device.updated_at | timeAgo }}</h6>
+      <h6>Last Seen: {{ device.collected_at && (device.collected_at | timeAgo) || 'Never' }}</h6>
     </div>
   </header>
 
@@ -18,6 +18,9 @@
       <h3>Actions</h3>
 
       <ul class="nav nav-list well">
+        <li class="nav-header">Lifecycle</li>
+        <li><a open-dialog="nodeComment"><i class="icon-comment"></i> Add Note</a></li>
+
         <li class="nav-header">Node</li>
         <li><a href="#/node/{{ device.id }}">Restart (via OS)</a></li>
         <li><a href="#/node/{{ device.id }}">Power Cycle (via PDU)</a></li>
@@ -26,4 +29,20 @@
     </div>
   </div>
 
+</div>
+
+<div class="modal hide" id="nodeComment">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Add Note</h3>
+  </div>
+
+  <div class="modal-body">
+    <textarea style="width: 95%;" ng-model="note"></textarea>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
+    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote()">Save</a>
+  </div>
 </div>

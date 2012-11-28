@@ -37,18 +37,18 @@ directive('ngModelOnenter', function() {
     }
   };
 }).
-directive('editable-columns', function(){
+directive('openDialog', function(){
   return {
     link: function(scope, element, attr){
-      console.log(element.type);
+      function openDialog() {
+        var element = angular.element('#'+attr.openDialog);
+        var ctrl = element.controller();
+        element.modal('show');
+      }
 
-      if(element.type !== 'table') return;
-
-      $(document, '.field-selector .dropdown-menu li a').on('click', function(e){
-        console.log(e)
-      });
+      element.bind('click', openDialog);
     }
-  };
+  }
 }).
 directive('chart', function() {
   return {
