@@ -99,6 +99,31 @@ filter('timeAgo', function(){
     return moment(Date.parse(date)).fromNow();
   };
 }).
+filter('section', function(){
+  return function(str, delim, start, len){
+    if(str){
+      var rv = str.split(delim);
+      start = parseInt(start);
+      len = parseInt(len);
+
+      if(start){
+        if(start == 0){
+          return str;
+        }
+
+        if(len){
+          return rv.slice(start-1, len).join(delim);
+        }
+
+        return rv.slice(start-1).join(delim);
+      }
+
+      return str;
+    }
+
+    return null;
+  };
+}).
 config(['$provide', function($provide) {
   $provide.factory('skipFilter', function(){
     return function(array, skip){

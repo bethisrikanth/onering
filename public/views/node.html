@@ -1,8 +1,13 @@
 <div class="container-fluid node" ng-show="device">
   <header class="row-fluid">
     <div class="span12">
-      <h1>Node: {{ device.name }}<i>[{{ device.id }}]</i></h1>
-      <h6>Last Seen: {{ device.collected_at && (device.collected_at | timeAgo) || 'Never' }}</h6>
+      <h1>
+        <span class="name">{{ device.name | section:'.':1:1 }}<i>.{{ device.name | section:'.':2 }}</i></span>
+        <span class="label hid">{{ device.id }}</span>
+      </h1>
+      <h6>
+        Last Seen: {{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || 'has not reported' }}
+      </h6>
     </div>
   </header>
 
@@ -38,11 +43,11 @@
   </div>
 
   <div class="modal-body">
-    <textarea style="width: 95%;" ng-model="note"></textarea>
+    <textarea autofocus style="width: 95%;" ng-model="note"></textarea>
   </div>
 
   <div class="modal-footer">
-    <a class="btn btn-danger" data-dismiss="modal">Cancel</a>
+    <a class="btn btn-danger" data-dismiss="modal" ng-click="note=null">Cancel</a>
     <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote()">Save</a>
   </div>
 </div>

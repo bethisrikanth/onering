@@ -204,3 +204,16 @@ table.table td input{
   margin-bottom: 0px;
   width: 64px;
 }
+
+
+
+
+.node .name i{
+  color: #888;
+  font-size: 18px;
+  margin-left: 0.125em;
+}
+
+.node .hid{
+  vertical-align: middle !important;
+}

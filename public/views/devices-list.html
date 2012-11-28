@@ -2,6 +2,7 @@
   <thead>
     <tr>
       <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
+      <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse"><abbr title="Notes">N</abbr></th>
       <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
       <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
       <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
@@ -15,13 +16,14 @@
   <tbody>
     <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
       <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+      <td><i ng-show="device.properties.notes" class="icon icon-comment"></i></td>
       <td>{{ device.name }}</td>
       <td>{{ device.properties.ip }}</td>
       <td>{{ device.properties.site | uppercase }}</td>
       <td><input class="rack" type="text" ng-model="device.properties.rack"></td>
       <td><input class="unit" type="text" ng-model="device.properties.unit"></td>
       <td>{{ device.properties.slot }}</td>
-      <td>{{ device.collected_at | timeAgo }}</td>
+      <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
     </tr>
   </tbody>
 </table>

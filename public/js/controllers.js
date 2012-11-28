@@ -143,6 +143,7 @@ function RackController($scope, $http, $routeParams, Rack){
 function NodeController($scope, $http, $routeParams, Device, DeviceNote){
   $scope.id = $routeParams.id;
   $scope.note = null;
+  $scope.hidAsAColor = false;
 
   $scope.reload = function(){
     Device.get({
