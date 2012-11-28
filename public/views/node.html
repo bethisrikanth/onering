@@ -6,7 +6,7 @@
         <span class="label hid">{{ device.id }}</span>
       </h1>
       <h6>
-        Last Seen: {{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || 'has not reported' }}
+        Last Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
       </h6>
     </div>
   </header>
