@@ -14,6 +14,7 @@ class Device < App::Model::Base
   key :properties,      Hash
   key :user_properties, Hash
   key :tags,            Array
+  key :aliases,         Array
   key :collected_at,    Time
 
   def add_note(body, id=nil)

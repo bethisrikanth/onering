@@ -6,27 +6,34 @@ module App
   # URL path (e.g.: field1/query1/field2/query2/..)
     def urlquerypath_to_mongoquery(query, regex=true)
       if query
-        rv = {}
+        rv = {'$or' => []}
 
         pairs = query.split('/')
         pairs = pairs.evens.zip(pairs.odds)
 
         pairs.each do |p|
-          rv['$and'] = [] if not rv['$and']
-          fieldExists = (p[0].gsub!(/^\^/,'') == nil)
+          fieldNames = p[0].split(':')
 
-          # autodetect type for p[1] := v
-          v = p[1]
-          v = get_rx_from_urlquery(v) if regex and v.is_a?(String)
+          fieldNames.each do |field|
+            q = {} if not q
+            q['$and'] = [] if not q['$and']
+            fieldExists = (field.gsub!(/^\^/,'') == nil)
 
-        # list of places to search for a given value
-          case p[0]
-          when /^id$/
-            rv['$and'] << {'_'+p[0] => (v || {'$exists' => fieldExists})}
-          when /name|tags/
-            rv['$and'] << {p[0] => (v || {'$exists' => fieldExists})}
-          else
-            rv['$and'] << {"properties.#{p[0]}" => (v || {'$exists' => fieldExists})}
+            # autodetect type for p[1] := v
+            v = p[1]
+            v = get_rx_from_urlquery(v) if regex and v.is_a?(String)
+
+          # list of places to search for a given value
+            case field
+            when /^id$/
+              q['$and'] << {'_'+field => (v || {'$exists' => fieldExists})}
+            when /name|tags|aliases/
+              q['$and'] << {field => (v || {'$exists' => fieldExists})}
+            else
+              q['$and'] << {"properties.#{field}" => (v || {'$exists' => fieldExists})}
+            end
+
+            rv['$or'] << q
           end
         end
 
@@ -39,7 +46,7 @@ module App
 
     def get_rx_from_urlquery(value)
       rv = []
-      
+
     # logical operators
       op = "([\+])"
       value.gsub!('.', "\\.")

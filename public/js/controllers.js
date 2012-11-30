@@ -24,7 +24,7 @@ function SearchController($scope, $http, Query){
 
     if($scope.query && $scope.query.length > 2){
       var q = $scope.query.split(':');
-      var field = (q.length > 1 ? q[0] : 'name');
+      var field = (q.length > 1 ? q[0] : 'id:name:aliases');
       q = (q[1] || q[0]).trim();
 
       Query.query({
