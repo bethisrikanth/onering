@@ -70,7 +70,7 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
 }
 
 
-function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteContact){
+function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
   $scope.sortField = 'name';
 
@@ -99,6 +99,15 @@ function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteCo
     $scope.devices = data;
   });
 
+
+  $scope.$watch('saved', function(){
+    if($scope.saved){
+      $timeout(function(){
+        $scope.saved = null;
+      }, 3000);
+    }
+  });
+
   $scope.addRack = function(){
     $scope.racks.push({
       'id': 'Untitled'
@@ -121,8 +130,11 @@ function SiteController($scope, $http, $routeParams, Device, Query, Site, SiteCo
             Device.save({
               id: i.id,
               properties: {
-                rack: i.properties.rack
+                rack: i.properties.rack,
+                unit: i.properties.unit
               }
+            }, function(){
+              $scope.saved = 'Changes saved';
             });
     });
   }
