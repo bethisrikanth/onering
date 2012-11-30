@@ -171,6 +171,7 @@ module App
               collection.aggregate(c).collect{|i|
               # add the current filter to the $match query
                 qq = (query.clone rescue {'$and' => []})
+                qq['$and'] = [] unless qq['$and']
                 qq['$and'] << {group_by => i['_id']}
 
               # recurse into summarize to next rollup properties
