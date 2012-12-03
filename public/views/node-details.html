@@ -4,14 +4,17 @@
       <th>Model</th>
       <td>{{ device.properties.make }} {{ device.properties.model }}</td>
     </tr>
+
     <tr ng-show="device.properties.serial">
       <th>Service Tag</th>
       <td>{{ device.properties.serial }} [<a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">Support</a>]</td>
     </tr>
+
     <tr>
       <th>Datacenter</th>
       <td><a href="#/inf/show/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
     </tr>
+
     <tr>
       <th>Location</th>
       <td>
@@ -25,6 +28,7 @@
         <span ng-show="device.properties.slot">Slot {{ device.properties.slot }}</span>
       </td>
     </tr>
+
     <tr ng-show="device.properties.chassis_label">
       <th>Chassis</th>
       <td>{{ device.properties.chassis_label }}</td>
