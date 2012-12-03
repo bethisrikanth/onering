@@ -152,7 +152,7 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $routeParams, Device, DeviceNote){
+function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceStat){
   $scope.id = $routeParams.id;
   $scope.note = null;
   $scope.hidAsAColor = false;
@@ -163,6 +163,12 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote){
     }, function(data){
       $scope.device = data;
     });
+
+    DeviceStat.get({
+      id: $scope.id
+    }, function(data){
+      $scope.stats = data;
+    })
   };
 
   $scope.saveNote = function(){

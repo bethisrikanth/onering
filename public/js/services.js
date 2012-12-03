@@ -23,6 +23,11 @@ factory('DeviceNote', function($resource){
     id: '@id'
   });
 }).
+factory('DeviceStat', function($resource){
+  return $resource('/api/devices/:id/stats', {
+    id: '@id'
+  });
+}).
 factory('Site', function($resource){
   return $resource('/api/devices/summary/by-site/rack/model/fqdn/?where=site/:site', {
     site: '@site'

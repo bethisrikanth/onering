@@ -15,7 +15,7 @@
     <div class="span8">
       <h3>Disk</h3>
 
-      <div class="stat disk" ng-repeat="disk in stats.disk | orderBy:'mount' ">
+      <div class="stat disk" ng-repeat="disk in stats.metrics.disk | orderBy:'mount' ">
         <chart
           class="chart"
           type="pie"
@@ -42,7 +42,7 @@
         <h3>Memory</h3>
 
         <div class="stat memory">
-          <h5>{{ stats.memory.total | autosize }} total</h5>
+          <h5>{{ stats.metrics.memory.total | autosize }} total</h5>
         </div>
       </div>
 
@@ -50,8 +50,8 @@
         <h3>CPU</h3>
 
         <div class="stat cpu">
-          <h5>{{ stats.cpu.count }} cores
-            <span ng-show="stats.cpu.speed"> @ {{ stats.cpu.speed | autospeed:'M' }}</span>
+          <h5>{{ stats.metrics.cpu.count }} cores
+            <span ng-show="stats.metrics.cpu.speed"> @ {{ stats.metrics.cpu.speed | autospeed:'M' }}</span>
           </h5>
 
           <div>

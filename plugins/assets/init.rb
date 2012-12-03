@@ -16,6 +16,30 @@ module App
       end
 
       %w{
+        /stats
+        /:id/stats
+      }.each do |route|
+        get route do
+          stat = DeviceStat.find(params[:id])
+          return 404 if not stat
+          stat.to_json
+        end
+
+        post route do
+          json = JSON.parse(request.env['rack.input'].read)
+          json = [json] if json.is_a?(Hash)
+
+          json.each do |o|
+            id = (params[:id] || o['id'])
+            stat = DeviceStat.find_or_create(id)
+            stat.from_json(o['stats'], false).safe_save
+          end
+
+          200
+        end
+      end
+
+      %w{
         /?
         /:id
       }.each do |route|

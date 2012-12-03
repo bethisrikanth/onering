@@ -1,4 +1,5 @@
 require 'model'
+require 'assets/models/device_stat'
 
 class Device < App::Model::Base
   include App::Model::Taggable

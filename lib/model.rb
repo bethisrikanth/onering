@@ -17,10 +17,14 @@ module App
 
     # populate the document from a Hash
       def from_h(hash, merge=true)
-        current = to_h
-        current = current.deeper_merge!(hash, {:merge_hash_arrays => true})
+        if merge
+          newhash = to_h
+          newhash = newhash.deeper_merge!(hash, {:merge_hash_arrays => true})
+        else
+          newhash = hash
+        end
 
-        current.each do |k,v|
+        newhash.each do |k,v|
           send("#{k}=", v) rescue nil
         end
 
@@ -35,6 +39,7 @@ module App
         json.each do |j|
           from_h(j, merge)
         end
+
         self
       end
 
