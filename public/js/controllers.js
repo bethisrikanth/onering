@@ -11,32 +11,34 @@ function NavigationController($scope, $http, $route, $routeParams, Summary){
   });
 }
 
-function SearchController($scope, $http, Query){
+function SearchController($scope, $http, $location, Query){
   $scope.results = null;
 
-  $scope.$watch('query', function(){
-    $scope.runQuery();
-  });
-
+  // $scope.$watch('query', function(){
+  //   $scope.runQuery();
+  // });
 
   $scope.runQuery = function(query){
     if(query) $scope.query = query;
 
     if($scope.query && $scope.query.length > 2){
-      var q = $scope.query.split(':');
-      var field = (q.length > 1 ? q[0] : 'id:name:aliases');
-      q = (q[1] || q[0]).trim();
-      q = q.replace('*', '~');
-
-      console.log(q);
-
       Query.query({
-        query: field+'/'+q
+        query: $scope.prepareQuery($scope.query),
+        limit: 10
       }, function(data){
         $scope.results = (data.length > 0 ? data : null);
       });
     }else{
       $scope.clearResults();
+    }
+  };
+
+  $scope.goQuery = function(query){
+    $scope.clearResults();
+    if(query) $scope.query = query;
+
+    if($scope.query){
+      $location.path('/inf/show/'+$scope.query);
     }
   };
 
@@ -46,13 +48,13 @@ function SearchController($scope, $http, Query){
 }
 
 function QueryController($scope, $http, $route, $routeParams, Query){
-  $scope.query = $routeParams.query.replace(/\|/g, '/');
+  $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
 //run arbitrary query
   if($scope.query){
     Query.query({
-      query: $scope.query
+      query: $scope.prepareQuery($scope.query)
     }, function(data){
       $scope.devices = data;
     });

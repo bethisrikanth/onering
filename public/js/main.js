@@ -37,7 +37,18 @@ app.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'views/index.html',
       controller:  DefaultController
     })
-}]);
+}]).run(function($rootScope){
+  $rootScope.prepareQuery = function(query){
+    console.log('prepareQuery', query)
+
+    var q = query.split(':');
+    var field = (q.length > 1 ? q[0] : 'id:name:aliases');
+    q = (q[1] || q[0]).trim();
+    q = q.replace(/\*/g, '~');
+
+    return field+'/'+q;
+  }
+});
 
 
 try {

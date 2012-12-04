@@ -55,14 +55,17 @@ module App
         if v == '+'
           v = '(?=.*%s.*)' % rv.pop
         else
+          negate = (v[0].chr == '!')
+          v = v.gsub(/^\!/, '')
           v = v.gsub('~', '.*')
           v = "(#{v.gsub(':', '|')})" if v.include?(':')
+          v = '^(?!.*%s.*).*$' % v if negate
         end
 
         rv << v
       end
 
-      return {"$regex" => rv.join}
+      return {"$regex" => rv.join, '$options' => 'i'}
     end
   end
 end

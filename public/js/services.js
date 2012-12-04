@@ -9,7 +9,7 @@ factory('Summary', function($resource){
   });
 }).
 factory('Query', function($resource){
-  return $resource('/api/devices/find/?q=:query', {
+  return $resource('/api/devices/find/tags/!disabled', {
     query: '@query'
   });
 }).

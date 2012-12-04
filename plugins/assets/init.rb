@@ -91,25 +91,37 @@ module App
 
 
     # set devices properties
-      get '/:id/set/*' do
-        device = Device.find(params[:id])
-        return 404 if not device
+      %w{
+        set
+        unset
+      }.each do |action|
+        get "/:id/#{action}/*" do
+          device = Device.find(params[:id])
+          return 404 if not device
 
-        if not params[:splat].empty?
-          prop = device.properties
-          pairs = params[:splat].first.split('/')
+          if not params[:splat].empty?
+            prop = device.properties
+            pairs = params[:splat].first.split('/')
 
-        # set each property
-          pairs.evens.zip(pairs.odds).each do |pair|
-            prop[pair.first] = pair.last
+            if action == 'set'
+            # set each property
+              pairs.evens.zip(pairs.odds).each do |pair|
+                prop[pair.first] = pair.last
+              end
+            else
+            # unset each property
+              pairs.each do |property|
+                prop[property] = nil
+              end
+            end
+
+          # set and save
+            device.properties = prop.reject{|k,v| v == nil}
+            device.safe_save
           end
 
-        # set and save
-          device.properties = prop
-          device.safe_save
+          device.to_json
         end
-
-        device.to_json
       end
 
     # get device property
@@ -153,12 +165,14 @@ module App
         /find/*
       }.each do |r|
         get r do
-          q = (!params[:splat] || params[:splat].empty? ? (params[:q] || {}) : params[:splat].first)
-          Device.where(urlquerypath_to_mongoquery(q)).to_json
+          qsq = (params[:q] || params[:query] || '')
+          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
+          Device.where(urlquerypath_to_mongoquery(q)).limit(params[:limit] || 1000).to_json
         end
 
         post r do
-          q = (!params[:splat] || params[:splat].empty? ? (params[:q] || {}) : params[:splat].first)
+          qsq = (params[:q] || params[:query] || '')
+          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           q = urlquerypath_to_mongoquery(q)
           set = params[:set].split(';').collect{|i| i=i.split(':'); ["properties.#{i.first}", i.last] }
 
