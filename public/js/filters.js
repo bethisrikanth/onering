@@ -106,16 +106,12 @@ filter('section', function(){
       start = parseInt(start);
       len = parseInt(len);
 
-      if(start){
-        if(start == 0){
-          return str;
+      if($.isNumeric(start)){
+        if($.isNumeric(len)){
+          return rv.slice(start, len).join(delim);
         }
 
-        if(len){
-          return rv.slice(start-1, len).join(delim);
-        }
-
-        return rv.slice(start-1).join(delim);
+        return rv.slice(start).join(delim);
       }
 
       return str;

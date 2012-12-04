@@ -15,20 +15,20 @@
 
     <tr>
       <th>Datacenter</th>
-      <td><a href="#/inf/show/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
+      <td><a href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
     </tr>
 
     <tr>
       <th>Location</th>
       <td>
         <span>
-          <a ng-show="device.properties.rack" href="#/inf/show/rack/{{ device.properties.rack }}">Rack {{ device.properties.rack | uppercase }}</a>
+          <a ng-show="device.properties.rack" href="#/inf/show/rack|{{ device.properties.rack }}">Rack {{ device.properties.rack | uppercase }}</a>
           <span ng-hide="device.properties.rack">Rack &mdash;</span>
         </span>
 
         <span>
           /
-          <a ng-show="device.properties.unit" href="#/inf/show/rack/{{ device.properties.rack }}/unit/{{ device.properties.unit }}">
+          <a ng-show="device.properties.unit" href="#/inf/show/rack|{{ device.properties.rack }}|unit|{{ device.properties.unit }}">
             U{{ device.properties.unit }}
           </a>
           <span ng-hide="device.properties.unit">U&mdash;</span>

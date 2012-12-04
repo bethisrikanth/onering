@@ -6,17 +6,16 @@ module App
   # URL path (e.g.: field1/query1/field2/query2/..)
     def urlquerypath_to_mongoquery(query, regex=true)
       if query
-        rv = {'$or' => []}
-
         pairs = query.split('/')
         pairs = pairs.evens.zip(pairs.odds)
 
+        rv = {'$and' => []}
+
         pairs.each do |p|
+          q = {'$or' => []}
           fieldNames = p[0].split(':')
 
           fieldNames.each do |field|
-            q = {} if not q
-            q['$and'] = [] if not q['$and']
             fieldExists = (field.gsub!(/^\^/,'') == nil)
 
             # autodetect type for p[1] := v
@@ -26,15 +25,15 @@ module App
           # list of places to search for a given value
             case field
             when /^id$/
-              q['$and'] << {'_'+field => (v || {'$exists' => fieldExists})}
+              q['$or'] << {'_'+field => (v || {'$exists' => fieldExists})}
             when /name|tags|aliases/
-              q['$and'] << {field => (v || {'$exists' => fieldExists})}
+              q['$or'] << {field => (v || {'$exists' => fieldExists})}
             else
-              q['$and'] << {"properties.#{field}" => (v || {'$exists' => fieldExists})}
+              q['$or'] << {"properties.#{field}" => (v || {'$exists' => fieldExists})}
             end
-
-            rv['$or'] << q
           end
+
+          rv['$and'] << q
         end
 
         return rv

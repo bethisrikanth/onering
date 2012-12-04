@@ -1,11 +1,3 @@
-<div class="notes" ng-show="device.properties.notes">
-  <h3>Notes</h3>
-  <div class="alert alert-info" ng-repeat="(note_id, note) in device.properties.notes | orderBy:'id':true" id="note-{{ note_id }}">
-    <button type="button" class="close" ng-click="deleteNote(note_id)">&times;</button>
-    {{ note.body }}
-  </div>
-</div>
-
 <div class="alerts" ng-show="alerts">
   <h4>Active Alerts</h4>
 </div>

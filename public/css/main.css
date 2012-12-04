@@ -10,6 +10,10 @@ html, body {
   min-height: 100%;
 }
 
+.center{
+  text-align: center !important;
+}
+
 body .modal {
   width: 774px;
   margin-left: -357px;
@@ -99,6 +103,35 @@ body .modal {
   clip-path: url(/img/masks/unknown.svg?embed);
 }
 
+
+.device-list td .emblem{
+  margin: 0;
+}
+
+.device-list td.status{
+  text-align: center;
+}
+
+.device-list .note_toggle{
+  border-radius: 4px;
+  display: block;
+  float: left;
+  height: 100%;
+  width: 100%;
+}
+
+.device-list .note_toggle:hover{
+  background-color: #CCC;
+}
+
+.notes-tip{
+  list-style-type: none;
+  margin-left: 0;
+}
+
+.notes-tip li{
+  padding-bottom: 0.25em;
+}
 
 
 

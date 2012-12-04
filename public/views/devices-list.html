@@ -1,10 +1,13 @@
-<div class="container" ng-show="devices">
+<div class="container device-list" ng-show="devices" ng-controller="DeviceListController">
   <form>
     <div class="row">
       <div class="span12">
         <div class="alert alert-success" ng-show="saved">{{ saved == true &amp;&amp; 'Saved!' || saved }}</div>
         <button ng-hide="editing" class="btn pull-right" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
-        <input ng-show="editing" type="submit" class="btn btn-primary pull-right" value="Save" ng-click="save()"></input>
+        <div class="btn-group pull-right">
+          <input ng-show="editing" type="submit" class="btn btn-danger" value="Cancel" ng-click="editing=false"></input>
+          <input ng-show="editing" type="submit" class="btn btn-primary" value="Save" ng-click="save()"></input>
+        </div>
 
         <br />
         <br />
@@ -17,31 +20,33 @@
           <thead>
             <tr>
               <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-              <th ng-click="sortField='status'; sortReverse=!sortReverse">Status</th>
+              <th ng-click="sortField='status'; sortReverse=!sortReverse"><abbr title="Status">St.</abbr></th>
               <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
               <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
               <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
+              <th ng-click="sortField='properties.model'; sortReverse=!sortReverse">Model</th>
               <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
               <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
               <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
               <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
-              <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse">Notes</th>
+              <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse" class="center">Notes</th>
             </tr>
           </thead>
 
           <tbody>
             <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
               <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
-              <td>
+              <td class="status">
                 <span title="Online" ng-show="device.status=='online'" class="emblem emblem-tiny emblem-online"></span>
                 <span title="Faulted" ng-show="device.status=='fault'" class="emblem emblem-tiny emblem-fault"></span>
                 <span title="Maintenence" ng-show="device.status=='maintenence'" class="emblem emblem-tiny emblem-maintenence"></span>
                 <span title="Unallocated" ng-show="device.status=='unallocated'" class="emblem emblem-tiny emblem-unallocated"></span>
                 <span title="Unknown" ng-hide="device.status" class="emblem emblem-tiny emblem-unknown"></span>
               </td>
-              <td>{{ device.name | section:'.':1:1 }}</td>
+              <td>{{ device.name | section:'.':0:1 }}</td>
               <td>{{ device.properties.ip }}</td>
               <td>{{ device.properties.site | uppercase }}</td>
+              <td>{{ device.properties.model | section:' ':-1 }}</td>
               <td>
                 <span ng-hide="editing">{{ device.properties.rack }}</span>
                 <input ng-show="editing" class="rack" type="text" ng-model="device.properties.rack">
@@ -52,7 +57,15 @@
               </td>
               <td>{{ device.properties.slot }}</td>
               <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
-              <td><i ng-show="device.properties.notes" class="icon icon-comment"></i></td>
+              <td>
+                <a
+                  ui-jq="popover"
+                  ui-options="note_tip_options(device.properties.notes)"
+                  class="note_toggle center"
+                  ng-show="device.properties.notes">
+                  <i class="icon icon-comment"></i>
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>

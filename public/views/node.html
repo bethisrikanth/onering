@@ -1,10 +1,10 @@
 <div class="container-fluid node" ng-show="device">
   <header class="row-fluid">
     <div class="span9">
-      <span class="label hid">{{ device.id }}</span>
+      <span class="label hid">ID: {{ device.id }}</span>
       <br />
       <h1>
-        <span class="name">{{ device.name | section:'.':1:1 }}<i class="minor">.{{ device.name | section:'.':2 }}</i></span>
+        <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
       </h1>
       <h5 ng-show="device.aliases">Aliases: <i class="normal">{{ device.aliases | join:', ' }}</i></h5>
     </div>
@@ -26,11 +26,26 @@
     <div class="span6" ng-include="'views/node-dashboard.html'" />
 
     <div class="span3">
+      <h3>Notes</h3>
+
+      <ul class="nav nav-list">
+        <li><a open-dialog="nodeComment"><i class="icon-comment"></i> Add Note</a></li>
+        <li class="divider"></li>
+        <li>
+          <div class="alert alert-info" ng-repeat="(time, note) in device.properties.notes | orderBy:'id':true" id="note-{{ time }}">
+            <button type="button" class="close" ng-click="deleteNote(time)">&times;</button>
+            <button type="button" class="close" open-dialog="nodeComment" ng-click="editNote(time)"><i title="Edit" class="icon-pencil"></i>&nbsp;</button>
+            <b class="pull-left">{{ (time*1000) | date:'short' }}</b><br />
+            {{ note.body }}
+          </div>
+        </li>
+      </ul>
+
       <h3>Actions</h3>
 
       <ul class="nav nav-list well">
         <li class="nav-header">Lifecycle</li>
-        <li><a open-dialog="nodeComment"><i class="icon-comment"></i> Add Note</a></li>
+        <li><a><i class="icon-retweet"></i> Transition to State</a></li>
       </ul>
     </div>
   </div>
@@ -49,6 +64,6 @@
 
   <div class="modal-footer">
     <a class="btn btn-danger" data-dismiss="modal" ng-click="note=null">Cancel</a>
-    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote()">Save</a>
+    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote(old_note_id)">Save</a>
   </div>
 </div>

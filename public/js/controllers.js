@@ -46,14 +46,13 @@ function SearchController($scope, $http, Query){
 }
 
 function QueryController($scope, $http, $route, $routeParams, Query){
-  if($routeParams.field) $scope.field = $routeParams.field;
-  $scope.query = $routeParams.query;
+  $scope.query = $routeParams.query.replace(/\|/g, '/');
   $scope.params = $route.current.$route.params;
 
 //run arbitrary query
   if($scope.query){
     Query.query({
-      query: [$scope.field, $scope.query].compact().join('/')
+      query: $scope.query
     }, function(data){
       $scope.devices = data;
     });
@@ -73,9 +72,61 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
 }
 
 
-function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Site, SiteContact){
-  $scope.site = $routeParams.site;
+function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNote){
   $scope.sortField = 'name';
+
+  $scope.note_tip_options = function(notes){
+    return {
+      placement: 'left',
+      trigger: 'hover',
+      delay: 250,
+      html: true,
+      content: (function(){
+        var rv = '<ul class="notes-tip">';
+
+        for(var time in notes){
+          rv += '<li><b>'+$filter('date')((time*1000), 'short')+':</b> '+notes[time].body+'</li>';
+        }
+
+        rv += '</ul>';
+        return rv;
+      })()
+    }
+  };
+
+  $scope.$watch('saved', function(){
+    if($scope.saved){
+      $timeout(function(){
+        $scope.saved = null;
+      }, 3000);
+    }
+  });
+
+  $scope.edit = function(){
+    $scope.editing = true;
+  }
+
+  $scope.save = function(){
+    $.each($scope.devices, function(idx, i){
+      if(i.properties)
+        if(i.properties.rack)
+          if(i.properties.rack.length > 0)
+            Device.save({
+              id: i.id,
+              properties: {
+                rack: i.properties.rack,
+                unit: i.properties.unit
+              }
+            }, function(){
+              $scope.saved = 'Changes saved';
+              $scope.editing = false;
+            });
+    });
+  }
+}
+
+function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
+  $scope.site = $routeParams.site;
 
 //site summary
   Site.query({
@@ -102,15 +153,6 @@ function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Si
     $scope.devices = data;
   });
 
-
-  $scope.$watch('saved', function(){
-    if($scope.saved){
-      $timeout(function(){
-        $scope.saved = null;
-      }, 3000);
-    }
-  });
-
   $scope.addRack = function(){
     $scope.racks.push({
       'id': 'Untitled'
@@ -124,28 +166,6 @@ function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Si
     console.log(rack.id, rack.old)
     $http.post('/api/devices/find/site/'+$scope.site+'/rack/'+rack.old+'/?set=rack:'+rack.id);
   };
-
-  $scope.edit = function(){
-    $scope.editing = true;
-  }
-
-  $scope.save = function(){
-    $.each($scope.devices, function(idx, i){
-      if(i.properties)
-        if(i.properties.rack)
-          if(i.properties.rack.length > 0)
-            Device.save({
-              id: i.id,
-              properties: {
-                rack: i.properties.rack,
-                unit: i.properties.unit
-              }
-            }, function(){
-              $scope.saved = 'Changes saved';
-              $scope.editing = false;
-            });
-    });
-  }
 }
 
 function RackController($scope, $http, $routeParams, Rack){
@@ -165,42 +185,53 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
   $scope.note = null;
   $scope.hidAsAColor = false;
 
-  $scope.reload = function(){
+  $scope.reload = function(id){
+    var id = id || $scope.id;
+
     Device.get({
-      id: $scope.id
+      id: id
     }, function(data){
       $scope.device = data;
     });
 
     DeviceStat.get({
-      id: $scope.id
+      id: id
     }, function(data){
       $scope.stats = data;
     })
   };
 
-  $scope.saveNote = function(){
+  $scope.saveNote = function(note_id){
     if($scope.note){
       if($scope.device && $scope.device.properties){
         if(!$scope.device.properties.notes)
           $scope.device.properties.notes = [];
 
         DeviceNote.save({
-          id:      $scope.device.id
+          id: $scope.device.id
         }, $scope.note, function(){
-          $scope.reload();
+          if(note_id)
+            $scope.deleteNote(note_id);
+
+          $scope.old_note_id = null;
           $scope.note = null;
+          $scope.reload($scope.device.id);
         });
       }
     }
-  }
+  };
+
+  $scope.editNote = function(note_id){
+    $scope.old_note_id = note_id;
+    $scope.note = $scope.device.properties.notes[note_id].body;
+  };
 
   $scope.deleteNote = function(note_id){
     DeviceNote.delete({
       id: $scope.device.id,
       note_id: note_id
     }, function(){
-      $scope.reload();
+      $scope.reload($scope.device.id);
     })
   };
 

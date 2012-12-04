@@ -1,4 +1,4 @@
-var app = angular.module('app', ['filters', 'directives', 'apiService']);
+var app = angular.module('app', ['filters', 'directives', 'ui', 'apiService']);
 
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
@@ -29,7 +29,7 @@ app.config(['$routeProvider', function($routeProvider) {
       templateUrl: 'views/devices.html',
       controller: QueryController
     }).
-    when('/inf/show/:field/:query', {
+    when('/inf/show/:query', {
       templateUrl: 'views/devices.html',
       controller: QueryController
     }).
