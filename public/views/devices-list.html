@@ -1,29 +1,62 @@
-<table class="table table-condensed">
-  <thead>
-    <tr>
-      <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-      <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse"><abbr title="Notes">N</abbr></th>
-      <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-      <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
-      <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
-      <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
-      <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
-      <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
-      <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
-    </tr>
-  </thead>
+<div class="container" ng-show="devices">
+  <form>
+    <div class="row">
+      <div class="span12">
+        <div class="alert alert-success" ng-show="saved">{{ saved == true &amp;&amp; 'Saved!' || saved }}</div>
+        <button ng-hide="editing" class="btn pull-right" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
+        <input ng-show="editing" type="submit" class="btn btn-primary pull-right" value="Save" ng-click="save()"></input>
 
-  <tbody>
-    <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
-      <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
-      <td><i ng-show="device.properties.notes" class="icon icon-comment"></i></td>
-      <td>{{ device.name }}</td>
-      <td>{{ device.properties.ip }}</td>
-      <td>{{ device.properties.site | uppercase }}</td>
-      <td><input class="rack" type="text" ng-model="device.properties.rack"></td>
-      <td><input class="unit" type="text" ng-model="device.properties.unit"></td>
-      <td>{{ device.properties.slot }}</td>
-      <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
-    </tr>
-  </tbody>
-</table>
+        <br />
+        <br />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span12">
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
+              <th ng-click="sortField='status'; sortReverse=!sortReverse">Status</th>
+              <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+              <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
+              <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
+              <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
+              <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
+              <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
+              <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
+              <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse">Notes</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
+              <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+              <td>
+                <span title="Online" ng-show="device.status=='online'" class="emblem emblem-tiny emblem-online"></span>
+                <span title="Faulted" ng-show="device.status=='fault'" class="emblem emblem-tiny emblem-fault"></span>
+                <span title="Maintenence" ng-show="device.status=='maintenence'" class="emblem emblem-tiny emblem-maintenence"></span>
+                <span title="Unallocated" ng-show="device.status=='unallocated'" class="emblem emblem-tiny emblem-unallocated"></span>
+                <span title="Unknown" ng-hide="device.status" class="emblem emblem-tiny emblem-unknown"></span>
+              </td>
+              <td>{{ device.name | section:'.':1:1 }}</td>
+              <td>{{ device.properties.ip }}</td>
+              <td>{{ device.properties.site | uppercase }}</td>
+              <td>
+                <span ng-hide="editing">{{ device.properties.rack }}</span>
+                <input ng-show="editing" class="rack" type="text" ng-model="device.properties.rack">
+              </td>
+              <td>
+                <span ng-hide="editing">{{ device.properties.unit }}</span>
+                <input ng-show="editing" class="unit" type="text" ng-model="device.properties.unit">
+              </td>
+              <td>{{ device.properties.slot }}</td>
+              <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
+              <td><i ng-show="device.properties.notes" class="icon icon-comment"></i></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </form>
+</div>

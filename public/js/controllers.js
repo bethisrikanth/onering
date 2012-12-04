@@ -26,6 +26,9 @@ function SearchController($scope, $http, Query){
       var q = $scope.query.split(':');
       var field = (q.length > 1 ? q[0] : 'id:name:aliases');
       q = (q[1] || q[0]).trim();
+      q = q.replace('*', '~');
+
+      console.log(q);
 
       Query.query({
         query: field+'/'+q
@@ -122,6 +125,10 @@ function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Si
     $http.post('/api/devices/find/site/'+$scope.site+'/rack/'+rack.old+'/?set=rack:'+rack.id);
   };
 
+  $scope.edit = function(){
+    $scope.editing = true;
+  }
+
   $scope.save = function(){
     $.each($scope.devices, function(idx, i){
       if(i.properties)
@@ -135,6 +142,7 @@ function SiteController($scope, $http, $routeParams, $timeout, Device, Query, Si
               }
             }, function(){
               $scope.saved = 'Changes saved';
+              $scope.editing = false;
             });
     });
   }

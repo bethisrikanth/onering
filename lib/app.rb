@@ -55,6 +55,10 @@ module App
 
     end
 
+    before do
+      cache_control :private, :must_revalidate, :max_age => 60
+    end
+
     error do
       content_type 'application/json'
 

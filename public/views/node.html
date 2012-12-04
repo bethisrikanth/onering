@@ -1,13 +1,19 @@
 <div class="container-fluid node" ng-show="device">
   <header class="row-fluid">
-    <div class="span12">
+    <div class="span9">
+      <span class="label hid">{{ device.id }}</span>
+      <br />
       <h1>
-        <span class="name">{{ device.name | section:'.':1:1 }}<i>.{{ device.name | section:'.':2 }}</i></span>
-        <span class="label hid">{{ device.id }}</span>
+        <span class="name">{{ device.name | section:'.':1:1 }}<i class="minor">.{{ device.name | section:'.':2 }}</i></span>
       </h1>
-      <h6>
+      <h5 ng-show="device.aliases">Aliases: <i class="normal">{{ device.aliases | join:', ' }}</i></h5>
+    </div>
+
+    <div class="span3">
+      <b class="pull-right">
+        <i class="icon-time"></i>
         Last Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
-      </h6>
+      </b>
     </div>
   </header>
 

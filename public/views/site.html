@@ -23,19 +23,5 @@
     </div>
   </div>
 
-  <div class="container">
-    <form name="unrackedForm" class="unracked" ng-show="devices">
-      <div class="row">
-        <div class="span12">
-          <div class="alert alert-success" ng-show="saved">{{ saved == true && 'Saved!' || saved }}</div>
-          <input type="submit" class="btn btn-primary pull-right" value="Save" ng-click="save()"></input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="span12">
-          <div ng-include="'views/devices-list.html'"></div>
-        </div>
-      </div>
-    </form>
-  </div>
+  <div ng-include="'views/devices-list.html'"></div>
 </div>

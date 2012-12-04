@@ -37,6 +37,12 @@ body .modal {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
+.emblem-tiny{
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+
 .emblem-small{
   width: 24px;
   height: 24px;
@@ -154,6 +160,7 @@ header .nav .dropdown-menu li a:hover span{
 .node header h1{
   font-size: 26px;
   margin-right: 0.5em;
+  margin-bottom: 0.0625em;
   line-height: 32px;
 }
 
@@ -162,6 +169,11 @@ header .nav .dropdown-menu li a:hover span{
   font-size: 14px;
   font-style: normal;
   margin-left: 1em;
+}
+
+.node header h5{
+  margin-top: 0;
+  margin-bottom: 1em;
 }
 
 .stat{
@@ -207,9 +219,18 @@ table.table td input{
 
 
 
-
-.node .name i{
+i.minor{
   color: #888;
+  font-style: normal;
+}
+
+i.normal{
+  font-variant: normal !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+}
+
+.node .name i.minor{
   font-size: 18px;
   margin-left: 0.125em;
 }
