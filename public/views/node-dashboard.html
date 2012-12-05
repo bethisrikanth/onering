@@ -4,52 +4,22 @@
 
 <div class="container-fluid stats" ng-show="stats">
   <div class="row-fluid">
-    <div class="span8">
-      <h3>Disk</h3>
-
-      <div class="stat disk" ng-repeat="disk in stats.metrics.disk | orderBy:'mount' ">
-        <chart
-          class="chart"
-          type="pie"
-          width="64"
-          height="64"
-          rows="[disk.percent_used, (100-disk.percent_used)]"
-          columns="['Used', 'Free']"
-          legend-position="none"
-          label-style="none"
-          tooltip-trigger="none"
-          hide-last-slice="true" />
-
-        <p>
-          <h4>{{ disk.mount }}</h4>
-          <h6 ng-show="disk.device">{{ disk.device }}</h6>
-          <span ng-show="disk.percent_used" class="percentUsed">{{ disk.percent_used }}% in use, </span>
-          <span ng-show="disk.available" class="spaceFree">{{ disk.available | autosize }} free</span>
-        </p>
-      </div>
+    <div class="span6">
+      <h3>Operations</h3>
+      <div ng-include="'views/node-osstats.html'" />
     </div>
 
-    <div class="span4 container">
-      <div class="row">
-        <h3>Memory</h3>
+    <div class="span6">
+      <h3>Applications</h3>
 
-        <div class="stat memory">
-          <h5>{{ stats.metrics.memory.total | autosize }} total</h5>
-        </div>
+      <div ng-show="device.properties.chef">
+        <h4>Chef</h4>
+        <div ng-include="'views/node-summary-chef.html'" />
       </div>
 
-      <div class="row">
-        <h3>CPU</h3>
-
-        <div class="stat cpu">
-          <h5>{{ stats.metrics.cpu.count }} cores
-            <span ng-show="stats.metrics.cpu.speed"> @ {{ stats.metrics.cpu.speed | autospeed:'M' }}</span>
-          </h5>
-
-          <div>
-            <div ng-repeat="c in []" class="emblem emblem-small emblem-online">{{ c }}</div>
-          </div>
-        </div>
+      <div ng-show="device.properties.glu">
+        <h4>Glu</h4>
+        <div ng-include="'views/node-summary-glu.html'" />
       </div>
     </div>
   </div>

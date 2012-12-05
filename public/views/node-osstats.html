@@ -1,0 +1,39 @@
+<h4>Disk</h4>
+
+<div class="stat disk" ng-repeat="disk in stats.metrics.disk | orderBy:'mount'">
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span4">
+        <div class="progress" title="{{ disk.percent_used }}% used">
+          <div class="bar" style="width: {{ disk.percent_used }}%;"></div>
+        </div>
+      </div>
+      <div class="span8">
+        <div><b>{{ disk.mount }} &mdash; <span ng-show="disk.available" class="spaceFree">{{ disk.available | autosize }} free</span></b></div>
+        <div ng-show="disk.device">{{ disk.device }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <h4>Memory</h4>
+
+  <div class="stat memory">
+    <h5>{{ stats.metrics.memory.total | autosize }} total</h5>
+  </div>
+</div>
+
+<div>
+  <h4>CPU</h4>
+
+  <div class="stat cpu">
+    <h5>{{ stats.metrics.cpu.count }} cores
+      <span ng-show="stats.metrics.cpu.speed"> @ {{ stats.metrics.cpu.speed | autospeed:'M' }}</span>
+    </h5>
+
+    <div>
+      <div ng-repeat="c in []" class="emblem emblem-small emblem-online">{{ c }}</div>
+    </div>
+  </div>
+</div>

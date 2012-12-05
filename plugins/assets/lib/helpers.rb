@@ -26,7 +26,7 @@ module App
             case field
             when /^id$/
               q['$or'] << {'_'+field => (v || {'$exists' => fieldExists})}
-            when /name|tags|aliases/
+            when /^(name|tags|aliases)/
               q['$or'] << {field => (v || {'$exists' => fieldExists})}
             else
               q['$or'] << {"properties.#{field}" => (v || {'$exists' => fieldExists})}
