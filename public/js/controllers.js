@@ -129,6 +129,7 @@ function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNo
 
 function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
+  $scope.devices = null;
 
 //site summary
   Site.query({

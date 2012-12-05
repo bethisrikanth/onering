@@ -158,6 +158,17 @@ module App
       end
 
 
+    # status
+    # set the status of a device
+      get '/:id/status/:status' do
+        device = Device.find(params[:id])
+        return 404 if not device
+        device.status = params[:status]
+        device.safe_save
+        device.to_json
+      end
+
+
       # /devices/find
       # search for devices by fields
       %w{

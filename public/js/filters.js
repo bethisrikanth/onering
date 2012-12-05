@@ -13,12 +13,16 @@ Array.prototype.compact = function(){
 angular.module('filters', ['ng']).
 filter('titleize', function(){
   return function(text){
-    if([
-      'NOC'
-    ].indexOf(text.toUpperCase()) >= 0)
-      return text.replace(/_/, ' ').toUpperCase();
+    if(text){
+      if([
+        'NOC'
+      ].indexOf(text.toUpperCase()) >= 0)
+        return text.replace(/_/, ' ').toUpperCase();
 
-    return text.replace(/_/, ' ').toTitleCase();
+      return text.replace(/_/, ' ').toTitleCase();
+    }
+
+    return text;
   };
 }).
 filter('autosize', function(){

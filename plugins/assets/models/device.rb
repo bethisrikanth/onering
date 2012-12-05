@@ -2,11 +2,15 @@ require 'model'
 require 'assets/models/device_stat'
 
 class Device < App::Model::Base
+  VALID_STATUS = ['online', 'fault', 'maintenance', 'allocatable']
+  MANUAL_STATUS = ['fault', 'maintenance', 'available']
+
   include App::Model::Taggable
 
   set_collection_name "devices"
 
   before_validation :_mangle_id
+  before_validation :_confine_status
   validate :_id_pattern_valid?
 
   timestamps!
@@ -17,6 +21,7 @@ class Device < App::Model::Base
   key :tags,            Array
   key :aliases,         Array
   key :collected_at,    Time
+  key :status,          String
 
   def add_note(body, id=nil)
     id = Time.now.to_i if not id or (id.to_i == 0)
@@ -47,6 +52,21 @@ class Device < App::Model::Base
   private
     def _mangle_id
       id = id.strip.downcase if id
+    end
+
+    def _confine_status
+      if self.status_changed?
+        if not VALID_STATUS.include?(self.status)
+          errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
+        end
+
+      # automatic collection cannot clear a fault, maintenance, or available state
+        if MANUAL_STATUS.include?(self.status_was)
+          if self.collected_at_changed?
+            self.status = self.status_was
+          end
+        end
+      end
     end
 
     def _id_pattern_valid?

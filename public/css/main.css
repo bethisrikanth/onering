@@ -103,6 +103,27 @@ body .modal {
   clip-path: url(/img/masks/unknown.svg?embed);
 }
 
+.label-online{
+  background-color: #468847;
+}
+
+.label-fault{
+  background-color: #B94A48;
+}
+
+.label-maintenance{
+  background-color: #F89406;
+}
+
+.label-unallocated{
+  background-color: #3A87AD;
+}
+
+.label-unknown{
+  background-color: #999;
+}
+
+
 
 .device-list td .emblem{
   margin: 0;
