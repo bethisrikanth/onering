@@ -278,7 +278,9 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
 
   $scope.tag = function(value){
     if($scope.device && typeof(value) == 'string' && $.trim(value).length > 0){
-      $http.get('/api/devices/'+$scope.device.id+'/tag/'+value);
+      $http.get('/api/devices/'+$scope.device.id+'/tag/'+value).success(function(){
+        $scope.reload();
+      });
     }
   };
 
@@ -296,7 +298,6 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
     }
 
     $scope.newtags = [];
-    $scope.reload();
   };
 
   $scope.reload();
