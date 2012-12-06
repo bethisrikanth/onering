@@ -4,10 +4,7 @@ app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.
     when('/inf', {
       templateUrl: 'views/sites.html',
-      controller:  SummaryController,
-      params: {
-        field: 'site'
-      }
+      controller:  OverviewController
     }).
     when('/inf/summary/:field', {
       templateUrl: 'views/summary.html',

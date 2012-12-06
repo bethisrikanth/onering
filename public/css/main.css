@@ -93,7 +93,7 @@ body .modal {
   clip-path: url(/img/masks/maintenance.svg?embed);
 }
 
-.emblem-unallocated{
+.emblem-allocatable{
   background-color: #3A87AD;
 }
 
@@ -115,7 +115,7 @@ body .modal {
   background-color: #F89406;
 }
 
-.label-unallocated{
+.label-allocatable{
   background-color: #3A87AD;
 }
 
@@ -299,4 +299,15 @@ i.normal{
 
 .node .hid{
   vertical-align: middle !important;
+}
+
+.status span{
+  color: #333;
+}
+
+.status .name{
+  display: block;
+  float: left;
+  font-weight: bold;
+  width: 128px;
 }

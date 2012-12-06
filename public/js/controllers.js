@@ -73,6 +73,26 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
   });
 }
 
+function OverviewController($scope, Summary){
+  $scope.overview = {
+    'global': {
+      'labels': [],
+      'values': []
+    }
+  };
+
+  Summary.query({
+    field: 'status'
+  }, function(data){
+    console.log(data)
+    for(var s in data){
+      $scope.overview.global.labels.push((data[s].id == null ? 'Unknown' : data[s].id.toString()).toTitleCase());
+      $scope.overview.global.values.push(data[s].count || 0);
+    }
+
+    console.log($scope.overview);
+  });
+}
 
 function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNote){
   $scope.sortField = 'name';
@@ -236,6 +256,15 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
     }, function(){
       $scope.reload($scope.device.id);
     })
+  };
+
+  $scope.setStatus = function(status){
+
+    if($scope.device && status){
+      $http.get('/api/devices/'+$scope.device.id+'/status/'+status).success(function(data){
+        $scope.reload();
+      });
+    }
   };
 
   $scope.reload();

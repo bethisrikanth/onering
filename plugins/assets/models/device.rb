@@ -2,10 +2,10 @@ require 'model'
 require 'assets/models/device_stat'
 
 class Device < App::Model::Base
+  include App::Model::Taggable
   VALID_STATUS = ['online', 'fault', 'maintenance', 'allocatable']
   MANUAL_STATUS = ['fault', 'maintenance', 'available']
-
-  include App::Model::Taggable
+  TOP_LEVEL_GROUPS = ['id', 'name', 'status']
 
   set_collection_name "devices"
 
@@ -72,4 +72,127 @@ class Device < App::Model::Base
     def _id_pattern_valid?
       errors.add(:id, "Device ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
     end
+
+  class<<self
+  # summarize
+  #   this method provides arbitrary-depth aggregate rollups of a MongoDB
+  #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)
+  #
+  #   group_by:   the top-level field to group by
+  #   properties: additional fields to drill down into
+  #   query:      a query Hash to filter the collection by
+  #               (defaults to a summary of the whole collection)
+  #
+    def summarize(group_by, properties=[], query=nil, options={})
+      unless TOP_LEVEL_GROUPS.include?(group_by)
+        group_by = "properties.#{group_by}"
+      end
+
+      group_root = group_by.split('.').last.to_sym
+
+      rv = (options[:root] || {})
+
+      q = {
+        '$match' => query
+      } if query
+
+
+      c = []
+      c << q if query
+
+      c << {
+        '$project' => {
+          :_id => "$#{group_by}"
+        }
+      }
+
+      c << {
+        '$group' => {
+          :_id => "$_id",
+          :count => {'$sum' => 1}
+        }
+      }
+
+    # do initial query on grouping field
+      collection.aggregate(c).collect{|i|
+        rv[i['_id']] = {
+          :id => i['_id'],
+          :count => i['count'].to_i
+        }
+      }
+
+    # ------------------------------------------
+    # run subqueries for providing field rollups
+      unless properties.empty?
+        field = properties.pop
+
+
+        if field
+          field_root = field.gsub('.', '_')
+
+          c = []
+          c << q if query
+
+        # project the document down to the group and rollup field
+          c << {
+            '$project' => {
+              :_id => 0,
+              group_root => "$#{group_by}",
+              :children => "$properties.#{field}"
+            }
+          }
+
+          #c << {'$unwind' => {'$cond' => [{'$eq' => ['$type', 4]}, "$#{field_root}", "$#{field_root}"]}}
+
+
+        # group by both group and rollup field, counting the documents in
+        # these groups
+          c << {
+            '$group' => {
+              :_id => {
+                group_root => "$#{group_root}",
+                :children => "$children"
+              },
+              :count => {'$sum' => 1}
+            }
+          }
+
+        # group by the group field, breaking the rollup field into a set
+        # of value-count pairs
+          c << {
+            '$group' => {
+              :_id => "$_id.#{group_root}",
+              :count => {'$sum' => '$count'},
+              :children => {
+                '$addToSet' => {
+                  :_id => {'$ifNull' => ["$_id.children", nil]},
+                  :count => '$count'
+                }
+              }
+            }
+          }
+
+          collection.aggregate(c).collect{|i|
+          # add the current filter to the $match query
+            qq = (query.clone rescue {'$and' => []})
+            qq['$and'] = [] unless qq['$and']
+            qq['$and'] << {group_by => i['_id']}
+
+          # recurse into summarize to next rollup properties
+            irv = summarize(field, properties.clone, qq, {
+              :root => rv[i['_id']][:children]
+            })
+
+            qq['$and'].pop
+
+          # set return value
+            rv[i['_id']][:children] = irv
+          }
+        end
+      end
+
+    # return only the top-level hash values
+      rv.collect{|k,v| v }.sort{|a,b| (a[:id] || '') <=> (b[:id] || '') }
+    end
+  end
 end

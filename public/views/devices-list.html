@@ -26,7 +26,7 @@
             <thead>
               <tr>
                 <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-                <th ng-click="sortField='status'; sortReverse=!sortReverse"><abbr title="Status">St.</abbr></th>
+                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
                 <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
                 <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
                 <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
@@ -43,11 +43,7 @@
               <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
                 <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
                 <td class="status">
-                  <span title="Online" ng-show="device.status=='online'" class="emblem emblem-tiny emblem-online"></span>
-                  <span title="Faulted" ng-show="device.status=='fault'" class="emblem emblem-tiny emblem-fault"></span>
-                  <span title="Maintenence" ng-show="device.status=='maintenence'" class="emblem emblem-tiny emblem-maintenence"></span>
-                  <span title="Unallocated" ng-show="device.status=='unallocated'" class="emblem emblem-tiny emblem-unallocated"></span>
-                  <span title="Unknown" ng-hide="device.status" class="emblem emblem-tiny emblem-unknown"></span>
+                  <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
                 </td>
                 <td>{{ device.name | section:'.':0:1 }}</td>
                 <td>{{ device.properties.ip }}</td>

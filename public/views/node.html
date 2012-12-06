@@ -46,7 +46,7 @@
 
       <ul class="nav nav-list well">
         <li class="nav-header">Lifecycle</li>
-        <li><a><i class="icon-retweet"></i> Transition to State</a></li>
+        <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
       </ul>
     </div>
   </div>
@@ -66,5 +66,39 @@
   <div class="modal-footer">
     <a class="btn btn-danger" data-dismiss="modal" ng-click="note=null">Cancel</a>
     <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote(old_note_id)">Save</a>
+  </div>
+</div>
+
+<div class="modal hide" id="nodeTransitionState">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Transition to State</h3>
+  </div>
+
+  <div class="modal-body">
+    <ul class="nav nav-list status">
+      <li>
+        <a ng-click="setStatus('online')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/online.png" title="Online" /> Online</span>
+          <span>Mark a node as online and active</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setStatus('maintenance')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/maintenance.png" title="Maintenance" /> Maintenance</span>
+          <span>Put this node into maintenance mode</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setStatus('allocatable')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/allocatable.png" title="Allocatable" /> Allocatable</span>
+          <span>Flag this node as free to be reinstalled and used for another role</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Close</a>
   </div>
 </div>
