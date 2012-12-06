@@ -35,13 +35,13 @@ app.config(['$routeProvider', function($routeProvider) {
       controller:  DefaultController
     })
 }]).run(function($rootScope){
-  $rootScope.prepareQuery = function(query){
+  $rootScope.prepareQuery = function(query, raw){
     var q = query.split(':');
     var field = (q.length > 1 ? q[0] : 'id:name:aliases:tags');
     q = (q[1] || q[0]).trim();
     q = q.replace(/\*/g, '~');
 
-    return field+'/'+q;
+    return (raw ? q : field+'/'+q);
   }
 });
 

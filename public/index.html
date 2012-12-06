@@ -39,13 +39,28 @@
             <a class="dropdown-toggle"
              data-toggle="dropdown"
              href="#">
-              Datacenters
+              Devices
               <b class="caret"></b>
             </a>
 
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
               <li ng-repeat="site in sites | orderBy:'-count'">
                 <a href="#site/{{ site.id }}">{{ (site.id | uppercase) || '(empty)' }} <span class="badge">{{ site.count }}</span></a>
+              </li>
+
+              <li class="divider"></li>
+
+              <li class="dropdown-submenu">
+                <a tabindex="-1">By Status...</a>
+                <ul class="dropdown-menu">
+                  <li ng-repeat="status in statuses | orderBy:'count':true">
+                    <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status?raw=true' }}">
+                      <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
+                      {{ (status.id || 'unknown') | titleize }}
+                      <span class="badge">{{ status.count }}</span>
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>

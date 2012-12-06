@@ -9,6 +9,13 @@ function NavigationController($scope, $http, $route, $routeParams, Summary){
   }, function(data){
     $scope.sites = data;
   });
+
+//get status summary
+  Summary.query({
+    field: 'status'
+  }, function(data){
+    $scope.statuses = data;
+  });
 }
 
 function SearchController($scope, $http, $location, Query){
@@ -54,7 +61,7 @@ function QueryController($scope, $http, $route, $location, $routeParams, Query){
 //run arbitrary query
   if($scope.query){
     Query.query({
-      query: $scope.prepareQuery($scope.query)
+      query: $scope.prepareQuery($scope.query, $routeParams.raw)
     }, function(data){
       if(data.length == 0){
         $scope.noresults = true;
@@ -93,13 +100,10 @@ function OverviewController($scope, Summary){
   Summary.query({
     field: 'status'
   }, function(data){
-    console.log(data)
     for(var s in data){
       $scope.overview.global.labels.push((data[s].id == null ? 'Unknown' : data[s].id.toString()).toTitleCase());
       $scope.overview.global.values.push(data[s].count || 0);
     }
-
-    console.log($scope.overview);
   });
 }
 
