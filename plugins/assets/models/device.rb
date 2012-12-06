@@ -4,7 +4,7 @@ require 'assets/models/device_stat'
 class Device < App::Model::Base
   include App::Model::Taggable
   VALID_STATUS = ['online', 'fault', 'maintenance', 'allocatable']
-  MANUAL_STATUS = ['fault', 'maintenance', 'available']
+  MANUAL_STATUS = ['fault', 'maintenance', 'allocatable']
   TOP_LEVEL_GROUPS = ['id', 'name', 'status']
 
   set_collection_name "devices"

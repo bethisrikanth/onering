@@ -16,7 +16,9 @@ gem "thin"
 gem "rake"
 gem "json"
 gem "liquid"
-gem 'sinatra-assetpack', :require => 'sinatra/assetpack'
+gem "sinatra-assetpack", :require => "sinatra/assetpack"
+gem "stasis"
+gem "rdiscount"
 
 group :test, :development do
   gem 'rspec'

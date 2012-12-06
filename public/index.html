@@ -39,25 +39,28 @@
             <a class="dropdown-toggle"
              data-toggle="dropdown"
              href="#">
-              Devices
+              <i class="icon-th-large icon-white"></i>&nbsp;Devices
               <b class="caret"></b>
             </a>
 
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="min-width: 220px;">
               <li ng-repeat="site in sites | orderBy:'-count'">
-                <a href="#site/{{ site.id }}">{{ (site.id | uppercase) || '(empty)' }} <span class="badge">{{ site.count }}</span></a>
+                <a href="#site/{{ site.id }}">
+                  {{ (site.id | uppercase) || '(empty)' }}
+                  <span class="badge">{{ site.count }}</span>
+                </a>
               </li>
 
               <li class="divider"></li>
 
               <li class="dropdown-submenu">
-                <a tabindex="-1">By Status...</a>
-                <ul class="dropdown-menu">
+                <a tabindex="-1">Status</a>
+                <ul class="dropdown-menu" style="min-width: 220px;">
                   <li ng-repeat="status in statuses | orderBy:'count':true">
                     <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status?raw=true' }}">
                       <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
                       {{ (status.id || 'unknown') | titleize }}
-                      <span class="badge">{{ status.count }}</span>
+                      <span>{{ status.count }}</span>
                     </a>
                   </li>
                 </ul>

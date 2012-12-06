@@ -14,13 +14,21 @@
       <div class="row">
         <div class="span12">
           <div class="alert alert-success" ng-show="saved">{{ saved == true &amp;&amp; 'Saved!' || saved }}</div>
-          <button ng-hide="editing" class="btn pull-right" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
-          <div class="btn-group pull-right">
-            <input ng-show="editing" type="submit" class="btn btn-danger" value="Cancel" ng-click="editing=false"></input>
-            <input ng-show="editing" type="submit" class="btn btn-primary" value="Save" ng-click="save()"></input>
-          </div>
 
           <br />
+
+          <!-- normal mode actions -->
+          <div ng-hide="editing">
+            <button class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
+            <button class="btn" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
+          </div>
+
+          <!-- edit mode actions -->
+          <div ng-show="editing">
+            <input type="submit" class="btn btn-primary" value="Save" ng-click="save()"></input>
+            <input type="submit" class="btn btn-danger" value="Cancel" ng-click="editing=false"></input>
+          </div>
+
           <br />
         </div>
       </div>
@@ -76,6 +84,16 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          <!-- edit mode actions -->
+          <div ng-show="editing">
+            <input type="submit" class="btn btn-primary" value="Save" ng-click="save()"></input>
+            <input type="submit" class="btn btn-danger" value="Cancel" ng-click="editing=false"></input>
+          </div>
         </div>
       </div>
     </form>

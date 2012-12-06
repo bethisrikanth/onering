@@ -58,23 +58,27 @@ function QueryController($scope, $http, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
-//run arbitrary query
-  if($scope.query){
-    Query.query({
-      query: $scope.prepareQuery($scope.query, $routeParams.raw)
-    }, function(data){
-      if(data.length == 0){
-        $scope.noresults = true;
+  $scope.reload = function(){
+  //run arbitrary query
+    if($scope.query){
+      Query.query({
+        query: $scope.prepareQuery($scope.query, $routeParams.raw)
+      }, function(data){
+        if(data.length == 0){
+          $scope.noresults = true;
 
-      }else if(data.length == 1){
-        $location.path('/node/'+data[0].id);
+        }else if(data.length == 1){
+          $location.path('/node/'+data[0].id);
 
-      }else{
-        $scope.devices = data;
+        }else{
+          $scope.devices = data;
 
-      }
-    });
+        }
+      });
+    }
   }
+
+  $scope.reload();
 }
 
 function SummaryController($scope, $http, $routeParams, $route, Summary){

@@ -154,8 +154,6 @@ body .modal {
   padding-bottom: 0.25em;
 }
 
-
-
 header .nav .dropdown-menu li a span{
   -moz-border-radius: 8px;
   -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.2);
@@ -318,4 +316,8 @@ i.normal{
 
 .node .tags .add i{
   margin-top: 2px;
+}
+
+.node .disk .mount {
+  margin-bottom: 8px;
 }

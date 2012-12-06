@@ -13,11 +13,14 @@ module App
         content_type 'application/json'
       end
 
-      get '/' do
+      get '/?' do
         {
           :status => 'ok',
           :local_root => ENV['PROJECT_ROOT'],
-          :environment => settings.environment
+          :environment => settings.environment,
+          :backend_server_port => request.env['SERVER_PORT'],
+          :backend_server_string => request.env['SERVER_SOFTWARE'],
+          :remote_addr => request.env['REMOTE_ADDR']
         }.to_json
       end
     end
