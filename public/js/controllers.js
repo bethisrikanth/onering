@@ -47,7 +47,7 @@ function SearchController($scope, $http, $location, Query){
   };
 }
 
-function QueryController($scope, $http, $route, $routeParams, Query){
+function QueryController($scope, $http, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
@@ -56,7 +56,16 @@ function QueryController($scope, $http, $route, $routeParams, Query){
     Query.query({
       query: $scope.prepareQuery($scope.query)
     }, function(data){
-      $scope.devices = data;
+      if(data.length == 0){
+        $scope.noresults = true;
+
+      }else if(data.length == 1){
+        $location.path('/node/'+data[0].id);
+
+      }else{
+        $scope.devices = data;
+
+      }
     });
   }
 }
@@ -207,6 +216,7 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
   $scope.id = $routeParams.id;
   $scope.note = null;
   $scope.hidAsAColor = false;
+  $scope.newtags = [];
 
   $scope.reload = function(id){
     var id = id || $scope.id;
@@ -259,7 +269,6 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
   };
 
   $scope.setStatus = function(status){
-
     if($scope.device && status){
       $http.get('/api/devices/'+$scope.device.id+'/status/'+status).success(function(data){
         $scope.reload();
@@ -267,8 +276,33 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
     }
   };
 
+  $scope.tag = function(value){
+    if($scope.device && typeof(value) == 'string' && $.trim(value).length > 0){
+      $http.get('/api/devices/'+$scope.device.id+'/tag/'+value);
+    }
+  };
+
+  $scope.untag = function(value){
+    if($scope.device && value && typeof(value) == 'string'){
+      $http.get('/api/devices/'+$scope.device.id+'/untag/'+value).success(function(data){
+        $scope.reload();
+      });
+    }
+  };
+
+  $scope.saveTags = function(){
+    for(var i in $scope.newtags){
+      $scope.tag($scope.newtags[i]);
+    }
+
+    $scope.newtags = [];
+    $scope.reload();
+  };
+
   $scope.reload();
 }
+
+
 
 function RackerController($scope, $window, Query){
   $scope.recheck = function(){

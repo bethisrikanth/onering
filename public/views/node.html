@@ -7,7 +7,20 @@
       <h1>
         <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
       </h1>
-      <h5 ng-show="device.aliases">Aliases: <i class="normal">{{ device.aliases | join:', ' }}</i></h5>
+      <div ng-show="device.aliases"><b>Aliases:</b> {{ device.aliases | join:', ' }}</div>
+      <div ng-show="device.tags" class="tags">
+        <b>Tags:</b>
+        <span>
+          <span ng-repeat="tag in device.tags">
+            <span class="label label-inverse">
+              {{ tag }}
+              <a style="color: white; text-decoration: none" ng-click="untag(tag)">&times;</a>
+            </span>
+          </span>
+        </span>
+
+        <a class="add" open-dialog="tagEditor" ng-click="newtags.push('')"><i class="icon-plus-sign"></i></a>
+      </div>
     </div>
 
     <div class="span3">
@@ -100,5 +113,29 @@
 
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">Close</a>
+  </div>
+</div>
+
+<div class="modal hide" id="tagEditor">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Add Tags</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="tags">
+      <input
+        ng-repeat="tag in newtags"
+        type="text"
+        name="tag0"
+        autofocus
+        ng-model="newtags[$index]">
+      </input>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Close</a>
+    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveTags()">Save</a>
   </div>
 </div>

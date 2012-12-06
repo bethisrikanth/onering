@@ -1,10 +1,15 @@
 <div ng-controller="DeviceListController">
-  <div class="container device-list loading center" ng-hide="devices">
+  <div class="container device-list loading center" ng-hide="devices || noresults">
     <img src="/img/loading.gif" title="Current Setting: Medium-Dark" />
     <h3>Loading...</h3>
   </div>
 
-  <div class="container device-list" ng-show="devices">
+  <div class="container device-list loading center" ng-show="noresults">
+    <img src="/img/noresults.gif" title="If the toast is without a toaster, does the toast still have meaning?" />
+    <h3>No results found</h3>
+  </div>
+
+  <div class="container device-list" ng-show="devices &amp;&amp; !noresults">
     <form>
       <div class="row">
         <div class="span12">

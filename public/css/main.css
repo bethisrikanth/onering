@@ -311,3 +311,11 @@ i.normal{
   font-weight: bold;
   width: 128px;
 }
+
+.node .tags .label{
+  margin-right: 4px;
+}
+
+.node .tags .add i{
+  margin-top: 2px;
+}
