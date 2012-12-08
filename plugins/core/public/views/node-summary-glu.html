@@ -1,0 +1,16 @@
+<div ng-repeat="app in device.properties.glu.apps">
+  <h5><a href="#/inf/show/glu.tags:{{ app.name }}">{{ app.name }}</a></h5>
+
+  <table class="table table-condensed">
+    <tbody>
+      <tr>
+        <th>Version</th>
+        <td>{{ app.version }}</td>
+      </tr>
+      <tr>
+        <th>Tags</th>
+        <td>{{ app.tags | join:', ' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

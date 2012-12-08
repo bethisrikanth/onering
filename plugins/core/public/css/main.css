@@ -1,0 +1,323 @@
+html, body {
+  height: 100%;
+}
+
+.clearfix{
+  clear: both;
+}
+
+.fill {
+  min-height: 100%;
+}
+
+.center{
+  text-align: center !important;
+}
+
+body .modal {
+  width: 774px;
+  margin-left: -357px;
+  margin-right: -387px;
+}
+
+.content{
+  margin-top: 60px;
+}
+
+.card h3{
+  margin-top: 0;
+}
+
+.card{
+  margin-bottom: 1em;
+}
+
+.emblem{
+  color: white;
+  float: left;
+  font-weight: bold;
+  margin: 4px;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.emblem-tiny{
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+}
+
+.emblem-small{
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.emblem-medium{
+  height: 32px;
+  line-height: 32px;
+  width: 32px;
+}
+
+.emblem-large{
+  font-size: 22px;
+  height: 64px;
+  line-height: 64px;
+  width: 64px;
+}
+
+.emblem-huge{
+  font-size: 36px;
+  height: 128px;
+  line-height: 128px;
+  margin: 8px;
+  text-shadow: -1 -2px 0 rgba(0, 0, 0, 0.25);
+  width: 128px;
+}
+
+.emblem-online{
+  -webkit-mask-box-image: url(/img/masks/online.svg?embed);
+  background-color: #468847;
+  clip-path: url(/img/masks/online.svg?embed);
+}
+
+.emblem-fault{
+  -webkit-mask-box-image: url(/img/masks/fault.svg?embed);
+  background-color: #B94A48;
+  clip-path: url(/img/masks/fault.svg?embed);
+}
+
+.emblem-maintenance{
+  -webkit-mask-box-image: url(/img/masks/maintenance.svg?embed);
+  background-color: #F89406;
+  clip-path: url(/img/masks/maintenance.svg?embed);
+}
+
+.emblem-allocatable{
+  background-color: #3A87AD;
+}
+
+.emblem-unknown{
+  -webkit-mask-box-image: url(/img/masks/unknown.svg?embed);
+  background-color: #999;
+  clip-path: url(/img/masks/unknown.svg?embed);
+}
+
+.label-online{
+  background-color: #468847;
+}
+
+.label-fault{
+  background-color: #B94A48;
+}
+
+.label-maintenance{
+  background-color: #F89406;
+}
+
+.label-allocatable{
+  background-color: #3A87AD;
+}
+
+.label-unknown{
+  background-color: #999;
+}
+
+
+
+.device-list td .emblem{
+  margin: 0;
+}
+
+.device-list td.status{
+  text-align: center;
+}
+
+.device-list .note_toggle{
+  border-radius: 4px;
+  display: block;
+  float: left;
+  height: 100%;
+  width: 100%;
+}
+
+.device-list .note_toggle:hover{
+  background-color: #CCC;
+}
+
+.notes-tip{
+  list-style-type: none;
+  margin-left: 0;
+}
+
+.notes-tip li{
+  padding-bottom: 0.25em;
+}
+
+header .nav .dropdown-menu li a span{
+  -moz-border-radius: 8px;
+  -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.2);
+  -webkit-border-radius: 8px;
+  -webkit-box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.2),0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #888;
+  float: right;
+  font-weight: normal;
+  line-height: 16px;
+  margin-top: 2px;
+  padding: 0 6px;
+  text-shadow: none;
+}
+
+header .nav .dropdown-menu li a:hover span{
+  color: white;
+}
+
+.navbar-search{
+  margin-right: 48px;
+}
+
+.navbar-search .autocomplete{
+  margin-right: 20px;
+}
+
+.logo{
+  padding: 0px !important;
+  text-align: center;
+}
+
+.logo i{
+  background: transparent center center no-repeat url('/img/logo.png?embed');
+  display: inline-block;
+  height: 32px;
+  margin-left: 12px;
+  margin: 4px;
+  width: 32px;
+}
+
+.site div.rack{
+  min-height: 250px;
+}
+
+.site .rack .nav li{
+  font-size: 12px;
+}
+
+.site .rack .nav li .badge{
+  float: right;
+}
+
+.node header h1{
+  font-size: 26px;
+  margin-right: 0.5em;
+  margin-bottom: 0.0625em;
+  line-height: 32px;
+}
+
+.node header h1 i{
+  color: #888;
+  font-size: 14px;
+  font-style: normal;
+  margin-left: 1em;
+}
+
+.node header h5{
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.stats{
+  padding: 0;
+}
+
+.stat{
+  margin-bottom: 2em;
+  clear: both;
+}
+
+.stat .chart{
+  float: left;
+}
+
+.stat h4{
+  margin-bottom: 4px;
+}
+
+.stat h6{
+  margin-top: 4px;
+}
+
+.stat .container-fluid{
+  padding: 0;
+}
+
+.dragging{
+  display: block;
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  width: 100%;
+}
+
+.site .rack .editing input{
+  height: 16px;
+  width: 64px;
+}
+
+.drop {
+  border: 1px solid #DDD;
+  height: 48px;
+}
+
+table.table td input{
+  height: 16px;
+  padding: 4px 1px;
+  margin-bottom: 0px;
+  width: 64px;
+}
+
+
+
+i.minor{
+  color: #888;
+  font-style: normal;
+}
+
+i.normal{
+  font-variant: normal !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+}
+
+.node .name i.minor{
+  font-size: 18px;
+  margin-left: 0.125em;
+}
+
+.node .hid{
+  vertical-align: middle !important;
+}
+
+.status span{
+  color: #333;
+}
+
+.status .name{
+  display: block;
+  float: left;
+  font-weight: bold;
+  width: 128px;
+}
+
+.node .tags .label{
+  margin-right: 4px;
+}
+
+.node .tags .add i{
+  margin-top: 2px;
+}
+
+.node .disk .mount {
+  margin-bottom: 8px;
+}

@@ -1,0 +1,141 @@
+<div class="container-fluid node" ng-show="device">
+  <header class="row-fluid">
+    <div class="span9">
+      <span class="label label-{{ device.status || 'unknown' }} hid">ID: {{ device.id }}</span>
+      <span class="label label-{{ device.status || 'unknown' }} status" ng-show="device.status">{{ device.status | titleize }}</span>
+      <br />
+      <h1>
+        <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
+      </h1>
+      <div ng-show="device.aliases"><b>Aliases:</b> {{ device.aliases | join:', ' }}</div>
+      <div ng-show="device.tags" class="tags">
+        <b>Tags:</b>
+        <span>
+          <span ng-repeat="tag in device.tags">
+            <span class="label label-inverse">
+              {{ tag }}
+              <a style="color: white; text-decoration: none" ng-click="untag(tag)">&times;</a>
+            </span>
+          </span>
+        </span>
+
+        <a class="add" open-dialog="tagEditor" ng-click="newtags.push('')"><i class="icon-plus-sign"></i></a>
+      </div>
+    </div>
+
+    <div class="span3">
+      <b class="pull-right">
+        <i class="icon-time"></i>
+        Last Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
+      </b>
+    </div>
+  </header>
+
+  <div class="row-fluid">
+    <div class="span3">
+      <h3>Details</h3>
+      <div ng-include="'views/node-details.html'" />
+    </div>
+
+    <div class="span6" ng-include="'views/node-dashboard.html'" />
+
+    <div class="span3">
+      <h3>Notes</h3>
+
+      <ul class="nav nav-list">
+        <li><a open-dialog="nodeComment"><i class="icon-comment"></i> Add Note</a></li>
+        <li class="divider"></li>
+        <li>
+          <div class="alert alert-info" ng-repeat="(time, note) in device.properties.notes | orderBy:'id':true" id="note-{{ time }}">
+            <button type="button" class="close" ng-click="deleteNote(time)">&times;</button>
+            <button type="button" class="close" open-dialog="nodeComment" ng-click="editNote(time)"><i title="Edit" class="icon-pencil"></i>&nbsp;</button>
+            <b class="pull-left">{{ (time*1000) | date:'short' }}</b><br />
+            {{ note.body }}
+          </div>
+        </li>
+      </ul>
+
+      <h3>Actions</h3>
+
+      <ul class="nav nav-list well">
+        <li class="nav-header">Lifecycle</li>
+        <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal hide" id="nodeComment">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Add Note</h3>
+  </div>
+
+  <div class="modal-body">
+    <textarea autofocus style="width: 95%;" ng-model="note"></textarea>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn btn-danger" data-dismiss="modal" ng-click="note=null">Cancel</a>
+    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveNote(old_note_id)">Save</a>
+  </div>
+</div>
+
+<div class="modal hide" id="nodeTransitionState">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Transition to State</h3>
+  </div>
+
+  <div class="modal-body">
+    <ul class="nav nav-list status">
+      <li>
+        <a ng-click="setStatus('online')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/online.png" title="Online" /> Online</span>
+          <span>Mark a node as online and active</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setStatus('maintenance')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/maintenance.png" title="Maintenance" /> Maintenance</span>
+          <span>Put this node into maintenance mode</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setStatus('allocatable')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/allocatable.png" title="Allocatable" /> Allocatable</span>
+          <span>Flag this node as free to be reinstalled and used for another role</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Close</a>
+  </div>
+</div>
+
+<div class="modal hide" id="tagEditor">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Add Tags</h3>
+  </div>
+
+  <div class="modal-body">
+    <form name="tags">
+      <input
+        ng-repeat="tag in newtags"
+        type="text"
+        name="tag0"
+        autofocus
+        ng-model="newtags[$index]">
+      </input>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Close</a>
+    <a class="btn btn-primary" data-dismiss="modal" ng-click="saveTags()">Save</a>
+  </div>
+</div>

@@ -44,7 +44,3 @@ factory('Rack', function($resource){
     rack: '@rack'
   });
 });
-
-// end file ./plugins/assets/public/js/services.js
-
-

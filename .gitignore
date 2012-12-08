@@ -5,7 +5,7 @@ tmp/
 .sass-cache/
 *.swp
 setup.sh
-public/assets/
+public
 .DS_Store
 *.pem
 *.sublime-project

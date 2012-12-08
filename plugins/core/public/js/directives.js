@@ -105,7 +105,3 @@ directive('chart', function() {
     }
   };
 });
-
-// end file ./plugins/core/public/js/directives.js
-
-

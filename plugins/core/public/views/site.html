@@ -1,0 +1,27 @@
+<div ng-show="summary" class="site">
+  <div class="container">
+    <div class="row">
+      <div class="span5">
+        <h3>Site {{ site | uppercase }} &mdash; {{ summary.count }} nodes</h3>
+      </div>
+      <address ng-show="contact" class="span4">
+        <br>
+        <strong>{{ contact.name }}<span ng-show="contact.vendor_site"> &ndash; {{ contact.vendor_site }}</span></strong><br>
+        {{ contact.address | join:', ' }}
+        (<a href="https://maps.google.com/?q={{ contact.address | join:',' }},{{ contact.city }},{{ contact.state }}" target="_blank">map</a>)<br>
+        {{ contact.city }}, {{ contact.state }}&nbsp;&nbsp;{{ contact.postal }}<br>
+        <br>
+      </address>
+      <div ng-show="contact" class="span3">
+        <br>
+        <div ng-show="contact.mail">
+          <div ng-repeat="(type, value) in contact.mail"><i class="icon-envelope"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+          <div ng-repeat="(type, value) in contact.phones"><i class="icon-user"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div ng-include="'views/devices-list.html'"></div>
+</div>

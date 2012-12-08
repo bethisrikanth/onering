@@ -1,26 +1,3 @@
-function DefaultController($scope){
-
-}
-
-function NavigationController($scope, $http, $route, $routeParams, Summary){
-//get site summary
-  Summary.query({
-    field: 'site'
-  }, function(data){
-    $scope.sites = data;
-  });
-
-//get status summary
-  Summary.query({
-    field: 'status'
-  }, function(data){
-    $scope.statuses = data;
-  });
-}
-
-// end file ./plugins/core/public/js/controllers.js
-
-
 function SearchController($scope, $http, $location, Query){
   $scope.results = null;
 
@@ -329,6 +306,3 @@ function RackerController($scope, $window, Query){
   $scope.recheck();
   $window.setInterval($scope.recheck, 2000);
 }
-// end file ./plugins/assets/public/js/controllers.js
-
-

@@ -198,7 +198,3 @@ config(['$provide', function($provide) {
   });
 }]);
 
-
-// end file ./plugins/core/public/js/filters.js
-
-

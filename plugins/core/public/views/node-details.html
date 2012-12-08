@@ -1,0 +1,71 @@
+<table class="table table-condensed">
+  <tbody>
+    <tr>
+      <th>Model</th>
+      <td>{{ device.properties.make }} {{ device.properties.model }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.serial">
+      <th>Service Tag</th>
+      <td>
+        {{ device.properties.serial }}
+        [<a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">Support</a>]
+      </td>
+    </tr>
+
+    <tr>
+      <th>Datacenter</th>
+      <td><a href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
+    </tr>
+
+    <tr>
+      <th>Location</th>
+      <td>
+        <span>
+          <a ng-show="device.properties.rack" href="#/inf/show/rack|{{ device.properties.rack }}">Rack {{ device.properties.rack | uppercase }}</a>
+          <span ng-hide="device.properties.rack">Rack &mdash;</span>
+        </span>
+
+        <span>
+          /
+          <a ng-show="device.properties.unit" href="#/inf/show/rack|{{ device.properties.rack }}|unit|{{ device.properties.unit }}">
+            U{{ device.properties.unit }}
+          </a>
+          <span ng-hide="device.properties.unit">U&mdash;</span>
+        </span>
+
+        <span ng-show="device.properties.slot">/ Slot {{ device.properties.slot }}</span>
+      </td>
+    </tr>
+
+    <tr ng-show="device.properties.chassis_label">
+      <th>Chassis</th>
+      <td>{{ device.properties.chassis_label }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.ip">
+      <th>IP</th>
+      <td>{{ device.properties.ip }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.mac">
+      <th>MAC</th>
+      <td>{{ device.properties.mac }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.ipmi_ip">
+      <th>IPMI Address</th>
+      <td><a target="_blank" href="http://{{ device.properties.ipmi_ip }}">{{ device.properties.ipmi_ip }}</a></td>
+    </tr>
+
+    <tr ng-show="device.properties.kernel">
+      <th>Kernel</th>
+      <td>{{ device.properties.kernel }}</td>
+    </tr>
+
+    <tr ng-show="device.properties.bios_version">
+      <th>BIOS Version</th>
+      <td>{{ device.properties.bios_version }}</td>
+    </tr>
+  </tbody>
+</table>
