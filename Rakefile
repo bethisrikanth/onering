@@ -33,3 +33,15 @@ namespace :db do
     puts "done"
   end
 end
+
+# utilities for managing static assets
+namespace :assets do
+  desc "Generate minified production-ready static resources from installed plugins"
+  task :generate, :plugins do |t, plugins|
+    p = (plugins[:plugins] || Dir["plugins/*"].collect{|d| File.basename(d) }.sort.join(','))
+    plugins = p.split(/\W/) unless plugins.is_a?(Array)
+
+  # hack?  yes.
+    system "./bin/regen-assets.sh #{plugins.join(' ')}"
+  end
+end

@@ -1,12 +1,16 @@
 #!/bin/bash
-
 [ $# -eq 0 ] && (echo 'Must specify at least one plugin to generate resources for!' 1>&2 && exit 1)
 
+echo "Generating static assets for plugins: $@"
+
+
 # clear out and remake destination
+echo "Cleaning out ./public folder..."
 rm -rf ./public
 mkdir ./public
 
 # merge all assets into a single tree
+echo "Merging plugin subtrees..."
 for i in $@; do
   if [ -d ./plugins/$i/public ]; then
     for j in ./plugins/$i/public/*; do
@@ -35,3 +39,5 @@ for i in js; do
     fi
   done
 done
+
+echo "Done."

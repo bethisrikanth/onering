@@ -1,0 +1,104 @@
+#!/usr/bin/env ruby
+require 'date'
+require 'json'
+require 'pp'
+
+block_types = ['info','programstatus','hoststatus', 'servicestatus', 'contactstatus', 'servicecomment']
+fields = {
+  'host_name'                     => false,
+  'current_state'                 => false,
+  'check_command'                 => false,
+  'plugin_output'                 => false, 
+  'service_description'           => ['description',     :string],
+  'last_hard_state_change'        => ['last_alert_at',   :date],
+  'last_check'                    => ['last_checked_at', :date],
+  'is_flapping'                   => ['flapping',        :bool],
+  'problem_has_been_acknowledged' => ['acknowledged',    :bool],
+  'current_event_id'              => ['event_id',        :int],
+  'current_problem_id'            => ['problem_id',      :int],
+  'current_notification_id'       => ['notification_id', :int],
+}
+
+cmd='grep -P "(^('+block_types.join('|')+') {|^\t}|^\t('+fields.keys.join('|')+')=)" '+File.expand_path(ARGV[0])
+
+hosts = {}
+current_host = nil
+current_block = nil
+in_block = nil
+
+IO.popen(cmd).each do |line|
+# entering block
+  if line =~ /^(hoststatus|servicestatus) \{$/
+    in_block = $1.gsub('status','').to_sym
+    next
+  end
+
+# leaving block
+  if line =~ /^\t\}$/
+    if current_block
+      hosts[current_host] = {} unless hosts[current_host]
+      hosts[current_host][in_block] = [] unless hosts[current_host][in_block]
+
+    # sanitize values
+    # -------------------------------------------------------------------------
+
+    # mangle fields
+      fields.each do |from, to|
+        next unless to
+        if current_block[from.to_sym]
+          current_block[to.first.to_sym] = case to.last
+          when :bool then (current_block[from.to_sym] == "1")
+          when :int  then current_block[from.to_sym].to_i
+          when :date then DateTime.strptime(current_block[from.to_sym], '%s')
+          else current_block[from.to_sym]
+          end
+
+          current_block.delete(from.to_sym)
+        end
+      end
+
+    # normalize state
+      current_block[:current_state] = case current_block[:current_state].to_i
+      when 0 then :okay
+      when 1 then :warning
+      when 2 then :critical
+      else nil
+      end
+
+    # cull okay/unknown values
+      if current_block[:current_state] and current_block[:current_state] != :okay
+        hosts[current_host][in_block] << current_block
+      end
+
+    # reset block
+      current_block = nil
+    end
+
+    in_block = nil 
+  end
+
+# inside block
+  if in_block
+    key, value = line.strip.split('=', 2)
+
+    if key == 'host_name'
+      current_host = value
+      next      
+    elsif current_host
+      current_block = {} unless current_block
+      current_block[key.to_sym] = value
+    end
+  else
+    current_host = nil
+  end
+end
+
+hosts.reject!{|host, status|
+  status.delete(:host) if status[:host].empty?
+  status.delete(:service) if status[:service].empty?
+
+  !(status[:host] || status[:service])
+}
+
+puts hosts.to_json
+#pp hosts
