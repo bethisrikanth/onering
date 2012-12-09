@@ -6,6 +6,5 @@ class NagiosHost < App::Model::Base
   timestamps!
 
   key :name,            String
-  key :host,            Array
-  key :service,         Array
+  key :alerts,          Array
 end

@@ -69,7 +69,7 @@
               </li>
 
               <li class="dropdown-submenu" ng-show="alert_states">
-                <a tabindex="-1">Active Alerts</a>
+                <a tabindex="-1">Hosts Alerting</a>
                 <ul class="dropdown-menu" style="min-width: 220px;">
                   <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
                     <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">

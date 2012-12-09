@@ -204,6 +204,8 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
   $scope.note = null;
   $scope.hidAsAColor = false;
   $scope.newtags = [];
+  $scope.alert_init_limit = 3;
+  $scope.alert_show_limit = $scope.alert_init_limit;
 
   $scope.reload = function(id){
     var id = id || $scope.id;
@@ -223,8 +225,8 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
     NagiosHost.get({
       id: id
     }, function(data){
-      if(data.service){
-        $scope.nagios_alerts = data.service;
+      if(data.alerts){
+        $scope.nagios_alerts = data.alerts;
       }
     });
   };

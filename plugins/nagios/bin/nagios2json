@@ -13,6 +13,7 @@ fields = {
   'last_hard_state_change'        => ['last_alert_at',   :date],
   'last_check'                    => ['last_checked_at', :date],
   'is_flapping'                   => ['flapping',        :bool],
+  'notifications_enabled'         => ['notify',          :bool],
   'problem_has_been_acknowledged' => ['acknowledged',    :bool],
   'current_event_id'              => ['event_id',        :int],
   'current_problem_id'            => ['problem_id',      :int],
@@ -36,8 +37,9 @@ IO.popen(cmd).each do |line|
 # leaving block
   if line =~ /^\t\}$/
     if current_block
-      hosts[current_host] = {} unless hosts[current_host]
-      hosts[current_host][in_block] = [] unless hosts[current_host][in_block]
+      hosts[current_host] = {
+        :alerts => []
+      } unless hosts[current_host]
 
     # sanitize values
     # -------------------------------------------------------------------------
@@ -57,6 +59,9 @@ IO.popen(cmd).each do |line|
         end
       end
 
+    # set alert check type
+      current_block[:type] = in_block
+
     # normalize state
       current_block[:current_state] = case current_block[:current_state].to_i
       when 0 then :okay
@@ -67,7 +72,7 @@ IO.popen(cmd).each do |line|
 
     # cull okay/unknown values
       if current_block[:current_state] and current_block[:current_state] != :okay
-        hosts[current_host][in_block] << current_block
+        hosts[current_host][:alerts] << current_block
       end
 
     # reset block
@@ -94,10 +99,7 @@ IO.popen(cmd).each do |line|
 end
 
 hosts.reject!{|host, status|
-  status.delete(:host) if status[:host].empty?
-  status.delete(:service) if status[:service].empty?
-
-  !(status[:host] || status[:service])
+  status[:alerts].empty?
 }
 
 puts hosts.to_json

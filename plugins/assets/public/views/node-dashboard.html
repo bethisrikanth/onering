@@ -1,14 +1,28 @@
 <div class="alerts" ng-show="nagios_alerts">
-  <h3>Active Alerts <i class="minor">as of {{ nagios_alerts.updated_at | timeAgo }}</i></h3>
+  <h3>{{ nagios_alerts.length }} Active Alert{{ nagios_alerts.length > 1 &amp;&amp; 's' || '' }} <i class="minor">as of {{ nagios_alerts.updated_at | timeAgo }}</i></h3>
 
   <ul class="unstyled">
-    <li ng-repeat="alert in nagios_alerts | orderBy:'last_alert_at':true" class="sidetab sidetab-{{ alert.current_state }} {{ alert.acknowledged &amp;&amp; 'acknowledged' }}">
-      <span>
-        <b>Since</b> {{ alert.last_alert_at | timeAgo }}<b ng-show="alert.flapping"><i> [FLAPPING]</i></b>,
-        <b>last checked</b> {{ alert.last_checked_at | timeAgo }}
-      </span>
-      <b>{{ alert.plugin_output }}</b>
-      <span ng-show="alert.description">Service: {{ alert.description }}</span>
+    <li ng-repeat="alert in nagios_alerts | orderBy:'last_alert_at':true | limitTo:alert_show_limit" class="sidetab sidetab-{{ alert.current_state }}">
+      <div ng-hide="alert.acknowledged">
+        <span>
+          <b>Since</b> {{ alert.last_alert_at | timeAgo }}<b ng-show="alert.flapping"><i> [FLAPPING]</i></b>,
+          <b>last checked</b> {{ alert.last_checked_at | timeAgo }}
+        </span>
+        <b>{{ alert.plugin_output }}</b>
+        <span ng-show="alert.description">{{ alert.type | titleize }}: {{ alert.description }}</span>
+      </div>
+
+      <div ng-show="alert.acknowledged">
+        <span><b>Acknowledged:</b> {{ alert.type }} check {{ alert.description }} failed, happening since {{ alert.last_checked_at | date:'short' }}</span>
+      </div>
+    </li>
+
+    <li ng-hide="nagios_alerts.length <= alert_init_limit || alert_show_limit > alert_init_limit">
+      <a ng-click="alert_show_limit=99">More &raquo;</a>
+    </li>
+
+    <li ng-show="nagios_alerts.length > alert_init_limit &amp;&amp; alert_show_limit > alert_init_limit">
+      <a ng-click="alert_show_limit=alert_init_limit">&laquo; Less</a>
     </li>
   </ul>
   <br />
