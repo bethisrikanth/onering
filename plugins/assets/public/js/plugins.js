@@ -3,11 +3,35 @@ angular.module('assetsPlugin', [
   'assetsRoutes'
 ]).run(['$rootScope', function($rootScope){
   $rootScope.prepareQuery = function(query, raw){
-    var q = query.split(':');
-    var field = (q.length > 1 ? q[0] : 'id:name:aliases:tags');
-    q = (q[1] || q[0]).trim();
-    q = q.replace(/\*/g, '~');
+//  explictly specify raw=true to send the query directly to the API
+//  without client-side processing
+    if(raw) return query;
 
-    return (raw ? q : field+'/'+q);
+    var rv = [];
+    query = $.trim(query).split(' ');
+
+    for(var part in query){
+      if(typeof(query[part]) == 'string'){
+        var q = query[part].split(':');
+
+    //  field negation operator should be processed in raw mode
+        if(query[part].indexOf('^') !== -1){
+          rv.push(query[part]);
+
+    //  normal query
+        }else{
+          var field = (q.length > 1 ? q[0] : 'id:name:aliases:tags');
+          q = $.trim(q[1] || q[0]);
+          q = q.replace(/\*/g, '~');
+
+          console.log(field, q)
+
+          rv.push(field)
+          rv.push(q);
+        }
+      }
+    }
+
+    return rv.join('/');
   }
 }]);

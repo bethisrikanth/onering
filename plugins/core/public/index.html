@@ -59,7 +59,7 @@
                 <a tabindex="-1">Status</a>
                 <ul class="dropdown-menu" style="min-width: 220px;">
                   <li ng-repeat="status in statuses | orderBy:'count':true">
-                    <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status?raw=true' }}">
+                    <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status' }}">
                       <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
                       {{ (status.id || 'unknown') | titleize }}
                       <span>{{ status.count }}</span>
