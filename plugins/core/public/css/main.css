@@ -366,3 +366,7 @@ i.normal{
   font-size: 12px;
   line-height: 12px;
 }
+
+.node .alerts li > div > span a{
+  color: #999;
+}

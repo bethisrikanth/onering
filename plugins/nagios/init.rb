@@ -1,6 +1,7 @@
 require 'controller'
 require 'assets/models/device'
 require 'nagios/models/nagios_host'
+require 'open-uri'
 
 module App
   class Base < Controller
@@ -62,7 +63,19 @@ module App
       get '/:id' do
         nagios_host = NagiosHost.find(params[:id])
         return 404 unless nagios_host
-        nagios_host.to_json
+        rv = nagios_host.to_h
+
+        if Config.get('nagios/url')
+          rv['alerts'].each_with_index do |alert, i|
+            name = URI::encode(rv['name'])
+            type = (alert['type'] == 'service' ? 2 : 1)
+            ext  = (alert['type'] == 'service' ? '&service='+URI::encode(alert['name']) : '')
+
+            rv['alerts'][i]['url'] = "#{Config.get('nagios/url')}/nagios/cgi-bin/extinfo.cgi?type=#{type}&host=#{name}#{ext}"
+          end
+        end
+
+        rv.to_json
       end
     end
   end

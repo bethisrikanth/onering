@@ -7,7 +7,7 @@
       <h1>
         <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
       </h1>
-      <div ng-show="device.aliases"><b>Aliases:</b> {{ device.aliases | join:', ' }}</div>
+      <div ng-show="device.aliases"><b> Aliases:</b> {{ device.aliases | join:', ' }}</div>
       <div ng-show="device.tags" class="tags">
         <b>Tags:</b>
         <span>

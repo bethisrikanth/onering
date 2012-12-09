@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
+require 'fileutils'
 require 'date'
 require 'json'
 require 'pp'
+
+
+NG_TEMP_PATH='/tmp/.nagios-status.dat'
 
 block_types = ['info','programstatus','hoststatus', 'servicestatus', 'contactstatus', 'servicecomment']
 fields = {
@@ -9,7 +13,7 @@ fields = {
   'current_state'                 => false,
   'check_command'                 => false,
   'plugin_output'                 => false, 
-  'service_description'           => ['description',     :string],
+  'service_description'           => ['name',            :string],
   'last_hard_state_change'        => ['last_alert_at',   :date],
   'last_check'                    => ['last_checked_at', :date],
   'is_flapping'                   => ['flapping',        :bool],
@@ -20,7 +24,11 @@ fields = {
   'current_notification_id'       => ['notification_id', :int],
 }
 
-cmd='grep -P "(^('+block_types.join('|')+') {|^\t}|^\t('+fields.keys.join('|')+')=)" '+File.expand_path(ARGV[0])
+# copy the status file to a temp location because I don't want this terrifying
+# unmanaged thing open any longer than it has to be
+FileUtils.cp(File.expand_path(ARGV[0]), NG_TEMP_PATH)
+
+cmd='grep -P "(^('+block_types.join('|')+') {|^\t}|^\t('+fields.keys.join('|')+')=)" '+NG_TEMP_PATH
 
 hosts = {}
 current_host = nil
@@ -38,6 +46,7 @@ IO.popen(cmd).each do |line|
   if line =~ /^\t\}$/
     if current_block
       hosts[current_host] = {
+        :name   => current_host,
         :alerts => []
       } unless hosts[current_host]
 
