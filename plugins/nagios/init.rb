@@ -14,11 +14,18 @@ module App
             host = host.strip.chomp rescue next
 
             device = Device.where({
-              'name' => {
-                '$regex' => "^#{host}.*$",
-                '$options' => 'i'
-              }
-            })
+              '$or' => [{
+                'name' => {
+                  '$regex' => "^#{host}.*$",
+                  '$options' => 'i'
+                }
+              },{ 
+                'aliases' => {
+                  '$regex' => "^#{host}.*$",
+                  '$options' => 'i'
+                }
+              }]
+            }).limit(1)
 
             if device.to_a.length == 1
               nagios_host = NagiosHost.find_or_create(device.first.id)
