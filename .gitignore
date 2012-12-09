@@ -6,6 +6,7 @@ tmp/
 *.swp
 setup.sh
 public
+public/*
 .DS_Store
 *.pem
 *.sublime-project

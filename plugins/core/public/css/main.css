@@ -322,6 +322,10 @@ i.normal{
   margin-bottom: 8px;
 }
 
+.node .alerts .minor{
+  font-size: 14px;
+}
+
 .node .alerts li{
   height: 36px;
   padding-top: 0;

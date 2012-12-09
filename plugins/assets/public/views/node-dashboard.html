@@ -1,5 +1,5 @@
 <div class="alerts" ng-show="nagios_alerts">
-  <h3>Active Alerts</h3>
+  <h3>Active Alerts <i class="minor">as of {{ nagios_alerts.updated_at | timeAgo }}</i></h3>
 
   <ul class="unstyled">
     <li ng-repeat="alert in nagios_alerts" class="sidetab sidetab-{{ alert.current_state }}">
@@ -7,6 +7,7 @@
       <span>{{ alert.last_alert_at | timeAgo }}</span>
     </li>
   </ul>
+  <br />
 </div>
 
 <div class="container-fluid stats" ng-show="stats">
