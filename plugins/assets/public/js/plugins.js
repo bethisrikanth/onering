@@ -24,8 +24,6 @@ angular.module('assetsPlugin', [
           q = $.trim(q[1] || q[0]);
           q = q.replace(/\*/g, '~');
 
-          console.log(field, q)
-
           rv.push(field)
           rv.push(q);
         }

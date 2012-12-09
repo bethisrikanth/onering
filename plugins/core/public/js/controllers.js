@@ -16,4 +16,13 @@ function NavigationController($scope, $http, $route, $routeParams, Summary){
   }, function(data){
     $scope.statuses = data;
   });
+
+//get alert state summary
+  Summary.query({
+    field: 'alert_state'
+  }, function(data){
+    $scope.alert_states = $.grep(data, function(el){
+      return (el.id !== null);
+    });
+  });
 }

@@ -183,7 +183,6 @@ function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
     delete rack.editing;
     var devices = [];
 
-    console.log(rack.id, rack.old)
     $http.post('/api/devices/find/site/'+$scope.site+'/rack/'+rack.old+'/?set=rack:'+rack.id);
   };
 }

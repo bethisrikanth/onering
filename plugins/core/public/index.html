@@ -67,6 +67,19 @@
                   </li>
                 </ul>
               </li>
+
+              <li class="dropdown-submenu">
+                <a tabindex="-1">Active Alerts</a>
+                <ul class="dropdown-menu" style="min-width: 220px;">
+                  <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
+                    <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
+                      <img ng-src="/img/alerts/{{ alert_state.id }}.png" />
+                      {{ (alert_state.id) | titleize }}
+                      <span>{{ alert_state.count }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </li>
         </ul>
