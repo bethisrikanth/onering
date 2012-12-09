@@ -5,11 +5,11 @@ tmp/
 .sass-cache/
 *.swp
 setup.sh
-public
-public/*
+/public
+/public/*
 .DS_Store
 *.pem
 *.sublime-project
 *.sublime-workspace
 *.log
-config/*.yaml
+/config/*.yaml
