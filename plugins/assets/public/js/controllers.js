@@ -199,13 +199,14 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceStat, NagiosHost){
+function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote, DeviceStat, NagiosHost){
   $scope.id = $routeParams.id;
   $scope.note = null;
   $scope.hidAsAColor = false;
   $scope.newtags = [];
   $scope.alert_init_limit = 3;
   $scope.alert_show_limit = $scope.alert_init_limit;
+  $scope.alert_load_age = 0;
 
   $scope.reload = function(id){
     var id = id || $scope.id;
@@ -222,13 +223,25 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
       $scope.stats = data;
     });
 
+    $scope.reloadAlerts(id);
+    $scope.load_time = new Date();
+  };
+
+  $scope.reloadAlerts = function(id){
+    $scope.alert_load_age = 0;
+
     NagiosHost.get({
-      id: id
+      id: (id || $scope.id)
     }, function(data){
       if(data.alerts){
         $scope.nagios_alerts = data.alerts;
       }
     });
+  }
+
+  $scope.updateAlertAge = function(){
+    $scope.alert_load_age += 1;
+    try { $scope.$apply(); }catch(e){ }
   };
 
   $scope.saveNote = function(note_id){
@@ -297,6 +310,8 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
     $scope.newtags = [];
   };
 
+  $window.setInterval($scope.updateAlertAge, 1000);
+  $window.setInterval($scope.reload, 60000);
   $scope.reload();
 }
 

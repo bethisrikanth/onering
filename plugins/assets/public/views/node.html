@@ -23,11 +23,21 @@
       </div>
     </div>
 
-    <div class="span3">
-      <b class="pull-right">
-        <i class="icon-time"></i>
-        Last Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
-      </b>
+    <div class="offset1 span2">
+      <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
+      <br />
+      <br />
+      <div>
+        <b>
+          <i class="icon-time"></i>
+          Node Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
+        </b>
+        <br />
+        <b>
+          <i class="icon-refresh"></i>
+          Refreshed: {{ load_time | timeAgo }}
+        </b>
+      </div>
     </div>
   </header>
 
