@@ -8,27 +8,31 @@
     <tr ng-show="device.properties.serial">
       <th>Service Tag</th>
       <td>
-        {{ device.properties.serial }}
+        <a target="_blank" ng-show="device.properties.rack" href="#/inf/show/serial:{{ device.properties.serial }}">{{ device.properties.serial }}</a>
         [<a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">Support</a>]
       </td>
     </tr>
 
     <tr>
       <th>Datacenter</th>
-      <td><a href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
+      <td><a target="_blank" href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
     </tr>
 
     <tr>
       <th>Location</th>
       <td>
         <span>
-          <a ng-show="device.properties.rack" href="#/inf/show/rack|{{ device.properties.rack }}">Rack {{ device.properties.rack | uppercase }}</a>
+          <a 
+            href="#/inf/show/site:{{ device.properties.site }}%20rack:{{ device.properties.rack }}"
+            target="_blank"
+            ng-show="device.properties.rack"
+          >Rack {{ device.properties.rack | uppercase }}</a>
           <span ng-hide="device.properties.rack">Rack &mdash;</span>
         </span>
 
         <span>
           /
-          <a ng-show="device.properties.unit" href="#/inf/show/rack|{{ device.properties.rack }}|unit|{{ device.properties.unit }}">
+          <a target="_blank" ng-show="device.properties.unit" href="#/inf/show/site:{{ device.properties.site }}%20rack:{{ device.properties.rack }}%20unit:{{ device.properties.unit }}">
             U{{ device.properties.unit }}
           </a>
           <span ng-hide="device.properties.unit">U&mdash;</span>
