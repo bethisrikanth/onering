@@ -233,6 +233,8 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
     NagiosHost.get({
       id: (id || $scope.id)
     }, function(data){
+      $scope.nagios_alerts = [];
+      
       if(data.alerts){
         $scope.nagios_alerts = data.alerts;
       }
