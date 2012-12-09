@@ -1,0 +1,63 @@
+<div ng-controller="NagiosAlertListController" class="alerts-list">
+  <div ng-include="'views/device-spinner.html'" />
+
+  <div class="container-fluid device-list" ng-show="results &amp;&amp; !noresults">
+    <div class="row-fluid">
+      <div class="span2">
+        <div>
+          <b>
+            <i class="icon-refresh"></i>
+            Refreshed: {{ load_age }}s ago
+          </b>
+        </div>
+      </div>
+      <div class="offset8 span2">
+        <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="span12">
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th ng-click="sortField='current_state'; sortReverse=!sortReverse"><abbr title="Severity"><i class="icon-warning-sign"></i></abbr></th>
+              <th ng-click="sortField='device.status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
+              <th ng-click="sortField='device.name'; sortReverse=!sortReverse">Host</th>
+              <th ng-click="sortField='name'; sortReverse=!sortReverse">Service</th>
+              <th ng-click="sortField='plugin_output'; sortReverse=!sortReverse">Message</th>
+              <th ng-click="sortField='last_alert_at'; sortReverse=!sortReverse">Alerting Since</th>
+              <th ng-click="sortField='device.collected_at'; sortReverse=!sortReverse">Last Seen</th>
+              <th ng-click="sortField='device.properties.notes'; sortReverse=!sortReverse" class="center">Notes</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="alert in results | orderBy:sortField:sortReverse" class="{{ alert.acknowledged &amp;&amp; 'acknowledged' || '' }}">
+              <td class="alert_state">
+                <span title="{{ alert.current_state | titleize }}" class="label label-{{ alert.current_state }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              </td>
+              <td class="status">
+                <img title="{{ (alert.device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ alert.device.status || 'unknown' }}.png" />
+              </td>
+              <td><a href="#/node/{{ alert.device.id }}">{{ alert.device.name | section:'.':0:1 }}</a></td>
+              <td>{{ alert.name }}</td>
+              <td>{{ alert.plugin_output | truncate:80 }}</td>
+              <td>{{ alert.last_alert_at | timeAgo }}</td>
+              <td>{{ alert.device.collected_at &amp;&amp; (alert.device.collected_at | timeAgo) || '-' }}</td>
+              <td>
+                <a
+                  ui-jq="popover"
+                  ui-options="note_tip_options(alert.device.properties.notes)"
+                  class="note_toggle center"
+                  ng-show="alert.device.properties.notes">
+                  <i class="icon icon-comment"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,39 +1,3 @@
-function SearchController($scope, $http, $location, Query){
-  $scope.results = null;
-
-  // $scope.$watch('query', function(){
-  //   $scope.runQuery();
-  // });
-
-  $scope.runQuery = function(query){
-    if(query) $scope.query = query;
-
-    if($scope.query && $scope.query.length > 2){
-      Query.query({
-        query: $scope.prepareQuery($scope.query),
-        limit: 10
-      }, function(data){
-        $scope.results = (data.length > 0 ? data : null);
-      });
-    }else{
-      $scope.clearResults();
-    }
-  };
-
-  $scope.goQuery = function(query){
-    $scope.clearResults();
-    if(query) $scope.query = query;
-
-    if($scope.query){
-      $location.path('/inf/show/'+$scope.query);
-    }
-  };
-
-  $scope.clearResults = function(){
-    $scope.results = null;
-  };
-}
-
 function QueryController($scope, $http, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
@@ -51,7 +15,7 @@ function QueryController($scope, $http, $route, $location, $routeParams, Query){
           $location.path('/node/'+data[0].id);
 
         }else{
-          $scope.devices = data;
+          $scope.results = data;
 
         }
       });
@@ -91,27 +55,8 @@ function OverviewController($scope, Summary){
   });
 }
 
-function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNote){
+function DeviceListController($scope, $http, $timeout, Device, DeviceNote){
   $scope.sortField = 'name';
-
-  $scope.note_tip_options = function(notes){
-    return {
-      placement: 'left',
-      trigger: 'hover',
-      delay: 250,
-      html: true,
-      content: (function(){
-        var rv = '<ul class="notes-tip">';
-
-        for(var time in notes){
-          rv += '<li><b>'+$filter('date')((time*1000), 'short')+':</b> '+notes[time].body+'</li>';
-        }
-
-        rv += '</ul>';
-        return rv;
-      })()
-    }
-  };
 
   $scope.$watch('saved', function(){
     if($scope.saved){
@@ -126,7 +71,7 @@ function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNo
   }
 
   $scope.save = function(){
-    $.each($scope.devices, function(idx, i){
+    $.each($scope.results, function(idx, i){
       if(i.properties)
         if(i.properties.rack)
           if(i.properties.rack.length > 0)
@@ -146,7 +91,7 @@ function DeviceListController($scope, $http, $timeout, $filter, Device, DeviceNo
 
 function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
   $scope.site = $routeParams.site;
-  $scope.devices = null;
+  $scope.results = null;
 
 //site summary
   Site.query({
@@ -170,7 +115,7 @@ function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
   Query.query({
     query: 'site/'+$scope.site,
   }, function(data){
-    $scope.devices = data;
+    $scope.results = data;
   });
 
   $scope.addRack = function(){
@@ -195,7 +140,7 @@ function RackController($scope, $http, $routeParams, Rack){
     site: $scope.site,
     rack: $scope.rack
   }, function(data){
-    $scope.devices = data;
+    $scope.results = data;
   });
 }
 
@@ -234,7 +179,7 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
       id: (id || $scope.id)
     }, function(data){
       $scope.nagios_alerts = [];
-      
+
       if(data.alerts){
         $scope.nagios_alerts = data.alerts;
       }

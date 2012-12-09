@@ -176,12 +176,51 @@ header .nav .dropdown-menu li a:hover span{
 }
 
 .navbar-search{
-  margin-right: 48px;
+}
+
+.navbar-search i.help{
+  margin-left: -26px;
+  margin-top: 2px;
+}
+
+div.autocomplete.ui-hide{
+  display: none;
+}
+
+div.autocomplete.help{
+  position: absolute;
+  margin-top: 8px;
+  margin-right: -40px;
+  min-width: 400px;
+  right: 0px;
 }
 
 .navbar-search .autocomplete{
   margin-right: 20px;
 }
+
+.dropdown-panel li{
+  color: #333;
+  padding: 2px 8px;
+}
+
+.dropdown-panel li h1{
+  color: #333;
+  font-size: 18px;
+  line-height: 20px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.dropdown-panel li li > i{
+  font-weight: bold;
+}
+
+.dropdown-panel li li > p{
+  font-size: smaller;
+  padding-left: 1em;
+}
+
 
 .logo{
   padding: 0px !important;
@@ -349,6 +388,10 @@ i.normal{
   border-color: #b94a48;
 }
 
+.label-critical, .badeg-critical{
+  background-color: #b94a48;
+}
+
 .sidetab-warning{
   border-color: #f89406;
 }
@@ -368,5 +411,9 @@ i.normal{
 }
 
 .node .alerts li > div > span a{
+  color: #999;
+}
+
+.alerts-list .acknowledged td{
   color: #999;
 }

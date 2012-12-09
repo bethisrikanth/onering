@@ -1,15 +1,7 @@
 <div ng-controller="DeviceListController">
-  <div class="container device-list loading center" ng-hide="devices || noresults">
-    <img src="/img/loading.gif" title="Current Setting: Medium-Dark" />
-    <h3>Loading...</h3>
-  </div>
+  <div ng-include="'views/device-spinner.html'" />
 
-  <div class="container device-list loading center" ng-show="noresults">
-    <img src="/img/noresults.gif" title="If the toast is without a toaster, does the toast still have meaning?" />
-    <h3>No results found</h3>
-  </div>
-
-  <div class="container device-list" ng-show="devices &amp;&amp; !noresults">
+  <div class="container device-list" ng-show="results &amp;&amp; !noresults">
     <form>
       <div class="row">
         <div class="span12">
@@ -54,8 +46,8 @@
             </thead>
 
             <tbody>
-              <tr ng-repeat="device in devices | orderBy:sortField:sortReverse">
-                <td class="id"><a tabindex="{{ devices.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+              <tr ng-repeat="device in results | orderBy:sortField:sortReverse">
+                <td class="id"><a tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
                 <td class="status">
                   <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
                 </td>

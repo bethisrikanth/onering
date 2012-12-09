@@ -1,3 +1,4 @@
 angular.module('nagiosPlugin', [
-  'nagiosService'
+  'nagiosService',
+  'nagiosRoutes'
 ]);

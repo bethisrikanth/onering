@@ -215,7 +215,7 @@ module App
         /list/:field/where/*
       }.each do |r|
         get r do
-          q = urlquerypath_to_mongoquery(params[:splat].empty? ? nil : params[:splat].first)
+          q = urlquerypath_to_mongoquery(params[:splat].empty? ? params[:where] : params[:splat].first)
           field = case params[:field]
           when 'id' then '_' + params[:field]
           when /name|tags/ then params[:field]

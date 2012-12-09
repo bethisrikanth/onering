@@ -1,35 +1,23 @@
 angular.module('assetsPlugin', [
   'assetsService',
   'assetsRoutes'
-]).run(['$rootScope', function($rootScope){
-  $rootScope.prepareQuery = function(query, raw){
-//  explictly specify raw=true to send the query directly to the API
-//  without client-side processing
-    if(raw) return query;
+]).run(['$rootScope', '$filter', function($rootScope, $filter){
+  $rootScope.note_tip_options = function(notes){
+    return {
+      placement: 'left',
+      trigger: 'hover',
+      delay: 250,
+      html: true,
+      content: (function(){
+        var rv = '<ul class="notes-tip">';
 
-    var rv = [];
-    query = $.trim(query).split(' ');
-
-    for(var part in query){
-      if(typeof(query[part]) == 'string'){
-        var q = query[part].split(':');
-
-    //  field negation operator should be processed in raw mode
-        if(query[part].indexOf('^') !== -1){
-          rv.push(query[part]);
-
-    //  normal query
-        }else{
-          var field = (q.length > 1 ? q[0] : 'id:name:aliases:tags');
-          q = $.trim(q[1] || q[0]);
-          q = q.replace(/\*/g, '~');
-
-          rv.push(field)
-          rv.push(q);
+        for(var time in notes){
+          rv += '<li><b>'+$filter('date')((time*1000), 'short')+':</b> '+notes[time].body+'</li>';
         }
-      }
-    }
 
-    return rv.join('/');
-  }
+        rv += '</ul>';
+        return rv;
+      })()
+    }
+  };
 }]);
