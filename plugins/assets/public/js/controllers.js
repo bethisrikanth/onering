@@ -200,7 +200,7 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceStat){
+function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceStat, NagiosHost){
   $scope.id = $routeParams.id;
   $scope.note = null;
   $scope.hidAsAColor = false;
@@ -219,7 +219,15 @@ function NodeController($scope, $http, $routeParams, Device, DeviceNote, DeviceS
       id: id
     }, function(data){
       $scope.stats = data;
-    })
+    });
+
+    NagiosHost.get({
+      id: id
+    }, function(data){
+      if(data.service){
+        $scope.nagios_alerts = data.service;
+      }
+    });
   };
 
   $scope.saveNote = function(note_id){

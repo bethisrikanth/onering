@@ -1,7 +1,8 @@
 angular.module('app', [
   'ui',
   'corePlugin',
-  'assetsPlugin'
+  'assetsPlugin',
+  'nagiosPlugin'
 ]);
 
 try {

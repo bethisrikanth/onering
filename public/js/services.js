@@ -48,3 +48,14 @@ factory('Rack', function($resource){
 // end file ./plugins/assets/public/js/services.js
 
 
+'use strict';
+
+angular.module('nagiosService', ['ngResource']).
+factory('NagiosHost', function($resource){
+  return $resource('/api/nagios/:id', {
+    id: '@id'
+  });
+});
+// end file ./plugins/nagios/public/js/services.js
+
+

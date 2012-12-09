@@ -29,6 +29,12 @@ module App
 
         200
       end
+
+      get '/:id' do
+        nagios_host = NagiosHost.find(params[:id])
+        return 404 unless nagios_host
+        nagios_host.to_json
+      end
     end
   end
 end

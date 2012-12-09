@@ -321,3 +321,41 @@ i.normal{
 .node .disk .mount {
   margin-bottom: 8px;
 }
+
+.node .alerts li{
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+  list-style-type: none;
+  margin-bottom: 4px;
+}
+
+.sidetab{
+  border-left-style: solid;
+  border-left-width: 10px;
+  border-left-color: #999;
+  border-radius: 3px;
+  padding-left: 6px;
+  display: block;
+}
+
+.sidetab-critical{
+  border-color: #b94a48;
+}
+
+.sidetab-warning{
+  border-color: #f89406;
+}
+
+.node .alerts li b{
+  display: block;
+  font-size: 18px;
+  margin: 0;
+  height: 20px;
+}
+
+.node .alerts li span{
+  display: block;
+  font-size: smaller;
+  height: 12px;
+}
