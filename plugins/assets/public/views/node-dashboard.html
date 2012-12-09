@@ -13,7 +13,7 @@
       </div>
 
       <div ng-show="alert.acknowledged">
-        <span><b>Acknowledged:</b> {{ alert.type }} check {{ alert.description }} failed, happening since {{ alert.last_checked_at | date:'short' }}</span>
+        <span><b>Acknowledged:</b> {{ alert.type }} check {{ alert.description }} failed, happening since {{ alert.last_checked_at | date:'short' }} ({{ alert.last_checked_at | timeAgo }})</span>
       </div>
     </li>
 
