@@ -1,7 +1,7 @@
 angular.module('corePlugin', [
   'coreFilters',
   'coreDirectives',
-  'coreRoutes'  
+  'coreRoutes'
 ]).
 run(['$rootScope', function($rootScope){
   $rootScope.prepareQuery = function(query, raw){
@@ -26,7 +26,7 @@ run(['$rootScope', function($rootScope){
           q = $.trim(q[1] || q[0]);
           q = q.replace(/\*/g, '~');
 
-          rv.push(field)
+          rv.push(field.toLowerCase());
           rv.push(q);
         }
       }

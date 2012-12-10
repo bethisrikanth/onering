@@ -39,6 +39,19 @@ module App
         end
       end
 
+      # /devices/find
+      # search for devices by fields
+      %w{
+        /find/stats/?
+        /find/stats/*
+      }.each do |r|
+        get r do
+          qsq = (params[:q] || params[:query] || '')
+          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
+          DeviceStat.where(urlquerypath_to_mongoquery(q,true,'metrics')).limit(params[:limit] || 1000).to_json
+        end
+      end
+
       %w{
         /?
         /:id

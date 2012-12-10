@@ -4,7 +4,7 @@ module App
 
   # generates a mongodb query hash from a field-urlquery
   # URL path (e.g.: field1/query1/field2/query2/..)
-    def urlquerypath_to_mongoquery(query, regex=true)
+    def urlquerypath_to_mongoquery(query, regex=true, autofield='properties')
       if query
         pairs = query.split('/')
         pairs = pairs.evens.zip(pairs.odds)
@@ -29,7 +29,7 @@ module App
             when /^(name|tags|aliases|status)$/
               q['$or'] << {field => (v || {'$exists' => fieldExists})}
             else
-              q['$or'] << {"properties.#{field}" => (v || {'$exists' => fieldExists})}
+              q['$or'] << {"#{autofield}.#{field}" => (v || {'$exists' => fieldExists})}
             end
           end
 

@@ -7,12 +7,20 @@ module App
 
       class<<self
         def load(name, config)
-          logger = Logger.new(File.join(ENV['PROJECT_ROOT'], "mongo-#{name}.log"))
+          conn = {
+            :safe => config['safe'].to_s.to_bool
+          }
+
+          if config['logging'] === true
+            logger = Logger.new(File.join(ENV['PROJECT_ROOT'], "mongo-#{name}.log"))
+            conn[:logger] = logger
+          end
+
           @database = name
           @connection = ::Mongo::Connection.new(
             (config['host'] || 'localhost'),
             (config['port'] || 27017).to_i,
-            :safe => config['safe'].to_s.to_bool
+            conn
           )
 
           ::MongoMapper.connection = @connection

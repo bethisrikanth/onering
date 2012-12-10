@@ -8,7 +8,7 @@ function NagiosAlertListController($scope, $http, $route, $window, $routeParams,
   $scope.reload = function(){
     NagiosAlerts.query({}, function(data){
       $scope.results = data;
-      $scope.load_time = new Date();
+      $scope.load_age = 0;
     });
   };
 
