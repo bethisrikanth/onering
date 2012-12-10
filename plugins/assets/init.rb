@@ -48,7 +48,8 @@ module App
         get r do
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          DeviceStat.where(urlquerypath_to_mongoquery(q,true,'metrics')).limit(params[:limit] || 1000).to_json
+          stats = DeviceStat.where(urlquerypath_to_mongoquery(q,true,'metrics')).limit(params[:limit] || 1000)
+          Device.find(stats.collect{|i| i['_id'] }).to_json
         end
       end
 
