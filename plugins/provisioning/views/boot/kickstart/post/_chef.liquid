@@ -29,7 +29,7 @@ cd /etc/chef
 /usr/bin/curl -O http://repo.ladc1.outbrain.com/Misc/Chef/client.rb
 /usr/bin/chef-client
 
-# build initial run-list (!! THIS WILL EVENTUALL NOT BE HERE !!)
+# build initial run-list (!! THIS WILL EVENTUALLY NOT BE HERE !!)
 cat <<EOF > /var/tmp/ob-roles.json
 { "run_list": [ "role[OB-Base]" ] }
 EOF

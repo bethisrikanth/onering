@@ -366,7 +366,7 @@ i.normal{
 }
 
 .node .alerts li{
-  padding: 2px; 
+  padding: 2px;
   list-style-type: none;
   margin-bottom: 4px;
 }
@@ -416,4 +416,8 @@ i.normal{
 
 .alerts-list .acknowledged td{
   color: #999;
+}
+
+.table-stacked tbody{
+  border-top-width: 0px !important;
 }

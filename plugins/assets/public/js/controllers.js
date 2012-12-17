@@ -50,6 +50,8 @@ function OverviewController($scope, Summary){
     for(var s in data){
       $scope.graphs.overview = $scope.summary_to_graphite(data);
     }
+
+    console.log($scope.graphs);
   });
 }
 
@@ -150,6 +152,7 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
   $scope.alert_init_limit = 3;
   $scope.alert_show_limit = $scope.alert_init_limit;
   $scope.alert_load_age = 0;
+  $scope.current_net_tab = 'system';
 
   $scope.reload = function(id){
     var id = id || $scope.id;

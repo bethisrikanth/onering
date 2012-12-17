@@ -42,8 +42,7 @@ selinux --disabled
 
 {% include 'boot/kickstart/post/init' %}
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# include: 'boot/kickstart/post/network'
+{% include 'boot/kickstart/post/network' %}
 
 {% include 'boot/kickstart/post/chef' %}
 

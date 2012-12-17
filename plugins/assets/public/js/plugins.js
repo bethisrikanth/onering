@@ -25,10 +25,12 @@ angular.module('assetsPlugin', [
     var graphData = [];
 
     for(var i in data){
-      graphData.push({
-        target: data[i].id.toTitleCase(),
-        datapoints: [[data[i].count, null]];
-      });
+      if(data[i] && data[i].id){
+        graphData.push({
+          target: data[i].id.toTitleCase(),
+          datapoints: [[data[i].count, null]]
+        });
+      }
     }
 
     return graphData;

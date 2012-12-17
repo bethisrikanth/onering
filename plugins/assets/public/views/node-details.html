@@ -22,7 +22,7 @@
       <th>Location</th>
       <td>
         <span>
-          <a 
+          <a
             href="#/inf/show/site:{{ device.properties.site }}%20rack:{{ device.properties.rack }}"
             target="_blank"
             ng-show="device.properties.site &amp;&amp; device.properties.rack"
@@ -85,3 +85,47 @@
     </tr>
   </tbody>
 </table>
+
+
+<div ng-show="device.properties.network">
+  <h3>Network</h3>
+
+  <table class="table table-condensed table-stacked">
+    <tbody ng-repeat="interface in device.properties.network.interfaces">
+      <tr>
+        <th colspan="2">{{ interface.name }}</th>
+      </tr>
+      <tr ng-repeat="address in interface.addresses">
+        <th>Address</th>
+        <td>
+          <div><b>IP</b> {{ address.ip }}<span ng-show="address.family=='inet6'">&nbsp;(IPv6)</span></div>
+          <div ng-show="address.netmask"><b>Mask</b> {{ address.netmask }}</div>
+        </td>
+      </tr>
+
+      <tr ng-show="interface.slaves">
+        <th>Slaves</th>
+        <td>
+          <div ng-repeat="slave in interface.slaves">
+            <b>{{ slave.name }}</b> ({{ slave.mac }})
+          </div>
+        </td>
+      </tr>
+
+      <tr ng-show="interface.switch">
+        <th>
+          Name<br />
+          IP<br />
+          Port<br />
+          Address<br />
+        </th>
+        <td>
+          {{ interface.switch.name }}<br />
+          {{ interface.switch.ip }}<br />
+          <abbr title="{{ interface.switch.port_name }}">{{ interface.switch.port }}</abbr><br />
+          {{ interface.switch.port_mac }}<br />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

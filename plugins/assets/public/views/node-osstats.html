@@ -43,31 +43,3 @@
     </div>
   </div>
 </div>
-
-<div class="row" ng-show="stats.metrics.network">
-  <div class="offset1 span11">
-    <h4>Network</h4>
-
-    <div class="stat net">
-      <div ng-repeat="(interface, details) in stats.metrics.network.link">
-        <h5>{{ interface }}</h5>
-        <table class="table table-condensed">
-          <tbody>
-            <tr>
-              <th>Switch</th>
-              <td><span title="Management IP: {{ details.management_ip }}">{{ details.switch }}</span></td>
-            </tr>
-            <tr>
-              <th>Port</th>
-              <td>{{ details.port_name }}</td>
-            </tr>
-            <tr>
-              <th>Port MAC</th>
-              <td>{{ details.port_mac }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>

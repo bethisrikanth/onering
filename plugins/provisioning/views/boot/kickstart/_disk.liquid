@@ -1,6 +1,6 @@
 clearpart --all --initlabel
 
-{% case device.properties.provisioning.disk_strategy %}
+{% case device.properties.provisioning.disk.strategy %}
  {% when 'mirror' %}
 # Disk Strategy: mirror
 bootloader --location=mbr --driveorder=sda,sdb
@@ -10,7 +10,7 @@ part raid.02 --size=1 --grow --asprimary --ondisk=sda
 part raid.12 --size=1 --grow --asprimary --ondisk=sdb
 
 raid /boot       --fstype=ext3 --device md0 --level=RAID1 raid.01 raid.11
-raid pv.01       --fstype ext3 --device md1 --level=RAID1 raid.02 raid.12  
+raid pv.01       --fstype ext3 --device md1 --level=RAID1 raid.02 raid.12
 
 volgroup outbrain pv.01
 
