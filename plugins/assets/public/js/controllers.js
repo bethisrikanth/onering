@@ -38,10 +38,9 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
 }
 
 function OverviewController($scope, Summary){
-  $scope.overview = {
-    'global': {
-      'labels': [],
-      'values': []
+  $scope.graphs = {
+    'default': {
+
     }
   };
 
@@ -49,8 +48,7 @@ function OverviewController($scope, Summary){
     field: 'status'
   }, function(data){
     for(var s in data){
-      $scope.overview.global.labels.push((data[s].id == null ? 'Unknown' : data[s].id.toString()).toTitleCase());
-      $scope.overview.global.values.push(data[s].count || 0);
+      $scope.graphs.overview = $scope.summary_to_graphite(data);
     }
   });
 }

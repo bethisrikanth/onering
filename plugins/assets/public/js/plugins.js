@@ -20,4 +20,17 @@ angular.module('assetsPlugin', [
       })()
     }
   };
+
+  $rootScope.summary_to_graphite = function(data){
+    var graphData = [];
+
+    for(var i in data){
+      graphData.push({
+        target: data[i].id.toTitleCase(),
+        datapoints: [[data[i].count, null]];
+      });
+    }
+
+    return graphData;
+  };
 }]);

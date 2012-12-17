@@ -66,6 +66,14 @@
       <td><a target="_blank" href="http://{{ device.properties.ipmi_ip }}">{{ device.properties.ipmi_ip }}</a></td>
     </tr>
 
+    <tr ng-show="device.properties.distro">
+      <th>Distribution</th>
+      <td>
+        <a href="#/inf/show/distro:{{ device.properties.distro }}">{{ device.properties.distro | titleize }}</a>
+        <a href="#/inf/show/distro:{{ device.properties.distro }}%20version:{{ device.properties.version }}">{{ device.properties.version }}</a>
+      </td>
+    </tr>
+
     <tr ng-show="device.properties.kernel">
       <th>Kernel</th>
       <td>{{ device.properties.kernel }}</td>

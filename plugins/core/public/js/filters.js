@@ -14,10 +14,14 @@ angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
     if(text){
-      if([
-        'NOC'
-      ].indexOf(text.toUpperCase()) >= 0)
-        return text.replace(/_/, ' ').toUpperCase();
+      var overrides = {
+        'noc':    'NOC',
+        'centos': 'CentOS',
+        'redhat': 'RedHat'
+      };
+
+      if(overrides.hasOwnProperty(text.toLowerCase()))
+        return overrides[text.toLowerCase()];
 
       return text.replace(/_/, ' ').toTitleCase();
     }
