@@ -36,11 +36,10 @@ module App
             if base['data']
               data = (JSON.load(base['data']) rescue base['data'])
 
-              host = (data['host'].gsub('.','~') rescue nil)
-              host = base['path'].split('/')[6] unless host and host.include?('~')
+              host = base['path'].split('/')[6]
               return nil unless host
 
-              device = Device.urlsearch("name/#{host}").first
+              device = Device.urlsearch("name:aliases/#{host}").first
               hid = (device[:_id] rescue nil)
               return nil unless hid
 
@@ -133,8 +132,8 @@ module App
           end
         end
 
-        #zk_versions.to_json
         #Device.find(rv).to_json
+        #zk_versions.to_json
         200
       end
     end
