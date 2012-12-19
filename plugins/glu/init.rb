@@ -37,7 +37,7 @@ module App
               data = (JSON.load(base['data']) rescue base['data'])
 
               host = (data['host'].gsub('.','~') rescue nil)
-              host = base['path'].split('/')[6] unless !host or host.include?('~')
+              host = base['path'].split('/')[6] unless host and host.include?('~')
               return nil unless host
 
               device = Device.urlsearch("name/#{host}").first
