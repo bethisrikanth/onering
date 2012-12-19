@@ -1,6 +1,7 @@
 require 'controller'
 require 'assets/models/device'
 require 'net/http'
+require 'pp'
 
 module App
   class Base < Controller
@@ -11,6 +12,61 @@ module App
         return 404 unless config && config['url']
         uri = URI.parse(config['url'])
 
+      # ------------------------------------------------------------------------
+      # parse zookie - this gets the deployed versions as reported from the
+      # Glu Agent in Zookeeper, via the "Zookie" REST API
+      #
+        zk = Config.get('zookie/config')
+        zkuri = URI.parse(zk['url'])
+        zk_versions = {}
+
+        Net::HTTP.start(zkuri.host, zkuri.port) do |http|
+          request = Net::HTTP::Get.new(zkuri.to_s)
+          request.basic_auth zk['username'], zk['password'] if zk['username'] && zk['password']
+          response = http.request(request)
+
+          zk_json = JSON.parse(response.body)
+          raise 'Invalid Zookie response' unless zk_json['children']
+
+          def get_leaf(base)
+            if base.is_a?(Hash) and base.has_key?('children') and base['children'].is_a?(Array)
+              return base['children'].collect{|i| get_leaf(i) }.flatten
+            end
+
+            if base['data']
+              data = (JSON.load(base['data']) rescue base['data'])
+
+              host = (data['host'].gsub('.','~') rescue nil)
+              host = base['path'].split('/')[6] unless !host or host.include?('~')
+              return nil unless host
+
+              device = Device.urlsearch("name/#{host}").first
+              hid = (device[:_id] rescue nil)
+              return nil unless hid
+
+              return {
+                :id      => hid,
+                :product => (base['path'].split('/')[4].strip rescue nil),
+                :version => (data['revision'].to_i rescue nil)
+              }
+            end
+
+            nil
+          end
+
+          get_leaf(zk_json).each do |node|
+            if node
+              id = node.delete(:id)
+
+              if id
+                zk_versions[id] ||= {}
+                zk_versions[id][node[:product]] = node[:version]
+              end
+            end
+          end
+        end
+
+      # parse glu.json
         Net::HTTP.start(uri.host, uri.port) do |http|
           request = Net::HTTP::Get.new(uri.path)
           request.basic_auth config['username'], config['password'] if config['username'] && config['password']
@@ -55,6 +111,21 @@ module App
 
             if device
               rv << device.id
+
+            # efficient?  no.
+            # this exposes the version as reported to Zookeeper from the Glu Agent
+            # in the device object
+              if zk_versions[device.id]
+                glu_properties['apps'].each do |i|
+                  zk_versions[device.id].each do |k,v|
+                    if i['name'] == k
+                      i['zk_version'] = v
+                      i.replace i
+                    end
+                  end
+                end
+              end
+
               device['properties'] = {} unless device['properties']
               device['properties']['glu'] = glu_properties
               device.safe_save
@@ -62,7 +133,9 @@ module App
           end
         end
 
-        Device.find(rv).to_json
+        #zk_versions.to_json
+        #Device.find(rv).to_json
+        200
       end
     end
   end

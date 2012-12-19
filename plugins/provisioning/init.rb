@@ -11,8 +11,8 @@ module App
 
     namespace '/api/provision' do
       %w{
-        /boot/?
-        /boot/:id
+        /
+        /:id
       }.each do |r|
         get r do
           content_type 'text/plain'

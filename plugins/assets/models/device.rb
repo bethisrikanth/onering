@@ -1,8 +1,10 @@
 require 'model'
 require 'assets/models/device_stat'
+require 'assets/lib/helpers'
 
 class Device < App::Model::Base
   include App::Model::Taggable
+
   VALID_STATUS = ['online', 'fault', 'maintenance', 'allocatable']
   MANUAL_STATUS = ['fault', 'maintenance', 'allocatable']
   TOP_LEVEL_GROUPS = ['id', 'name', 'status']
@@ -74,6 +76,15 @@ class Device < App::Model::Base
     end
 
   class<<self
+    include App::Helpers
+
+  # urlsearch
+  #   perform a query formatted as a URL partial path component
+    def urlsearch(query)
+      self.where(urlquerypath_to_mongoquery(query))
+    end
+
+
   # summarize
   #   this method provides arbitrary-depth aggregate rollups of a MongoDB
   #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)

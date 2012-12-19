@@ -192,7 +192,7 @@ module App
         get r do
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          Device.where(urlquerypath_to_mongoquery(q)).limit(params[:limit] || 1000).to_json
+          Device.urlsearch(q).limit(params[:limit] || 1000).to_json
         end
 
         post r do

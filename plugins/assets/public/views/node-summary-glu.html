@@ -5,7 +5,18 @@
     <tbody>
       <tr>
         <th>Version</th>
-        <td>{{ app.version }}</td>
+        <td>{{ app.version || 'Not Present' }}</td>
+      </tr>
+      <tr>
+        <th>Deployed</th>
+        <td>
+          <span style="color: #CC0000;" ng-hide="app.version==app.zk_version">
+            {{ app.zk_version || 'Not Reporting' }}
+          </span>
+          <span ng-show="app.version==app.zk_version">
+            {{ app.zk_version || 'Not Present' }}
+          </span>
+        </td>
       </tr>
       <tr>
         <th>Tags</th>
