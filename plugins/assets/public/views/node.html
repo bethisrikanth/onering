@@ -3,6 +3,7 @@
     <div class="span9">
       <span class="label label-{{ device.status || 'unknown' }} hid">ID: {{ device.id }}</span>
       <span class="label label-{{ device.status || 'unknown' }} status" ng-show="device.status">{{ device.status | titleize }}</span>
+      <span class="label" ng-show="device.maintenance_status"><i class="icon-{{ device.maintenance_status }} icon-white"></i> {{ device.maintenance_status | titleize }}</span>
       <br />
       <h1>
         <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
@@ -70,6 +71,7 @@
       <ul class="nav nav-list well">
         <li class="nav-header">Lifecycle</li>
         <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
+        <li><a open-dialog="nodeTransitionMaintState"><i class="icon-wrench"></i> Maintenance Status</a></li>
       </ul>
     </div>
   </div>
@@ -107,9 +109,9 @@
         </a>
       </li>
       <li>
-        <a ng-click="setStatus('maintenance')" data-dismiss="modal">
-          <span class="name"><img src="/img/status/maintenance.png" title="Maintenance" /> Maintenance</span>
-          <span>Put this node into maintenance mode</span>
+        <a ng-click="setStatus('reserved')" data-dismiss="modal">
+          <span class="name"><img src="/img/status/reserved.png" title="Reserved" /> Reserved</span>
+          <span>Reserve this node for a special purpose outside of typical Production or R&amp;D services</span>
         </a>
       </li>
       <li>
@@ -125,6 +127,42 @@
     <a class="btn" data-dismiss="modal">Close</a>
   </div>
 </div>
+
+
+<div class="modal hide" id="nodeTransitionMaintState">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Maintenance Status</h3>
+  </div>
+
+  <div class="modal-body">
+    <ul class="nav nav-list status">
+      <li>
+        <a ng-click="setMaintStatus('healthy')" data-dismiss="modal">
+          <span class="name"><i class="icon-ok"></i> Healthy</span>
+          <span>All problems fixed, no known issues</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setMaintStatus('parts')" data-dismiss="modal">
+          <span class="name"><i class="icon-parts"></i> Needs Parts</span>
+          <span>Something is physically broken and needs to be replaced</span>
+        </a>
+      </li>
+      <li>
+        <a ng-click="setMaintStatus('service')" data-dismiss="modal">
+          <span class="name"><i class="icon-service"></i> Needs Service</span>
+          <span>Requires some form of manual intervention to get the node to a healthy state</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Close</a>
+  </div>
+</div>
+
 
 <div class="modal hide" id="tagEditor">
   <div class="modal-header">

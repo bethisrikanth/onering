@@ -177,8 +177,30 @@ module App
       get '/:id/status/:status' do
         device = Device.find(params[:id])
         return 404 if not device
-        device.status = params[:status]
-        device.safe_save
+        if params[:status] == 'unknown'
+          device.unset(:status)
+          device.reload
+        else
+          device.status = params[:status]
+          device.safe_save
+        end
+
+        device.to_json
+      end
+
+    # maintenance_status
+    # set the maintenance_status of a device
+      get '/:id/maintenance/:status' do
+        device = Device.find(params[:id])
+        return 404 if not device
+        if params[:status] == 'healthy'
+          device.unset(:maintenance_status)
+          device.reload
+        else
+          device.maintenance_status = params[:status]
+          device.safe_save
+        end
+
         device.to_json
       end
 
@@ -232,12 +254,11 @@ module App
           q = urlquerypath_to_mongoquery(params[:splat].empty? ? params[:where] : params[:splat].first)
           field = case params[:field]
           when 'id' then '_' + params[:field]
-          when /name|tags/ then params[:field]
+          when /^(name|tags|aliases|status)$/ then params[:field]
           else "properties.#{params[:field]}"
           end
 
-          Device.sort(field.to_sym.asc)
-          Device.collection.distinct(field, q).compact.to_json
+          Device.collection.distinct(field, q).sort.compact.to_json
         end
       end
 

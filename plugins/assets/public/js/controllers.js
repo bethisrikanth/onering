@@ -234,6 +234,14 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
     }
   };
 
+  $scope.setMaintStatus = function(status){
+    if($scope.device && status){
+      $http.get('/api/devices/'+$scope.device.id+'/maintenance/'+status).success(function(data){
+        $scope.reload();
+      });
+    }
+  };
+
   $scope.tag = function(value){
     if($scope.device && typeof(value) == 'string' && $.trim(value).length > 0){
       $http.get('/api/devices/'+$scope.device.id+'/tag/'+value).success(function(){

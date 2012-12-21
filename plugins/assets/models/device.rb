@@ -5,25 +5,28 @@ require 'assets/lib/helpers'
 class Device < App::Model::Base
   include App::Model::Taggable
 
-  VALID_STATUS = ['online', 'fault', 'maintenance', 'allocatable']
-  MANUAL_STATUS = ['fault', 'maintenance', 'allocatable']
+  VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved']
+  MANUAL_STATUS = ['fault', 'allocatable']
+  VALID_MAINT_STATUS = ['parts', 'service']
   TOP_LEVEL_GROUPS = ['id', 'name', 'status']
 
   set_collection_name "devices"
 
   before_validation :_mangle_id
   before_validation :_confine_status
+  before_validation :_confine_maintenance_status
   validate :_id_pattern_valid?
 
   timestamps!
 
-  key :name,            String
-  key :properties,      Hash
-  key :user_properties, Hash
-  key :tags,            Array
-  key :aliases,         Array
-  key :collected_at,    Time
-  key :status,          String
+  key :name,               String
+  key :properties,         Hash
+  key :user_properties,    Hash
+  key :tags,               Array
+  key :aliases,            Array
+  key :collected_at,       Time
+  key :status,             String
+  key :maintenance_status, String
 
   def add_note(body, id=nil)
     id = Time.now.to_i if not id or (id.to_i == 0)
@@ -67,6 +70,14 @@ class Device < App::Model::Base
           if self.collected_at_changed?
             self.status = self.status_was
           end
+        end
+      end
+    end
+
+    def _confine_maintenance_status
+      if self.maintenance_status_changed?
+        if not VALID_MAINT_STATUS.include?(self.maintenance_status)
+          errors.add(:maintenance_status, "Maintenance Status must be one of #{VALID_MAINT_STATUS.join(', ')}")
         end
       end
     end
