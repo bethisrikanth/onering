@@ -6,7 +6,7 @@ class Device < App::Model::Base
   include App::Model::Taggable
 
   VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved']
-  MANUAL_STATUS = ['fault', 'allocatable']
+  MANUAL_STATUS = ['fault', 'allocatable', 'reserved']
   VALID_MAINT_STATUS = ['parts', 'service']
   TOP_LEVEL_GROUPS = ['id', 'name', 'status']
 
@@ -65,7 +65,7 @@ class Device < App::Model::Base
           errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
         end
 
-      # automatic collection cannot clear a fault, maintenance, or available state
+      # automatic collection cannot clear a fault, reserved, or available state
         if MANUAL_STATUS.include?(self.status_was)
           if self.collected_at_changed?
             self.status = self.status_was

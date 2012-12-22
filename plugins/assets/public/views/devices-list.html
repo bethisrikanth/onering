@@ -60,7 +60,7 @@
                   />
                 </td>
                 <td class="maintenance_status">
-                  <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="{{ (device.maintenance_status || 'healthy') | titleize }}"></i>
+                  <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="Needs {{ (device.maintenance_status || 'healthy') | titleize }}"></i>
                 </td>
                 <td>{{ device.name | section:'.':0:1 }}</td>
                 <td>{{ device.properties.ip }}</td>
