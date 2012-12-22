@@ -3,7 +3,7 @@
     <div class="span9">
       <span class="label label-{{ device.status || 'unknown' }} hid">ID: {{ device.id }}</span>
       <span class="label label-{{ device.status || 'unknown' }} status" ng-show="device.status">{{ device.status | titleize }}</span>
-      <span class="label" ng-show="device.maintenance_status"><i class="icon-{{ device.maintenance_status }} icon-white"></i> {{ device.maintenance_status | titleize }}</span>
+      <span class="label" ng-show="device.maintenance_status"><i class="icon-{{ device.maintenance_status }} icon-white"></i> Needs {{ device.maintenance_status | titleize }}</span>
       <br />
       <h1>
         <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>

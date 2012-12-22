@@ -90,42 +90,54 @@
 <div ng-show="device.properties.network">
   <h3>Network</h3>
 
-  <table class="table table-condensed table-stacked">
-    <tbody ng-repeat="interface in device.properties.network.interfaces">
-      <tr>
-        <th colspan="2">{{ interface.name }}</th>
-      </tr>
-      <tr ng-repeat="address in interface.addresses">
-        <th>Address</th>
-        <td>
-          <div><b>IP</b> {{ address.ip }}<span ng-show="address.family=='inet6'">&nbsp;(IPv6)</span></div>
-          <div ng-show="address.netmask"><b>Mask</b> {{ address.netmask }}</div>
-        </td>
-      </tr>
+  <div ng-repeat="interface in device.properties.network.interfaces">
+    <h5>{{ interface.name }}</h5>
 
-      <tr ng-show="interface.slaves">
-        <th>Slaves</th>
-        <td>
-          <div ng-repeat="slave in interface.slaves">
-            <b>{{ slave.name }}</b> ({{ slave.mac }})
-          </div>
-        </td>
-      </tr>
+    <table class="table table-condensed table-stacked">
+      <tbody ng-repeat="address in interface.addresses">
+        <tr>
+          <th><span ng-show="$index==0">Address</span></th>
+          <th>IP</th>
+          <td>{{ address.ip }}<span ng-show="address.family=='inet6'">&nbsp;(IPv6)</span></td>
+        </tr>
 
-      <tr ng-show="interface.switch">
-        <th>
-          Name<br />
-          IP<br />
-          Port<br />
-          Address<br />
-        </th>
-        <td>
-          {{ interface.switch.name }}<br />
-          {{ interface.switch.ip }}<br />
-          <abbr title="{{ interface.switch.port_name }}">{{ interface.switch.port }}</abbr><br />
-          {{ interface.switch.port_mac }}<br />
-        </td>
-      </tr>
-    </tbody>
-  </table>
+        <tr ng-show="address.netmask">
+          <th> </th>
+          <th>Mask</th>
+          <td>{{ address.netmask }}</td>
+        </tr>
+      </tbody>
+
+      <tbody ng-repeat="slave in interface.slaves">
+        <tr>
+          <th><span ng-show="$index==0">Slaves</span></th>
+          <th>{{ slave.name }}</th>
+          <td>{{ slave.mac }}</td>
+        </tr>
+      </tbody>
+
+      <tbody ng-show="interface.switch">
+        <tr>
+          <th>Switch</th>
+          <th>Name</th>
+          <td>{{ interface.switch.name }}</td>
+        </tr>
+        <tr>
+          <th> </th>
+          <th>IP</th>
+          <td>{{ interface.switch.ip }}</td>
+        </tr>
+        <tr>
+          <th> </th>
+          <th>Port</th>
+          <td><abbr title="{{ interface.switch.port_name }}">{{ interface.switch.port }}</abbr></td>
+        </tr>
+        <tr>
+          <th> </th>
+          <th>Address</th>
+          <td>{{ interface.switch.port_mac }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -31,8 +31,9 @@
             <thead>
               <tr>
                 <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
+                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>                
                 <th ng-click="sortField='properties.alert_state'; sortReverse=!sortReverse" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
+                <th ng-click="sortField='maintenance_status'; sortReverse=!sortReverse" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
                 <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
                 <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
                 <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
@@ -57,6 +58,9 @@
                     title="{{ device.properties.alert_state | titleize }}"
                     ng-src="/img/alerts/{{ (device.properties.alert_state || 'unknown') }}.png"
                   />
+                </td>
+                <td class="maintenance_status">
+                  <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="{{ (device.maintenance_status || 'healthy') | titleize }}"></i>
                 </td>
                 <td>{{ device.name | section:'.':0:1 }}</td>
                 <td>{{ device.properties.ip }}</td>
