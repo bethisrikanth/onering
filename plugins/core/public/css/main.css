@@ -68,10 +68,6 @@ body .modal {
   margin: 0;
 }
 
-.device-list td.status{
-  text-align: center;
-}
-
 .device-list .note_toggle{
   border-radius: 4px;
   display: block;

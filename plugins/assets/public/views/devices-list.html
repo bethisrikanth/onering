@@ -49,17 +49,17 @@
             <tbody>
               <tr ng-repeat="device in results | orderBy:sortField:sortReverse">
                 <td class="id"><a tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
-                <td class="status">
+                <td class="status center">
                   <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
                 </td>
-                <td class="alerts">
+                <td class="alerts center">
                   <img
                     ng-show="device.properties.alert_state"
                     title="{{ device.properties.alert_state | titleize }}"
                     ng-src="/img/alerts/{{ (device.properties.alert_state || 'unknown') }}.png"
                   />
                 </td>
-                <td class="maintenance_status">
+                <td class="maintenance_status center">
                   <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="Needs {{ (device.maintenance_status || 'healthy') | titleize }}"></i>
                 </td>
                 <td>{{ device.name | section:'.':0:1 }}</td>

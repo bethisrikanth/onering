@@ -2,7 +2,7 @@ function DefaultController($scope){
 
 }
 
-function NavigationController($scope, $http, $route, $window, $routeParams, Summary){
+function NavigationController($scope, $http, $route, $window, $routeParams, Summary, List){
   $scope.reload = function(){
   //get site summary
     Summary.query({
@@ -18,12 +18,37 @@ function NavigationController($scope, $http, $route, $window, $routeParams, Summ
       $scope.statuses = data;
     });
 
+  //get maintenance status summary
+    Summary.query({
+      field: 'maintenance_status'
+    }, function(data){
+      $scope.maintenance_statuses = data;
+    });
+
   //get alert state summary
     Summary.query({
       field: 'alert_state'
     }, function(data){
       $scope.alert_states = $.grep(data, function(el){
         return (el.id !== null);
+      });
+    });
+
+  //get tags
+    List.query({
+      field: 'tags'
+    }, function(data){
+      $scope.tags = [];
+
+  //  WHY IS THIS SO COMPLICATED? #didntreadlol
+      $.each(data, function(ix, i){
+        var s = '';
+        
+        for(var ss in i){
+          if(typeof(i[ss]) == 'string') s += i[ss];
+        }
+
+        $scope.tags.push(s);
       });
     });
   }

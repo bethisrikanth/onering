@@ -69,6 +69,19 @@
                 </ul>
               </li>
 
+              <li class="dropdown-submenu">
+                <a tabindex="-1">Maintenance</a>
+                <ul class="dropdown-menu" style="min-width: 220px;">
+                  <li ng-repeat="maint in maintenance_statuses | orderBy:'count':true">
+                    <a href="#/inf/show/{{ (maint.id &amp;&amp; 'maintenance_status:'+maint.id) || '^maintenance_status' }}">
+                      <i class="icon-{{ maint.id || 'ok' }}"></i>
+                      {{ (maint.id &amp;&amp; 'Needs '+maint.id || 'healthy') | titleize }}
+                      <span>{{ maint.count }}</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
               <li class="dropdown-submenu" ng-show="alert_states">
                 <a tabindex="-1">Hosts Alerting</a>
                 <ul class="dropdown-menu" style="min-width: 220px;">
@@ -81,6 +94,18 @@
                   </li>
                 </ul>
               </li>
+
+              <li class="dropdown-submenu" ng-show="tags">
+                <a tabindex="-1">Tags</a>
+                <ul class="dropdown-menu" style="min-width: 220px;">
+                  <li ng-repeat="tag in tags">
+                    <a href="#/inf/show/tags:{{ tag }}">
+                      {{ tag }}
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
             </ul>
           </li>
         </ul>

@@ -39,8 +39,8 @@ module App
         end
       end
 
-      # /devices/find
-      # search for devices by fields
+      # /devices/find/stats
+      # search for devices stats by
       %w{
         /find/stats/?
         /find/stats/*
@@ -254,7 +254,7 @@ module App
           q = urlquerypath_to_mongoquery(params[:splat].empty? ? params[:where] : params[:splat].first)
           field = case params[:field]
           when 'id' then '_' + params[:field]
-          when /^(name|tags|aliases|status)$/ then params[:field]
+          when Regexp.new("^(#{TOP_LEVEL_GROUPS.join('|')})$") then params[:field]
           else "properties.#{params[:field]}"
           end
 

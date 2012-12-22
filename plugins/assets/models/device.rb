@@ -8,7 +8,6 @@ class Device < App::Model::Base
   VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved']
   MANUAL_STATUS = ['fault', 'allocatable', 'reserved']
   VALID_MAINT_STATUS = ['parts', 'service']
-  TOP_LEVEL_GROUPS = ['id', 'name', 'status']
 
   set_collection_name "devices"
 

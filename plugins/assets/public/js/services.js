@@ -8,6 +8,11 @@ factory('Summary', function($resource){
     field: '@field'
   });
 }).
+factory('List', function($resource){
+  return $resource('/api/devices/list/:field', {
+    field: '@field'
+  });
+}).
 factory('Query', function($resource){
   return $resource('/api/devices/find/tags/!disabled', {
     query: '@query'

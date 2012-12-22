@@ -1,6 +1,6 @@
 module App
   module Helpers
-  # /lib/find/album/containsvalue[+andcontains][:orcontains][+] ? s=field1[,-field2]
+    TOP_LEVEL_GROUPS = ['id', 'name', 'tags', 'aliases', 'status', 'maintenance_status']
 
   # generates a mongodb query hash from a field-urlquery
   # URL path (e.g.: field1/query1/field2/query2/..)
@@ -26,7 +26,7 @@ module App
             case field
             when /^id$/
               q['$or'] << {'_'+field => (v || {'$exists' => fieldExists})}
-            when /^(name|tags|aliases|status)$/
+            when Regexp.new("^(#{TOP_LEVEL_GROUPS.join('|')})$")
               q['$or'] << {field => (v || {'$exists' => fieldExists})}
             else
               q['$or'] << {"#{autofield}.#{field}" => (v || {'$exists' => fieldExists})}
