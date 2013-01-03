@@ -11,7 +11,7 @@ module App
 
     namespace '/api/provision' do
       %w{
-        /
+        /?
         /:id
       }.each do |r|
         get r do
@@ -22,7 +22,10 @@ module App
           elsif request['X-RHN-Provisioning-MAC-0'] || params[:mac]
             mac = (request['X-RHN-Provisioning-MAC-0'].split(' ').last rescue param[:mac])
             device = Device.first({
-              'properties.mac' => mac
+              '$and' => [
+                {'properties.network.interfaces.name' => 'eth0'},
+                {'properties.network.interfaces.mac'  =>  mac}
+              ]
             }) if mac
           end
 
