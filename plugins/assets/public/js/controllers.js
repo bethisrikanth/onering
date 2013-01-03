@@ -144,7 +144,7 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote, DeviceStat, NagiosHost){
+function NodeController($scope, $http, $location, $routeParams, $window, Device, DeviceNote, DeviceStat, NagiosHost){
   $scope.id = $routeParams.id;
   $scope.note = null;
   $scope.hidAsAColor = false;
@@ -153,6 +153,7 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
   $scope.alert_show_limit = $scope.alert_init_limit;
   $scope.alert_load_age = 0;
   $scope.current_net_tab = 'system';
+  $scope.deleteConfirmId = null;
 
   $scope.reload = function(id){
     var id = id || $scope.id;
@@ -265,6 +266,18 @@ function NodeController($scope, $http, $routeParams, $window, Device, DeviceNote
 
     $scope.newtags = [];
   };
+
+  $scope.deleteNode = function(){
+    if($scope.device){
+      if($scope.deleteConfirmId){
+        if($scope.device.id == $scope.deleteConfirmId){
+          $http.delete('/api/devices/'+$scope.device.id).success(function(){
+            $location.path('/inf');
+          });
+        }
+      }
+    }
+  }
 
   $window.setInterval($scope.updateAlertAge, 1000);
   $window.setInterval($scope.reload, 60000);

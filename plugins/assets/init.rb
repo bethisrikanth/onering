@@ -15,6 +15,11 @@ module App
         device.to_json
       end
 
+      delete '/:id' do
+        Device.destroy(params[:id])
+        200
+      end
+
       %w{
         /stats
         /:id/stats

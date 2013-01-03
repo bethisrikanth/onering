@@ -72,6 +72,7 @@
         <li class="nav-header">Lifecycle</li>
         <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
         <li><a open-dialog="nodeTransitionMaintState"><i class="icon-wrench"></i> Maintenance Status</a></li>
+        <li><a open-dialog="nodeDeleteConfirm"><i class="icon-trash"></i> Delete Node</a></li>
       </ul>
     </div>
   </div>
@@ -191,5 +192,28 @@
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">Close</a>
     <a class="btn btn-primary" data-dismiss="modal" ng-click="saveTags()">Save</a>
+  </div>
+</div>
+
+
+<div class="modal hide" id="nodeDeleteConfirm">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Confirm Delete</h3>
+  </div>
+
+  <div class="modal-body">
+    Are you sure you want to delete this node?  All data associated with this node will be permanently removed.
+    <br />
+    <br />
+    <b>If you are sure, type the node's Hardware ID below (case sensitive):</b>
+    <br />
+    <br />
+    <input type="text" ng-model="deleteConfirmId"></input>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Cancel</a>
+    <a class="btn btn-danger" data-dismiss="modal" ng-click="deleteNode()">Delete</a>
   </div>
 </div>
