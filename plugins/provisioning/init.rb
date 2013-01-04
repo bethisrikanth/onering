@@ -23,8 +23,6 @@ module App
             iface = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').first.strip.chomp rescue 'eth0')
             mac = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').last rescue param[:mac]).strip.chomp
 
-            raise mac.inspect
-
             device = Device.first({
               '$and' => [
                 {'properties.network.interfaces.name' => iface},
