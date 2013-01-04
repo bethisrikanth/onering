@@ -172,8 +172,10 @@ module App
         device = Device.find(params[:id])
         return 404 if not device
         if params[:status] == 'unknown'
-          device.unset(:status)
-          device.reload
+          if (Device::VALID_STATUS - Device::MANUAL_STATUS).include?(device.status)
+            device.unset(:status)
+            device.reload
+          end
         else
           device.status = params[:status]
           device.safe_save
