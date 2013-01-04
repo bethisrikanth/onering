@@ -26,7 +26,7 @@ module App
             device = Device.first({
               '$and' => [
                 {'properties.network.interfaces.name' => iface},
-                {'properties.network.interfaces.addresses.mac'  =>
+                {'properties.network.interfaces.mac'  =>
                   {
                     '$regex'   => "^#{mac}$",
                     '$options' => 'i'
