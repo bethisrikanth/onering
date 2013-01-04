@@ -24,8 +24,7 @@ rm -f /etc/sysconfig/network
 mv /etc/sysconfig/network.cobbler /etc/sysconfig/network
 
 # Also set the hostname now, some applications require it
-# (e.g.: if we're connecting to Puppet before a reboot).
-/bin/hostname 05f239.hw.outbrain.com
+/bin/hostname {{ device.id }}.hw.outbrain.com
 
 # Start configuration for bond0
 echo "DEVICE=bond0" > /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0

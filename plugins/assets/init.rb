@@ -114,30 +114,19 @@ module App
         set
         unset
       }.each do |action|
-        get "/:id/#{action}/*" do
+        get "/:id/#{action}/:key/:value" do
           device = Device.find(params[:id])
           return 404 if not device
 
-          if not params[:splat].empty?
-            prop = device.properties
-            pairs = params[:splat].first.split('/')
+          device.properties ||= {}
 
-            if action == 'set'
-            # set each property
-              pairs.evens.zip(pairs.odds).each do |pair|
-                prop[pair.first] = pair.last
-              end
-            else
-            # unset each property
-              pairs.each do |property|
-                prop[property] = nil
-              end
-            end
-
-          # set and save
-            device.properties = prop.reject{|k,v| v == nil}
-            device.safe_save
+          if action == 'set'
+            device.properties.set(params[:key], params[:value])
+          else
+            device.properties.delete(params[:key])
           end
+
+          device.safe_save
 
           device.to_json
         end

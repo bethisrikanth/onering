@@ -37,6 +37,17 @@ module App
           }
         end
       end
+
+      get '/:id/set/:key/:value' do
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        device.properties ||= {}
+        device.properties.set("provisioning.#{params[:key]}", params[:value])
+        device.safe_save
+
+        device.to_json
+      end
     end
   end
 end
