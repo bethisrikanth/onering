@@ -55,6 +55,20 @@ module App
 
         device.to_json
       end
+
+      get '/:id/action' do
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        rv = device.properties.get('provisioning.action')
+
+        if params[:clear] == 'true'
+          device.properties['provisioning'].delete('action')
+          device.safe_save
+        end
+
+        rv
+      end
     end
   end
 end
