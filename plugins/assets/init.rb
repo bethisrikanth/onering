@@ -139,7 +139,7 @@ module App
         return 404 if not device
         rv = []
         params[:splat].first.split('/').each do |key|
-          rv << (device.properties[key] || ' ').to_s
+          rv << (device.properties.get(key) || ' ').to_s
         end
 
         return rv.join("\n")
@@ -250,7 +250,7 @@ module App
           q = urlquerypath_to_mongoquery(params[:splat].empty? ? params[:where] : params[:splat].first)
           field = case params[:field]
           when 'id' then '_' + params[:field]
-          when Regexp.new("^(#{TOP_LEVEL_GROUPS.join('|')})$") then params[:field]
+          when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then params[:field]
           else "properties.#{params[:field]}"
           end
 

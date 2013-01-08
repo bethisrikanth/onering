@@ -1,6 +1,6 @@
 module App
   module Helpers
-    TOP_LEVEL_GROUPS = ['id', 'name', 'tags', 'aliases', 'status', 'maintenance_status']
+    TOP_LEVEL_FIELDS = ['id', 'name', 'tags', 'aliases', 'status', 'maintenance_status']
 
   # generates a mongodb query hash from a field-urlquery
   # URL path (e.g.: field1/query1/field2/query2/..)
@@ -18,7 +18,7 @@ module App
           fieldNames.each do |field|
             fieldExists = (field.gsub!(/^\^/,'') == nil)
 
-            # autodetect type for p[1] := v
+
             v = p[1]
             v = get_rx_from_urlquery(v) if regex and v.is_a?(String)
 
@@ -26,7 +26,7 @@ module App
             case field
             when /^id$/
               q['$or'] << {'_'+field => (v || {'$exists' => fieldExists})}
-            when Regexp.new("^(#{TOP_LEVEL_GROUPS.join('|')})$")
+            when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$")
               q['$or'] << {field => (v || {'$exists' => fieldExists})}
             else
               q['$or'] << {"#{autofield}.#{field}" => (v || {'$exists' => fieldExists})}
@@ -41,7 +41,6 @@ module App
 
       return nil
     end
-
 
     def get_rx_from_urlquery(value)
       rv = []
