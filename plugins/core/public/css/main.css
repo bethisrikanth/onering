@@ -356,3 +356,11 @@ i.normal{
 .table-stacked tbody{
   border-top-width: 0px !important;
 }
+
+.label a{
+  color: inherit;
+}
+
+.label a:hover{
+  text-decoration: none;
+}
