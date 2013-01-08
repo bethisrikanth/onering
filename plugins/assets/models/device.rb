@@ -105,7 +105,7 @@ class Device < App::Model::Base
   #               (defaults to a summary of the whole collection)
   #
     def summarize(group_by, properties=[], query=nil, options={})
-      unless TOP_LEVEL_GROUPS.include?(group_by)
+      unless TOP_LEVEL_FIELDS.include?(group_by)
         group_by = "properties.#{group_by}"
       end
 
