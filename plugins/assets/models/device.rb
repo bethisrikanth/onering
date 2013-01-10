@@ -213,7 +213,9 @@ class Device < App::Model::Base
       end
 
     # return only the top-level hash values
-      rv.collect{|k,v| v }.sort{|a,b| (a[:id] || '') <=> (b[:id] || '') }
+      rv = rv.collect{|k,v| v }
+      rv = rv.sort{|a,b| (a[:id] || '') <=> (b[:id] || '') } rescue rv
+      rv
     end
   end
 end
