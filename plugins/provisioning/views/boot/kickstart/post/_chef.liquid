@@ -18,24 +18,19 @@ EOF_NTP
 
 # install packages
 /usr/bin/yum clean all
-/usr/bin/yum -y install gcc chef-full
-/opt/opscode/embedded/bin/gem install mongrel --pre
-/opt/opscode/embedded/bin/gem install ruby-shadow
+/usr/bin/yum -y install gcc chef
 
-# configure chef
 mkdir /etc/chef
 cd /etc/chef
-/usr/bin/curl -O http://repo.ladc1.outbrain.com/Misc/Chef/validation.pem
-/usr/bin/curl -O http://repo.ladc1.outbrain.com/Misc/Chef/client.rb
+
+/usr/bin/curl -O http://chefmaster.outbrain.com/chef/validation.pem
+/usr/bin/curl -O http://chefmaster.outbrain.com/chef/client.rb
+
 /usr/bin/chef-client
 
-# build initial run-list (!! THIS WILL EVENTUALLY NOT BE HERE !!)
 cat <<EOF > /var/tmp/ob-roles.json
 { "run_list": [ "role[OB-Base]" ] }
 EOF
-chef-client -j /var/tmp/ob-roles.json
 
-cat <<EOF > /var/tmp/ob-roles.json
-{ "run_list": [ "role[OB-Base]" ] }
-EOF
+# do initial chef run
 chef-client -j /var/tmp/ob-roles.json

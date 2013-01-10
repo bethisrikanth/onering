@@ -5,7 +5,7 @@ require 'assets/lib/helpers'
 class Device < App::Model::Base
   include App::Model::Taggable
 
-  VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved']
+  VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved', 'provisioning']
   MANUAL_STATUS = ['fault', 'allocatable', 'reserved']
   VALID_MAINT_STATUS = ['parts', 'service']
 

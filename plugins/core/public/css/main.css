@@ -48,6 +48,10 @@ body .modal {
   background-color: #7C3AAD;
 }
 
+.label-provisioning{
+  background-color: #F89406;
+}
+
 .label-allocatable{
   background-color: #3A87AD;
 }
