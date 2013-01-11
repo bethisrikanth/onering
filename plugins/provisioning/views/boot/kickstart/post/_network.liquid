@@ -1,15 +1,11 @@
-{% case device.properties.provisioning.network.strategy %}
- {% when 'bonded' %}
-# Network Strategy: bonded
+# -----------------------------------------------------------------------------
+# post: network
 
-# we have bonded interfaces, so set max_bonds
-if [ -f "/etc/modprobe.conf" ]; then
-  echo "options bonding max_bonds=1" >> /etc/modprobe.conf
-fi
-
-# create a working directory for interface scripts
-mkdir /etc/sysconfig/network-scripts/cobbler
-cp /etc/sysconfig/network-scripts/ifcfg-lo /etc/sysconfig/network-scripts/cobbler/
+{% if device.properties.provisioning.hostname != empty %}
+  {% assign hostname = device.properties.provisioning.hostname %}
+{% else %}
+  {% capture hostname %}{{ device.id }}.hw.outbrain.com{% endcapture %}
+{% endif %}
 
 # set the gateway in the network configuration file
 grep -v GATEWAY /etc/sysconfig/network > /etc/sysconfig/network.tmp
@@ -17,14 +13,43 @@ echo "GATEWAY={{ device.properties.provisioning.network.gateway }}" >> /etc/sysc
 rm -f /etc/sysconfig/network
 mv /etc/sysconfig/network.tmp /etc/sysconfig/network
 
+# update /etc/hosts with the new hostname
+sed -i 's/localhost.localdomain/{{ hostname }}/' /etc/hosts
+
 # set the hostname in the network configuration file
 grep -v HOSTNAME /etc/sysconfig/network > /etc/sysconfig/network.tmp
-echo "HOSTNAME={{ device.id }}.hw.outbrain.com" >> /etc/sysconfig/network.tmp
+echo "HOSTNAME={{ hostname }}" >> /etc/sysconfig/network.tmp
 rm -f /etc/sysconfig/network
-mv /etc/sysconfig/network.cobbler /etc/sysconfig/network
+mv /etc/sysconfig/network.tmp /etc/sysconfig/network
 
 # Also set the hostname now, some applications require it
-/bin/hostname {{ device.id }}.hw.outbrain.com
+/bin/hostname {{ hostname }}
+
+
+# configure resolv.conf
+cat <<EOF_DNS >> /etc/resolv.conf
+domain {{ device.properties.site | downcase }}.outbrain.com
+search lcl.outbrain.com {{ device.properties.site | downcase }}.outbrain.com hw.outbrain.com outbrain.com
+nameserver 192.168.255.11
+nameserver {{ device.properties.provisioning.network.dns }}
+
+EOF_DNS
+
+{% case device.properties.provisioning.network.strategy %}
+ {% when 'bonded' %}
+################################################################################
+################################################################################
+#
+#  THIS IS A MESS
+#
+################################################################################
+################################################################################
+# Network Strategy: bonded
+
+# set max_bonds
+if [ -f "/etc/modprobe.conf" ]; then
+  echo "options bonding max_bonds=1" >> /etc/modprobe.conf
+fi
 
 # Start configuration for bond0
 echo "DEVICE=bond0" > /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
@@ -79,18 +104,6 @@ echo "MASTER=bond0" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
 echo "HOTPLUG=no" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
 echo "BOOTPROTO=dhcp" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
 # End configuration for eth0
-
-sed -i -e "/^search /d" /etc/resolv.conf
-echo -n "search " >>/etc/resolv.conf
-echo -n "nydc1.outbrain.com " >>/etc/resolv.conf
-echo -n "hw.outbrain.com " >>/etc/resolv.conf
-echo "" >>/etc/resolv.conf
-
-sed -i -e "/^nameserver /d" /etc/resolv.conf
-echo "nameserver 192.168.253.11" >>/etc/resolv.conf
-echo "nameserver 192.168.253.12" >>/etc/resolv.conf
-echo "nameserver 10.11.5.101" >>/etc/resolv.conf
-echo "nameserver 10.10.65.75" >>/etc/resolv.conf
 
 sed -i 's/ONBOOT=yes/ONBOOT=no/g' /etc/sysconfig/network-scripts/ifcfg-eth*
 

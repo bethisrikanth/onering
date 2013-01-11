@@ -108,12 +108,15 @@
         </tr>
       </tbody>
 
-      <tbody ng-repeat="slave in interface.slaves">
-        <tr>
-          <th><span ng-show="$index==0">Slaves</span></th>
-          <th>{{ slave.name }}</th>
-          <td>{{ slave.mac }}</td>
-        </tr>
+      <tbody>
+        <th>MAC</th>
+        <th> </th>
+        <td>
+          {{ interface.mac }}
+          <!-- <span ng-show="checkPxeStatus(interface.mac)">
+            <a href="http://pxe.{{ device.properties.site }}.outbrain.com/devices/{{ interface.mac }}"><i class="icon-info-sign"></i></a>
+          </span> -->
+        </td>
       </tbody>
 
       <tbody ng-show="interface.switch">

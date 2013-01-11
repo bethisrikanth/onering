@@ -154,6 +154,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, Device,
   $scope.alert_load_age = 0;
   $scope.current_net_tab = 'system';
   $scope.deleteConfirmId = null;
+  $scope.redeployConfirmId = null;
 
   $scope.reload = function(id){
     var id = id || $scope.id;
@@ -274,6 +275,18 @@ function NodeController($scope, $http, $location, $routeParams, $window, Device,
           $http.delete('/api/devices/'+$scope.device.id).success(function(){
             $location.path('/inf');
           });
+        }
+      }
+    }
+  }
+
+  $scope.redeployNode = function(){
+    if($scope.device){
+      if($scope.redeployConfirmId){
+        if($scope.device.id == $scope.redeployConfirmId){
+          $http.get('/api/provision/'+$scope.device.id+'/boot/install').success(function(){
+            $scope.reload();
+          })
         }
       }
     }

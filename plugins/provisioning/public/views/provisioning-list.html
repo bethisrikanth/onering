@@ -4,7 +4,45 @@
   <div class="container-fluid device-list provisioning" ng-show="results &amp;&amp; !noresults">
     <form>
       <div class="row-fluid">
-        <div class="offset1 span10">
+        <div class="span12">
+          <b>
+            <i class="icon-refresh"></i>
+            Refreshed: {{ load_time | timeAgo }}
+          </b>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="offset6 span6">
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <th>DNS Server</th>
+                <td>
+                  <input type="text" ng-model="defaults.dns" ng-change="updateDefaults('dns')"></input>
+                </td>
+              </tr>
+
+              <tr>
+                <th>Netmask</th>
+                <td>
+                  <input type="text" ng-model="defaults.netmask" ng-change="updateDefaults('netmask')"></input>
+                </td>
+              </tr>
+
+              <tr>
+                <th>Gateway</th>
+                <td>
+                  <input type="text" ng-model="defaults.gateway" ng-change="updateDefaults('gateway')"></input>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row-fluid">
+        <div class="span12">
           <div class="alert alert-success" ng-show="saved">{{ saved == true &amp;&amp; 'Saved!' || saved }}</div>
 
           <br />
@@ -26,15 +64,19 @@
       </div>
 
       <div class="row-fluid">
-        <div class="offset1 span10">
+        <div class="span12">
           <table class="table table-condensed table-hover">
             <thead>
               <tr>
                 <th>&nbsp;</th>
                 <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
+                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
                 <th ng-click="sortField='maintenance_status'; sortReverse=!sortReverse" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
                 <th ng-click="sortField='properties.model'; sortReverse=!sortReverse">Model</th>
-                <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+                <th ng-click="sortField='properties.provisioning.hostname'; sortReverse=!sortReverse">Name</th>
+                <th ng-click="sortField='properties.provisioning.network.ip'; sortReverse=!sortReverse">IP</th>
+                <th ng-click="sortField='properties.provisioning.network.netmask'; sortReverse=!sortReverse">Netmask</th>
+                <th ng-click="sortField='properties.provisioning.network.gateway'; sortReverse=!sortReverse">Gateway</th>
                 <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
                 <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
                 <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
@@ -51,29 +93,49 @@
 
                 <td class="id"><a tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
 
+                <td class="status center">
+                  <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
+                </td>
+
                 <td class="maintenance_status center">
                   <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="Needs {{ (device.maintenance_status || 'healthy') | titleize }}"></i>
                 </td>
 
-                <td>{{ device.properties.make }} {{ device.properties.model | section:' ':-1 }}</td>
+                <td class="model">{{ device.properties.make }} {{ device.properties.model | section:' ':-1 }}</td>
 
-                <td>
-                  <span ng-hide="editing">{{ device.provisioning.hostname }}</span>
-                  <input ng-show="editing" class="name" type="text" ng-model="device.provisioning.hostname">
+                <td class="name">
+                  <span ng-hide="editing">{{ device.properties.provisioning.hostname }}</span>
+                  <input ng-show="editing" type="text" ng-model="device.properties.provisioning.hostname">
                 </td>
 
-                <td>
+                <td class="ip">
+                  <span ng-hide="editing">{{ device.properties.provisioning.network.ip }}</span>
+                  <input ng-show="editing" type="text" ng-model="device.properties.provisioning.network.ip">
+                </td>
+
+                <td class="netmask">
+                  <span ng-hide="editing">{{ device.properties.provisioning.network.netmask }}</span>
+                  <input ng-show="editing" type="text" ng-model="device.properties.provisioning.network.netmask" placeholder="{{ defaults.netmask }}">
+                </td>
+
+                <td class="gateway">
+                  <span ng-hide="editing">{{ device.properties.provisioning.network.gateway }}</span>
+                  <input ng-show="editing" type="text" ng-model="device.properties.provisioning.network.gateway" placeholder="{{ defaults.gateway }}">
+                </td>
+
+                <td class="site">
                   <span ng-hide="editing">{{ device.properties.site }}</span>
-                  <input ng-show="editing" class="site" type="text" ng-model="device.properties.site">
+                  <input ng-show="editing" type="text" ng-model="device.properties.site">
                 </td>
 
-                <td>
+                <td class="rack">
                   <span ng-hide="editing">{{ device.properties.rack }}</span>
-                  <input ng-show="editing" class="rack" type="text" ng-model="device.properties.rack">
+                  <input ng-show="editing" type="text" ng-model="device.properties.rack">
                 </td>
-                <td>
+
+                <td class="unit">
                   <span ng-hide="editing">{{ device.properties.unit }}</span>
-                  <input ng-show="editing" class="unit" type="text" ng-model="device.properties.unit">
+                  <input ng-show="editing" type="text" ng-model="device.properties.unit">
                 </td>
 
                 <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
@@ -94,7 +156,7 @@
       </div>
 
       <div class="row-fluid">
-        <div class="offset1 span10">
+        <div class="span12">
           <!-- edit mode actions -->
           <div ng-show="editing">
             <input type="submit" class="btn btn-primary" value="Save" ng-click="save()"></input>

@@ -56,6 +56,10 @@ body .modal {
   background-color: #3A87AD;
 }
 
+.label-installing{
+  background-color: #3A87AD;
+}
+
 .label-unknown{
   background-color: #999;
 }
@@ -367,4 +371,36 @@ i.normal{
 
 .label a:hover{
   text-decoration: none;
+}
+
+.provisioning td input[type="text"]{
+  width: 98% !important;
+}
+
+.provisioning td.select{
+  width: 24px;
+}
+
+.provisioning td.id{
+  width: 36px;
+}
+
+.provisioning td.model{
+  width: 10%;
+}
+
+.provisioning td.name{
+  width: 25%;
+}
+
+.provisioning td.ip,
+.provisioning td.netmask,
+.provisioning td.gateway{
+  width: 8%;
+}
+
+.provisioning td.site,
+.provisioning td.rack,
+.provisioning td.unit{
+  width: 5%;
 }

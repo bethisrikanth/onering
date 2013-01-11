@@ -1,32 +1,14 @@
 # -----------------------------------------------------------------------------
 # post: chef
 
-# configure NTP (pre-flight)
-cat <<EOF_NTP >> /etc/ntp/step-tickers
-0.centos.pool.ntp.org
-1.centos.pool.ntp.org
-2.centos.pool.ntp.org
-EOF_NTP
-
-# enable prerequisite services
-/sbin/chkconfig crond on
-/sbin/chkconfig ntpd on
-
-# start prerequisite services
-/sbin/service ntpd start
-/sbin/service crond start
-
 # install packages
-/usr/bin/yum clean all
 /usr/bin/yum -y install gcc chef
 
 mkdir /etc/chef
 cd /etc/chef
 
-/usr/bin/curl -O http://chefmaster.outbrain.com/chef/validation.pem
-/usr/bin/curl -O http://chefmaster.outbrain.com/chef/client.rb
-
-/usr/bin/chef-client
+/usr/bin/curl http://chefmaster.outbrain.com/boot/validation.pem -o /etc/chef/validation.pem
+/usr/bin/curl http://chefmaster.outbrain.com/boot/client.rb -o /etc/chef/client.rb
 
 cat <<EOF > /var/tmp/ob-roles.json
 { "run_list": [ "role[OB-Base]" ] }

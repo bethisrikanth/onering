@@ -172,7 +172,7 @@ module App
         device = Device.find(params[:id])
         return 404 if not device
         if params[:status] == 'unknown'
-          if (Device::VALID_STATUS - Device::MANUAL_STATUS).include?(device.status)
+          if (Device::VALID_STATUS - Device::MANUAL_STATUS - Device::NO_AUTOCLEAR_STATUS).include?(device.status)
             device.unset(:status)
             device.reload
           end
@@ -254,7 +254,7 @@ module App
           else "properties.#{params[:field]}"
           end
 
-          Device.collection.distinct(field, q).sort.compact.to_json
+          Device.collection.distinct(field, q).compact.sort.to_json
         end
       end
 

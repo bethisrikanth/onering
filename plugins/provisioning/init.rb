@@ -1,6 +1,8 @@
 require 'liquid_patches'
 require 'controller'
 require 'assets/models/device'
+require 'uri'
+require 'net/http'
 
 module App
   class Base < Controller
@@ -10,6 +12,44 @@ module App
     end
 
     namespace '/api/provision' do
+      %w{
+        /:id/boot/?
+        /:id/boot/:profile/?
+      }.each do |r|
+        get r do
+          device = Device.find(params[:id])
+          return 404 unless device
+
+          if device.properties['site']
+            macs = []
+
+            device.properties.get('network.interfaces').each do |iface|
+              if ['eth0', 'eth1'].include?(iface['name'])
+                macs << "01-#{iface['mac'].downcase.gsub(':', '-')}" if iface['mac']
+              end
+            end
+
+            rv = ''
+
+            macs.compact.uniq.each do |mac|
+              rv += "# PXE configuration for device #{mac}\n"
+
+              if params[:profile]
+                rv += (Net::HTTP.get(URI("http://pxe.#{device.properties['site'].downcase}.outbrain.com:9521/devices/#{mac}/link/#{params[:profile]}")) rescue '')
+              else
+                rv += (Net::HTTP.get(URI("http://pxe.#{device.properties['site'].downcase}.outbrain.com:9521/devices/#{mac}")) rescue '')
+              end
+
+              rv += "\n"
+            end
+
+            rv
+          else
+            raise "Cannot provision device #{device.id} without specifying a site"
+          end
+        end
+      end
+
       %w{
         /?
         /:id
@@ -37,6 +77,11 @@ module App
           end
 
           return 404 unless device
+
+          if params[:status]
+            device.status = params[:status]
+            device.safe_save
+          end
 
           liquid 'boot/kickstart/base'.to_sym, :locals => {
             :device => (device.to_h rescue {}),

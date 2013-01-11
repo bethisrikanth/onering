@@ -30,7 +30,7 @@
       <br />
       <div>
         <b>
-          <i class="icon-time"></i>
+            <i class="icon-time"></i>
           Node Seen: <span ng-show="device.collected_at">{{ device.collected_at | timeAgo }}</span><span ng-hide="device.collected_at">has not reported</span>
         </b>
         <br />
@@ -73,11 +73,55 @@
 
         <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
         <li><a open-dialog="nodeTransitionMaintState"><i class="icon-wrench"></i> Maintenance Status</a></li>
-        <!-- <li><a open-dialog="nodeRedeploy"><i class="icon-repeat"></i> Redeploy Node</a></li> -->
+        <li><a open-dialog="nodeRedeploy"><i class="icon-repeat"></i> Redeploy Node</a></li>
 
         <li class="nav-header">Metadata</li>
         <!-- <li><a><i class="icon-book"></i> Update Inventory</a></li> -->
         <li><a open-dialog="nodeDeleteConfirm"><i class="icon-trash"></i> Delete Node</a></li>
+      </ul>
+
+      <div ng-show="device.status=='provisioning'" ng-controller="ProvisioningNodeController">
+        <h3>Provisioning</h3>
+
+        <table class="table table-condensed">
+          <tbody>
+            <tr ng-show="device.properties.provisioning.hostname">
+              <th>Hostname</th>
+              <td>{{ device.properties.provisioning.hostname | section:'.':0:1 }}</td>
+            </tr>
+
+            <tr ng-show="device.properties.provisioning.hostname">
+              <th>Domain</th>
+              <td>{{ device.properties.provisioning.hostname | section:'.':1 }}</td>
+            </tr>
+
+            <tr ng-show="device.properties.provisioning.network.ip">
+              <th>IP</th>
+              <td>{{ device.properties.provisioning.network.ip }}</td>
+            </tr>
+
+            <tr ng-show="device.properties.provisioning.network.netmask">
+              <th>Mask</th>
+              <td>{{ device.properties.provisioning.network.netmask }}</td>
+            </tr>
+
+            <tr ng-show="device.properties.provisioning.network.gateway">
+              <th>Gateway</th>
+              <td>{{ device.properties.provisioning.network.gateway }}</td>
+            </tr>
+
+            <tr ng-show="device.properties.provisioning.network.dns">
+              <th>DNS 1</th>
+              <td>{{ device.properties.provisioning.network.dns }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul class="nav nav-list well">
+          <li class="nav-header">Razor Actions <span ng-show="device.properties.provisioning.action">(Next Action: {{ device.properties.provisioning.action }})</span></li>
+          <li><a ng-click="setNextAction('reboot')"><i class="icon-repeat"></i> Reboot Node</a></li>
+          <li><a ng-click="setNextAction('reboot-install')"><i class="icon-hdd"></i> Reboot to Installer</a></li>
+        </ul>
       </ul>
     </div>
   </div>
@@ -220,5 +264,28 @@
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">Cancel</a>
     <a class="btn btn-danger" data-dismiss="modal" ng-click="deleteNode()">Delete</a>
+  </div>
+</div>
+
+
+<div class="modal hide" id="nodeRedeploy">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Confirm Node Redeploy</h3>
+  </div>
+
+  <div class="modal-body">
+    Are you sure you want to redeploy this node?  <b style="color: red">THIS IS WILL DESTROY THE PHYSICAL DATA ON THE MACHINE!</b>
+    <br />
+    <br />
+    <b>If you are sure, type the node's Hardware ID below (case sensitive):</b>
+    <br />
+    <br />
+    <input type="text" ng-model="redeployConfirmId"></input>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">Cancel</a>
+    <a class="btn btn-danger" data-dismiss="modal" ng-click="redeployNode()">Redeploy</a>
   </div>
 </div>
