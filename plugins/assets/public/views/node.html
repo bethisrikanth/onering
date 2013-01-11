@@ -278,6 +278,11 @@
     Are you sure you want to redeploy this node?  <b style="color: red">THIS IS WILL DESTROY THE PHYSICAL DATA ON THE MACHINE!</b>
     <br />
     <br />
+    <h5>Before continuing, please be sure to:</h5>
+    <ul>
+      <li>Delete the Chef client for this node: <tt>knife client delete {{ device.name }}</tt></li>
+    </ul>
+    <br />
     <b>If you are sure, type the node's Hardware ID below (case sensitive):</b>
     <br />
     <br />
