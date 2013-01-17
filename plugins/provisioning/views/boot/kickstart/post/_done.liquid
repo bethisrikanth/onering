@@ -4,6 +4,4 @@
 echo 'System Installation Complete!'
 
 # tell onering that the installation is complete
-if [ -f /etc/hardware.id ]; then
-  /usr/bin/curl -s http://onering.outbrain.com/api/provision/$(cat /etc/hardware.id)/boot/local
-fi
+/usr/bin/curl -s http://onering.outbrain.com/api/provision/{{ device.id }}/boot/local

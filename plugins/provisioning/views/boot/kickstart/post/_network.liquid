@@ -1,11 +1,10 @@
+{% if device.properties.provisioning.hostname == empty or device.properties.provisioning.hostname == nil %}
+  {% capture hostname %}{{ device.id }}.hw.outbrain.com{% endcapture %}
+{% else %}
+  {% assign hostname = device.properties.provisioning.hostname %}
+{% endif %}
 # -----------------------------------------------------------------------------
 # post: network
-
-{% if device.properties.provisioning.hostname != empty %}
-  {% assign hostname = device.properties.provisioning.hostname %}
-{% else %}
-  {% capture hostname %}{{ device.id }}.hw.outbrain.com{% endcapture %}
-{% endif %}
 
 # set the gateway in the network configuration file
 grep -v GATEWAY /etc/sysconfig/network > /etc/sysconfig/network.tmp

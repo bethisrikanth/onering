@@ -78,9 +78,11 @@
         <li class="nav-header">Metadata</li>
         <!-- <li><a><i class="icon-book"></i> Update Inventory</a></li> -->
         <li><a open-dialog="nodeDeleteConfirm"><i class="icon-trash"></i> Delete Node</a></li>
+        <li ng-hide="showProvisioning"><a ng-click="showProvisioning=!showProvisioning"><i class="icon-list"></i> Show Provisioning Data</a></li>
+        <li ng-show="showProvisioning"><a ng-click="showProvisioning=!showProvisioning"><i class="icon-list"></i> Hide Provisioning Data</a></li>
       </ul>
 
-      <div ng-show="device.status=='provisioning'" ng-controller="ProvisioningNodeController">
+      <div ng-show="device.status=='provisioning' || device.status=='installing' || showProvisioning" ng-controller="ProvisioningNodeController">
         <h3>Provisioning</h3>
 
         <table class="table table-condensed">
@@ -118,9 +120,17 @@
         </table>
 
         <ul class="nav nav-list well">
-          <li class="nav-header">Razor Actions <span ng-show="device.properties.provisioning.action">(Next Action: {{ device.properties.provisioning.action }})</span></li>
-          <li><a ng-click="setNextAction('reboot')"><i class="icon-repeat"></i> Reboot Node</a></li>
-          <li><a ng-click="setNextAction('reboot-install')"><i class="icon-hdd"></i> Reboot to Installer</a></li>
+          <li class="nav-header">Actions</li>
+          <li><a target="_blank" href="/api/provision/{{ device.id }}"><i class="icon-list-alt"></i> View Installation Script</a></li>
+
+          <li class="nav-header">
+            Reboot to Profile
+            <span ng-show="device.properties.provisioning.action">(Next Action: {{ device.properties.provisioning.action }})</span>
+          </li>
+          <li ng-show="device.properties.provisioning.action"><a ng-click="setNextAction('clear')"><i class="icon-remove-circle"></i> Clear Next Action</a></li>
+          <li><a ng-click="setNextAction('reboot:razor')"><i class="icon-check"></i> Razor</a></li>
+          <li><a ng-click="setNextAction('reboot:install')"><i class="icon-fire"></i> Installer</a></li>
+          <li><a ng-click="setNextAction('reboot:local')"><i class="icon-hdd"></i> Local</a></li>
         </ul>
       </ul>
     </div>

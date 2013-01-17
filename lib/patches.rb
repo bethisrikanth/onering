@@ -53,6 +53,11 @@ class Hash
 
     root[path.last] = value
   end
+
+  def join(inner_delimiter, outer_delimiter=nil)
+    outer_delimiter = inner_delimiter unless outer_delimiter
+    self.to_a.collect{|i| i.join(inner_delimiter) }.join(outer_delimiter)
+  end
 end
 
 class Array

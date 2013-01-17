@@ -6,10 +6,10 @@ install
 text
 skipx
 url --url http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5.8/os/x86_64/
-repo --name=NYDC1-Operations-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/Operations/el/5/x86_64/
-repo --name=NYDC1-EPEL-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/epel/5/x86_64/
-repo --name=NYDC1-CentOS-5-Updates --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/updates/x86_64/
-repo --name=NYDC1-CentOS-5-Base --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/os/x86_64/
+repo --name=Operations-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/Operations/el/5/x86_64/
+repo --name=EPEL-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/epel/5/x86_64/
+repo --name=CentOS-5-Updates --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/updates/x86_64/
+repo --name=CentOS-5-Base --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/os/x86_64/
 
 
 # =============================================================================

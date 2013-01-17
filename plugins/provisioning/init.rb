@@ -108,11 +108,40 @@ module App
         rv = device.properties.get('provisioning.action')
 
         if params[:clear] == 'true'
-          device.properties['provisioning'].delete('action')
-          device.safe_save
+          if device.properties['provisioning']
+            device.properties['provisioning'].delete('action')
+            device.safe_save
+          end
         end
 
         rv
+      end
+
+  #   IP Address Management
+      namespace '/ipam' do
+        get '/:network/:mask/?' do
+          require 'net/ping'
+          require 'resolv'
+
+          netip = params[:network].split('.').collect{|i| i.to_i.to_s(2).rjust(8,'0') }
+          mask = params[:mask].split('.').collect{|i| i.to_i.to_s(2).rjust(8,'0') }
+          network = [nil, nil, nil, nil]
+          mask.each_index{|i| network[i] = (mask[i].to_i(2) & netip[i].to_i(2)) }
+          network = network.reject{|i| i == 0 }.join('.')
+
+          ips = Device.list('network.interfaces.addresses.ip').to_a
+          ips.select!{|i| i =~ Regexp.new("^#{network}") }
+
+          raise ips.inspect
+
+            begin
+              Resolv.new.getname ip
+            rescue Resolv::ResolvError => e
+              if e.message =~ /^no name for/
+
+              end
+            end
+        end
       end
     end
   end

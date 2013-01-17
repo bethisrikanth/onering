@@ -247,14 +247,8 @@ module App
         /list/:field/where/*
       }.each do |r|
         get r do
-          q = urlquerypath_to_mongoquery(params[:splat].empty? ? params[:where] : params[:splat].first)
-          field = case params[:field]
-          when 'id' then '_' + params[:field]
-          when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then params[:field]
-          else "properties.#{params[:field]}"
-          end
-
-          Device.collection.distinct(field, q).compact.sort.to_json
+          q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
+          Device.list(params[:field], q).to_json
         end
       end
 

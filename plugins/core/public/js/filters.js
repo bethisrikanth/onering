@@ -216,5 +216,20 @@ config(['$provide', function($provide) {
       return rv;
     }
   });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('lengthFilter', function(){
+    return function(obj){
+      if(obj instanceof Array){
+        return obj.length;
+      }else if($.isPlainObject(obj)){
+        return Object.keys(obj).length;
+      }else if(obj instanceof String){
+        return obj.length;
+      }else{
+        return null;
+      }
+    }
+  });
 }]);
 

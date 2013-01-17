@@ -58,6 +58,10 @@ GEM
       plucky (~> 0.5.2)
     multi_json (1.4.0)
     net-http-persistent (2.8)
+    net-ldap (0.2.2)
+    net-ping (1.5.3)
+      ffi (>= 1.0.0)
+      net-ldap (~> 0.2.2)
     oats (0.1.4)
       log4r
       net-http-persistent
@@ -138,6 +142,7 @@ DEPENDENCIES
   mongo
   mongo_ext
   mongo_mapper
+  net-ping
   oats
   racksh
   rake

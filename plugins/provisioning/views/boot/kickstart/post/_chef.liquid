@@ -1,9 +1,6 @@
 # -----------------------------------------------------------------------------
 # post: chef
 
-# install packages
-/usr/bin/yum -y install gcc chef
-
 mkdir /etc/chef
 cd /etc/chef
 
@@ -13,6 +10,3 @@ cd /etc/chef
 cat <<EOF > /var/tmp/ob-roles.json
 { "run_list": [ "role[OB-Base]" ] }
 EOF
-
-# do initial chef run
-chef-client -j /var/tmp/ob-roles.json

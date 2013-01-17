@@ -95,6 +95,18 @@ class Device < App::Model::Base
       self.where(urlquerypath_to_mongoquery(query))
     end
 
+  # list
+  #   list distinct values for a field
+    def list(field, query=nil)
+      query = urlquerypath_to_mongoquery(query) if query
+      field = case field
+      when 'id' then '_' + field
+      when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
+      else "properties.#{field}"
+      end
+
+      self.collection.distinct(field, query).compact.sort
+    end
 
   # summarize
   #   this method provides arbitrary-depth aggregate rollups of a MongoDB

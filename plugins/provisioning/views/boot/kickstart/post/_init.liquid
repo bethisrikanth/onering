@@ -3,3 +3,7 @@
 
 /sbin/chkconfig --del cups
 /sbin/chkconfig --del bluetooth
+
+# set static site fact
+mkdir -p /etc/onering/static
+echo "{{ device.properties.site | downcase }}" > /etc/onering/static/site

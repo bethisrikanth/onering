@@ -1,25 +1,20 @@
 clearpart --all --initlabel
 
 {% case device.properties.provisioning.disk.strategy %}
- {% when 'mirror' %}
-# Disk Strategy: mirror
-bootloader --location=mbr --driveorder=sda,sdb
-part raid.01 --size=300 --asprimary --ondisk=sda
-part raid.11 --size=300 --asprimary --ondisk=sdb
-part raid.02 --size=1 --grow --asprimary --ondisk=sda
-part raid.12 --size=1 --grow --asprimary --ondisk=sdb
-
-raid /boot       --fstype=ext3 --device md0 --level=RAID1 raid.01 raid.11
-raid pv.01       --fstype ext3 --device md1 --level=RAID1 raid.02 raid.12
+ {% when 'single' %}
+# Disk Strategy: single
+bootloader       --location=mbr --driveorder=sda
+part /boot       --fstype ext3  --size=300       --asprimary       --ondisk=sda
+part pv.01       --size=150     --grow                             --ondisk=sda
 
 volgroup outbrain pv.01
 
-logvol /         --fstype ext3 --name=root     --vgname=outbrain --size=10240
-logvol /var      --fstype ext3 --name=var      --vgname=outbrain --size=10240
-logvol /home     --fstype ext3 --name=home     --vgname=outbrain --size=5120
-logvol /opt      --fstype ext3 --name=opt      --vgname=outbrain --size=5120
-logvol /outbrain --fstype ext3 --name=outbrain --vgname=outbrain --size=5120
-logvol swap      --fstype swap --name=swap     --vgname=outbrain --size=4096
+logvol /         --fstype ext3  --name=root      --vgname=outbrain --size=10240
+logvol /var      --fstype ext3  --name=var       --vgname=outbrain --size=10240
+logvol /home     --fstype ext3  --name=home      --vgname=outbrain --size=5120
+logvol /opt      --fstype ext3  --name=opt       --vgname=outbrain --size=5120
+logvol /outbrain --fstype ext3  --name=outbrain  --vgname=outbrain --size=51200
+logvol swap      --fstype swap  --name=swap      --vgname=outbrain --size=8096
 
 {% when 'hadoop' %}
 # Disk Strategy: hadoop
@@ -65,18 +60,23 @@ logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
 
 
 {% else %}
-# Disk Strategy: single
-bootloader       --location=mbr --driveorder=sda
-part /boot       --fstype ext3  --size=300       --asprimary       --ondisk=sda
-part pv.01       --size=150     --grow                             --ondisk=sda
+# Disk Strategy: mirror
+bootloader --location=mbr --driveorder=sda,sdb
+part raid.01 --size=300 --asprimary --ondisk=sda
+part raid.11 --size=300 --asprimary --ondisk=sdb
+part raid.02 --size=1 --grow --asprimary --ondisk=sda
+part raid.12 --size=1 --grow --asprimary --ondisk=sdb
+
+raid /boot       --fstype=ext3 --device md0 --level=RAID1 raid.01 raid.11
+raid pv.01       --fstype ext3 --device md1 --level=RAID1 raid.02 raid.12
 
 volgroup outbrain pv.01
 
-logvol /         --fstype ext3  --name=root      --vgname=outbrain --size=10240
-logvol /var      --fstype ext3  --name=var       --vgname=outbrain --size=10240
-logvol /home     --fstype ext3  --name=home      --vgname=outbrain --size=5120
-logvol /opt      --fstype ext3  --name=opt       --vgname=outbrain --size=5120
-logvol /outbrain --fstype ext3  --name=outbrain  --vgname=outbrain --size=51200
-logvol swap      --fstype swap  --name=swap      --vgname=outbrain --size=8096
+logvol /         --fstype ext3 --name=root     --vgname=outbrain --size=10240
+logvol /var      --fstype ext3 --name=var      --vgname=outbrain --size=10240
+logvol /home     --fstype ext3 --name=home     --vgname=outbrain --size=5120
+logvol /opt      --fstype ext3 --name=opt      --vgname=outbrain --size=5120
+logvol /outbrain --fstype ext3 --name=outbrain --vgname=outbrain --size=5120
+logvol swap      --fstype swap --name=swap     --vgname=outbrain --size=4096
 
 {% endcase %}

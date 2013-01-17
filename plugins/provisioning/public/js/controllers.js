@@ -1,8 +1,43 @@
+function provisioningSetNextAction(action, device_id, scope, http){
+  if(typeof $scope != 'undefined' && !scope) scope = $scope;
+  if(typeof $http != 'undefined' && !http) http = $http;
+  if(scope.device && !device_id) device_id = scope.device.id;
+
+  if(device_id && action){
+    action = action.split(':');
+    target = null;
+
+    if(action.length > 1){
+      target = action.pop();
+      action = action.shift();
+    }
+
+    if(target){
+      http.get('/api/provision/'+device_id+'/boot/'+target).success(function(data){
+        scope.bootTarget = target;
+
+        http.get('/api/provision/'+device_id+'/set/action/'+action).success(function(d2){
+          scope.nextAction = action;
+        });
+      });
+    }else if(action == 'clear'){
+      http.get('/api/provision/'+device_id+'/action?clear=true').success(function(data){
+        scope.reload();
+      });
+    }else{
+      scope.nextAction = action;
+    }
+  }
+}
+
+
 function ProvisioningController($scope, $http, $window, $timeout, Query, Device){
   $scope.defaults = {};
 
   $scope.reload = function(){
     if(!$scope.editing){
+      $scope.selected = {};
+
       Query.query({
         query: 'status/provisioning:installing'
       }, function(data){
@@ -32,6 +67,42 @@ function ProvisioningController($scope, $http, $window, $timeout, Query, Device)
 
   $scope.edit = function(){
     $scope.editing = true;
+  }
+
+  $scope.deviceSelect = function(device, event){
+    if(event.target.checked){
+      $scope.selected[device.id] = device;
+    }else{
+      delete $scope.selected[device.id];
+    }
+  }
+
+  $scope.deviceSelectAll = function(event){
+    if(event.target.checked){
+      for(var i in $scope.results){
+        $scope.selected[$scope.results[i].id] = $scope.results[i];
+      }
+    }else{
+      $scope.selected = {};
+    }
+  }
+
+  $scope.deviceIsSelected = function(device){
+    return ($scope.selected.hasOwnProperty(device.id));
+  }
+
+  $scope.setNextActions = function(action){
+    //provisioningSetNextAction
+    var devices = null;
+
+    if($scope.selected.length == 0) devices = $scope.selected;
+
+    for(var device_id in $scope.selected){
+      provisioningSetNextAction(action, device_id, $scope, $http);
+    }
+
+    $scope.editing = false;
+    $scope.reload();
   }
 
   $scope.save = function(){
@@ -76,17 +147,13 @@ function ProvisioningController($scope, $http, $window, $timeout, Query, Device)
 }
 
 function ProvisioningNodeController($scope, $http){
-  $scope.setNextAction = function(action){
-    if($scope.device && action){
-      if(action == 'reboot-install'){
-        $http.get('/api/provision/'+$scope.device.id+'/boot/install').success(function(data){
-          action = 'reboot';
-        });
-      }
-
-      $http.get('/api/provision/'+$scope.device.id+'/set/action/'+action).success(function(data){
+  $scope.$watch('nextAction', function(){
+    if($scope.device){
+      $http.get('/api/provision/'+$scope.device.id+'/set/action/'+$scope.nextAction).success(function(data){
         $scope.reload();
       });
     }
-  }
+  });
+
+  $scope.setNextAction = provisioningSetNextAction;
 }

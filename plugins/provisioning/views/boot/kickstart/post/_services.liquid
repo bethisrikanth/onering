@@ -15,3 +15,11 @@ EOF_NTP
 # start prerequisite services
 /sbin/service ntpd start
 /sbin/service crond start
+
+# install straphanger
+/usr/bin/curl http://chefmaster.outbrain.com/boot/straphanger.tar.gz -o /tmp/straphanger.tar.gz
+
+if [ -f /tmp/straphanger.tar.gz ]; then
+  tar xf /tmp/straphanger.tar.gz -C /
+  /sbin/chkconfig --add straphanger
+fi
