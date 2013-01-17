@@ -43,7 +43,7 @@ function NavigationController($scope, $http, $route, $window, $routeParams, Summ
   //  WHY IS THIS SO COMPLICATED? #didntreadlol
       $.each(data, function(ix, i){
         var s = '';
-        
+
         for(var ss in i){
           if(typeof(i[ss]) == 'string') s += i[ss];
         }

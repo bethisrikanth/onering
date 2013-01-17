@@ -12,7 +12,7 @@ module App
       get '/:id' do
         device = Device.find(params[:id])
         return 404 if not device
-        device.to_json
+        output device.to_h
       end
 
       delete '/:id' do
@@ -27,7 +27,7 @@ module App
         get route do
           stat = DeviceStat.find(params[:id])
           return 404 if not stat
-          stat.to_json
+          output stat.to_h
         end
 
         post route do
@@ -54,7 +54,7 @@ module App
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           stats = DeviceStat.where(urlquerypath_to_mongoquery(q,true,'metrics')).limit(params[:limit] || 1000)
-          Device.find(stats.collect{|i| i['_id'] }).to_json
+          output Device.find(stats.collect{|i| i['_id'] })
         end
       end
 
@@ -128,7 +128,7 @@ module App
 
           device.safe_save
 
-          device.to_json
+          output device.to_h
         end
       end
 
@@ -142,7 +142,7 @@ module App
           rv << (device.properties.get(key) || ' ').to_s
         end
 
-        return rv.join("\n")
+        rv.join("\n")
       end
 
 
@@ -153,7 +153,7 @@ module App
         device = Device.find(params[:id])
         tags.each{|t| device.tags.push_uniq(t) }
         device.safe_save
-        device.to_json
+        output device.to_h
       end
 
 
@@ -162,7 +162,7 @@ module App
         device = Device.find(params[:id])
         tags.each{|t| device.tags.delete(t) }
         device.safe_save
-        device.to_json
+        output device.to_h
       end
 
 
@@ -181,7 +181,7 @@ module App
           device.safe_save
         end
 
-        device.to_json
+        output device.to_h
       end
 
     # maintenance_status
@@ -197,7 +197,7 @@ module App
           device.safe_save
         end
 
-        device.to_json
+        output device.to_h
       end
 
 
@@ -210,7 +210,7 @@ module App
         get r do
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          Device.urlsearch(q).limit(params[:limit] || 1000).to_json
+          output Device.urlsearch(q).limit(params[:limit] || 1000)
         end
 
         post r do
@@ -231,12 +231,12 @@ module App
         /list/stale/:age
       }.each do |r|
         get r do
-          Device.where({
+          output Device.where({
             'collected_at' => {
               '$lte' => (params[:age] || 4).to_i.hours.ago
             },
             'tags' => 'auto'
-          }).to_json
+          })
         end
       end
 
@@ -248,7 +248,7 @@ module App
       }.each do |r|
         get r do
           q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
-          Device.list(params[:field], q).to_json
+          output Device.list(params[:field], q)
         end
       end
 
@@ -261,7 +261,7 @@ module App
         get r do
           q = urlquerypath_to_mongoquery(params[:where])
           rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
-          rv.to_json
+          output rv
         end
       end
     end

@@ -111,6 +111,12 @@
           </li>
         </ul>
 
+        <ul class="nav" ng-hide="online">
+          <span class="label label-important">
+            Could not contact the server
+          </span>
+        </ul>
+
         <ul class="nav pull-right">
           <li><a ng-click="search_show_help=!search_show_help"><i class="icon-question-sign icon-white"></i>&nbsp;Help</a></li>
         </ul>
@@ -186,7 +192,5 @@
     </header>
 
     <section class="content" ng-view>
-
-    <footer class="container-fluid">
   </body>
 </html>

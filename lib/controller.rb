@@ -18,6 +18,43 @@ module App
       headers 'Access-Control-Allow-Headers' => 'origin, x-requested-with, accept'
     end
 
+    helpers do
+      def output(body, status=200, mime='application/json')
+        rv = nil
+
+        case params[:format]
+        when 'txt'
+          mime = 'text/plain'
+          rv = format_text(body)
+
+        when 'yaml'
+          mime = 'text/yaml'
+          rv = YAML.dump(body)
+
+        else
+          rv = body.to_json
+        end
+
+        [status, { 'Content-Type' => mime }, rv]
+      end
+
+      def format_text(body)
+        if body.is_a?(Array)
+          body.join("\n")
+        elsif body.is_a?(Hash)
+          body.coalesce.to_a.collect{|i|
+            key = i.first
+            val = (i.last.is_a?(Array) ? i.last.join(",") : i.last)
+
+            "#{key}: #{val}"
+
+          }.join("\n")
+        else
+          body.to_s
+        end
+      end
+    end
+
     class<<self
       def get(url, opts={}, &block)
         any(url, ['get', 'options'], opts, &block)

@@ -3,7 +3,9 @@ angular.module('corePlugin', [
   'coreDirectives',
   'coreRoutes'
 ]).
-run(['$rootScope', function($rootScope){
+run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
+  $rootScope.online = true;
+
   $rootScope.prepareQuery = function(query, raw){
 //  explictly specify raw=true to send the query directly to the API
 //  without client-side processing
@@ -34,4 +36,18 @@ run(['$rootScope', function($rootScope){
 
     return rv.join('/');
   }
+
+  $rootScope.ping = function(){
+    $http.get('/api').
+    success(function(data){
+      $rootScope.online = true;
+      $rootScope.$broadcast('online');
+    }).
+    error(function(data){
+      $rootScope.online = false;
+      $rootScope.$broadcast('offline');
+    });
+  }
+
+  $window.setInterval($rootScope.ping, 15000);
 }]);

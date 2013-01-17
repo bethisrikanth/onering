@@ -58,6 +58,33 @@ class Hash
     outer_delimiter = inner_delimiter unless outer_delimiter
     self.to_a.collect{|i| i.join(inner_delimiter) }.join(outer_delimiter)
   end
+
+  def coalesce(prefix=nil, base=nil)
+    base = self unless base
+    rv = {}
+
+    if base.is_a?(Hash)
+      base.each do |k,v|
+        base.coalesce(k,v).each do |kk,vv|
+          kk = kk.gsub(/(^_+|_+$)/,'')
+          kk = (prefix.to_s+'_'+kk.to_s) if prefix
+          rv[kk.to_s] = vv
+        end
+      end
+    else
+      rv[prefix.to_s] = base
+    end
+
+    rv
+  end
+end
+
+module ActiveSupport
+  class HashWithIndifferentAccess < Hash
+    def to_yaml(opts = {})
+      self.to_hash.to_yaml(opts)
+    end
+  end
 end
 
 class Array
