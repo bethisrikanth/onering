@@ -32,8 +32,19 @@ class Hash
     root = self
 
     begin
-      path.strip.split(/[\/\.]/).each do |p|
-        root = root[p]
+      path.strip.scan(/[a-z0-9]+(?:\[[^\]]+\])?/).to_a.each do |p|
+        x, key, subfield, subvalue = p.split(/([a-z0-9]+)(?:\[([^=]+)(?:=(.+))?\])?/i)
+        root = (root[key] rescue nil)
+        #puts key, root.inspect
+
+        if subfield and root.is_a?(Array)
+          root.each do |r|
+            if r.is_a?(Hash) and r[subfield] and ( (subvalue && r[subfield].to_s == subvalue) || true)
+              root = r
+              break
+            end
+          end
+        end
       end
 
       return root || default
