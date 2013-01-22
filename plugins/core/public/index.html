@@ -85,6 +85,8 @@
               <li class="dropdown-submenu" ng-show="alert_states">
                 <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>
                 <ul class="dropdown-menu" style="min-width: 220px;">
+                  <li><a href="#/alerts/nagios"><i class="icon-list"></i> All Alerts</a></li>
+                  <li class="divider"></li>
                   <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
                     <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
                       <img ng-src="/img/alerts/{{ alert_state.id }}.png" />

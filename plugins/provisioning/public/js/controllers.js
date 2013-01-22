@@ -1,7 +1,7 @@
 function provisioningSetNextAction(action, device_id, scope, http){
   if(typeof $scope != 'undefined' && !scope) scope = $scope;
   if(typeof $http != 'undefined' && !http) http = $http;
-  if(scope.device && !device_id) device_id = scope.device.id;
+  if(scope && scope.device && !device_id) device_id = scope.device.id;
 
   if(device_id && action){
     action = action.split(':');
@@ -155,5 +155,7 @@ function ProvisioningNodeController($scope, $http){
     }
   });
 
-  $scope.setNextAction = provisioningSetNextAction;
+  $scope.setNextAction = function(action){
+    provisioningSetNextAction(action, $scope.device.id, $scope, $http);
+  }
 }
