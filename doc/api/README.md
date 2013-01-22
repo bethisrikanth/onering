@@ -47,10 +47,10 @@ If you are using the API for anything other than one-off queries (a tool that pe
 Supports Plaintext, Where Applicable
 ------------------------------------
 
-JSON is the default serialization format for all responses, and is the ONLY acceptable format for submissions.  Other formats can be returned for convenience in parsing the output.  These formats include:
+JSON is the default serialization format for all responses, and is the ONLY acceptable format for submissions.  Other formats can be returned for convenience in parsing the output.  These formats are specified using the `format=` query string.  They include:
 
 * `format=yaml` : Returns the requested endpoint as a YAML document with the mimetype of `text/x-yaml`.
-* `format=txt`  : Returns the requested endpoint as `snake\_case\_key: value` pairs, one per line as mimetype `text/plain`.
+* `format=txt`  : Returns the requested endpoint as `snake_case_key: value` pairs, one per line as mimetype `text/plain`.
 
 For all other `format=` values, JSON objects or arrays will be returned with a mimetype of `application/json`.
 
