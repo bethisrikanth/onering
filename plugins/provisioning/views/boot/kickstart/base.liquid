@@ -5,7 +5,7 @@
 install
 text
 skipx
-url --url http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5.8/os/x86_64/
+url --url http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/os/x86_64/
 repo --name=Operations-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/Operations/el/5/x86_64/
 repo --name=EPEL-5 --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/epel/5/x86_64/
 repo --name=CentOS-5-Updates --baseurl=http://repo.{{ device.properties.site | downcase }}.outbrain.com/CentOS/5/updates/x86_64/
@@ -26,7 +26,6 @@ authconfig --enableshadow --enablemd5 --enableldap --enableldapauth --enableloca
 firewall --disabled
 selinux --disabled
 
-
 # =============================================================================
 # NETWORK
 {% include 'boot/kickstart/network' %}
@@ -38,6 +37,12 @@ selinux --disabled
 # =============================================================================
 # PACKAGE MANIFEST
 {% include 'boot/kickstart/packages' %}
+
+# =============================================================================
+# PRE-INSTALL SCRIPTS
+%pre
+
+{% include 'boot/kickstart/pre/log' %}
 
 # =============================================================================
 # POST-INSTALL SCRIPTS

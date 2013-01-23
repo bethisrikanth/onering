@@ -1,5 +1,4 @@
 clearpart --all --initlabel
-
 {% case device.properties.provisioning.disk.strategy %}
  {% when 'single' %}
 # Disk Strategy: single
@@ -18,15 +17,13 @@ logvol swap      --fstype swap  --name=swap      --vgname=outbrain --size=8096
 
 {% when 'hadoop' %}
 # Disk Strategy: hadoop
-bootloader   --location=mbr     --driveorder=sda,sdb,sdc
+bootloader   --location=mbr     --driveorder=sda
 part /boot   --fstype ext3      --size=300               --asprimary  --ondisk=sda
-part /       --fstype ext3      --size=10240             --asprimary
+part /       --fstype ext3      --size=10240             --asprimary  --ondisk=sda
 part /var    --fstype ext3      --size=51200                          --ondisk=sda
 part /home   --fstype ext3      --size=4096                           --ondisk=sda
 part /tmp    --fstype ext3      --size=4096                           --ondisk=sda
 part /data/a --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sda
-part /data/b --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sdb
-part /data/c --fstype ext3      --size=1     --grow      --asprimary  --ondisk=sdc
 
 {% when 'single-vm' %}
 # Disk Strategy: single-vm
@@ -58,6 +55,11 @@ logvol /opt      --fstype ext3  --name=opt        --vgname=outbrain --size=2120
 logvol /outbrain --fstype ext3  --name=outbrain   --vgname=outbrain --size=10240
 logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
 
+{% when 'monolithic' %}
+# Disk Strategy: monolithic
+bootloader       --location=mbr --driveorder=sda
+part  /          --fstype ext3  --size=1   --grow --asprimary  --ondisk=sda
+part  swap                      --size=512
 
 {% else %}
 # Disk Strategy: mirror

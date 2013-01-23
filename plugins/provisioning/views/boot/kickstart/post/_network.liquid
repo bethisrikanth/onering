@@ -30,8 +30,9 @@ cat <<EOF_DNS >> /etc/resolv.conf
 domain {{ device.properties.site | downcase }}.outbrain.com
 search lcl.outbrain.com {{ device.properties.site | downcase }}.outbrain.com hw.outbrain.com outbrain.com
 nameserver 192.168.255.11
+{% if device.properties.provisioning.network.dns %}
 nameserver {{ device.properties.provisioning.network.dns }}
-
+{% endif %}
 EOF_DNS
 
 {% case device.properties.provisioning.network.strategy %}

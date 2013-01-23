@@ -21,6 +21,8 @@ module App
           return 404 unless device
 
           if device.properties['site']
+            pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
+            uses_default = true
             macs = []
 
             device.properties.get('network.interfaces').each do |iface|
@@ -29,18 +31,32 @@ module App
               end
             end
 
-            rv = ''
+            rv  = "# ============================================================================= \n"
+            rv += "# pxed server at #{pxed}, site #{device.properties['site'].upcase}\n"
+            rv += "# ============================================================================= \n"
+            rv += "#\n"
 
             macs.compact.uniq.each do |mac|
               rv += "# PXE configuration for device #{mac}\n"
 
               if params[:profile]
-                rv += (Net::HTTP.get(URI("http://pxe.#{device.properties['site'].downcase}.outbrain.com:9521/devices/#{mac}/link/#{params[:profile]}")) rescue '')
+                response = Net::HTTP.get_response(URI("#{pxed}/devices/#{mac}/link/#{params[:profile]}"))
               else
-                rv += (Net::HTTP.get(URI("http://pxe.#{device.properties['site'].downcase}.outbrain.com:9521/devices/#{mac}")) rescue '')
+                response = Net::HTTP.get_response(URI("#{pxed}/devices/#{mac}"))
               end
 
-              rv += "\n"
+              if response.code.to_i < 400
+                uses_default = false
+                rv += response.body
+              end
+
+              rv += "#\n"
+            end
+
+            if uses_default
+              rv += "# Default PXE configuration\n"
+              rv += "#\n"
+              rv += (Net::HTTP.get(URI("#{pxed}/devices/default")) rescue '')
             end
 
             rv
