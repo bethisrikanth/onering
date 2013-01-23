@@ -1,9 +1,8 @@
-Developer
-====
+Onering: Operations Inventory & Metadata Management
+===================================================
 
-- Check out: git clone ...
-- bundle install
- 
+Onering is a tool designed to provide a central point of contact within your operations team for all of your systems.  It allows for easy, powerful, and extensible metadata collection from multiple sources.  Once the data is collected, you can search for systems based on this data.
+
 
 Testing:
 ---

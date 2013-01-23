@@ -36,8 +36,10 @@ module App
         json = JSON.parse(json) if json.is_a?(String)
         json = [json] if json.is_a?(Hash)
 
-        json.each do |j|
-          from_h(j, merge)
+        if json
+          json.each do |j|
+            from_h(j, merge)
+          end
         end
 
         self
