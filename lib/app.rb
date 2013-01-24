@@ -19,6 +19,7 @@ module App
     configure do
       set :root, ENV['PROJECT_ROOT']
       set :environment, ENV['RACK_ENV'].to_sym if ENV['RACK_ENV']
+      set :protection, :except => :json_csrf
 
       enable  :logging
       #enable  :raise_errors
