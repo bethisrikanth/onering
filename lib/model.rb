@@ -28,7 +28,7 @@ module App
             i = k.index{|i| i[0].chr == '@' }
 
             (i ? k.first(i+1).join('.') : nil)
-          }.compact
+          }.compact.uniq
 
           newhash = to_h
         # delete existing keys that are to be replaced
