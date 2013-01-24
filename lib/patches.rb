@@ -44,8 +44,8 @@ class Hash
     root = self
 
     begin
-      path.strip.scan(/[a-z0-9]+(?:\[[^\]]+\])?/).to_a.each do |p|
-        x, key, subfield, subvalue = p.split(/([a-z0-9]+)(?:\[([^=]+)(?:=(.+))?\])?/i)
+      path.strip.scan(/[a-z0-9\@\_\-\+]+(?:\[[^\]]+\])?/).to_a.each do |p|
+        x, key, subfield, subvalue = p.split(/([a-z0-9\@\_\-\+]+)(?:\[([^=]+)(?:=(.+))?\])?/i)
         root = (root[key] rescue nil)
         #puts key, root.inspect
 
@@ -74,7 +74,23 @@ class Hash
       root = root[p]
     end
 
-    root[path.last] = value
+    if value
+      root[path.last] = value
+    else
+      root.delete(path.last)
+    end
+
+    self
+  end
+
+  def unset(path)
+    set(path, nil)
+  end
+
+  def rekey(from, to)
+    value = get(from)
+    unset(from)
+    set(to, value)
   end
 
   def join(inner_delimiter, outer_delimiter=nil)
@@ -82,15 +98,14 @@ class Hash
     self.to_a.collect{|i| i.join(inner_delimiter) }.join(outer_delimiter)
   end
 
-  def coalesce(prefix=nil, base=nil)
+  def coalesce(prefix=nil, base=nil, delimiter='_')
     base = self unless base
     rv = {}
 
     if base.is_a?(Hash)
       base.each do |k,v|
-        base.coalesce(k,v).each do |kk,vv|
-          kk = kk.gsub(/(^_+|_+$)/,'')
-          kk = (prefix.to_s+'_'+kk.to_s) if prefix
+        base.coalesce(k,v,delimiter).each do |kk,vv|
+          kk = (prefix.to_s+delimiter+kk.to_s) if prefix
           rv[kk.to_s] = vv
         end
       end

@@ -17,8 +17,27 @@ module App
 
     # populate the document from a Hash
       def from_h(hash, merge=true)
+        raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)
+
         if merge
+        # build list of paths to fully replace
+          unset_keys = hash.coalesce(nil, nil, '.').select{|k,v|
+            k.include?('@')
+          }.keys.collect{|k|
+            k = k.split('.')
+            i = k.index{|i| i[0].chr == '@' }
+
+            (i ? k.first(i+1).join('.') : nil)
+          }.compact
+
           newhash = to_h
+        # delete existing keys that are to be replaced
+        # rename incoming keys to exclude symbols
+          unset_keys.each do |key|
+            newhash.unset(key.delete('@'))
+            hash.rekey(key, key.delete('@'))
+          end
+
           newhash = newhash.deeper_merge!(hash, {:merge_hash_arrays => true})
         else
           newhash = hash
