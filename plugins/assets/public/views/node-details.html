@@ -18,6 +18,11 @@
       <td><a target="_blank" href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
     </tr>
 
+    <tr ng-show="device.properties.environment">
+      <th>Environment</th>
+      <td><a target="_blank" href="#/inf/show/environment:{{ device.properties.environment }}">{{ device.properties.environment | titleize }}</a></td>
+    </tr>
+
     <tr>
       <th>Location</th>
       <td>
