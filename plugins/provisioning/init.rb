@@ -38,6 +38,7 @@ module App
 
             macs.compact.uniq.each do |mac|
               rv += "# PXE configuration for device #{mac}\n"
+              rv += "#\n"
 
               if params[:profile]
                 response = Net::HTTP.get_response(URI("#{pxed}/devices/#{mac}/link/#{params[:profile]}"))
