@@ -126,7 +126,7 @@ module App
               end
 
               device['properties'] = {} unless device['properties']
-              device['properties']['@glu'] = glu_properties
+              device['properties']['glu'] = glu_properties
               device.safe_save
             end
           end
