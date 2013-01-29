@@ -30,6 +30,4 @@ EOS
 chmod +x /tmp/logflume
 
 # setup logging
-/tmp/logflume /tmp/anaconda.log 192.168.80.15
-
-#logflume.{{ device.properties.site }}.outbrain.com
+/tmp/logflume /tmp/anaconda.log logflume.{{ device.properties.site }}.outbrain.com
