@@ -6,10 +6,10 @@ The Assets plugin is one of the primary components of Onering.  Every trackable,
 
 Endpoints Summary
 -----------------
-* `GET /api/devices/abc123` - get node abc123
+* `GET /api/devices/abc123` - get node 'abc123'
 * `GET /api/devices/abc123/get/<field>[/<other> ...]` - get a plaintext list of one or more properties
-* `GET /api/devices/find/<urlquery>` - find all nodes that match <urlquery>
-* `GET /api/devices/list/<field>[/<urlquery>]` - list the value of all <field>s, optionally only for nodes matching <urlquery>
+* `GET /api/devices/find/<urlquery>` - find all nodes that match \<urlquery\>
+* `GET /api/devices/list/<field>[/<urlquery>]` - list the value of all \<field\>s, optionally only for nodes matching \<urlquery\>
 * `POST /api/devices[/abc123]` - create/update node ID 'abc123', submitting JSON as `application/json`.
 
 
