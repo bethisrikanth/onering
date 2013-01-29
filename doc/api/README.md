@@ -59,5 +59,5 @@ API endpoints ready for use
 ---------------------------
 
 * [Core](plugins/core.md)
-* [Devices](plugins/devices.md)
+* [Assets](plugins/assets.md)
 * [Provisioning](plugins/provisioning.md)
