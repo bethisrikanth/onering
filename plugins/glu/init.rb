@@ -46,7 +46,7 @@ module App
               return {
                 :id      => hid,
                 :product => (base['path'].split('/')[4].strip rescue nil),
-                :version => (data['revision'].to_i rescue nil)
+                :version => (data['revision'] rescue nil)
               }
             end
 
@@ -118,7 +118,7 @@ module App
                 glu_properties['apps'].each do |i|
                   zk_versions[device.id].each do |k,v|
                     if i['name'] == k
-                      i['zk_version'] = v
+                      i['zk_version'] = v.to_s
                       i.replace i
                     end
                   end
@@ -126,7 +126,7 @@ module App
               end
 
               device['properties'] = {} unless device['properties']
-              device['properties']['glu'] = glu_properties
+              device['properties']['@glu'] = glu_properties
               device.safe_save
             end
           end
