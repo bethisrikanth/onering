@@ -87,7 +87,7 @@ module App
           # add app details
             app = {
               'name'          => (entry['metadata']['product'] rescue nil),
-              'version'       => (entry['metadata']['version'] rescue nil),
+              'version'       => (entry['metadata']['version'].to_s rescue nil),
               'mount_point'   => (entry['mountPoint'] rescue nil),
               'tags'          => (entry['tags'] rescue nil),
               'deploy_script' => (entry['script'] rescue nil)
