@@ -58,6 +58,6 @@ For all other `format=` values, JSON objects or arrays will be returned with a m
 API endpoints ready for use
 ---------------------------
 
-* [Core](api/plugins/core.md)
-* [Assets](api/plugins/assets.md)
-* [Provisioning](api/plugins/provisioning.md)
+* [Core](plugins/core.md)
+* [Assets](plugins/assets.md)
+* [Provisioning](plugins/provisioning.md)
