@@ -11,6 +11,7 @@ Endpoints Summary
 * `GET /api/devices/find/<urlquery>` - find all nodes that match \<urlquery\>
 * `GET /api/devices/list/<field>[/<urlquery>]` - list the value of all \<field\>s, optionally only for nodes matching \<urlquery\>
 * `POST /api/devices[/abc123]` - create/update node ID 'abc123', submitting JSON as `application/json`.
+* `DELETE /api/devices/abc123` - completely remove node 'abc123' from Onering.
 
 
 Get Device
@@ -231,3 +232,9 @@ The POSTed JSON would look something like this:
 </pre>
 
 By using the '@' sign in the submitted JSON, Onering knows to delete any existing _properties.network_ object before saving the incoming one.  Note that the '@' will be omitted from the name before being saved.
+
+
+Delete Device
+-------------
+
+* `DELETE /api/devices/abc123` - completely remove node 'abc123' from Onering.
