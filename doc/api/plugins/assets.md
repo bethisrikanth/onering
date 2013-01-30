@@ -95,7 +95,9 @@ By default, the `value` search operates as "if x contains 'value'".  You can spe
 * `^value` : _starts with_ "value".
 * `value$` : _ends with_ "value".
 * `val~e` :  greedy contains "val[any characters]e" (e.g.: matches **value**, **vale**, **vale**t, **valet ke**y)
+* `!value` : is anything but "value".
 
+Any of these can be combined to form complex value queries.
 
 #### Fields
 
