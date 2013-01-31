@@ -22,6 +22,19 @@ module App
 
         rv.to_json
       end
+
+      get '/:id/run/*' do
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        #content_type 'text/plain'
+
+        commands = params[:splat].first
+        arguments = (params[:args] || '').split('|')
+
+        rv = proxy_command_to_sites([device], commands, arguments)
+        rv.to_json
+      end
     end
   end
 end
