@@ -40,7 +40,7 @@ module App
           rv[site.to_sym] = []
 
           begin
-            rv[site.to_sym] << JSON.load(http.request(request).body).reject{|k,v| v.empty? }
+            rv[site.to_sym] << JSON.load(http.request(request).body).reject{|k,v| v.to_s.empty? }
           rescue Errno::ECONNREFUSED
             rv[site.to_sym] << {
               :errors => ["Connection refused while attempting #{saltrest_base}"]
