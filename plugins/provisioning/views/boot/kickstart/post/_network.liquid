@@ -36,14 +36,7 @@ nameserver {{ device.properties.provisioning.network.dns }}
 EOF_DNS
 
 {% case device.properties.provisioning.network.strategy %}
- {% when 'bonded' %}
-################################################################################
-################################################################################
-#
-#  THIS IS A MESS
-#
-################################################################################
-################################################################################
+ {% else %}
 # Network Strategy: bonded
 
 # set max_bonds
@@ -51,68 +44,46 @@ if [ -f "/etc/modprobe.conf" ]; then
   echo "options bonding max_bonds=1" >> /etc/modprobe.conf
 fi
 
-# Start configuration for bond0
-echo "DEVICE=bond0" > /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-if [ -f "/etc/modprobe.conf" ]; then
-    echo "alias bond0 bonding" >> /etc/modprobe.conf.cobbler
-fi
-cat >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0 << EOF
-BONDING_OPTS="mode=active-backup arp_interval=30000 primary_reselect=2 arp_validate=active arp_ip_target=10.11.64.1"
-EOF
-echo "BOOTPROTO=static" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "IPADDR=10.11.65.19" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "NETMASK=255.255.240.0" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "DNS1=192.168.253.11" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "DNS2=192.168.253.12" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "DNS3=10.11.5.101" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-echo "DNS4=10.10.65.75" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-bond0
-# End configuration for bond0
+# -----------------------------------------------------------------------------
+# bond0
+cat<<NIC_BOND0 > /etc/sysconfig/network-scripts/ifcfg-bond0
+DEVICE="bond0"
+BOOTPROTO=static
+DHCPCLASS=
+IPADDR="{{ device.properties.provisioning.network.ip }}"
+NETMASK="{{ device.properties.provisioning.network.netmask }}"
+GATEWAY="{{ device.properties.provisioning.network.gateway }}"
+ONBOOT=yes
+BONDING_OPTS="mode=active-backup arp_interval=30000 primary_reselect=2 arp_validate=active arp_ip_target={{ device.properties.provisioning.network.gateway }}"
 
-# Start configuration for eth1
-echo "DEVICE=eth1" > /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "HWADDR=00:8C:FA:10:5E:C1" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-IFNAME=$(ifconfig -a | grep -i '00:8C:FA:10:5E:C1' | cut -d ' ' -f 1)
-if [ -f "/etc/modprobe.conf" ] && [ $IFNAME ]; then
-    grep $IFNAME /etc/modprobe.conf | sed "s/$IFNAME/eth1/" >> /etc/modprobe.conf.cobbler
-    grep -v $IFNAME /etc/modprobe.conf >> /etc/modprobe.conf.new
-    rm -f /etc/modprobe.conf
-    mv /etc/modprobe.conf.new /etc/modprobe.conf
-fi
-echo "TYPE=Ethernet" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "SLAVE=yes" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "MASTER=bond0" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "HOTPLUG=no" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-echo "BOOTPROTO=dhcp" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth1
-# End configuration for eth1
+NIC_BOND0
 
-# Start configuration for eth0
-echo "DEVICE=eth0" > /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "ONBOOT=yes" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "HWADDR=00:8C:FA:10:5E:C0" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-IFNAME=$(ifconfig -a | grep -i '00:8C:FA:10:5E:C0' | cut -d ' ' -f 1)
-if [ -f "/etc/modprobe.conf" ] && [ $IFNAME ]; then
-    grep $IFNAME /etc/modprobe.conf | sed "s/$IFNAME/eth0/" >> /etc/modprobe.conf.cobbler
-    grep -v $IFNAME /etc/modprobe.conf >> /etc/modprobe.conf.new
-    rm -f /etc/modprobe.conf
-    mv /etc/modprobe.conf.new /etc/modprobe.conf
-fi
-echo "TYPE=Ethernet" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "SLAVE=yes" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "MASTER=bond0" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "HOTPLUG=no" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-echo "BOOTPROTO=dhcp" >> /etc/sysconfig/network-scripts/cobbler/ifcfg-eth0
-# End configuration for eth0
+# -----------------------------------------------------------------------------
+# eth0
+cat<<NIC_ETH0 > /etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=none
+DHCPCLASS=
+$(grep -m1 HWADDR /etc/sysconfig/network-scripts/ifcfg-eth0)
+ONBOOT=yes
+MASTER="bond0"
+SLAVE=yes
+USERCTL=no
 
-sed -i 's/ONBOOT=yes/ONBOOT=no/g' /etc/sysconfig/network-scripts/ifcfg-eth*
+NIC_ETH0
 
-rm -f /etc/sysconfig/network-scripts/ifcfg-*
-mv /etc/sysconfig/network-scripts/cobbler/* /etc/sysconfig/network-scripts/
-rm -r /etc/sysconfig/network-scripts/cobbler
+# -----------------------------------------------------------------------------
+# eth1
+cat<<NIC_ETH1 > /etc/sysconfig/network-scripts/ifcfg-eth1
+DEVICE=eth1
+BOOTPROTO=none
+DHCPCLASS=
+$(grep -m1 HWADDR /etc/sysconfig/network-scripts/ifcfg-eth1)
+ONBOOT=yes
+MASTER="bond0"
+SLAVE=yes
+USERCTL=no
 
-if [ -f "/etc/modprobe.conf" ]; then
-  cat /etc/modprobe.conf.cobbler >> /etc/modprobe.conf
-  rm -f /etc/modprobe.conf.cobbler
-fi
+NIC_ETH1
+
 {% endcase %}
