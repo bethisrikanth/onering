@@ -64,7 +64,6 @@ GEM
     oats (0.1.4)
       log4r
       net-http-persistent
-    oniguruma (1.1.0)
     plucky (0.5.2)
       mongo (~> 1.5)
     rack (1.4.4)
@@ -131,6 +130,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable
   bson_ext
   deep_merge
   guard (~> 1.0.2)
@@ -142,9 +142,9 @@ DEPENDENCIES
   mongo
   mongo_ext
   mongo_mapper
+  net-ldap
   net-ping
   oats
-  oniguruma
   racksh
   rake
   rdiscount

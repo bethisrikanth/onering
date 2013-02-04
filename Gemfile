@@ -20,6 +20,8 @@ gem "sinatra-assetpack", :require => "sinatra/assetpack"
 gem "stasis"
 gem "rdiscount"
 gem "net-ping"
+gem "net-ldap"
+gem "addressable"
 
 group :test, :development do
   gem 'rspec'
