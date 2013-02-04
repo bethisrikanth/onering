@@ -6,7 +6,8 @@ function QueryController($scope, $http, $route, $location, $routeParams, Query){
   //run arbitrary query
     if($scope.query){
       Query.query({
-        query: $scope.prepareQuery($scope.query, $routeParams.raw)
+        query: $scope.prepareQuery($scope.query, $routeParams.raw),
+        only:  'alert_state,ip,site,model,rack,unit,slot'
       }, function(data){
         if(data.length == 0){
           $scope.noresults = true;
@@ -114,6 +115,7 @@ function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){
 //all devices
   Query.query({
     query: 'site/'+$scope.site,
+    only:  'alert_state,ip,site,model,rack,unit,slot'
   }, function(data){
     $scope.results = data;
   });

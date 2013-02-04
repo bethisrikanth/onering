@@ -19,6 +19,38 @@ module App
     end
 
     helpers do
+      def filter_hash(hash, prefix=nil)
+        if params[:only]
+          hash = [hash] unless hash.is_a?(Array)
+          rv = hash.collect do |h|
+            h = h.to_h if h.respond_to?(:to_h)
+            _rv = {}
+
+          # prepend properties to all :only fields, as this is implied
+            only = params[:only].split(/[\,\|]/).collect{|i| i = "#{prefix ? prefix.to_s+'.' : ''}#{i}" }
+
+          # knock the prefixed key out of the result object to be selectively filled in below
+            _rv = h.reject{|k,v| k.to_s == prefix.to_s } if prefix
+
+          # flatten out the hash tree to make key searches less recursive
+            h.coalesce(nil,nil,'.').each do |k,v|
+            # only add this value to the output if its key path exists in the requested set of keys
+              _rv.set(k,v) unless only.collect{|i| (k =~ Regexp.new("^#{i}(?![a-z])") ? true : nil) }.compact.empty?
+            end
+
+            _rv
+          end
+
+          if hash.is_a?(Array)
+            return rv
+          else
+            return rv.first
+          end
+        end
+        
+        return hash
+      end
+
       def output(body, status=200, mime='application/json')
         rv = nil
 

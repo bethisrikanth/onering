@@ -12,7 +12,8 @@ module App
       get '/:id' do
         device = Device.find(params[:id])
         return 404 if not device
-        output device.to_h
+
+        output(filter_hash(device.to_h, :properties))
       end
 
       delete '/:id' do
@@ -210,7 +211,9 @@ module App
         get r do
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          output Device.urlsearch(q).limit(params[:limit] || 1000)
+          rv = Device.urlsearch(q).limit(params[:limit] || 1000).to_a
+
+          output(filter_hash(rv, :properties))
         end
 
         post r do
