@@ -10,8 +10,20 @@
           <br />
 
           <!-- normal mode actions -->
-          <div ng-hide="editing">
-            <button ng-disabled="loading" class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
+          <div class="btn-group" ng-hide="editing">
+<!--             <button ng-disabled="loading" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+              <i class="icon-refresh icon-white"></i> Reload <span ng-show="autoreload_id">({{ time_left }})</span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-show="autoreload_id"><a ng-click="clearAutoReload()">Stop Auto-reload</a></li>
+              <li ng-show="autoreload_id" class="divider"></li>
+              <li><a ng-click="startAutoReload(15)">Reload every 15s</a></li>
+              <li><a ng-click="startAutoReload(30)">Reload every 30s</a></li>
+              <li><a ng-click="startAutoReload(60)">Reload every 60s</a></li>
+              <li><a ng-click="startAutoReload(300)">Reload every 5m</a></li>
+            </ul> -->
+
             <button ng-disabled="loading" class="btn" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
           </div>
 

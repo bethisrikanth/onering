@@ -1,6 +1,7 @@
 function QueryController($scope, $http, $window, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
+  $scope.time_left = 0;
 
   $scope.reload = function(){
     $scope.loading = true;
@@ -23,24 +24,34 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
         }
 
         $scope.loading = false;
+        $scope.time_left = 0;
       });
     }
   }
 
   $scope.setAutoReload = function(interval){
+    console.log(interval)
     if(interval){
-      if($scope._autoreload_id) $scope.clearAutoReload();
-      $scope._autoreload_id = $window.setInterval($scope.reload, interval);
+      if($scope.autoreload_id) $scope.clearAutoReload();
+      $scope.autoreload_id = $window.setInterval($scope.reload, interval);
+      $scope.time_left = interval;
+      $scope.reload();
     }
   }
 
   $scope.clearAutoReload = function(){
-    if($scope._autoreload_id){
-      $window.clearInterval($scope._autoreload_id);
-      $scope._autoreload_id = null;
+    if($scope.autoreload_id){
+      $window.clearInterval($scope.autoreload_id);
+      $scope.autoreload_id = null;
+      $scope.time_left = 0;
     }
   }
 
+  $scope.updateTime = function(){
+    $scope.time_left -= 1;
+  }
+
+  $window.setInterval($scope.updateTime, 1000);
   $scope.reload();
 }
 
