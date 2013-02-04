@@ -1,8 +1,10 @@
-function QueryController($scope, $http, $route, $location, $routeParams, Query){
+function QueryController($scope, $http, $window, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
 
   $scope.reload = function(){
+    $scope.loading = true;
+
   //run arbitrary query
     if($scope.query){
       Query.query({
@@ -19,7 +21,23 @@ function QueryController($scope, $http, $route, $location, $routeParams, Query){
           $scope.results = data;
 
         }
+
+        $scope.loading = false;
       });
+    }
+  }
+
+  $scope.setAutoReload = function(interval){
+    if(interval){
+      if($scope._autoreload_id) $scope.clearAutoReload();
+      $scope._autoreload_id = $window.setInterval($scope.reload, interval);
+    }
+  }
+
+  $scope.clearAutoReload = function(){
+    if($scope._autoreload_id){
+      $window.clearInterval($scope._autoreload_id);
+      $scope._autoreload_id = null;
     }
   }
 

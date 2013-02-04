@@ -11,8 +11,8 @@
 
           <!-- normal mode actions -->
           <div ng-hide="editing">
-            <button class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
-            <button class="btn" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
+            <button ng-disabled="loading" class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"></i> Reload</button>
+            <button ng-disabled="loading" class="btn" ng-click="edit()"><i class="icon-pencil"></i> Edit</button>
           </div>
 
           <!-- edit mode actions -->
@@ -31,7 +31,7 @@
             <thead>
               <tr>
                 <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>                
+                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
                 <th ng-click="sortField='properties.alert_state'; sortReverse=!sortReverse" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
                 <th ng-click="sortField='maintenance_status'; sortReverse=!sortReverse" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
                 <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
