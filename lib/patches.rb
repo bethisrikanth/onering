@@ -77,7 +77,7 @@ class Hash
     if value
       root[path.last] = value
     else
-      root.delete(path.last)
+      root.reject!{|k,v| k.to_sym == path.last.to_sym } 
     end
 
     self
@@ -104,9 +104,11 @@ class Hash
 
     if base.is_a?(Hash)
       base.each do |k,v|
-        base.coalesce(k,v,delimiter).each do |kk,vv|
-          kk = (prefix.to_s+delimiter+kk.to_s) if prefix
-          rv[kk.to_s] = vv
+        if v
+          base.coalesce(k,v,delimiter).each do |kk,vv|
+            kk = (prefix.to_s+delimiter+kk.to_s) if prefix
+            rv[kk.to_s] = vv
+          end
         end
       end
     else
@@ -114,6 +116,40 @@ class Hash
     end
 
     rv
+  end
+
+  def each_recurse(root=self, path=[], &block)
+    root.each do |k,v|
+      path << k
+
+      if v.is_a?(Hash)
+        each_recurse(v, path, &block)
+      else
+        yield(k, v, path)
+      end
+
+      path.pop
+    end
+  end
+
+  def compact
+    def _is_empty?(i)
+      i === nil or (i.is_a?(String) and i.strip.chomp.empty?) or (i.respond_to?(:empty?) and i.empty?)
+    end
+
+    each_recurse do |k,v,path|
+      path = path.join('.')
+      
+      if v.is_a?(Array)
+        v.reject!{|i| _is_empty?(i) }
+        unset(path) if v.empty?
+
+      else
+        unset(path) if _is_empty?(v)
+      end
+    end
+
+    self
   end
 end
 

@@ -21,9 +21,9 @@ module App
 
         if merge
         # build list of paths to fully replace
-          unset_keys = hash.coalesce(nil, nil, '.').select{|k,v|
+          unset_keys = Hash[hash.coalesce(nil, nil, '.').select{|k,v|
             k.include?('@')
-          }.keys.collect{|k|
+          }].keys.collect{|k|
             k = k.split('.')
             i = k.index{|i| i[0].chr == '@' }
 

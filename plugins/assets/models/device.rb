@@ -15,6 +15,7 @@ class Device < App::Model::Base
   before_validation :_mangle_id
   before_validation :_confine_status
   before_validation :_confine_maintenance_status
+  before_save       :_compact
   validate :_id_pattern_valid?
 
   timestamps!
@@ -84,6 +85,10 @@ class Device < App::Model::Base
 
     def _id_pattern_valid?
       errors.add(:id, "Device ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
+    end
+
+    def _compact
+      self.properties = self.properties.compact
     end
 
   class<<self
