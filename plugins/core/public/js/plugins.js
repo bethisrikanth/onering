@@ -1,4 +1,5 @@
 angular.module('corePlugin', [
+  'coreService',
   'coreFilters',
   'coreDirectives',
   'coreRoutes'

@@ -1,0 +1,70 @@
+<div ng-controller="UserManagerController">
+  <div class="container user-list" ng-show="users &amp;&amp; !noresults">
+    <form>
+      <div class="row">
+        <div class="span12">
+          <h1>User Manager</h1>
+          <br />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span12">
+          <div class="tabbable">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#users" data-toggle="tab">Users</a></li>
+              <li><a href="#groups" data-toggle="tab">Groups</a></li>
+              <li><a href="#capabilities" data-toggle="tab">Capabilities</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <div class="tab-content">
+        <div class="row tab-pane active" id="users">
+          <div class="span12">
+              <div class="btn-group">
+                <button class="btn"><i class="icon-plus"> </i> Add</button>
+              </div>
+
+              <br />
+
+              <table class="table table-condensed table-hover">
+                <thead>
+                  <tr>
+                    <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
+                    <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+                    <th ng-click="sortField='_type'; sortReverse=!sortReverse">Authentication Type</th>
+                    <th ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Seen</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr ng-repeat="user in users | orderBy:sortField:sortReverse">
+                    <td class="id"><a>{{ user.id }}</a></td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user._type | replace:'User':'' | titleize }}</td>
+                    <td>{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="row tab-pane" id="groups">
+            <div class="span12">
+              Groups
+            </div>
+          </div>
+
+          <div class="row tab-pane" id="capabilities">
+            <div class="span12">
+              Capabilities
+            </div>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>

@@ -28,8 +28,6 @@ class PamUser < User
       service = App::Config.get('global.authentication.pam.service')
 
       begin
-        puts "PAM authentication for service #{service}, user #{options[:username]}"
-
         PAM.start(service, options[:username], CONVERSATION, options) do |pam|
           begin
             pam.authenticate(0)

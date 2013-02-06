@@ -2,6 +2,15 @@ require 'sinatra/base'
 require 'sinatra/namespace'
 require 'sinatra/cross_origin'
 
+require 'errors'
+
+# user types
+require 'core/models/ldap_user'
+require 'core/models/pam_user'
+
+require 'core/models/group'
+require 'core/models/capability'
+
 module App
   class Controller < Sinatra::Base
     register Sinatra::Namespace
@@ -19,6 +28,14 @@ module App
     end
 
     helpers do
+      def allowed_to?(key, *args)
+        if @user and not Config.get('global.authentication.disable')
+          raise Errors::HttpForbidden, "User #{@user.id} is denied the #{key} capability" unless @user.capability?(key, args)
+        end
+
+        true
+      end
+
       def filter_hash(hash, prefix=nil)
         if params[:only]
           hash = [hash] unless hash.is_a?(Array)

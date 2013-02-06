@@ -2,8 +2,13 @@ function DefaultController($scope){
 
 }
 
-function NavigationController($scope, $http, $route, $window, $routeParams, Summary, List){
+function NavigationController($scope, $http, $route, $window, $routeParams, Summary, List, CurrentUser){
   $scope.reload = function(){
+  //get current user details
+    CurrentUser.get({}, function(data){
+      $scope.user = data;
+    });
+
   //get site summary
     Summary.query({
       field: 'site'
@@ -93,4 +98,33 @@ function SearchController($scope, $http, $location, Query){
     $scope.results = null;
     $scope.search_show_help = false;
   };
+}
+
+function UserManagerController($scope, User, UserList, GroupList, CapabilityList){
+  
+  $scope.reloadUsers = function(){
+    UserList.query({}, function(data){
+      $scope.users = data;
+    });
+  }
+
+  $scope.reloadGroups = function(){
+    GroupList.query({}, function(data){
+      $scope.groups = data;
+    });
+  }
+
+  $scope.reloadCapabilities = function(){
+    CapabilityList.query({}, function(data){
+      $scope.capabilities = data;
+    });
+  }
+
+  $scope.reload = function(){
+    $scope.reloadUsers();
+    $scope.reloadGroups();
+    $scope.reloadCapabilities();
+  }
+
+  $scope.reload();
 }

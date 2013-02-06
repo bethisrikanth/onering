@@ -17,7 +17,9 @@ filter('titleize', function(){
       var overrides = {
         'noc':    'NOC',
         'centos': 'CentOS',
-        'redhat': 'RedHat'
+        'redhat': 'RedHat',
+        'pam':    'PAM',
+        'ldap':   'LDAP'
       };
 
       if(overrides.hasOwnProperty(text.toLowerCase()))
@@ -224,10 +226,29 @@ config(['$provide', function($provide) {
         return obj.length;
       }else if($.isPlainObject(obj)){
         return Object.keys(obj).length;
-      }else if(obj instanceof String){
+      }else if(typeof(obj) == 'string'){
         return obj.length;
       }else{
         return null;
+      }
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('replaceFilter', function(){
+    return function(str,find,rep){
+      if(str instanceof Array){
+        for(var i in str){
+          if(typeof(str[i]) == 'string'){
+            str[i] = str[i].replace(find, rep);
+          }
+        }
+
+        return str;
+      }else if(typeof(str) == 'string'){
+        return str.replace(find, rep);
+      }else{
+        return str;
       }
     }
   });

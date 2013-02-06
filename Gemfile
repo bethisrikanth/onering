@@ -23,6 +23,7 @@ gem "net-ping"
 gem "net-ldap"
 gem "addressable"
 gem "ruby-pam"
+gem "rack-webconsole"
 
 group :test, :development do
   gem 'rspec'
