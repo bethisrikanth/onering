@@ -1,5 +1,4 @@
-require 'user'
-
+require 'core/models/user'
 
 class LdapUser < User
   class<<self
@@ -20,9 +19,9 @@ class LdapUser < User
     end
   end
 
-  def authenticate(options={})
+  def authenticate!(options={})
     if super
-
+      return false
     end
   end
 end

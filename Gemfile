@@ -22,6 +22,7 @@ gem "rdiscount"
 gem "net-ping"
 gem "net-ldap"
 gem "addressable"
+gem "ruby-pam"
 
 group :test, :development do
   gem 'rspec'
