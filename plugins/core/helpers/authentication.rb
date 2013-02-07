@@ -6,7 +6,7 @@ module App
       # get user list
         get '/list' do
           allowed_to? :list_users
-          output(User.all)
+          output(User.all.collect{|i| i.to_h })
         end
 
       # get user
@@ -17,7 +17,7 @@ module App
 
           user = User.find(id)
           return 404 unless user
-          output(user)
+          output(user.to_h)
         end
 
       # update user
@@ -35,8 +35,9 @@ module App
 
             user = User.find_or_create(id)
             user.from_json(json).safe_save
+            user.reload
 
-            200
+            output(user)
           else
             raise "Invalid JSON submitted"
           end
@@ -106,7 +107,9 @@ module App
         }.each do |route|
           get route do
             allowed_to? :list_capabilities, params[:parent]
-            output(Capability.tree(params[:parent]))
+            output(Capability.where({
+              :capabilities.exists => false
+            }))
           end
         end
 

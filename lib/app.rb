@@ -27,6 +27,7 @@ module App
       disable :debug
 
       register Sinatra::AssetPack
+      use MongoMapper::Middleware::IdentityMap
 
       assets {
         serve '/js',   :from => 'public/js'

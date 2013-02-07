@@ -14,6 +14,12 @@ class User < App::Model::Base
     }).collect{|i| i.id } rescue []
   end
 
+  def to_h
+    super.merge({
+      :groups => groups
+    })
+  end
+
   def capabilities
   # find all capabilites where this user or any of its groups are named
   # get the flattened list of all capabilities, return it
@@ -36,8 +42,8 @@ class User < App::Model::Base
 
   def capability?(key, args=nil)
     send("capability_#{key}", args)
-  rescue
-    false
+  # rescue
+  #   false
   end
 
   class<<self

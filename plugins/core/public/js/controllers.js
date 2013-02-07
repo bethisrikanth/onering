@@ -101,7 +101,41 @@ function SearchController($scope, $http, $location, Query){
 }
 
 function UserManagerController($scope, User, UserList, GroupList, CapabilityList){
-  
+  $scope._userClass = 'span12';
+  $scope._userPaneClass= 'span4';
+
+  $scope.toggleUserPane = function(user){
+    if(user){
+      if($scope.userPaneUser && ($scope.userPaneUser.id == user.id)){
+    //  same user triggered, hide the pane
+        $scope.userPaneUser = null;
+        $scope._userClass = 'span12';
+      }else{
+    //  different (or new) user, show pane and update
+        $scope._userClass = 'span8';
+        $scope.userPaneUser = user;
+      }
+    }
+  }
+
+
+  $scope._groupClass = 'span12';
+  $scope._capabilityClass = 'span12';
+
+
+  $scope.addGroup = function(user){
+    if(user){
+      user.groups.push(null);
+    }
+  }
+
+  $scope.removeGroup = function(user, group){
+    if(user && group){
+      delete user.groups[user.groups.indexOf(group)];
+    }
+  }
+
+//reloaders
   $scope.reloadUsers = function(){
     UserList.query({}, function(data){
       $scope.users = data;

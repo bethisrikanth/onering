@@ -2,6 +2,7 @@ require 'model'
 
 class Capability < App::Model::Base
   set_collection_name "capabilities"
+  plugin MongoMapper::Plugins::IdentityMap
 
   timestamps!
   
@@ -16,6 +17,22 @@ class Capability < App::Model::Base
   end
 
   class<<self
+    def tree(root=nil)
+      rv = []
+
+      where({
+        :capabilities.exists => true
+      }).each do |capability|
+        capability[:children] = capability[:capabilities].collect{|c|
+          find(c).to_h.compact
+        }
+
+        rv << capability.to_h.compact
+      end
+
+      rv
+    end
+
     def users_that_can(key)
       users = []
 

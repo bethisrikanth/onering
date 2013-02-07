@@ -1,70 +1,147 @@
 <div ng-controller="UserManagerController">
   <div class="container user-list" ng-show="users &amp;&amp; !noresults">
-    <form>
-      <div class="row">
-        <div class="span12">
-          <h1>User Manager</h1>
-          <br />
+    <div class="row">
+      <div class="span12">
+        <h1>User Manager</h1>
+        <br />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span12">
+        <div class="tabbable">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#users" data-toggle="tab">Users</a></li>
+            <li><a href="#groups" data-toggle="tab">Groups</a></li>
+            <li><a href="#capabilities" data-toggle="tab">Capabilities</a></li>
+          </ul>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="span12">
-          <div class="tabbable">
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#users" data-toggle="tab">Users</a></li>
-              <li><a href="#groups" data-toggle="tab">Groups</a></li>
-              <li><a href="#capabilities" data-toggle="tab">Capabilities</a></li>
-            </ul>
+    <br />
+
+    <div class="tab-content">
+      <div class="row tab-pane active" id="users">
+        <div ng-class="_userClass">
+            <div class="btn-group">
+              <button class="btn"><i class="icon-plus"> </i> Add User</button>
+            </div>
+
+            <br />
+
+            <table class="table table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
+                  <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+                  <th ng-click="sortField='_type'; sortReverse=!sortReverse">Authentication Type</th>
+                  <th ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Seen</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr ng-repeat="user in users | orderBy:sortField:sortReverse" ng-click="toggleUserPane(user)">
+                  <td class="center"><input type="checkbox"></input></td>
+                  <td class="id"><a>{{ user.id }}</a></td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user._type | replace:'User':'' | titleize }}</td>
+                  <td>{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
 
-      <br />
-
-      <div class="tab-content">
-        <div class="row tab-pane active" id="users">
-          <div class="span12">
-              <div class="btn-group">
-                <button class="btn"><i class="icon-plus"> </i> Add</button>
-              </div>
-
+          <div ng-class="_userPaneClass" ng-show="userPaneUser">
+            <div>
+              <h3>{{ userPaneUser.id }}</h3>
               <br />
+            </div>
 
-              <table class="table table-condensed table-hover">
-                <thead>
-                  <tr>
-                    <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
-                    <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                    <th ng-click="sortField='_type'; sortReverse=!sortReverse">Authentication Type</th>
-                    <th ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Seen</th>
-                  </tr>
-                </thead>
-
+            <form>
+              <table class="table table-condensed">
                 <tbody>
-                  <tr ng-repeat="user in users | orderBy:sortField:sortReverse">
-                    <td class="id"><a>{{ user.id }}</a></td>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user._type | replace:'User':'' | titleize }}</td>
-                    <td>{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
+                  <tr>
+                    <th>Full Name</th>
+                    <td><input type="text" ng-model="userPaneUser.name" class="input-medium" /></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <h5>
+                        Groups ({{ userPaneUser.groups | length }})
+                        <span ng-click="addGroup(userPaneUser)" class="pull-right"><i class="icon-plus"> </i></span>
+                      </h5>
+
+                      <ul class="nav">
+                        <li ng-repeat="group in userPaneUser.groups">
+                          <span ng-show="group">{{ group }}</span>
+                          <select ng-hide="group" ng-model="group" ng-options="g.id for g in groups"></select>
+
+                          <span ng-click="removeGroup(userPaneUser, group)" class="pull-right"><i class="icon-remove"> </i></span>
+                        </li>
+                      </ul>
+                    </td>
                   </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          <div class="row tab-pane" id="groups">
-            <div class="span12">
-              Groups
-            </div>
-          </div>
-
-          <div class="row tab-pane" id="capabilities">
-            <div class="span12">
-              Capabilities
-            </div>
+            </form>
           </div>
         </div>
-    </form>
+
+        <div class="row tab-pane" id="groups">
+          <div ng-class="_groupClass">
+            <div class="btn-group">
+              <button class="btn"><i class="icon-plus"> </i> Add Group</button>
+            </div>
+
+            <br />
+
+            <table class="table table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th ng-click="sortField='id'; sortReverse=!sortReverse">Group ID</th>
+                  <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+                  <th ng-click="sortField='users.length'; sortReverse=!sortReverse">Members</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr ng-repeat="group in groups | orderBy:sortField:sortReverse">
+                  <td class="center"><input type="checkbox"></input></td>
+                  <td class="id"><a>{{ group.id }}</a></td>
+                  <td>{{ group.name }}</td>
+                  <td>{{ group.users | length }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row tab-pane" id="capabilities">
+          <div ng-class="_capabilityClass">
+            <table class="table table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th ng-click="sortField='id'; sortReverse=!sortReverse">Capability</th>
+                  <th ng-click="sortField='name'; sortReverse=!sortReverse">Description</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr ng-repeat="capability in capabilities | orderBy:sortField:sortReverse">
+                  <td class="center"><input type="checkbox"></input></td>
+                  <td class="id"><a>{{ capability.id }}</a></td>
+                  <td>{{ capability.description }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>

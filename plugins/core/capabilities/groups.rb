@@ -1,5 +1,6 @@
 User.capability :list_groups
 User.capability :add_to_group
+User.capability :update_group
 
 # users can remove themselves from groups
 User.capability :remove_from_group do |cap, user|
