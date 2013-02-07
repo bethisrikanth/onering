@@ -100,9 +100,8 @@ function SearchController($scope, $http, $location, Query){
   };
 }
 
-function UserManagerController($scope, User, UserList, GroupList, CapabilityList){
+function UserManagerController($scope, $http, User, UserList, GroupList, CapabilityList){
   $scope._userClass = 'span12';
-  $scope._userPaneClass= 'span4';
 
   $scope.toggleUserPane = function(user){
     if(user){
@@ -120,9 +119,32 @@ function UserManagerController($scope, User, UserList, GroupList, CapabilityList
 
 
   $scope._groupClass = 'span12';
+
+  $scope.toggleGroupPane = function(group){
+    if(group){
+      if($scope.groupPaneGroup && ($scope.groupPaneGroup.id == group.id)){
+    //  same group triggered, hide the pane
+        $scope.groupPaneGroup = null;
+        $scope._groupClass = 'span12';
+      }else{
+    //  different (or new) user, show pane and update
+        $scope._groupClass = 'span8';
+        $scope.groupPaneGroup = group;
+      }
+    }
+  }
+
   $scope._capabilityClass = 'span12';
 
 
+////////////////////////////////////////////////////////////////////////////////
+// YO! FUTURE GARY!  ************* READ THIS *************
+////////////////////////////////////////////////////////////////////////////////
+// these should be methods on the User() service instance
+// there *must* be a way to do this
+//
+// this would let me call this junk directly in the template and
+// avoid all this boilerplate in the controller
   $scope.addGroup = function(user){
     if(user){
       user.groups.push(null);
@@ -131,7 +153,9 @@ function UserManagerController($scope, User, UserList, GroupList, CapabilityList
 
   $scope.removeGroup = function(user, group){
     if(user && group){
-      delete user.groups[user.groups.indexOf(group)];
+      $http.get('/api/core/groups/'+group+'/remove/'+user.id, function(){
+        $scope.reload();
+      });
     }
   }
 

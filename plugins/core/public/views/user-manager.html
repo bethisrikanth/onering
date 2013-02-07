@@ -53,7 +53,7 @@
             </table>
           </div>
 
-          <div ng-class="_userPaneClass" ng-show="userPaneUser">
+          <div class="span4" ng-show="userPaneUser">
             <div>
               <h3>{{ userPaneUser.id }}</h3>
               <br />
@@ -108,7 +108,7 @@
               </thead>
 
               <tbody>
-                <tr ng-repeat="group in groups | orderBy:sortField:sortReverse">
+                <tr ng-repeat="group in groups | orderBy:sortField:sortReverse" ng-click="toggleGroupPane(group)">
                   <td class="center"><input type="checkbox"></input></td>
                   <td class="id"><a>{{ group.id }}</a></td>
                   <td>{{ group.name }}</td>
@@ -116,6 +116,39 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="span4" ng-show="groupPaneGroup">
+            <div>
+              <h3>{{ groupPaneGroup.id }}</h3>
+              <br />
+            </div>
+
+            <form>
+              <table class="table table-condensed">
+                <tbody>
+                  <tr>
+                    <th>Name</th>
+                    <td><input type="text" ng-model="groupPaneGroup.name" class="input-medium" /></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <h5>
+                        Users ({{ groupPaneGroup.users | length }})
+                        <span ng-click="addUser(groupPaneGroup)" class="pull-right"><i class="icon-plus"> </i></span>
+                      </h5>
+
+                      <ul class="nav">
+                        <li ng-repeat="user in groupPaneGroup.users">
+                          <span ng-show="user"><span ng-show="user.name">{{ user.name }} (</span>{{ user }}<span ng-show="user.name">)</span></span>
+                          <span class="pull-right"><i class="icon-remove"> </i></span>
+                        </li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
           </div>
         </div>
 
