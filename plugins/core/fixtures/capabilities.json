@@ -1,0 +1,87 @@
+[{
+  "_id":         "update_user",
+  "_type":       "Capability",
+  "description": "Update any user's details"
+},{
+  "_id":         "get_user",
+  "_type":       "Capability",
+  "description": "Show any single user"
+},{
+  "_id":         "list_users",
+  "_type":       "Capability",
+  "description": "List all users and their details"
+},{
+  "_id":         "delete_user",
+  "_type":       "Capability",
+  "description": "Delete any user completely from the system"
+},{
+  "_id":         "update_group",
+  "_type":       "Capability",
+  "description": "Update any group's members or details"
+},{
+  "_id":         "get_group",
+  "_type":       "Capability",
+  "description": "Show any single group"
+},{
+  "_id":         "list_groups",
+  "_type":       "Capability",
+  "description": "List all groups and their details"
+},{
+  "_id":         "delete_group",
+  "_type":       "Capability",
+  "description": "Delete any group completely from the system"
+},{
+  "_id":         "add_to_group",
+  "_type":       "Capability",
+  "description": "Add a user to any group"
+},{
+  "_id":         "remove_from_group",
+  "_type":       "Capability",
+  "description": "Remove a user from any group"
+},{
+  "_id":         "update_capability",
+  "_type":       "Capability",
+  "description": "Update the details, users, or groups for any capability"
+},{
+  "_id":         "get_capability",
+  "_type":       "Capability",
+  "description": "Show the details from any single capability"
+},{
+  "_id":         "list_capabilities",
+  "_type":       "Capability",
+  "description": "List all capabilities, including granted users and groups"
+},{
+  "_id":         "grant_capability_to_user",
+  "_type":       "Capability",
+  "description": "Grant a user a given capability"
+},{
+  "_id":         "grant_capability_to_group",
+  "_type":       "Capability",
+  "description": "Grant a group a given capability"
+},{
+  "_id":         "delete_capability",
+  "_type":       "Capability",
+  "description": "Remove a capability from the system"
+},{
+  "_id": "manage_users",
+  "_type": "Capability",
+  "description": "Capabilities for managing users, groups, and permissions",
+  "capabilities": [
+    "update_user",
+    "get_user",
+    "list_users",
+    "delete_user",
+    "update_group",
+    "get_group",
+    "list_groups",
+    "delete_group",
+    "add_to_group",
+    "remove_from_group",
+    "update_capbility",
+    "get_capability",
+    "list_capabilities",
+    "delete_capability"
+  ],
+  "groups": [
+    "admins"
+  ]

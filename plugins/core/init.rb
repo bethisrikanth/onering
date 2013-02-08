@@ -1,45 +1,22 @@
 require 'controller'
 require 'core/helpers/authentication'
+require 'sinatra/session'
 
 module App
   class Base < Controller
+    include Helpers
+    register Sinatra::Session
+
+    configure do
+      set :session_fail, '/login.html'
+      set :session_secret, 'abc123zyx987'
+    end
+
     before do
+    # force SSL redirect
       if Config.get('global.force_ssl')
         port = (request.port == 80 ? '' : ":#{request.port}")
         redirect "https://#{request.host}#{port}", 301
-      end
-
-      unless Config.get('global.authentication.disable') then
-        @user = nil
-        auth = Rack::Auth::Basic::Request.new(request.env)
-
-        unless auth.provided? then
-          response['WWW-Authenticate'] = "Basic realm=\"#{Config.get('global.authentication.realm') || 'HTTP Authentication'}\""
-          throw :halt, 401
-        end
-
-        throw :halt, 400 unless auth.basic?
-
-      # this will become the correct class using MM Single-collection inheritance
-        user = User.find(auth.username)
-
-      # if user found...
-        if user
-        # and user/pass were good...
-          if user.authenticate!({
-            :username => auth.username,
-            :password => auth.credentials[1]
-          })
-            user.logged_in_at = Time.now
-            user.safe_save
-            @user = user
-
-          else
-            throw :halt, 401
-          end
-        else
-          throw :halt, 401
-        end
       end
     end
 
@@ -51,7 +28,7 @@ module App
     if settings.environment == 'development'
       require 'rack/webconsole'
       use Rack::Webconsole
-      
+
       get '/console' do
         Rack::Webconsole.inject_jquery = true
 

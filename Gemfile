@@ -2,6 +2,7 @@ source :rubygems
 
 gem "sinatra"
 gem "sinatra-contrib"
+gem "sinatra-session"
 gem "sinatra-cross_origin"
 gem "shotgun"
 gem "deep_merge"

@@ -26,17 +26,18 @@ class PamUser < User
   def authenticate!(options={})
     if super
       service = App::Config.get('global.authentication.pam.service')
+      options[:username] = id
 
       begin
-        PAM.start(service, options[:username], CONVERSATION, options) do |pam|
+        PAM.start(service, id, CONVERSATION, options) do |pam|
           begin
             pam.authenticate(0)
           rescue PAM::PAM_USER_UNKNOWN
-            STDERR.puts "Unknown user #{options[:username]}"
+            STDERR.puts "Unknown user #{id}"
             return false
 
           rescue PAM::PAM_AUTH_ERR
-            STDERR.puts "Authentication failed for user #{options[:username]}"
+            STDERR.puts "Authentication failed for user #{id}"
             return false
 
           rescue PAM::PAMError => e

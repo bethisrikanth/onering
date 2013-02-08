@@ -36,7 +36,7 @@
                   <th>&nbsp;</th>
                   <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
                   <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                  <th ng-click="sortField='_type'; sortReverse=!sortReverse">Authentication Type</th>
+                  <th ng-click="sortField='type'; sortReverse=!sortReverse">Authentication Type</th>
                   <th ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Seen</th>
                 </tr>
               </thead>
@@ -46,7 +46,7 @@
                   <td class="center"><input type="checkbox"></input></td>
                   <td class="id"><a>{{ user.id }}</a></td>
                   <td>{{ user.name }}</td>
-                  <td>{{ user._type | replace:'User':'' | titleize }}</td>
+                  <td>{{ user.type | replace:'User':'' | titleize }}</td>
                   <td>{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
                 </tr>
               </tbody>
@@ -70,15 +70,19 @@
                     <td colspan="2">
                       <h5>
                         Groups ({{ userPaneUser.groups | length }})
-                        <span ng-click="addGroup(userPaneUser)" class="pull-right"><i class="icon-plus"> </i></span>
+                        <div class="dropdown pull-right">
+                          <a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-plus"> </i> </a>
+
+                          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <li ng-repeat="group in groups"><a ng-click="addGroup(userPaneUser.id, group.id)">{{ group.id }}</a></li>
+                          </ul>
+                        </div>
                       </h5>
 
                       <ul class="nav">
                         <li ng-repeat="group in userPaneUser.groups">
-                          <span ng-show="group">{{ group }}</span>
-                          <select ng-hide="group" ng-model="group" ng-options="g.id for g in groups"></select>
-
-                          <span ng-click="removeGroup(userPaneUser, group)" class="pull-right"><i class="icon-remove"> </i></span>
+                          <span>{{ group }}</span>
+                          <span ng-click="removeGroup(userPaneUser.id, group.id)" class="pull-right"><i class="icon-remove"> </i></span>
                         </li>
                       </ul>
                     </td>

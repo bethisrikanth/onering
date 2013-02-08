@@ -4,7 +4,7 @@ class User < App::Model::Base
   set_collection_name "users"
 
   timestamps!
-  
+
   key :name,         String
   key :logged_in_at, Time
 
@@ -15,7 +15,9 @@ class User < App::Model::Base
   end
 
   def to_h
+    return super if groups.empty?
     super.merge({
+      :type   => _type,
       :groups => groups
     })
   end

@@ -1,12 +1,38 @@
-function DefaultController($scope){
-
+function GlobalController($scope, $http, $rootScope, $window){
+  $http.get('/api/core/users/current').error(function(data, status){
+    if(status == 401){
+      $window.location = '/login.html';
+    }
+  });
 }
 
-function NavigationController($scope, $http, $route, $window, $routeParams, Summary, List, CurrentUser){
+function LoginController($scope, $rootScope, $http, $window){
+  $scope.user = {};
+
+  $scope.login = function(){
+    if($scope.user && $scope.user.name && $scope.user.password){
+      $http.post('/api/core/users/login', {
+        username: $scope.user.name,
+        password: $scope.user.password
+      }).success(function(data){
+        $window.location = '/';
+      });
+    }
+  }
+}
+
+function LogoutController($scope, $http, $rootScope, $window){
+  $http.get('/api/core/users/logout').success(function(){
+    $window.location = '/login.html';
+  });
+}
+
+function NavigationController($scope, $rootScope, $http, $route, $window, $routeParams, Summary, List, CurrentUser){
   $scope.reload = function(){
   //get current user details
     CurrentUser.get({}, function(data){
-      $scope.user = data;
+      $rootScope.user = data;
+      $scope.addError("Test", "Testing")
     });
 
   //get site summary
@@ -145,15 +171,17 @@ function UserManagerController($scope, $http, User, UserList, GroupList, Capabil
 //
 // this would let me call this junk directly in the template and
 // avoid all this boilerplate in the controller
-  $scope.addGroup = function(user){
-    if(user){
-      user.groups.push(null);
+  $scope.addGroup = function(user, group){
+    if(user && group){
+      $http.get('/api/core/groups/'+group+'/add/'+user).success(function(){
+        $scope.reload();
+      });
     }
   }
 
   $scope.removeGroup = function(user, group){
     if(user && group){
-      $http.get('/api/core/groups/'+group+'/remove/'+user.id, function(){
+      $http.get('/api/core/groups/'+group+'/remove/'+user).success(function(){
         $scope.reload();
       });
     }

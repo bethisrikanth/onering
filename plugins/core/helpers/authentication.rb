@@ -1,5 +1,39 @@
+# user types
+require 'core/models/ldap_user'
+require 'core/models/pam_user'
+
+require 'core/models/group'
+require 'core/models/capability'
+require 'core/models/session'
+
 module App
+  module Helpers
+    def anonymous?(path)
+      %w{
+        /
+        /api
+        /api/core/users/login
+      }.each do |p|
+        return true if path == p
+      end
+
+      return false
+    end
+  end
+
   class Base < Controller
+  # session based authentication
+    before do
+      unless Config.get('global.authentication.disable') then
+        unless anonymous?(request.path)
+          session_start!
+          session! unless session?
+          @user = User.find(session[:user])
+          throw :halt, 401 unless @user
+        end
+      end
+    end
+
     namespace '/api/core' do
     # user management
       namespace '/users' do
@@ -7,6 +41,36 @@ module App
         get '/list' do
           allowed_to? :list_users
           output(User.all.collect{|i| i.to_h })
+        end
+
+        post '/login' do
+          json = JSON.load(request.env['rack.input'].read)
+
+          if json
+            user = User.find(json['username'])
+            return 404 unless user
+
+          # and user/pass were good...
+            if user.authenticate!({
+              :password => json['password']
+            })
+              user.logged_in_at = Time.now
+              user.safe_save
+              @user = session[:user] = user.id
+
+            else
+              throw :halt, 401
+            end
+          else
+            throw :halt, 400
+          end
+
+          200
+        end
+
+        get '/logout' do
+          session_end!
+          200
         end
 
       # get user
@@ -64,7 +128,7 @@ module App
         end
 
       # get group
-        get '/:group' do 
+        get '/:group' do
           allowed_to? :get_group, params[:group]
           group = Group.find(params[:group])
           return 404 unless group
@@ -72,7 +136,7 @@ module App
         end
 
       # add user to group
-        get '/:group/add/:user' do 
+        get '/:group/add/:user' do
           allowed_to? :add_to_group, params[:group], params[:user]
           group = Group.find(params[:group])
           user = User.find(params[:user])
@@ -87,7 +151,7 @@ module App
         end
 
       # remove user from group
-        get '/:group/remove/:user' do 
+        get '/:group/remove/:user' do
           allowed_to? :remove_from_group, params[:group], params[:user]
           group = Group.find(params[:group])
           user = User.find(params[:user])
@@ -126,7 +190,7 @@ module App
         end
 
       # update capability
-        post '/:id' do 
+        post '/:id' do
           allowed_to? :update_capability, params[:id]
           json = JSON.load(request.env['rack.input'].read)
 

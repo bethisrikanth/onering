@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <title>Onering</title>
+
+    <meta charset="UTF-8">
+
+    <!-- Function -->
+    <script type="text/javascript" src="/js/vendor/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular-resource.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular-ui.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/base64-1.7.js"></script>
+
+    <script type="text/javascript" src="/js/services.js"></script>
+    <script type="text/javascript" src="/js/directives.js"></script>
+    <script type="text/javascript" src="/js/filters.js"></script>
+    <script type="text/javascript" src="/js/controllers.js"></script>
+    <script type="text/javascript" src="/js/routes.js"></script>
+    <script type="text/javascript" src="/js/plugins.js"></script>
+    <script type="text/javascript" src="/js/site.js"></script>
+
+    <!-- Form -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css"></link>
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css"></link>
+    <link rel="stylesheet" href="/css/angular-ui.min.css"></link>
+    <link rel="stylesheet" href="/css/main.css"></link>
+  </head>
+  <body>
+    <header class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+      </div>
+    </header>
+
+    <section class="content" ng-controller="LoginController">
+      <div class="container">
+        <div class="row">
+          <div class="offset3 span6">
+            <form class="well form-horizontal" ng-submit="login()">
+              <legend>Onering Login</legend>
+
+              <div class="control-group">
+                <label class="control-label" for="username">Username</label>
+                <div class="controls">
+                  <input type="text" id="username" ng-model="user.name" autofocus>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="password">Password</label>
+                <div class="controls">
+                  <input type="password" id="password" ng-model="user.password">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <div class="controls">
+                  <button type="submit" class="btn btn-primary pull-right"><i class="icon-lock icon-white"></i>&nbsp;&nbsp;Log In</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

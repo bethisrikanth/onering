@@ -1,0 +1,8 @@
+[{
+  "_id":   "admins",
+  "_type": "Group",
+  "name":  "Administrators",
+  "users": [
+    "onering"
+  ]
+}]

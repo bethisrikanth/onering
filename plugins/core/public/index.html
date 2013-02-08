@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
   <head>
     <title>Onering</title>
 
     <meta charset="UTF-8">
 
     <!-- Function -->
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="/js/vendor/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" src="/js/vendor/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/vendor/angular.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular-ui.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular-resource.min.js"></script>
     <script type="text/javascript" src="/js/vendor/bootstrap.min.js"></script>
     <script type="text/javascript" src="/js/vendor/moment.min.js"></script>
 
@@ -21,7 +21,6 @@
     <script type="text/javascript" src="/js/routes.js"></script>
     <script type="text/javascript" src="/js/plugins.js"></script>
     <script type="text/javascript" src="/js/site.js"></script>
-    <script type="text/javascript" src="/js/vendor/angular-resource.min.js"></script>
 
     <!-- Form -->
     <link rel="stylesheet" href="/css/bootstrap.min.css"></link>
@@ -29,175 +28,194 @@
     <link rel="stylesheet" href="/css/angular-ui.min.css"></link>
     <link rel="stylesheet" href="/css/main.css"></link>
   </head>
-  <body>
+  <body ng-controller="GlobalController">
     <header class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavigationController">
       <div class="navbar-inner">
-        <ul class="nav">
-          <li><a class="logo" href="/"><i>&nbsp;</i></a></li>
-          <li class="divider-vertical"></li>
-          <li><a href="#/inf"><i class="icon-cog icon-white"></i> Overview</a></li>
-          <li class="divider-vertical"></li>
-          <li class="dropdown">
-            <a class="dropdown-toggle"
-             data-toggle="dropdown"
-             href="#">
-              <i class="icon-th-large icon-white"></i>&nbsp;Devices
-              <b class="caret"></b>
-            </a>
+        <div ng-show="user">
+          <ul class="nav">
+            <li><a class="logo" href="/"><i>&nbsp;</i></a></li>
+            <li class="divider-vertical"></li>
+            <li><a href="#/inf"><i class="icon-cog icon-white"></i> Overview</a></li>
+            <li class="divider-vertical"></li>
+            <li class="dropdown">
+              <a class="dropdown-toggle"
+               data-toggle="dropdown"
+               href="#">
+                <i class="icon-th-large icon-white"></i>&nbsp;Devices
+                <b class="caret"></b>
+              </a>
 
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="min-width: 220px;">
-              <li ng-repeat="site in sites | orderBy:'-count'">
-                <a href="#site/{{ site.id }}">
-                  {{ (site.id | uppercase) || '(empty)' }}
-                  <span class="badge">{{ site.count }}</span>
-                </a>
-              </li>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="min-width: 220px;">
+                <li ng-repeat="site in sites | orderBy:'-count'">
+                  <a href="#site/{{ site.id }}">
+                    {{ (site.id | uppercase) || '(empty)' }}
+                    <span class="badge">{{ site.count }}</span>
+                  </a>
+                </li>
 
-              <li class="divider"></li>
+                <li class="divider"></li>
 
-              <li class="dropdown-submenu">
-                <a tabindex="-1"><i class="icon-ok-circle"></i>&nbsp;&nbsp;Status</a>
-                <ul class="dropdown-menu" style="min-width: 220px;">
-                  <li ng-repeat="status in statuses | orderBy:'count':true">
-                    <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status' }}">
-                      <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
-                      {{ (status.id || 'unknown') | titleize }}
-                      <span>{{ status.count }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                <li class="dropdown-submenu">
+                  <a tabindex="-1"><i class="icon-ok-circle"></i>&nbsp;&nbsp;Status</a>
+                  <ul class="dropdown-menu" style="min-width: 220px;">
+                    <li ng-repeat="status in statuses | orderBy:'count':true">
+                      <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status' }}">
+                        <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
+                        {{ (status.id || 'unknown') | titleize }}
+                        <span>{{ status.count }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
 
-              <li class="dropdown-submenu">
-                <a tabindex="-1"><i class="icon-wrench"></i>&nbsp;&nbsp;Maintenance</a>
-                <ul class="dropdown-menu" style="min-width: 220px;">
-                  <li ng-repeat="maint in maintenance_statuses | orderBy:'count':true">
-                    <a href="#/inf/show/{{ (maint.id &amp;&amp; 'maintenance_status:'+maint.id) || '^maintenance_status' }}">
-                      <i class="icon-{{ maint.id || 'ok' }}"></i>
-                      {{ (maint.id &amp;&amp; 'Needs '+maint.id || 'healthy') | titleize }}
-                      <span>{{ maint.count }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                <li class="dropdown-submenu">
+                  <a tabindex="-1"><i class="icon-wrench"></i>&nbsp;&nbsp;Maintenance</a>
+                  <ul class="dropdown-menu" style="min-width: 220px;">
+                    <li ng-repeat="maint in maintenance_statuses | orderBy:'count':true">
+                      <a href="#/inf/show/{{ (maint.id &amp;&amp; 'maintenance_status:'+maint.id) || '^maintenance_status' }}">
+                        <i class="icon-{{ maint.id || 'ok' }}"></i>
+                        {{ (maint.id &amp;&amp; 'Needs '+maint.id || 'healthy') | titleize }}
+                        <span>{{ maint.count }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
 
-              <li class="dropdown-submenu" ng-show="alert_states">
-                <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>
-                <ul class="dropdown-menu" style="min-width: 220px;">
-                  <li><a href="#/alerts/nagios"><i class="icon-list"></i> All Alerts</a></li>
-                  <li class="divider"></li>
-                  <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
-                    <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
-                      <img ng-src="/img/alerts/{{ alert_state.id }}.png" />
-                      {{ (alert_state.id) | titleize }}
-                      <span>{{ alert_state.count }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                <li class="dropdown-submenu" ng-show="alert_states">
+                  <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>
+                  <ul class="dropdown-menu" style="min-width: 220px;">
+                    <li><a href="#/alerts/nagios"><i class="icon-list"></i> All Alerts</a></li>
+                    <li class="divider"></li>
+                    <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
+                      <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
+                        <img ng-src="/img/alerts/{{ alert_state.id }}.png" />
+                        {{ (alert_state.id) | titleize }}
+                        <span>{{ alert_state.count }}</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
 
-              <li class="dropdown-submenu" ng-show="tags">
-                <a tabindex="-1"><i class="icon-tags"></i>&nbsp;&nbsp;Tags</a>
-                <ul class="dropdown-menu" style="min-width: 220px;">
-                  <li ng-repeat="tag in tags">
-                    <a href="#/inf/show/tags:{{ tag }}">
-                      {{ tag }}
-                    </a>
-                  </li>
-                </ul>
-              </li>
+                <li class="dropdown-submenu" ng-show="tags">
+                  <a tabindex="-1"><i class="icon-tags"></i>&nbsp;&nbsp;Tags</a>
+                  <ul class="dropdown-menu" style="min-width: 220px;">
+                    <li ng-repeat="tag in tags">
+                      <a href="#/inf/show/tags:{{ tag }}">
+                        {{ tag }}
+                      </a>
+                    </li>
+                  </ul>
+                </li>
 
-              <li><a href="#/provisioning"><i class="icon-hdd"></i>&nbsp;&nbsp;Provisioning</a></li>
-            </ul>
-          </li>
+                <li><a href="#/provisioning"><i class="icon-hdd"></i>&nbsp;&nbsp;Provisioning</a></li>
+              </ul>
+            </li>
 
-          <li class="divider-vertical"></li>
-          <li><a><i class="icon-question-sign icon-white"></i>&nbsp;Help</a></li>
-        </ul>
+            <li class="divider-vertical"></li>
+            <li><a><i class="icon-question-sign icon-white"></i>&nbsp;Help</a></li>
+          </ul>
 
-        <ul class="nav" ng-hide="online">
-          <span class="label label-important">
-            Could not contact the server
-          </span>
-        </ul>
+          <ul class="nav" ng-hide="online">
+            <span class="label label-important">
+              Could not contact the server
+            </span>
+          </ul>
 
-        <ul class="nav pull-right">
-          <li class="divider-vertical"></li>
-          <li ng-show="user"><a href="#/user"><i class="icon-user icon-white"></i>&nbsp;&nbsp;{{ user.id }}</a></li>
-          <li class="divider-vertical"></li>
-        </ul>
+          <ul class="nav pull-right">
+            <li class="divider-vertical"></li>
+            <li ng-show="user" class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                <i class="icon-user icon-white"></i>&nbsp;&nbsp;{{ user.id }}&nbsp;&nbsp;<b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li><a href="#/logout"><i class="icon-arrow-right"></i> Logout</a></li>
+              </ul>
+            </li>
+            <li class="divider-vertical"></li>
+          </ul>
 
-        <form class="navbar-search pull-right" ng-controller="SearchController">
-          <input type="text" ng-model="query" class="search-query" placeholder="Search"
-            ui-keypress="{'enter alt-space': 'goQuery()'}">
-          <span ng-click="search_show_help=!search_show_help" class="add-on"><i class="icon-question-sign icon-white"></i></span>
+          <form class="navbar-search pull-right" ng-controller="SearchController">
+            <span ng-show="errors.length > 0">
+              <a ng-click="show_errors=!show_errors" class="badge badge-important">{{ errors | length }} errors</a>&nbsp;&nbsp;
+            </span>
 
-          <!-- <i class="help icon-question-sign" ng-click="search_show_help=!search_show_help"></i> -->
+            <!-- <div class="autocomplete errors ui-hide" ui-toggle="show_errors" ng-click="show_errors=false">
+              <div ng-repeat="error in errors">
+                <b>{{ error.name }}:</b> <span>{{ error.message }}</span>
+              </div>
+            </div> -->
 
-          <div class="autocomplete help ui-hide" ui-toggle="search_show_help" ng-click="search_show_help=false">
-            <ul class="dropdown-menu dropdown-panel pull-right show" role="menu">
-              <li>
-                <h1>Search Help</h1>
-              </li>
-              <li>
-                <b>Examples:</b>
-                <br />
-                <ul class="unstyled">
-                  <li>
-                    <i>test-12345</i><br />
-                    <p>
-                      Search for all nodes whose ID, name, tags, or aliases start with the string "test-12345"
-                    </p>
-                  </li>
+            <input type="text" ng-model="query" class="search-query" placeholder="Search"
+              ui-keypress="{'enter alt-space': 'goQuery()'}">
+            <span ng-click="search_show_help=!search_show_help" class="add-on"><i class="icon-question-sign icon-white"></i></span>
 
-                  <li>
-                    <i>site:nyc</i><br />
-                    <p>
-                      Search for nodes that contain a "site" property that starts with "nyc"
-                    </p>
-                  </li>
+            <!-- <i class="help icon-question-sign" ng-click="search_show_help=!search_show_help"></i> -->
 
-                  <li>
-                    <i>ip:192.168.*$</i><br />
-                    <p>
-                      Find all nodes with an "ip" property that matches the pattern "192\.168\..*$"
-                    </p>
-                  </li>
+            <div class="autocomplete help ui-hide" ui-toggle="search_show_help" ng-click="search_show_help=false">
+              <ul class="dropdown-menu dropdown-panel pull-right show" role="menu">
+                <li>
+                  <h1>Search Help</h1>
+                </li>
+                <li>
+                  <b>Examples:</b>
+                  <br />
+                  <ul class="unstyled">
+                    <li>
+                      <i>test-12345</i><br />
+                      <p>
+                        Search for all nodes whose ID, name, tags, or aliases start with the string "test-12345"
+                      </p>
+                    </li>
 
-                  <li>
-                    <i>status:maintenance notes:^$</i><br />
-                    <p>
-                      Find all nodes whose status is 'maintenance' without notes attached.
-                    </p>
-                  </li>
+                    <li>
+                      <i>site:nyc</i><br />
+                      <p>
+                        Search for nodes that contain a "site" property that starts with "nyc"
+                      </p>
+                    </li>
 
-                  <li>
-                    <i>site:nydc1 ip:!10.11.*$</i><br />
-                    <p>
-                      Find all nodes in site "nydc1" whose IP does <i>NOT</i> start with "10.11."
-                    </p>
-                  </li>
+                    <li>
+                      <i>ip:192.168.*$</i><br />
+                      <p>
+                        Find all nodes with an "ip" property that matches the pattern "192\.168\..*$"
+                      </p>
+                    </li>
 
-                  <li>
-                    <i>chef.run_list:!base</i>
-                    <p>
-                      Find all nodes whose Chef run_list property does not contain a recipe or role containing the word "base"
-                    </p>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </div>
+                    <li>
+                      <i>status:maintenance notes:^$</i><br />
+                      <p>
+                        Find all nodes whose status is 'maintenance' without notes attached.
+                      </p>
+                    </li>
 
-          <div class="autocomplete ui-hide" ui-show="results">
-            <ul class="dropdown-menu show" role="menu">
-              <li ng-repeat="device in results"><a tabindex="-1" href="#/node/{{ device.id }}" ng-click="clearResults()">{{ device.name }}</a></li>
-            </ul>
-          </div>
-        </form>
+                    <li>
+                      <i>site:nydc1 ip:!10.11.*$</i><br />
+                      <p>
+                        Find all nodes in site "nydc1" whose IP does <i>NOT</i> start with "10.11."
+                      </p>
+                    </li>
+
+                    <li>
+                      <i>chef.run_list:!base</i>
+                      <p>
+                        Find all nodes whose Chef run_list property does not contain a recipe or role containing the word "base"
+                      </p>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="autocomplete ui-hide" ui-show="results">
+              <ul class="dropdown-menu show" role="menu">
+                <li ng-repeat="device in results"><a tabindex="-1" href="#/node/{{ device.id }}" ng-click="clearResults()">{{ device.name }}</a></li>
+              </ul>
+            </div>
+          </form>
+        </div>
       </div>
     </header>
 
-    <section class="content" ng-view>
+    <section class="content" ng-show="user" ng-view>
   </body>
 </html>

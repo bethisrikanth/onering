@@ -6,6 +6,19 @@ angular.module('corePlugin', [
 ]).
 run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
   $rootScope.online = true;
+  $rootScope.user = null;
+  $rootScope.errors = [];
+
+  $rootScope.addError = function(name, message){
+    $rootScope.errors.push({
+      name: name,
+      message: message
+    });
+  }
+
+  $rootScope.clearErrors = function(){
+    $rootScope.errors = [];
+  }
 
   $rootScope.prepareQuery = function(query, raw){
 //  explictly specify raw=true to send the query directly to the API

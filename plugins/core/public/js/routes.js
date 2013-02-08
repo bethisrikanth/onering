@@ -5,8 +5,11 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'views/user-manager.html',
     controller:  UserManagerController
   }).
+  when('/logout', {
+    templateUrl: 'views/user-logout.html',
+    controller:  LogoutController
+  }).
   otherwise({
-    templateUrl: 'views/index.html',
-    controller:  DefaultController
+    templateUrl: 'views/index.html'
   });
 }]);
