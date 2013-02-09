@@ -4,6 +4,21 @@ String.prototype.toTitleCase = function(){
   });
 };
 
+String.prototype.titleize = function(){
+  var overrides = {
+    'noc':    'NOC',
+    'centos': 'CentOS',
+    'redhat': 'RedHat',
+    'pam':    'PAM',
+    'ldap':   'LDAP'
+  };
+
+  if(overrides.hasOwnProperty(this.toLowerCase()))
+    return overrides[this.toLowerCase()];
+
+  return this.replace(/_/g, ' ').toTitleCase();
+};
+
 Array.prototype.compact = function(){
   return this.filter(function(i){
     return i;
@@ -13,21 +28,7 @@ Array.prototype.compact = function(){
 angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
-    if(text){
-      var overrides = {
-        'noc':    'NOC',
-        'centos': 'CentOS',
-        'redhat': 'RedHat',
-        'pam':    'PAM',
-        'ldap':   'LDAP'
-      };
-
-      if(overrides.hasOwnProperty(text.toLowerCase()))
-        return overrides[text.toLowerCase()];
-
-      return text.replace(/_/, ' ').toTitleCase();
-    }
-
+    if(text) return text.toString().titleize();
     return text;
   };
 }).

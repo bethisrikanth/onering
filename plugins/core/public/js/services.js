@@ -10,6 +10,12 @@ factory('CurrentUser', function($resource){
 factory('UserList', function($resource){
   return $resource('/api/core/users/list');
 }).
+factory('UserType', function($resource){
+  return $resource('/api/core/users/:user/type/:type', {
+    user: '@user',
+    type: '@type'
+  });
+}).
 factory('GroupList', function($resource){
   return $resource('/api/core/groups/list');
 }).

@@ -20,7 +20,7 @@ body .modal {
   margin-right: -387px;
 }
 
-.content{
+.clear-navbar{
   margin-top: 60px;
 }
 
@@ -95,6 +95,12 @@ body .modal {
 
 .notes-tip li{
   padding-bottom: 0.25em;
+}
+
+.content > header{
+  -webkit-box-shadow: 0 0 3px 3px rgba(32,32,32,0.2);
+  -moz-box-shadow: 0 0 3px 3px rgba(32,32,32,0.2);
+  box-shadow: 0 0 3px 3px rgba(32,32,32,0.2);
 }
 
 header .nav .dropdown-menu li a span{

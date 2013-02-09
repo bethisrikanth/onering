@@ -4,7 +4,6 @@ require 'core/models/pam_user'
 
 require 'core/models/group'
 require 'core/models/capability'
-require 'core/models/session'
 
 module App
   module Helpers
@@ -28,7 +27,7 @@ module App
         unless anonymous?(request.path)
           session_start!
           session! unless session?
-          @user = User.find(session[:user])
+          @user = User.find(session[:user]) if session[:user]
           throw :halt, 401 unless @user
         end
       end
@@ -43,12 +42,18 @@ module App
           output(User.all.collect{|i| i.to_h })
         end
 
+      # get user types list
+        get '/list/types' do 
+          allowed_to? :list_users
+          output(User.list(:_type))
+        end
+
         post '/login' do
           json = JSON.load(request.env['rack.input'].read)
 
           if json
             user = User.find(json['username'])
-            return 404 unless user
+            halt 401, 'Invalid username' unless user
 
           # and user/pass were good...
             if user.authenticate!({
@@ -59,10 +64,10 @@ module App
               @user = session[:user] = user.id
 
             else
-              throw :halt, 401
+              halt 401, 'Incorrect password'
             end
           else
-            throw :halt, 400
+            halt 400
           end
 
           200
@@ -93,9 +98,10 @@ module App
           json = JSON.load(request.env['rack.input'].read)
 
           if json
-          # remove these fields
-            json.delete('_id')
-            json.delete('_type')
+          # remove certain fields
+            json.delete_if{|k,v|
+              k =~ /(?:^_?id$|^_?type$|_at$)/
+            }
 
             user = User.find_or_create(id)
             user.from_json(json).safe_save
@@ -113,7 +119,7 @@ module App
 
           user = User.find(params[:id])
           return 404 unless user
-          user.type = params[:type]
+          user._type = params[:type]
           user.safe_save
           output(user)
         end

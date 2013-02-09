@@ -110,7 +110,7 @@ class Device < App::Model::Base
       else "properties.#{field}"
       end
 
-      self.collection.distinct(field, query).compact.sort
+      super(field, query)
     end
 
   # summarize

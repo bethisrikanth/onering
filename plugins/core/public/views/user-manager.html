@@ -19,81 +19,106 @@
       </div>
     </div>
 
-    <br />
-
     <div class="tab-content">
-      <div class="row tab-pane active" id="users">
-        <div ng-class="_userClass">
+
+      <!-- ######## USERS ######## -->
+
+      <div class="tab-pane active" id="users">
+        <div class="row">
+          <div class="span10">
             <div class="btn-group">
               <button class="btn"><i class="icon-plus"> </i> Add User</button>
             </div>
-
             <br />
-
+            <br />
+          </div>
+        </div>
+        
+        <div class="row">
+          <div ng-class="_userClass">
             <table class="table table-condensed table-hover">
               <thead>
                 <tr>
                   <th>&nbsp;</th>
                   <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
                   <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                  <th ng-click="sortField='type'; sortReverse=!sortReverse">Authentication Type</th>
-                  <th ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Seen</th>
+                  <th ng-hide="userPaneUser" ng-click="sortField='type'; sortReverse=!sortReverse">Authentication Type</th>
+                  <th ng-hide="userPaneUser" ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Logged In</th>
                 </tr>
               </thead>
 
               <tbody>
-                <tr ng-repeat="user in users | orderBy:sortField:sortReverse" ng-click="toggleUserPane(user)">
+                <tr ng-repeat="user in users | orderBy:sortField:sortReverse">
                   <td class="center"><input type="checkbox"></input></td>
-                  <td class="id"><a>{{ user.id }}</a></td>
+                  <td class="id"><a ng-click="toggleUserPane(user)">{{ user.id }}</a></td>
                   <td>{{ user.name }}</td>
-                  <td>{{ user.type | replace:'User':'' | titleize }}</td>
-                  <td>{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
+                  <td ng-hide="userPaneUser">{{ user.type | replace:'User':'' | titleize }}</td>
+                  <td ng-hide="userPaneUser">{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="span4" ng-show="userPaneUser">
-            <div>
-              <h3>{{ userPaneUser.id }}</h3>
-              <br />
+          <div ng-class="_userPaneClass" ng-show="userPaneUser">
+            <div class="container-fluid">
+              <div class="row-fluid">
+                <div class="span6">
+                  <h3 style="margin-top: 0;">{{ userPaneUser.id }}</h3>
+                </div>
+                <div class="span6 text-right">
+                  <button ng-click="saveUser(userPaneUser)" type="submit" ng-disabled="submitting" class="btn btn-small btn-primary">Save</button>
+                </div>
+              </div>
             </div>
 
-            <form>
-              <table class="table table-condensed">
-                <tbody>
-                  <tr>
-                    <th>Full Name</th>
-                    <td><input type="text" ng-model="userPaneUser.name" class="input-medium" /></td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">
-                      <h5>
-                        Groups ({{ userPaneUser.groups | length }})
-                        <div class="dropdown pull-right">
-                          <a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-plus"> </i> </a>
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label" for="user.name">Full Name</label>
+                <div class="controls">
+                  <input ng-disabled="submitting" name="user.name" type="text" ng-model="userPaneUser.name" class="input-large" required />
+                </div>
+              </div>
 
-                          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <li ng-repeat="group in groups"><a ng-click="addGroup(userPaneUser.id, group.id)">{{ group.id }}</a></li>
-                          </ul>
-                        </div>
-                      </h5>
+              <div class="control-group">
+                <label class="control-label" for="user.name">Authentication Type</label>
+                <div class="controls">
+                  <select ng-disabled="submitting" name="user.type" ng-model="userPaneUser.type" class="input-large" required ng-options="t.value as t.label for t in userTypes"></select>
+                </div>
+              </div>
 
-                      <ul class="nav">
-                        <li ng-repeat="group in userPaneUser.groups">
-                          <span>{{ group }}</span>
-                          <span ng-click="removeGroup(userPaneUser.id, group.id)" class="pull-right"><i class="icon-remove"> </i></span>
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="control-group">
+                <label class="control-label" for="user.groups">Groups ({{ userPaneUser.groups | length }})</label>
+                <div class="controls">
+                  <ul class="nav">
+                    <li ng-repeat="group in userPaneUser.groups">
+                      <span>{{ group | titleize }}</span>
+                      <span ng-click="removeUserFromGroup(userPaneUser.id, group)" class="pull-right"><i class="icon-remove"> </i></span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="user.capabilities">Capabilities ({{ userPaneUser.capabilities | length }})</label>
+                <div class="controls">
+                  <ul class="nav">
+                    <li ng-repeat="capability in userPaneUser.capabilities">
+                      <span>{{ capability | titleize }}</span>
+                      <span ng-click="revokeCapability(capability, 'user', userPaneUser.id)" class="pull-right"><i class="icon-remove"> </i></span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </form>
           </div>
         </div>
+      </div>
 
-        <div class="row tab-pane" id="groups">
+
+      <!-- ######## GROUPS ######## -->
+
+      <div class="tab-pane" id="groups">
+        <div class="row">
           <div ng-class="_groupClass">
             <div class="btn-group">
               <button class="btn"><i class="icon-plus"> </i> Add Group</button>
@@ -107,22 +132,22 @@
                   <th>&nbsp;</th>
                   <th ng-click="sortField='id'; sortReverse=!sortReverse">Group ID</th>
                   <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                  <th ng-click="sortField='users.length'; sortReverse=!sortReverse">Members</th>
+                  <th ng-hide="groupPaneGroup" ng-click="sortField='users.length'; sortReverse=!sortReverse">Members</th>
                 </tr>
               </thead>
 
               <tbody>
                 <tr ng-repeat="group in groups | orderBy:sortField:sortReverse" ng-click="toggleGroupPane(group)">
                   <td class="center"><input type="checkbox"></input></td>
-                  <td class="id"><a>{{ group.id }}</a></td>
+                  <td class="id"><a>{{ group.id | titleize }}</a></td>
                   <td>{{ group.name }}</td>
-                  <td>{{ group.users | length }}</td>
+                  <td ng-hide="groupPaneGroup">{{ group.users | length }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="span4" ng-show="groupPaneGroup">
+          <div ng-class="_groupPaneClass" ng-show="groupPaneGroup">
             <div>
               <h3>{{ groupPaneGroup.id }}</h3>
               <br />
@@ -139,7 +164,7 @@
                     <td colspan="2">
                       <h5>
                         Users ({{ groupPaneGroup.users | length }})
-                        <span ng-click="addUser(groupPaneGroup)" class="pull-right"><i class="icon-plus"> </i></span>
+                        <span ng-click="addUserToGroup(groupPaneGroup)" class="pull-right"><i class="icon-plus"> </i></span>
                       </h5>
 
                       <ul class="nav">
@@ -155,8 +180,13 @@
             </form>
           </div>
         </div>
+      </div>
 
-        <div class="row tab-pane" id="capabilities">
+
+      <!-- ######## CAPABILITIES ######## -->
+
+      <div class="tab-pane" id="capabilities">
+        <div class="row">
           <div ng-class="_capabilityClass">
             <table class="table table-condensed table-hover">
               <thead>
@@ -170,13 +200,14 @@
               <tbody>
                 <tr ng-repeat="capability in capabilities | orderBy:sortField:sortReverse">
                   <td class="center"><input type="checkbox"></input></td>
-                  <td class="id"><a>{{ capability.id }}</a></td>
+                  <td class="id"><a>{{ capability.id | titleize }}</a></td>
                   <td>{{ capability.description }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+      </div>
 
       </div>
     </div>

@@ -23,7 +23,7 @@ module App
     helpers do
       def allowed_to?(key, *args)
         if @user and not Config.get('global.authentication.disable')
-          raise Errors::HttpForbidden.new("User #{@user.id} is denied the #{key} capability") unless @user.capability?(key, args)
+          halt [403, "User #{@user.id} is denied the #{key} capability"] unless @user.has_capability?(key, args)
         end
 
         true

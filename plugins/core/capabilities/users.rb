@@ -11,3 +11,4 @@ end
 
 # default simply checks if the user is granted a capability
 User.capability :list_users
+User.capability :update_user_type

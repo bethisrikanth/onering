@@ -33,7 +33,7 @@
       </div>
     </header>
 
-    <section class="content" ng-controller="LoginController">
+    <section class="content clear-navbar" ng-controller="LoginController">
       <div class="container">
         <div class="row">
           <div class="offset3 span6">
@@ -43,23 +43,28 @@
               <div class="control-group">
                 <label class="control-label" for="username">Username</label>
                 <div class="controls">
-                  <input type="text" id="username" ng-model="user.name" autofocus>
+                  <input ng-disabled="submitting" type="text" id="username" ng-model="user.name" autofocus required>
                 </div>
               </div>
 
               <div class="control-group">
                 <label class="control-label" for="password">Password</label>
                 <div class="controls">
-                  <input type="password" id="password" ng-model="user.password">
+                  <input ng-disabled="submitting" type="password" id="password" ng-model="user.password" required>
                 </div>
               </div>
 
               <div class="control-group">
                 <div class="controls">
-                  <button type="submit" class="btn btn-primary pull-right"><i class="icon-lock icon-white"></i>&nbsp;&nbsp;Log In</button>
+                  <button ng-disabled="submitting" type="submit" class="btn btn-primary pull-right"><i class="icon-lock icon-white"></i>&nbsp;&nbsp;Log In</button>
                 </div>
               </div>
             </form>
+
+            <div class="alert alert-error" ng-repeat="error in errors">
+              <button ng-click="clearErrors($index)" type="button" class="close" data-dismiss="alert">&times;</button>
+              <b>{{ error.type }}: </b>{{ error.message }}
+            </div>
           </div>
         </div>
       </div>

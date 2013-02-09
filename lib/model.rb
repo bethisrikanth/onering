@@ -98,6 +98,10 @@ module App
 
           rv
         end
+
+        def list(field, query=nil)
+          self.collection.distinct(field, query).compact.sort
+        end
       end
     end
 

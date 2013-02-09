@@ -9,6 +9,10 @@ config(['$routeProvider', function($routeProvider) {
     templateUrl: 'views/user-logout.html',
     controller:  LogoutController
   }).
+  when('/error', {
+    templateUrl: 'views/error.html',
+    controller:  ErrorController
+  }).
   otherwise({
     templateUrl: 'views/index.html'
   });

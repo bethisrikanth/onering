@@ -3,6 +3,10 @@
   "_type":       "Capability",
   "description": "Update any user's details"
 },{
+  "_id":         "update_user_type",
+  "_type":       "Capability",
+  "description": "Update the authentication backend for a user"
+},{
   "_id":         "get_user",
   "_type":       "Capability",
   "description": "Show any single user"
@@ -59,6 +63,14 @@
   "_type":       "Capability",
   "description": "Grant a group a given capability"
 },{
+  "_id":         "revoke_capability_from_user",
+  "_type":       "Capability",
+  "description": "Revoke a capability from a user"
+},{
+  "_id":         "revoke_capability_from_group",
+  "_type":       "Capability",
+  "description": "Revoke a capability from a group"
+},{
   "_id":         "delete_capability",
   "_type":       "Capability",
   "description": "Remove a capability from the system"
@@ -68,6 +80,7 @@
   "description": "Capabilities for managing users, groups, and permissions",
   "capabilities": [
     "update_user",
+    "update_user_type",
     "get_user",
     "list_users",
     "delete_user",
@@ -80,7 +93,11 @@
     "update_capbility",
     "get_capability",
     "list_capabilities",
-    "delete_capability"
+    "delete_capability",
+    "grant_capability_to_group",
+    "grant_capability_to_user",
+    "revoke_capability_from_group",
+    "revoke_capability_from_user"
   ],
   "groups": [
     "admins"

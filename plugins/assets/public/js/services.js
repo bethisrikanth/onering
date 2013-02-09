@@ -25,12 +25,14 @@ factory('Device', function($resource){
 }).
 factory('DeviceNote', function($resource){
   return $resource('/api/devices/:id/notes', {
-    id: '@id'
+    id: '@id',
+    severity: 'info'
   });
 }).
 factory('DeviceStat', function($resource){
   return $resource('/api/devices/:id/stats', {
-    id: '@id'
+    id: '@id',
+    severity: 'info'
   });
 }).
 factory('Site', function($resource){

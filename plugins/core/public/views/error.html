@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <h2>An error has occurred:</h2>
+
+      <br />
+      <br />
+
+      <div class="alert" ng-repeat="error in errors" ng-class="error.alertClass">
+        <b>{{ error.type }}: </b> {{ error.message }}
+        <div ng-show="error.backtrace">
+          <br />
+          <br />
+          <b>Backtrace:</b><br />
+          <tt style="font-size: smaller;" ng-repeat="line in error.backtrace">  {{ line }}</tt>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

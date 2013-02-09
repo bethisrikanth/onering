@@ -31,17 +31,17 @@
   <body ng-controller="GlobalController">
     <header class="navbar navbar-inverse navbar-fixed-top" ng-controller="NavigationController">
       <div class="navbar-inner">
+        <ul class="nav">
+          <li><a class="logo" href="/"><i>&nbsp;</i></a></li>
+        </ul>
+        
         <div ng-show="user">
           <ul class="nav">
-            <li><a class="logo" href="/"><i>&nbsp;</i></a></li>
-            <li class="divider-vertical"></li>
-            <li><a href="#/inf"><i class="icon-cog icon-white"></i> Overview</a></li>
-            <li class="divider-vertical"></li>
             <li class="dropdown">
               <a class="dropdown-toggle"
                data-toggle="dropdown"
                href="#">
-                <i class="icon-th-large icon-white"></i>&nbsp;Devices
+                <i class="icon-cog icon-white"></i>&nbsp;Infrastructure
                 <b class="caret"></b>
               </a>
 
@@ -112,7 +112,52 @@
             </li>
 
             <li class="divider-vertical"></li>
+
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-list-alt icon-white"></i>&nbsp;Applications
+                <b class="caret"></b>
+              </a>
+
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+              </ul>
+            </li>
+
+            <li class="divider-vertical"></li>
+
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="icon-wrench icon-white"></i>&nbsp;Settings
+                <b class="caret"></b>
+              </a>
+
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li><a href="#/users/manage">User Manager</a></li>
+              </ul>
+            </li>
+
+            <li class="divider-vertical"></li>
+
             <li><a><i class="icon-question-sign icon-white"></i>&nbsp;Help</a></li>
+
+            <li class="divider-vertical"></li>
+
+            <li class="dropdown" ng-show="errors.length > 0">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <span class="badge">{{ errors | length }} messages</span>
+              </a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                <li ng-repeat="error in errors">
+                  <a ng-click="clearErrors($index)">
+                    <b class="label" ng-class="error.labelClass" style="margin-bottom: 0.5em;">{{ error.code }} {{ error.type }}</b><br />{{ error.message }}
+                  </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <a ng-click="clearErrors()">Clear All Messages</a>
+                </li>
+              </ul>
+            </li>
           </ul>
 
           <ul class="nav" ng-hide="online">
@@ -131,20 +176,9 @@
                 <li><a href="#/logout"><i class="icon-arrow-right"></i> Logout</a></li>
               </ul>
             </li>
-            <li class="divider-vertical"></li>
           </ul>
 
           <form class="navbar-search pull-right" ng-controller="SearchController">
-            <span ng-show="errors.length > 0">
-              <a ng-click="show_errors=!show_errors" class="badge badge-important">{{ errors | length }} errors</a>&nbsp;&nbsp;
-            </span>
-
-            <!-- <div class="autocomplete errors ui-hide" ui-toggle="show_errors" ng-click="show_errors=false">
-              <div ng-repeat="error in errors">
-                <b>{{ error.name }}:</b> <span>{{ error.message }}</span>
-              </div>
-            </div> -->
-
             <input type="text" ng-model="query" class="search-query" placeholder="Search"
               ui-keypress="{'enter alt-space': 'goQuery()'}">
             <span ng-click="search_show_help=!search_show_help" class="add-on"><i class="icon-question-sign icon-white"></i></span>
@@ -216,6 +250,6 @@
       </div>
     </header>
 
-    <section class="content" ng-show="user" ng-view>
+    <section class="content clear-navbar" ng-show="user" ng-view>
   </body>
 </html>
