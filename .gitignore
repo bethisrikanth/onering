@@ -13,3 +13,4 @@ setup.sh
 *.sublime-workspace
 *.log
 /config/*.yaml
+/config/*/

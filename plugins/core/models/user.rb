@@ -6,7 +6,9 @@ class User < App::Model::Base
   timestamps!
 
   key :name,         String
+  key :email,        String
   key :client_keys,  Hash
+  key :options,      Hash
   key :logged_in_at, Time
 
   def groups

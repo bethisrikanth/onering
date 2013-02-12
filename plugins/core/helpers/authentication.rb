@@ -20,6 +20,15 @@ module App
 
       return false
     end
+
+    def ssl_verified?
+      (request.env['HTTP_X_CLIENT_VERIFY'] === 'SUCCESS')
+    end
+    
+    def ssl_hash(type)
+    # looks for ENVVAR X-SSL-(.*)
+      (request.env["HTTP_X_SSL_#{type.to_s.upcase}"] ? request.env["HTTP_X_SSL_#{type.to_s.upcase}"].to_s.sub(/^\//,'').split('/').collect{|i| i.split('=') } : nil)
+    end
   end
 
   class Base < Controller
@@ -27,9 +36,34 @@ module App
     before do
       unless Config.get('global.authentication.disable') then
         unless anonymous?(request.path)
-          session_start!
-          session! unless session?
-          @user = User.find(session[:user]) if session[:user]
+          # attempt SSL client key auth (if present)
+            if ssl_verified?
+              subject = ssl_hash(:subject)
+              issuer =  ssl_hash(:issuer)
+
+            # subject and issuer are required
+              if subject and issuer
+              # make sure issuer Organization's match
+                subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
+
+              # get user named by CN
+                @user = User.find(subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
+
+              # TODO
+              # ensure the key submitted matches the like-named key for this user
+              # does this mean i have to store the private key and sign this cert to "properly" verify it?
+              #
+              end
+            end
+
+          # if two-factor is enabled or SSL client key was not present
+            if (@user && @user.options['two_factor']) or not @user
+              session_start!
+              session! unless session?
+
+              @user = User.find(session[:user]) if session[:user]
+            end
+
           throw :halt, 401 unless @user
         end
       end
@@ -117,9 +151,11 @@ module App
 
       # update user type
         get '/:id/type/:type' do
-          allowed_to? :update_user_type, params[:id], params[:type]
+          id = (params[:id] == 'current' ? @user.id : params[:id])
 
-          user = User.find(params[:id])
+          allowed_to? :update_user_type, id, params[:type]
+
+          user = User.find(id)
           return 404 unless user
           user._type = params[:type]
           user.safe_save
@@ -127,51 +163,92 @@ module App
         end
 
       # generate a new client key for this user
-        get '/:id/ssl/new' do
-          #allowed_to? :generate_api_key, params[:id]
-          user = User.find(params[:id])
+        get '/:id/keys/:name' do
+          id = (params[:id] == 'current' ? @user.id : params[:id])
+
+          #allowed_to? :generate_api_key, id
+
+          user = User.find(id)
           return 404 unless user
 
-          keyfile = Config.get('global.authentication.ssl.ca.key')
-          crtfile = Config.get('global.authentication.ssl.ca.cert')
-          client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
+          if not user.client_keys[params[:name]]
+            keyfile = Config.get('global.authentication.ssl.ca.key')
+            crtfile = Config.get('global.authentication.ssl.ca.cert')
+            client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
 
-          halt 500, "OpenSSL is required to generate keys" unless defined?(OpenSSL)
-          halt 500, "Cannot find server CA key" unless File.readable?(keyfile)
-          halt 500, "Cannot find server CA certificate" unless File.readable?(crtfile)
+            halt 500, "OpenSSL is required to generate keys" unless defined?(OpenSSL)
+            halt 500, "Cannot find server CA key" unless File.readable?(keyfile)
+            halt 500, "Cannot find server CA certificate" unless File.readable?(crtfile)
 
-        # server cert details
-          cacert = OpenSSL::X509::Certificate.new(File.read(crtfile))
+          # server cert details
+            cacert = OpenSSL::X509::Certificate.new(File.read(crtfile))
 
-        # new client pkey
-          key = OpenSSL::PKey::RSA.new(File.read(keyfile))
+          # new client pkey
+            key = OpenSSL::PKey::RSA.new(File.read(keyfile))
 
-        # fill in new cert details
-          client_cert = OpenSSL::X509::Certificate.new
-          client_cert.subject = client_cert.issuer = OpenSSL::X509::Name.parse(client_subject)
-          client_cert.not_before = Time.now
-          client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
-          client_cert.public_key = key.public_key
-          client_cert.serial = 0x0
-          client_cert.version = 2
+          # fill in new cert details
+            client_cert = OpenSSL::X509::Certificate.new          
+            client_cert.subject = OpenSSL::X509::Name.parse(client_subject)
+            client_cert.issuer = cacert.issuer
+            client_cert.not_before = Time.now
+            client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
+            client_cert.public_key = key.public_key
+            client_cert.serial = 0x0
+            client_cert.version = 2
 
 
-        # this is happening now (for very present values of 'this')
-          ef = OpenSSL::X509::ExtensionFactory.new
-          ef.subject_certificate = client_cert
-          ef.issuer_certificate = client_cert
+          # add extensions (don't entirely know what these do)
+            ef = OpenSSL::X509::ExtensionFactory.new
+            ef.subject_certificate = client_cert
+            ef.issuer_certificate = cacert
 
-          client_cert.extensions = [
-            ef.create_extension("basicConstraints","CA:TRUE", true),
-            ef.create_extension("subjectKeyIdentifier", "hash")
-          ]
+            client_cert.extensions = [
+              ef.create_extension("basicConstraints","CA:TRUE", true),
+              ef.create_extension("subjectKeyIdentifier", "hash"),
+              ef.create_extension("authorityKeyIdentifier","keyid:always,issuer:always")
+            ]
 
-          client_cert.add_extension(ef.create_extension("authorityKeyIdentifier","keyid:always,issuer:always"))
+          # sign it
+            client_cert.sign(key, OpenSSL::Digest::SHA256.new)
 
-          client_cert.sign(key, OpenSSL::Digest::SHA1.new)
+          # save this key
+            user.client_keys[params[:name]] = {
+              :name => params[:name],
+              :pem  => client_cert.to_pem
+            }
 
-          content_type 'text/plain'
-          client_cert.to_pem
+            user.safe_save
+
+            content_type 'text/plain'
+
+          # allow saving the certificate in various container formats
+            case params[:cert]
+            when 'pem'
+            # optionally return the cert inline (default is to download)
+              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.pem" unless params[:inline]
+              return key.to_pem + "\n\n" + client_cert.to_pem
+            else
+            # optionally return the cert inline (default is to download)
+              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.p12" unless params[:inline]
+              return OpenSSL::PKCS12.create(params[:name], params[:name], key, client_cert).to_der rescue nil
+            end
+          else
+            halt 403, "Cannot download previously-generated key"
+          end
+        end
+
+        get '/:id/keys/:name/remove' do
+          id = (params[:id] == 'current' ? @user.id : params[:id])
+
+          #allowed_to? :remove_api_key, id
+
+          user = User.find(id)
+          return 404 unless user
+
+          user.client_keys.delete(params[:name])
+          user.safe_save
+
+          200
         end
       end
 

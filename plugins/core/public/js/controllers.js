@@ -139,6 +139,14 @@ function SearchController($scope, $http, $location, Query){
   };
 }
 
+
+function UserProfileController($scope, $http, CurrentUser){
+  CurrentUser.get({}, function(data){
+    $scope.user = data;
+  })
+}
+
+
 function UserManagerController($scope, $http, User, UserType, UserList, GroupList, CapabilityList){
 //USERS
   $scope.submitting = false;
