@@ -1,3 +1,5 @@
+require 'openssl'
+
 # user types
 require 'core/models/ldap_user'
 require 'core/models/pam_user'
@@ -43,7 +45,7 @@ module App
         end
 
       # get user types list
-        get '/list/types' do 
+        get '/list/types' do
           allowed_to? :list_users
           output(User.list(:_type))
         end
@@ -122,6 +124,54 @@ module App
           user._type = params[:type]
           user.safe_save
           output(user)
+        end
+
+      # generate a new client key for this user
+        get '/:id/ssl/new' do
+          #allowed_to? :generate_api_key, params[:id]
+          user = User.find(params[:id])
+          return 404 unless user
+
+          keyfile = Config.get('global.authentication.ssl.ca.key')
+          crtfile = Config.get('global.authentication.ssl.ca.cert')
+          client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
+
+          halt 500, "OpenSSL is required to generate keys" unless defined?(OpenSSL)
+          halt 500, "Cannot find server CA key" unless File.readable?(keyfile)
+          halt 500, "Cannot find server CA certificate" unless File.readable?(crtfile)
+
+        # server cert details
+          cacert = OpenSSL::X509::Certificate.new(File.read(crtfile))
+
+        # new client pkey
+          key = OpenSSL::PKey::RSA.new(File.read(keyfile))
+
+        # fill in new cert details
+          client_cert = OpenSSL::X509::Certificate.new
+          client_cert.subject = client_cert.issuer = OpenSSL::X509::Name.parse(client_subject)
+          client_cert.not_before = Time.now
+          client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
+          client_cert.public_key = key.public_key
+          client_cert.serial = 0x0
+          client_cert.version = 2
+
+
+        # this is happening now (for very present values of 'this')
+          ef = OpenSSL::X509::ExtensionFactory.new
+          ef.subject_certificate = client_cert
+          ef.issuer_certificate = client_cert
+
+          client_cert.extensions = [
+            ef.create_extension("basicConstraints","CA:TRUE", true),
+            ef.create_extension("subjectKeyIdentifier", "hash")
+          ]
+
+          client_cert.add_extension(ef.create_extension("authorityKeyIdentifier","keyid:always,issuer:always"))
+
+          client_cert.sign(key, OpenSSL::Digest::SHA1.new)
+
+          content_type 'text/plain'
+          client_cert.to_pem
         end
       end
 

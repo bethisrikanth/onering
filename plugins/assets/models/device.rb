@@ -29,9 +29,8 @@ class Device < App::Model::Base
   key :status,             String
   key :maintenance_status, String
 
-  def add_note(body, id=nil)
-    id = Time.now.to_i if not id or (id.to_i == 0)
-    id = id.to_s
+  def add_note(body, user_id)
+    id = Time.now.to_i.to_s
 
     if properties
       properties['notes'] = {} unless properties['notes']
@@ -41,6 +40,7 @@ class Device < App::Model::Base
         note = properties['notes'][id]
       else
         note = {
+          'user_id'    => user_id,
           'created_at' => now
         }
       end

@@ -1,0 +1,56 @@
+[{
+  "_id":         "update_asset",
+  "_type":       "Capability",
+  "description": "Update any asset object"
+},{
+  "_id":         "bulk_update_assets",
+  "_type":       "Capability",
+  "description": "Perform bulk updates to many assets at once"
+},{
+  "_id":         "remove_asset",
+  "_type":       "Capability",
+  "description": "Remove an asset object"
+},{
+  "_id":         "update_asset_note",
+  "_type":       "Capability",
+  "description": "Update the notes on any asset"
+},{
+  "_id":         "remove_asset_note",
+  "_type":       "Capability",
+  "description": "Remove a note on an asset"
+},{
+  "_id":         "query_assets",
+  "_type":       "Capability",
+  "description": "Issue a search for assets"
+},{
+  "_id":         "get_asset",
+  "_type":       "Capability",
+  "description": "Retrieve a single asset by ID"
+},{
+  "_id": "manage_assets",
+  "_type": "Capability",
+  "description": "Capabilities for creating, modifying and deleting assets",
+  "capabilities": [
+    "update_asset",
+    "bulk_update_assets",
+    "update_asset_note",
+    "remove_asset_note",
+    "get_asset",
+    "remove_asset",
+    "query_assets"
+  ],
+  "groups": [
+    "admins"
+  ]
+},{
+  "_id": "use_assets",
+  "_type": "Capability",
+  "description": "Capabilities for viewing and querying assets",
+  "capabilities": [
+    "get_asset",
+    "query_assets"
+  ],
+  "groups": [
+    "admins"
+  ]
+}]

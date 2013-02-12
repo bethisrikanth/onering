@@ -60,8 +60,8 @@
           <div class="alert alert-info" ng-repeat="(time, note) in device.properties.notes | orderBy:'id':true" id="note-{{ time }}">
             <button type="button" class="close" ng-click="deleteNote(time)">&times;</button>
             <button type="button" class="close" open-dialog="nodeComment" ng-click="editNote(time)"><i title="Edit" class="icon-pencil"></i>&nbsp;</button>
-            <b class="pull-left">{{ (time*1000) | date:'short' }}</b><br />
-            {{ note.body }}
+            <span class="pull-left"><b>{{ note.user_id }}</b> ({{ (time*1000) | date:'short' }}):</span></span><br />
+            <span>{{ note.body }}</span>
           </div>
         </li>
       </ul>

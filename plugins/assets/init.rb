@@ -65,18 +65,20 @@ module App
       }.each do |route|
         post route do
           json = JSON.parse(request.env['rack.input'].read)
-          json = [json] if json.is_a?(Hash)
+          halt 400, "Invalid JSON" unless json
 
-          json.each do |o|
-            id = (params[:id] || o['id'])
+          id = (params[:id] || json['id'])
 
-            device = Device.find_or_create(id)
+          allowed_to? :update_asset, id
 
-          # update the collected_at timestamp if this is an inventory run
-            device['collected_at'] = Time.now if o.delete('inventory')
+          device = Device.find_or_create(id)
+          return 404 unless device
 
-            device.from_json(o).safe_save
-          end
+        # update the collected_at timestamp if this is an inventory run
+          device['collected_at'] = Time.now if json.delete('inventory')
+
+        # load and save json
+          device.from_json(json).safe_save
 
           200
         end
@@ -89,7 +91,8 @@ module App
         post route do
           device = Device.find(params[:id])
           return 404 if not device
-          device.add_note(request.env['rack.input'].read)
+
+          device.add_note(request.env['rack.input'].read, @user.id)
           device.safe_save
 
           200
@@ -100,9 +103,13 @@ module App
           return 404 if not device
 
           if device.properties and device.properties['notes']
-            device.properties['notes'].delete(params[:note_id])
-            device.properties.delete('notes') if device.properties['notes'].empty?
-            device.safe_save
+            if device.properties['notes'][params[:note_id]]
+              allowed_to? :remove_asset_note, device.properties['notes'][params[:note_id]]
+
+              device.properties['notes'].delete(params[:note_id])
+              device.properties.delete('notes') if device.properties['notes'].empty?
+              device.safe_save
+            end
           end
 
           200

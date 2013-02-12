@@ -14,10 +14,14 @@ config(function($httpProvider){
           if(response.data.error){
         //  only reject severe issues
             switch(response.data.error.severity){
-              case 'info':
+              case 'ignore':
                 return response;
 
               case 'debug':
+              case 'info':
+                $rootScope.addError(response.data.error, response.status, response.data.error.severity);
+                return response;
+
               case 'warning':
                 $rootScope.addError(response.data.error, response.status, response.data.error.severity);
                 break;

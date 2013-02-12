@@ -14,9 +14,10 @@ module App
       super
     end
 
-    mime_type :json, "application/json"
 
     configure do
+      mime_type :json, 'application/json'
+
       set :root, ENV['PROJECT_ROOT']
       set :environment, ENV['RACK_ENV'].to_sym if ENV['RACK_ENV']
       set :protection, :except => :json_csrf
@@ -26,35 +27,7 @@ module App
       disable :raise_errors
       disable :debug
 
-      register Sinatra::AssetPack
       use MongoMapper::Middleware::IdentityMap
-
-      assets {
-        serve '/js',   :from => 'public/js'
-        serve '/css/', :from => 'public/css'
-        serve '/img',  :from => 'public/img'
-
-        js :app, '/js/app.js', [
-          "/js/vendor/jquery-1.8.2.min.js",
-          "/js/vendor/jquery-ui.js",
-          "/js/vendor/angular.min.js",
-          "/js/vendor/bootstrap.min.js",
-          "/js/vendor/moment.min.js",
-          "/js/vendor/angular-resource.min.js",
-          "/js/services.js",
-          "/js/directives.js",
-          "/js/filters.js",
-          "/js/main.js",
-          "/js/controllers.js",
-        ]
-
-        css :app, '/css/app.css', [
-          "/css/bootstrap.min.css",
-          "/css/bootstrap-responsive.min.css",
-          "/css/main.css"
-        ]
-      }
-
     end
 
     error do
@@ -109,7 +82,7 @@ module App
       }.to_json
     end
 
-    error 404 do 
+    error 404 do
       content_type 'application/json'
       message = (response.body.empty? ? "Resource #{request.path} does not exist" : [*response.body].join(','))
 
