@@ -1,0 +1,26 @@
+<div class="popover widget widget-chef-status" ng-controller="WidgetChefStatus">
+  <h2 class="popover-title">Chef Status</h2>
+  <div class="popover-content container-fluid">
+    <div class="row-fluid">
+      <table class="span2 table-condensed">
+        <tr ng-repeat="state in chefStates | orderBy:'count':true">
+          <td style="border: 0">
+            <a href="#/inf/show/chef.last_run.state:{{ state.id || 'unknown' }}" style="width: 95%;" class="label label-{{ state.id || 'unknown' }} text-center">
+              {{ (state.id || 'unknown') | titleize }}
+            </a>
+          </td>
+          <td style="font-size: 22px; border: 0">&nbsp;&nbsp;&nbsp;&nbsp;<b>{{ state.count }}</b></td>
+        </tr>
+      </table>
+
+      <div class="span10">
+        <blockchart
+            block-size="12"
+            height="8"
+            width="60"
+            data="chef_runs">
+        </blockchart>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,8 @@
 angular.module('assetsRoutes', ['ng']).
 config(['$routeProvider', function($routeProvider){
   $routeProvider.
-  when('/inf', {
-    templateUrl: 'views/sites.html',
+  when('/overview', {
+    templateUrl: 'views/overview.html',
     controller:  OverviewController
   }).
   when('/inf/summary/:field', {

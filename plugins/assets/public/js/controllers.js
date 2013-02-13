@@ -343,3 +343,29 @@ function RackerController($scope, $window, Query){
   $scope.recheck();
   $window.setInterval($scope.recheck, 2000);
 }
+
+
+
+
+function WidgetFieldSummary($scope, $http, $window){
+  if(!$scope.currentField) $scope.currentField = 'status';
+
+  $scope.selectField = function(field, query){
+    if(!query) query = '';
+
+    $http.get('/api/devices/summary/by-'+field+'/?severity=info').success(function(data){
+      $scope.summary = data;
+    });
+  }
+
+  $scope.$watch('currentField', function(value){
+    $scope.selectField(value);
+  });
+
+  $scope.reload = function(){
+    $scope.selectField($scope.currentField);
+  }
+
+  $scope.reload();
+  $window.setInterval($scope.reload, 30000);
+}

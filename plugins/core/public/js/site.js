@@ -3,5 +3,6 @@ angular.module('app', [
   'corePlugin',
   'assetsPlugin',
   'nagiosPlugin',
-  'provisioningPlugin'
+  'provisioningPlugin',
+  'chefPlugin'
 ]);

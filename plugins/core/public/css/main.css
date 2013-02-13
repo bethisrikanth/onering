@@ -410,3 +410,48 @@ i.normal{
 .provisioning td.unit{
   width: 5%;
 }
+
+.popover.widget{
+  position: relative;
+  display: block;
+  width: auto;
+  max-width: none;
+  margin-bottom: 2.5em;
+}
+
+.popover.widget .popover-title{
+  font-weight: bold;
+}
+
+
+
+/*blockchart*/
+
+.blockchart .background{
+  fill: #F2F2F2;
+}
+
+.blockchart line{
+  stroke: #FFF;
+  stroke-width: 2;
+}
+
+.blockchart .bar:hover{
+  fill: #AAA;
+}
+
+.blockchart .plot rect{
+  fill: #b94a48;
+}
+
+.commits .plot rect{
+  fill: #3A87AD;
+}
+
+.commits line.vertical{
+  stroke-width: 12;
+}
+
+.commits .background{
+  fill: transparent;
+}

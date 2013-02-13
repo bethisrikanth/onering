@@ -1,0 +1,15 @@
+<div class="popover widget widget-field-summary" ng-controller="WidgetFieldSummary">
+  <h2 class="popover-title">{{ currentField | titleize }} Summary</h2>
+  <div class="popover-content">
+    <table class="table-condensed">
+      <tr ng-repeat="field in summary | orderBy:'count':true">
+        <td style="border: 0">
+          <a href="#/inf/show/status:{{ field.id || 'unknown' }}" style="width: 95%;" class="label label-{{ field.id || 'unknown' }} text-center">
+            {{ (field.id || 'unknown') | titleize }}
+          </a>
+        </td>
+        <td style="font-size: 22px; border: 0">&nbsp;&nbsp;&nbsp;&nbsp;<b>{{ field.count }}</b></td>
+      </tr>
+    </table>
+  </div>
+</div>

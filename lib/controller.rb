@@ -18,6 +18,10 @@ module App
 
     before do
       headers 'Access-Control-Allow-Headers' => 'origin, x-requested-with, accept'
+
+    # handle query modifiers
+      App::Model::Base.query_limit = params[:limit].to_i if params[:limit]
+      App::Model::Base.query_offset = params[:offset].to_i if params[:offset]
     end
 
     helpers do

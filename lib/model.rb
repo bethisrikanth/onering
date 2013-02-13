@@ -83,6 +83,18 @@ module App
       include Utils
 
       class<<self
+        alias :_mongo_find :find
+        attr_accessor :query_limit
+        attr_accessor :query_offset
+
+        def find(id)
+          q = self._mongo_find(id)
+          q.limit(query_limit) if query_limit
+          q.skip(query_offset) if query_offset
+          q
+        end
+
+
         def find_or_create(ids, init={})
           rv = find(ids)
 
@@ -100,7 +112,9 @@ module App
         end
 
         def list(field, query=nil)
-          self.collection.distinct(field, query).compact.sort
+          rv = self.collection.distinct(field, query).compact.sort
+          rv = rv[(query_offset.to_i)..(query_offset.to_i + (query_limit || rv.length))]
+          rv
         end
       end
     end
