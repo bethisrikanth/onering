@@ -1,9 +1,23 @@
+$: << File.join(ENV['PROJECT_ROOT'], 'lib')
+$: << File.join(ENV['PROJECT_ROOT'], 'plugins')
+
 require 'rubygems'
+require 'rack/webconsole'
+require 'mongo_patches'
+require 'config'
+require 'db'
 require 'utils'
 require 'patches'
 require 'model'
 require 'controller'
 require 'sinatra/assetpack'
+
+# require plugins
+Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
+  name = File.basename(p)
+  require "#{name}/init"
+end
+
 
 module App
   class Base < Controller

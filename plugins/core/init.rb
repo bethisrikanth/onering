@@ -1,17 +1,8 @@
 require 'controller'
-require 'core/helpers/authentication'
 require 'sinatra/session'
 
 module App
   class Base < Controller
-    include Helpers
-    register Sinatra::Session
-
-    configure do
-      set :session_fail, '/login.html'
-      set :session_secret, 'abc123zyx987'
-    end
-
     before do
     # force SSL redirect
       if Config.get('global.force_ssl')

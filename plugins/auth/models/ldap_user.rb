@@ -1,4 +1,4 @@
-require 'core/models/user'
+require 'auth/models/user'
 
 class LdapUser < User
   class<<self

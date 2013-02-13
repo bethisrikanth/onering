@@ -1,5 +1,5 @@
 require 'pam'
-require 'core/models/user'
+require 'auth/models/user'
 
 class PamUser < User
   CONVERSATION = Proc.new do |messages, data|

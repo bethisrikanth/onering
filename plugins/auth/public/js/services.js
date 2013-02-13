@@ -1,24 +1,24 @@
-angular.module('coreService', ['ngResource']).
+angular.module('authService', ['ngResource']).
 factory('User', function($resource){
-  return $resource('/api/core/users/:user', {
+  return $resource('/api/users/:user', {
     user: '@user'
   });
 }).
 factory('CurrentUser', function($resource){
-  return $resource('/api/core/users/current');
+  return $resource('/api/users/current');
 }).
 factory('UserList', function($resource){
-  return $resource('/api/core/users/list');
+  return $resource('/api/users/list');
 }).
 factory('UserType', function($resource){
-  return $resource('/api/core/users/:user/type/:type', {
+  return $resource('/api/users/:user/type/:type', {
     user: '@user',
     type: '@type'
   });
 }).
 factory('GroupList', function($resource){
-  return $resource('/api/core/groups/list');
+  return $resource('/api/groups/list');
 }).
 factory('CapabilityList', function($resource){
-  return $resource('/api/core/capabilities/list');
+  return $resource('/api/capabilities/list');
 });

@@ -22,7 +22,7 @@ class String
   end
 
   def to_bool
-    self.chomp.strip =~ /^(true|on|yes|y|1)$/i
+    (self.chomp.strip =~ /^(?:true|on|yes|y|1)$/i) != nil
   end
 end
 
@@ -77,7 +77,7 @@ class Hash
     if value
       root[path.last] = value
     else
-      root.reject!{|k,v| k.to_sym == path.last.to_sym } 
+      root.reject!{|k,v| k.to_sym == path.last.to_sym }
     end
 
     self
@@ -139,7 +139,7 @@ class Hash
 
     each_recurse do |k,v,path|
       path = path.join('.')
-      
+
       if v.is_a?(Array)
         v.reject!{|i| _is_empty?(i) }
         unset(path) if v.empty?

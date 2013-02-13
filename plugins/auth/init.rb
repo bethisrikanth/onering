@@ -1,75 +1,89 @@
 require 'openssl'
+require 'auth/helpers/helpers'
 
 # user types
-require 'core/models/ldap_user'
-require 'core/models/pam_user'
+require 'auth/models/pam_user'
+require 'auth/models/device_user'
 
-require 'core/models/group'
-require 'core/models/capability'
+require 'auth/models/group'
+require 'auth/models/capability'
 
 module App
-  module Helpers
-    def anonymous?(path)
-      %w{
-        /
-        /api
-        /api/core/users/login
-      }.each do |p|
-        return true if path == p
-      end
-
-      return false
-    end
-
-    def ssl_verified?
-      (request.env['HTTP_X_CLIENT_VERIFY'] === 'SUCCESS')
-    end
-    
-    def ssl_hash(type)
-    # looks for ENVVAR X-SSL-(.*)
-      (request.env["HTTP_X_SSL_#{type.to_s.upcase}"] ? request.env["HTTP_X_SSL_#{type.to_s.upcase}"].to_s.sub(/^\//,'').split('/').collect{|i| i.split('=') } : nil)
-    end
-  end
-
   class Base < Controller
+    include Helpers
+    register Sinatra::Session
+
+    configure do
+      set :session_fail, '/login.html'
+
+    # get session secret from config
+    # TODO: should this rotate at all?
+      set :session_secret, Config.get('global.authentication.session.secret')
+    end
+
   # session based authentication
     before do
-      unless Config.get('global.authentication.disable') then
-        unless anonymous?(request.path)
-          # attempt SSL client key auth (if present)
-            if ssl_verified?
-              subject = ssl_hash(:subject)
-              issuer =  ssl_hash(:issuer)
+      unless anonymous?(request.path)
+        # attempt SSL client key auth (if present)
+          if ssl_verified?
+            subject = ssl_hash(:subject)
+            issuer =  ssl_hash(:issuer)
 
-            # subject and issuer are required
-              if subject and issuer
-              # make sure issuer Organization's match
-                subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
+          # subject and issuer are required
+            if subject and issuer
+            # make sure issuer Organization's match
+              subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
 
-              # get user named by CN
-                @user = User.find(subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
+            # get OU, CN
+              ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
+              cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
 
-              # TODO
-              # ensure the key submitted matches the like-named key for this user
-              # does this mean i have to store the private key and sign this cert to "properly" verify it?
-              #
+            # if SSL subject is .../OU=System/CN=Validation
+              if cn
+                if ou == 'System'
+                  if cn == 'Validation'
+                    @bootstrapUser = true
+                  else
+                    halt 403, "Invalid system certificate presented"
+                  end
+                else
+                  @bootstrapUser = false
+
+                # get user named by CN
+                  @user = User.find(cn) rescue nil
+                end
               end
+
+            # TODO
+            # ensure the key submitted matches the like-named key for this user
+            # does this mean i have to store the private key and sign this cert to "properly" verify it?
+            #
             end
+          end
 
-          # if two-factor is enabled or SSL client key was not present
-            if (@user && @user.options['two_factor']) or not @user
-              session_start!
-              session! unless session?
+        # if two-factor is enabled or SSL client key was not present
+          if (@user && @user.options['two_factor']) or not @user
+            session_start!
 
-              @user = User.find(session[:user]) if session[:user]
-            end
+          # ===================================================================
+          # HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX!
+          # -------------------------------------------------------------------
+          # authentication bypass hack: REMOVE THIS AFTER ROLLOUT
+            session[:user] = Config.get('global.authentication.autologin') if Config.get('global.authentication.autologin')
+          # -------------------------------------------------------------------
+          # HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX!
+          # ===================================================================
 
-          throw :halt, 401 unless @user
-        end
+            session! unless session?
+
+            @user = User.find(session[:user]) if session[:user]
+          end
+
+        throw :halt, 401 unless @user
       end
     end
 
-    namespace '/api/core' do
+    namespace '/api' do
     # user management
       namespace '/users' do
       # get user list
@@ -84,6 +98,7 @@ module App
           output(User.list(:_type))
         end
 
+      # perform session login
         post '/login' do
           json = JSON.load(request.env['rack.input'].read)
 
@@ -166,6 +181,12 @@ module App
         get '/:id/keys/:name' do
           id = (params[:id] == 'current' ? @user.id : params[:id])
 
+        # this is also where pre-validated devices go to retrieve their API key
+          if @bootstrapUser === true and not id === 'current'
+            DeviceUser.find_or_create(id, {})
+          end
+
+
           #allowed_to? :generate_api_key, id
 
           user = User.find(id)
@@ -187,7 +208,7 @@ module App
             key = OpenSSL::PKey::RSA.new(File.read(keyfile))
 
           # fill in new cert details
-            client_cert = OpenSSL::X509::Certificate.new          
+            client_cert = OpenSSL::X509::Certificate.new
             client_cert.subject = OpenSSL::X509::Name.parse(client_subject)
             client_cert.issuer = cacert.issuer
             client_cert.not_before = Time.now
