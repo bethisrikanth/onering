@@ -18,7 +18,7 @@ module App
 
     # get session secret from config
     # TODO: should this rotate at all?
-      set :session_secret, Config.get('global.authentication.session.secret')
+      set :session_secret, File.read(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key'))
     end
 
   # session based authentication
@@ -189,6 +189,8 @@ module App
 
           #allowed_to? :generate_api_key, id
 
+
+          # TODO: need to specify DeviceUser separately, or default filter out device users on /api/users/list
           user = User.find(id)
           return 404 unless user
 
