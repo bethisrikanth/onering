@@ -25,7 +25,7 @@ class PamUser < User
 
   def authenticate!(options={})
     if super
-      service = App::Config.get('global.authentication.pam.service')
+      service = App::Config.get('global.authentication.methods.pam.service')
       options[:username] = id
 
       begin
