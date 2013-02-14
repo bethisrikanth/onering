@@ -11,4 +11,6 @@ end
 
 # default simply checks if the user is granted a capability
 User.capability :list_users
+User.capability :list_machines
 User.capability :update_user_type
+User.capability :delete_user

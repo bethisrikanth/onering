@@ -45,6 +45,7 @@ GEM
     jsmin (1.0.1)
     json (1.7.6)
     liquid (2.4.1)
+    listen (0.7.2)
     log4r (1.1.10)
     mime-types (1.21)
     mongo (1.8.2)
@@ -78,7 +79,11 @@ GEM
       rack (>= 1.0)
       rack-test (>= 0.5)
     rake (10.0.3)
+    rb-inotify (0.9.0)
+      ffi (>= 0.5.0)
     rdiscount (2.0.7)
+    rerun (0.8.0)
+      listen
     ripl (0.5.1)
       bond (~> 0.4.0)
     ripl-multi_line (0.3.0)
@@ -100,8 +105,6 @@ GEM
       multi_json (~> 1.0)
       rubyzip
       websocket (~> 1.0.4)
-    shotgun (0.9)
-      rack (>= 1.0)
     sinatra (1.3.4)
       rack (~> 1.4)
       rack-protection (~> 1.3)
@@ -143,7 +146,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport
   addressable
   bson_ext
   capybara
@@ -162,10 +164,11 @@ DEPENDENCIES
   rack-webconsole
   racksh
   rake
+  rb-inotify
   rdiscount
+  rerun
   rspec
   ruby-pam
-  shotgun
   sinatra
   sinatra-assetpack
   sinatra-contrib

@@ -2,11 +2,9 @@ require 'rubygems'
 require 'cucumber'
 require 'cucumber/rake/task'
 
-namespace :test do
-  Cucumber::Rake::Task.new(:integration) do |t|
-    desc "Run API backend integration tests"
-    t.cucumber_opts = "features plugins/*/features"
-  end
+Cucumber::Rake::Task.new(:test) do |t|
+desc "Run API backend integration tests"
+  t.cucumber_opts = "features plugins/*/features"
 end
 
 

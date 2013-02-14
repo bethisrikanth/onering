@@ -62,7 +62,7 @@ module App
           end
 
         # if two-factor is enabled or SSL client key was not present
-          if (@user && @user.options['two_factor']) or not @user
+          if (@user && @user.options['two_factor']) or (not @user and not @bootstrapUser)
             session_start!
 
           # ===================================================================
@@ -79,7 +79,7 @@ module App
             @user = User.find(session[:user]) if session[:user]
           end
 
-        throw :halt, 401 unless @user
+        throw :halt, 401 unless @user or @bootstrapUser
       end
     end
 
@@ -89,7 +89,16 @@ module App
       # get user list
         get '/list' do
           allowed_to? :list_users
-          output(User.all.collect{|i| i.to_h })
+          output(User.all({
+            :_type.ne => Config.get('global.authentication.machine_user_type', 'DeviceUser')
+          }).collect{|i| i.to_h })
+        end
+
+        get '/list/machines' do
+          allowed_to? :list_machines
+          output(User.all({
+            :_type => Config.get('global.authentication.machine_user_type', 'DeviceUser')
+          }).collect{|i| i.to_h })
         end
 
       # get user types list
@@ -164,6 +173,14 @@ module App
           end
         end
 
+      # delete user
+        delete '/:id' do
+          allowed_to? :delete_user
+
+          User.destroy(params[:id])
+          200
+        end
+
       # update user type
         get '/:id/type/:type' do
           id = (params[:id] == 'current' ? @user.id : params[:id])
@@ -179,7 +196,9 @@ module App
 
       # generate a new client key for this user
         get '/:id/keys/:name' do
-          id = (params[:id] == 'current' ? @user.id : params[:id])
+          id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
+
+          STDERR.puts @bootstrapUser.inspect
 
         # this is also where pre-validated devices go to retrieve their API key
           if @bootstrapUser === true and not id === 'current'
@@ -189,8 +208,6 @@ module App
 
           #allowed_to? :generate_api_key, id
 
-
-          # TODO: need to specify DeviceUser separately, or default filter out device users on /api/users/list
           user = User.find(id)
           return 404 unless user
 
@@ -237,7 +254,7 @@ module App
           # save this key
             user.client_keys[params[:name]] = {
               :name => params[:name],
-              :pem  => client_cert.to_pem
+              :public_key => client_cert.to_pem
             }
 
             user.safe_save

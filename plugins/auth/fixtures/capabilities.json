@@ -15,6 +15,10 @@
   "_type":       "Capability",
   "description": "List all users and their details"
 },{
+  "_id":         "list_machines",
+  "_type":       "Capability",
+  "description": "List all machine users and their details"
+},{
   "_id":         "delete_user",
   "_type":       "Capability",
   "description": "Delete any user completely from the system"
@@ -83,6 +87,7 @@
     "update_user_type",
     "get_user",
     "list_users",
+    "list_machines",
     "delete_user",
     "update_group",
     "get_group",
