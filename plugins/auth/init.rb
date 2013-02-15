@@ -1,5 +1,6 @@
 require 'openssl'
 require 'auth/helpers/helpers'
+require 'sinatra/session'
 
 # user types
 require 'auth/models/pam_user'
