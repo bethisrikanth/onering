@@ -10,7 +10,6 @@ require 'utils'
 require 'patches'
 require 'model'
 require 'controller'
-require 'sinatra/assetpack'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
