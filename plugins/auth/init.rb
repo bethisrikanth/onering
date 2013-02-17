@@ -300,6 +300,28 @@ module App
           output(group)
         end
 
+      # update group
+        post '/:group' do
+          allowed_to? :update_group, params[:group]
+
+          json = JSON.load(request.env['rack.input'].read)
+
+          if json
+          # remove certain fields
+            json.delete_if{|k,v|
+              k =~ /(?:^_?id$|^_?type$|_at$)/
+            }
+
+            group = Group.find_or_create(id)
+            group.from_json(json).safe_save
+            group.reload
+
+            output(group)
+          else
+            raise "Invalid JSON submitted"
+          end
+        end
+
       # add user to group
         get '/:group/add/:user' do
           allowed_to? :add_to_group, params[:group], params[:user]

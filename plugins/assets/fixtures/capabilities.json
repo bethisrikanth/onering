@@ -49,8 +49,5 @@
   "capabilities": [
     "get_asset",
     "query_assets"
-  ],
-  "groups": [
-    "admins"
   ]
 }]
