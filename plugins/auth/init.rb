@@ -25,62 +25,51 @@ module App
   # session based authentication
     before do
       unless anonymous?(request.path)
-        # attempt SSL client key auth (if present)
-          if ssl_verified?
-            subject = ssl_hash(:subject)
-            issuer =  ssl_hash(:issuer)
+        @bootstrapUser = false
 
-          # subject and issuer are required
-            if subject and issuer
-            # make sure issuer Organization's match
-              subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
+      # attempt SSL client key auth (if present)
+        if ssl_verified?
+          subject = ssl_hash(:subject)
+          issuer =  ssl_hash(:issuer)
 
-            # get OU, CN
-              ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
-              cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
+        # subject and issuer are required
+          if subject and issuer
+          # make sure issuer Organization's match
+            subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
 
-            # if SSL subject is .../OU=System/CN=Validation
-              if cn
-                if ou == 'System'
-                  if cn == 'Validation'
-                    @bootstrapUser = true
-                  else
-                    halt 403, "Invalid system certificate presented"
-                  end
+          # get OU, CN
+            ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
+            cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
+
+          # if SSL subject is .../OU=System/CN=Validation
+            if cn
+              if ou == 'System'
+                if cn == 'Validation'
+                  @bootstrapUser = true
                 else
-                  @bootstrapUser = false
-
-                # get user named by CN
-                  @user = User.find(cn) rescue nil
+                  halt 403, "Invalid system certificate presented"
                 end
+              else
+              # get user named by CN
+                @user = User.find(cn) rescue nil
               end
-
-            # TODO
-            # ensure the key submitted matches the like-named key for this user
-            # does this mean i have to store the private key and sign this cert to "properly" verify it?
-            #
             end
+
+          # TODO
+          # ensure the key submitted matches the like-named key for this user
+          # does this mean i have to store the private key and sign this cert to "properly" verify it?
+          #
           end
+        end
 
-        # if two-factor is enabled or SSL client key was not present
-          if (@user && @user.options['two_factor']) or (not @user and not @bootstrapUser)
-            session_start!
+      # if two-factor is enabled or SSL client key was not present
+        if (@user && @user.options['two_factor']) or (not @user and not @bootstrapUser)
+          session_start!
+          session! unless session?
+          @user = User.find(session[:user]) if session[:user]
+        end
 
-          # ===================================================================
-          # HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX!
-          # -------------------------------------------------------------------
-          # authentication bypass hack: REMOVE THIS AFTER ROLLOUT
-            session[:user] = Config.get('global.authentication.autologin') if Config.get('global.authentication.autologin')
-          # -------------------------------------------------------------------
-          # HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX! HAX!
-          # ===================================================================
-
-            session! unless session?
-
-            @user = User.find(session[:user]) if session[:user]
-          end
-
-        throw :halt, 401 unless @user or @bootstrapUser
+        halt 401, "Invalid authentication request" unless @user or @bootstrapUser
       end
     end
 
