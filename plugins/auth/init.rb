@@ -312,7 +312,7 @@ module App
               k =~ /(?:^_?id$|^_?type$|_at$)/
             }
 
-            group = Group.find_or_create(id)
+            group = Group.find_or_create(params[:group])
             group.from_json(json).safe_save
             group.reload
 
