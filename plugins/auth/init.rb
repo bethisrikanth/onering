@@ -35,7 +35,7 @@ module App
         # subject and issuer are required
           if subject and issuer
           # make sure issuer Organization's match
-            subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
+            #subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
 
           # get OU, CN
             ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
@@ -53,6 +53,8 @@ module App
               # get user named by CN
                 @user = User.find(cn) rescue nil
               end
+            else
+              halt 403, "Invalid client certificate presented"
             end
 
           # TODO
