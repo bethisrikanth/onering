@@ -223,7 +223,7 @@ module App
             client_cert.subject = OpenSSL::X509::Name.parse(client_subject)
             client_cert.issuer = cacert.issuer
             client_cert.not_before = Time.now
-            client_cert.not_after = Time.now + ((Integer(Config.get!('global.authentication.methods.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
+            client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.methods.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
             client_cert.public_key = key.public_key
             client_cert.serial = 0x0
             client_cert.version = 2
