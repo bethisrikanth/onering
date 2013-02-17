@@ -347,6 +347,17 @@ module App
           group.users.delete(user.id) && group.safe_save
           output(group)
         end
+
+      # grant group a given capability
+        get '/:group/grant/:capability' do
+          allowed_to? :grant_capability_to_group, params[:capability], params[:group]
+          group = Group.find(params[:group])
+          capability = Capability.find(params[:capability])
+          return 404 unless group and capability
+
+          capability.groups << group.id && capability.safe_save
+          200
+        end
       end
 
     # capability management
