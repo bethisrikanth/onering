@@ -213,8 +213,8 @@ module App
           return 404 unless user
 
           if not user.client_keys[params[:name]]
-            keyfile = Config.get('global.authentication.ssl.ca.key')
-            crtfile = Config.get('global.authentication.ssl.ca.cert')
+            keyfile = Config.get!('global.authentication.methods.ssl.ca.key')
+            crtfile = Config.get!('global.authentication.methods.ssl.ca.cert')
             client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
 
             halt 500, "OpenSSL is required to generate keys" unless defined?(OpenSSL)
@@ -232,7 +232,7 @@ module App
             client_cert.subject = OpenSSL::X509::Name.parse(client_subject)
             client_cert.issuer = cacert.issuer
             client_cert.not_before = Time.now
-            client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
+            client_cert.not_after = Time.now + ((Integer(Config.get!('global.authentication.methods.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
             client_cert.public_key = key.public_key
             client_cert.serial = 0x0
             client_cert.version = 2
