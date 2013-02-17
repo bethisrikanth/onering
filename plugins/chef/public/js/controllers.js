@@ -30,5 +30,5 @@ function WidgetChefStatus($scope, $http, $window){
     });
   }
 
-  $window.setInterval($scope.reload, 1000);
+  //$window.setInterval($scope.reload, 1000);
 }
