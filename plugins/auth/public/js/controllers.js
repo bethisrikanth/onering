@@ -156,6 +156,11 @@ function UserManagerController($scope, $http, User, UserType, UserList, GroupLis
   $scope.reloadUsers = function(){
     UserList.query({}, function(data){
       $scope.users = data;
+      if($scope.userPaneUser){
+        $scope.userPaneUser = $.grep($scope.users, function(n){
+          return (n.id == $scope.userPaneUser.id);
+        })[0];
+      }
     });
   }
 

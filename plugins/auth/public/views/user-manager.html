@@ -33,7 +33,7 @@
             <br />
           </div>
         </div>
-        
+
         <div class="row">
           <div ng-class="_userClass">
             <table class="table table-condensed table-hover">
@@ -89,6 +89,11 @@
               <div class="control-group">
                 <label class="control-label" for="user.groups">Groups ({{ userPaneUser.groups | length }})</label>
                 <div class="controls">
+                  <select ui-select2 ng-change="addUserToGroup(userPaneUser.id, selectedGroup)" ng-model="selectedGroup">
+                    <option data-placeholer>Select a group to add</option>
+                    <option ng-repeat="group in groups" value="{{ group.id }}">{{ group.id | titleize }}</option>
+                  </select>
+
                   <ul class="nav">
                     <li ng-repeat="group in userPaneUser.groups">
                       <span>{{ group | titleize }}</span>
