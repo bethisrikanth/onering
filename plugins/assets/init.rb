@@ -241,12 +241,11 @@ module App
         /list/stale/:age
       }.each do |r|
         get r do
-          output Device.where({
+          output(Device.list('id', {
             'collected_at' => {
               '$lte' => (params[:age] || 4).to_i.hours.ago
-            },
-            'tags' => 'auto'
-          })
+            }
+          }))
         end
       end
 
@@ -258,7 +257,7 @@ module App
       }.each do |r|
         get r do
           q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
-          output Device.list(params[:field], q)
+          output Device.list(params[:field], urlquerypath_to_mongoquery(q))
         end
       end
 

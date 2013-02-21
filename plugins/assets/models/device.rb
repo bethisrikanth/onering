@@ -103,7 +103,6 @@ class Device < App::Model::Base
   # list
   #   list distinct values for a field
     def list(field, query=nil)
-      query = urlquerypath_to_mongoquery(query) if query
       field = case field
       when 'id' then '_' + field
       when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
