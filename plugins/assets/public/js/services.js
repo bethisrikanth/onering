@@ -20,7 +20,8 @@ factory('Query', function($resource){
 }).
 factory('Device', function($resource){
   return $resource('/api/devices/:id', {
-    id: '@id'
+    id:       '@id',
+    children: true
   });
 }).
 factory('DeviceNote', function($resource){

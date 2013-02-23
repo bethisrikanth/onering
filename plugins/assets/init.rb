@@ -12,8 +12,13 @@ module App
       get '/:id' do
         device = Device.find(params[:id])
         return 404 if not device
+        d = device.to_h
 
-        output(filter_hash(device.to_h, :properties))
+        d[:children] = device.children.collect{|i|
+          filter_hash(i.to_h, :properties)
+        } if params[:children]
+
+        output(filter_hash(d, :properties))
       end
 
       delete '/:id' do
@@ -44,6 +49,70 @@ module App
           200
         end
       end
+
+      get '/:id/parent' do
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device and device.parent_id and device.parent
+        output(filter_hash(device.parent.to_h, :properties))
+      end
+
+      get '/:id/children' do
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device
+        output(device.children.collect{|i|
+          allowed_to?(:get_asset, i.id) rescue next
+          filter_hash(i.to_h, :properties)
+        })
+      end
+
+
+    # child management operations
+      get '/:id/children/:action/?*/?' do
+        allowed_to? :update_asset, params[:id]
+        device = Device.find(params[:id])
+        action = params[:action].to_s.downcase.to_sym
+        child_ids = params[:splat].first.split('/')
+        return 404 unless device
+
+
+      # set operation works on all children
+        if action == :set or action == :unset
+          children = Device.where({
+            :parent_id => params[:id]
+          }).to_a
+
+        # an empty existing set means we're just going to take the incoming set as gospel
+          if children.empty? and action == :set
+            children = Device.find(child_ids)
+          end
+        else
+      # add/remove can operate exclusively on named child IDs
+          children = Device.find(child_ids)
+        end
+
+        children.each do |child|
+          allowed_to?(:update_asset, child.id) rescue next
+
+          case action
+          when :add    then child.parent_id = params[:id]
+          when :remove, :unset then child.parent_id = nil
+          when :set    then
+          # if the current child is in the set, set its parent
+            if child_ids.include?(child.id)
+              child.parent_id = params[:id]
+            else
+              child.parent_id = nil
+            end
+          end
+
+          child.safe_save
+        end
+
+        output(device)
+      end
+
 
       # /devices/find/stats
       # search for devices stats by
