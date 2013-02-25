@@ -105,6 +105,7 @@ module App
             glu_agents[entry['agent']]['tags'] = [glu_agents[entry['agent']]['tags'] + (entry['tags'] rescue [])].flatten.uniq.sort
           end
 
+        # save glu data
           glu_agents.each do |name, glu_properties|
             device = Device.find_by_name(name)
 
@@ -129,6 +130,15 @@ module App
               device['properties']['glu'] = glu_properties
               device.safe_save
             end
+          end
+
+        # remove glu properties from hosts not appearing in the glu.json
+          glu_missing = (Device.where({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
+          glu_missing.each do |node|
+            node = Device.find_by_name(node)
+            next unless node
+            node.properties[:glu] = nil
+            node.safe_save rescue next
           end
         end
 
