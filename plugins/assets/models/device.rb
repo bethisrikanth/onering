@@ -16,7 +16,7 @@ class Device < App::Model::Base
   before_validation :_confine_status
   before_validation :_confine_maintenance_status
   before_save       :_compact
-  validate          :_id_pattern_valid?
+#  validate          :_id_pattern_valid?
 
   timestamps!
 
