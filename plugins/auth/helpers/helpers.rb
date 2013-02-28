@@ -6,7 +6,7 @@ module App
         ^/api/?$
         ^/api/users/login/?$
         ^/api/users/machine/?.*$
-        ^/api/provision/.*$
+        ^/api/provision/?.*$
       }.each do |p|
         return true if path =~ Regexp.new(p)
       end
