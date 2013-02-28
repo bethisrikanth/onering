@@ -44,6 +44,10 @@ selinux --disabled
 
 {% include 'boot/kickstart/pre/log' %}
 
+{% if device.properties.provisioning.disk.type == 'gpt' %}
+{% include 'boot/kickstart/pre/gpt' %}
+{% endif %}
+
 # =============================================================================
 # POST-INSTALL SCRIPTS
 %post
