@@ -54,7 +54,7 @@ namespace :ssl do
     validation_pem  = './config/ssl/validation.pem'
     subject         = "#{ App::Config.get!('global.authentication.methods.ssl.subject_prefix').sub(/\/$/,'') }/OU=System/CN=Validation"
 
-    raise "#{validation_pem} already exists!" if File.size?(validation_pem)
+    raise "Cannot generate validation certificate, #{validation_pem} already exists!" if File.size?(validation_pem)
 
   # load CA certificate and keys
     ca_crt = OpenSSL::X509::Certificate.new(File.read("#{ca_base}.crt"))
