@@ -51,8 +51,10 @@ namespace :ssl do
     App::Config.load(ENV['PROJECT_ROOT'])
 
     ca_base         = './config/ssl/ca'
-    validation_base = './config/ssl/validation'
+    validation_pem  = './config/ssl/validation.pem'
     subject         = "#{ App::Config.get!('global.authentication.methods.ssl.subject_prefix').sub(/\/$/,'') }/OU=System/CN=Validation"
+
+    raise "#{validation_pem} already exists!" if File.size?(validation_pem)
 
   # load CA certificate and keys
     ca_crt = OpenSSL::X509::Certificate.new(File.read("#{ca_base}.crt"))
@@ -82,7 +84,7 @@ namespace :ssl do
     validation_crt.sign(ca_key, OpenSSL::Digest::SHA256.new)
 
   # save it
-    File.open("#{validation_base}.pem", "w") do |f|
+    File.open(validation_pem, "w") do |f|
       f.write(validation_crt.to_pem)
     end
   end
