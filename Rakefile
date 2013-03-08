@@ -75,8 +75,7 @@ namespace :ssl do
 
     validation_crt.extensions = [
       ef.create_extension("basicConstraints","CA:TRUE", true),
-      ef.create_extension("subjectKeyIdentifier", "hash"),
-      ef.create_extension("authorityKeyIdentifier","keyid:always,issuer:always")
+      ef.create_extension("subjectKeyIdentifier", "hash")
     ]
 
   # sign it
