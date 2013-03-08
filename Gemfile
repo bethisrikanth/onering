@@ -23,7 +23,7 @@ gem "rdiscount", "1.6.8"
 gem "net-ping"
 gem "net-ldap"
 gem "addressable"
-gem "ruby-pam"
+gem "ruby-pam", :git => "git://github.com/portertech/ruby-pam.git"
 
 group :test, :development do
   gem "rack-webconsole"
