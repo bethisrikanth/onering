@@ -177,7 +177,7 @@ div.autocomplete.help{
 }
 
 .logo i{
-  background: transparent center center no-repeat url('/img/logo.png?embed');
+  background: transparent center center no-repeat url('/img/logo.png');
   display: inline-block;
   height: 32px;
   margin-left: 12px;
