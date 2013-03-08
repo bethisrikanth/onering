@@ -16,11 +16,12 @@ class Device < App::Model::Base
   before_validation :_confine_status
   before_validation :_confine_maintenance_status
   before_save       :_compact
-  validate :_id_pattern_valid?
+#  validate          :_id_pattern_valid?
 
   timestamps!
 
   key :name,               String
+  key :parent_id,          String
   key :properties,         Hash
   key :user_properties,    Hash
   key :tags,               Array
@@ -53,6 +54,16 @@ class Device < App::Model::Base
     end
 
     false
+  end
+
+  def parent
+    (parent_id ? Device.find(parent_id) : nil)
+  end
+
+  def children
+    Device.where({
+      :parent_id => id
+    }).to_a
   end
 
   private
@@ -103,7 +114,6 @@ class Device < App::Model::Base
   # list
   #   list distinct values for a field
     def list(field, query=nil)
-      query = urlquerypath_to_mongoquery(query) if query
       field = case field
       when 'id' then '_' + field
       when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field

@@ -2,10 +2,9 @@ require 'model'
 
 class Capability < App::Model::Base
   set_collection_name "capabilities"
-  plugin MongoMapper::Plugins::IdentityMap
 
   timestamps!
-  
+
   key :users,  Array
   key :groups, Array
 

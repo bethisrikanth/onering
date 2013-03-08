@@ -39,8 +39,6 @@ module App
       #enable  :raise_errors
       disable :raise_errors
       disable :debug
-
-      use MongoMapper::Middleware::IdentityMap
     end
 
     error do

@@ -1,4 +1,6 @@
+{% if device.properties.provisioning.disk.type != 'gpt' %}
 clearpart --all --initlabel
+{% endif %}
 {% case device.properties.provisioning.disk.strategy %}
  {% when 'single' %}
 # Disk Strategy: single

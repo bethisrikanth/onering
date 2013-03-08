@@ -1,6 +1,7 @@
 module App
   module Helpers
-    TOP_LEVEL_FIELDS = ['id', 'name', 'tags', 'aliases', 'status', 'maintenance_status']
+  # TODO: move this into the Device model definition
+    TOP_LEVEL_FIELDS = ['id', 'parent_id', 'name', 'tags', 'aliases', 'status', 'maintenance_status']
 
   # generates a mongodb query hash from a field-urlquery
   # URL path (e.g.: field1/query1/field2/query2/..)

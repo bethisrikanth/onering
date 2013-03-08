@@ -8,5 +8,7 @@ factory('NagiosHost', function($resource){
   });
 }).
 factory('NagiosAlerts', function($resource){
-  return $resource('/api/nagios/alerts');
+  return $resource('/api/nagios/alerts', {
+    severity: 'ignore'
+  });
 });

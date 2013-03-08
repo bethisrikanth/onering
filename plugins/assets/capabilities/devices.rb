@@ -1,11 +1,11 @@
 # machines may view their own objects
 User.capability :get_asset do |cap, user, args|
-  ((user.type == :MachineUser && user.id == args.first) rescue false) || (Capability.user_can?(user.id, cap))
+  (( (user.class.ancestors.include?(DeviceUser) rescue false) && user.id == args.first) rescue false) || (Capability.user_can?(user.id, cap))
 end
 
 # machines may update their own objects
 User.capability :update_asset do |cap, user, args|
-  ((user.type == :MachineUser && user.id == args.first) rescue false) || (Capability.user_can?(user.id, cap))
+  (( (user.class.ancestors.include?(DeviceUser) rescue false) && user.id == args.first) rescue false) || (Capability.user_can?(user.id, cap))
 end
 
 # users may remove their own notes within a certain period of time
