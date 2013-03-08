@@ -43,6 +43,11 @@ namespace :ssl do
   desc "Generate SSL certificates"
 
   task :generate do |t|
+    ca_base         = './config/ssl/ca'
+    validation_pem  = './config/ssl/validation.pem'
+    raise "Cannot generate validation certificate, #{validation_pem} already exists!" if File.size?(validation_pem)
+
+
     ENV['PROJECT_ROOT'] = File.dirname(File.expand_path(__FILE__))
 
     require 'openssl'
@@ -50,11 +55,8 @@ namespace :ssl do
 
     App::Config.load(ENV['PROJECT_ROOT'])
 
-    ca_base         = './config/ssl/ca'
-    validation_pem  = './config/ssl/validation.pem'
     subject         = "#{ App::Config.get!('global.authentication.methods.ssl.subject_prefix').sub(/\/$/,'') }/OU=System/CN=Validation"
 
-    raise "Cannot generate validation certificate, #{validation_pem} already exists!" if File.size?(validation_pem)
 
   # load CA certificate and keys
     ca_crt = OpenSSL::X509::Certificate.new(File.read("#{ca_base}.crt"))
