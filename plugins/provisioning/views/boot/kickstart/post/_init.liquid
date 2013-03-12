@@ -7,3 +7,6 @@
 # set static site fact
 mkdir -p /etc/onering/static
 echo "{{ device.properties.site | downcase }}" > /etc/onering/static/site
+
+# set hardware id file
+echo "{{ device.id }}" > /etc/hardware.id

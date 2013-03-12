@@ -77,6 +77,10 @@ module App
           mime = 'text/yaml'
           rv = YAML.dump(body)
 
+        when 'xml'
+          mime = 'text/xml'
+          rv = body.to_xml()
+
         else
           rv = body.to_json
         end
