@@ -133,117 +133,99 @@ class Device < App::Model::Base
   #               (defaults to a summary of the whole collection)
   #
     def summarize(group_by, properties=[], query=nil, options={})
-      unless TOP_LEVEL_FIELDS.include?(group_by)
-        group_by = "properties.#{group_by}"
+      rv = _get_aggregate_children([group_by]+[*properties].reverse)
+    end
+
+    def _get_aggregate_children(properties, parents=[])
+      rv = []
+      parent = (parents.last || {})
+
+      query = _aggregate_field(properties.first, parents)
+
+      if query
+        rv += collection.aggregate(query).to_a.collect{|i|
+          i['field'] = properties.first
+          children = _get_aggregate_children(properties[1..-1], parents+[i])
+          i['children'] = children unless children.empty?
+          i
+        }
       end
 
-      group_root = group_by.split('.').last.to_sym
+      rv
+    end
 
-      rv = (options[:root] || {})
+    def _aggregate_field(field, parents)
+      pipeline = nil
+      parent = (parents.last || {})
 
-      q = {
-        '$match' => query
-      } if query
+      if field
+        basefield = field.split('.').last
+        field = _get_field_name(field)
+        parent_match = []
 
+        parents.each do |p|
+          parent_match << {_get_field_name(p['field']) => p['_id']}
+        end
 
-      c = []
-      c << q if query
-
-      c << {
-        '$project' => {
-          :_id => "$#{group_by}"
+        projection = {
+          field => 1
         }
-      }
 
-      c << {
-        '$group' => {
-          :_id => "$_id",
-          :count => {'$sum' => 1}
+      # add all parent fields to the projection
+        unless parent_match.empty?
+          parent_match.each do |p|
+            projection[p.to_a.first.first] = 1
+          end
+        end
+
+        pipeline = []
+        pipeline << {
+          :$project => projection
         }
-      }
 
-    # do initial query on grouping field
-      collection.aggregate(c).collect{|i|
-        rv[i['_id']] = {
-          :id => i['_id'],
-          :count => i['count'].to_i
-        }
-      }
-
-    # ------------------------------------------
-    # run subqueries for providing field rollups
-      unless properties.empty?
-        field = properties.pop
-
-
-        if field
-          field_root = field.gsub('.', '_')
-
-          c = []
-          c << q if query
-
-        # project the document down to the group and rollup field
-          c << {
-            '$project' => {
-              :_id => 0,
-              group_root => "$#{group_by}",
-              :children => "$properties.#{field}"
+      # add all parent field values to the match
+        unless parent_match.empty?
+          pipeline << {
+            :$match => {
+              :$and => parent_match
             }
-          }
-
-          #c << {'$unwind' => {'$cond' => [{'$eq' => ['$type', 4]}, "$#{field_root}", "$#{field_root}"]}}
-
-
-        # group by both group and rollup field, counting the documents in
-        # these groups
-          c << {
-            '$group' => {
-              :_id => {
-                group_root => "$#{group_root}",
-                :children => "$children"
-              },
-              :count => {'$sum' => 1}
-            }
-          }
-
-        # group by the group field, breaking the rollup field into a set
-        # of value-count pairs
-          c << {
-            '$group' => {
-              :_id => "$_id.#{group_root}",
-              :count => {'$sum' => '$count'},
-              :children => {
-                '$addToSet' => {
-                  :_id => {'$ifNull' => ["$_id.children", nil]},
-                  :count => '$count'
-                }
-              }
-            }
-          }
-
-          collection.aggregate(c).collect{|i|
-          # add the current filter to the $match query
-            qq = (query.clone rescue {'$and' => []})
-            qq['$and'] = [] unless qq['$and']
-            qq['$and'] << {group_by => i['_id']}
-
-          # recurse into summarize to next rollup properties
-            irv = summarize(field, properties.clone, qq, {
-              :root => rv[i['_id']][:children]
-            })
-
-            qq['$and'].pop
-
-          # set return value
-            rv[i['_id']][:children] = irv
           }
         end
+
+        if _is_field_array?(field)
+          pipeline << {
+            :$unwind => "$#{field}"
+          }
+        end
+
+        pipeline << {
+          :$group => {
+            :_id => "$#{field}",
+            :count => {
+              :$sum => 1
+            }
+          }
+        }
+
+        puts "QUERY #{pipeline}"
       end
 
-    # return only the top-level hash values
-      rv = rv.collect{|k,v| v }
-      rv = rv.sort{|a,b| (a[:id] || '') <=> (b[:id] || '') } rescue rv
-      rv
+      pipeline
+    end
+
+    def _get_field_name(field)
+      return "properties.#{field}" unless TOP_LEVEL_FIELDS.include?(field)
+      field
+    end
+
+    def _is_field_array?(field)
+      unless TOP_LEVEL_FIELDS.include?(field)
+        return ((Device.where({field => {:$exists => 1}}).limit(1).first.to_h.get(field).class.name == "Array") rescue false)
+      else
+        return (Device.keys[field].type.name == "Array")
+      end
+
+      false
     end
   end
 end
