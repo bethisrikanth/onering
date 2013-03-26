@@ -337,7 +337,7 @@ module App
         /summary/by-:field/*/?
       }.each do |r|
         get r do
-          q = urlquerypath_to_mongoquery(params[:where])
+          q = urlquerypath_to_mongoquery(params[:where] || params[:q])
           rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
           output rv
         end

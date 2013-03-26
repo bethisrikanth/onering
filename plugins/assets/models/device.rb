@@ -133,99 +133,20 @@ class Device < App::Model::Base
   #               (defaults to a summary of the whole collection)
   #
     def summarize(group_by, properties=[], query=nil, options={})
-      rv = _get_aggregate_children([group_by]+[*properties].reverse)
-    end
-
-    def _get_aggregate_children(properties, parents=[])
-      rv = []
-      parent = (parents.last || {})
-
-      query = _aggregate_field(properties.first, parents)
-
-      if query
-        rv += collection.aggregate(query).to_a.collect{|i|
-          i['field'] = properties.first
-          children = _get_aggregate_children(properties[1..-1], parents+[i])
-          i['children'] = children unless children.empty?
-          i
-        }
-      end
-
-      rv
-    end
-
-    def _aggregate_field(field, parents)
-      pipeline = nil
-      parent = (parents.last || {})
-
-      if field
-        basefield = field.split('.').last
-        field = _get_field_name(field)
-        parent_match = []
-
-        parents.each do |p|
-          parent_match << {_get_field_name(p['field']) => p['_id']}
+      fields = ([group_by]+[*properties]).compact.collect{|field|
+        case field
+        when 'id' then '_' + field
+        when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
+        else "properties.#{field}"
         end
+      }
 
-        projection = {
-          field => 1
-        }
+      puts query.inspect
+      results = (query.nil? ? self.fields(fields).all() : self.where(query).fields(fields)).to_a.collect{|i|
+        i.to_h
+      }
 
-      # add all parent fields to the projection
-        unless parent_match.empty?
-          parent_match.each do |p|
-            projection[p.to_a.first.first] = 1
-          end
-        end
-
-        pipeline = []
-        pipeline << {
-          :$project => projection
-        }
-
-      # add all parent field values to the match
-        unless parent_match.empty?
-          pipeline << {
-            :$match => {
-              :$and => parent_match
-            }
-          }
-        end
-
-        if _is_field_array?(field)
-          pipeline << {
-            :$unwind => "$#{field}"
-          }
-        end
-
-        pipeline << {
-          :$group => {
-            :_id => "$#{field}",
-            :count => {
-              :$sum => 1
-            }
-          }
-        }
-
-        puts "QUERY #{pipeline}"
-      end
-
-      pipeline
-    end
-
-    def _get_field_name(field)
-      return "properties.#{field}" unless TOP_LEVEL_FIELDS.include?(field)
-      field
-    end
-
-    def _is_field_array?(field)
-      unless TOP_LEVEL_FIELDS.include?(field)
-        return ((Device.where({field => {:$exists => 1}}).limit(1).first.to_h.get(field).class.name == "Array") rescue false)
-      else
-        return (Device.keys[field].type.name == "Array")
-      end
-
-      false
+      results.count_distinct(fields)
     end
   end
 end

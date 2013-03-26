@@ -3,6 +3,8 @@ require 'sinatra/namespace'
 require 'sinatra/cross_origin'
 
 require 'errors'
+require 'profiler'
+require 'stringio'
 
 module App
   class Controller < Sinatra::Base
@@ -22,6 +24,22 @@ module App
     # handle query modifiers
       App::Model::Base.query_limit = params[:limit].to_i if params[:limit]
       App::Model::Base.query_offset = params[:offset].to_i if params[:offset]
+
+      if params[:profile] === '1'
+        Profiler__.start_profile
+      end
+    end
+
+    after do
+      if params[:profile] === '1'
+        Profiler__.stop_profile
+
+        content_type 'text/plain'
+        rv = StringIO.new("-- BEGIN PROFILE --\n", "w+")
+        Profiler__.print_profile(rv)
+        response.body = rv.string()
+        response.body << "-- END PROFILE --"
+      end
     end
 
     helpers do

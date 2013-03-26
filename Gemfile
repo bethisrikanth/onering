@@ -25,6 +25,7 @@ gem "net-ldap"
 gem "addressable"
 gem "ruby-pam", :git => "git://github.com/portertech/ruby-pam.git"
 gem "active_support"
+gem "hashlib", ">= 0.0.8"
 
 group :test, :development do
   gem "rack-webconsole"
