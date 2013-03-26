@@ -16,7 +16,6 @@ GEM
     activesupport (3.0.0)
     addressable (2.3.3)
     backports (3.1.1)
-    bond (0.4.3)
     bson (1.8.3)
     bson_ext (1.8.3)
       bson (~> 1.8.3)
@@ -79,11 +78,6 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    rack-webconsole (0.1.4)
-      multi_json (~> 1.0.3)
-      rack
-      ripl (~> 0.5.1)
-      ripl-multi_line (~> 0.3.0)
     racksh (1.0.0)
       rack (>= 1.0)
       rack-test (>= 0.5)
@@ -94,10 +88,6 @@ GEM
     redis (2.2.2)
     rerun (0.8.0)
       listen
-    ripl (0.5.1)
-      bond (~> 0.4.0)
-    ripl-multi_line (0.3.0)
-      ripl (>= 0.3.6)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -168,7 +158,6 @@ DEPENDENCIES
   net-ldap
   net-ping
   oats
-  rack-webconsole
   racksh
   rake
   rb-inotify (= 0.8.8)

@@ -28,7 +28,7 @@ gem "active_support"
 gem "hashlib", ">= 0.0.8"
 
 group :test, :development do
-  gem "rack-webconsole"
+#  gem "rack-webconsole"
   gem "cucumber"
   gem "cucumber-sinatra"
   gem "capybara"

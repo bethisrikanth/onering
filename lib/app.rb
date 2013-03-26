@@ -3,7 +3,6 @@ $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 require 'rubygems'
 require 'active_support'
-require 'rack/webconsole'
 require 'mongo_patches'
 require 'config'
 require 'db'
