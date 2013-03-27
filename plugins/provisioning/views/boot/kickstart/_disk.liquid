@@ -57,6 +57,23 @@ logvol /opt      --fstype ext3  --name=opt        --vgname=outbrain --size=2120
 logvol /outbrain --fstype ext3  --name=outbrain   --vgname=outbrain --size=10240
 logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
 
+
+{% when 'single-vm-kvm' %}
+# Disk Strategy: single-vm-xen
+bootloader       --location=mbr --driveorder=vda
+part /boot       --fstype ext3  --size=300        --asprimary       --ondisk=vda
+part pv.01       --size=31      --grow                              --ondisk=vda
+
+volgroup outbrain pv.01
+
+logvol /         --fstype ext3  --name=root       --vgname=outbrain --size=5120
+logvol /var      --fstype ext3  --name=var        --vgname=outbrain --size=2120
+logvol /home     --fstype ext3  --name=home       --vgname=outbrain --size=2120
+logvol /opt      --fstype ext3  --name=opt        --vgname=outbrain --size=2120
+logvol /outbrain --fstype ext3  --name=outbrain   --vgname=outbrain --size=10240
+logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
+
+
 {% when 'monolithic' %}
 # Disk Strategy: monolithic
 bootloader       --location=mbr --driveorder=sda
