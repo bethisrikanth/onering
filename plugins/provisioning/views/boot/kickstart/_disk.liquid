@@ -59,7 +59,7 @@ logvol swap      --fstype swap  --name=swap       --vgname=outbrain --size=2120
 
 
 {% when 'single-vm-kvm' %}
-# Disk Strategy: single-vm-xen
+# Disk Strategy: single-vm-kvm
 bootloader       --location=mbr --driveorder=vda
 part /boot       --fstype ext3  --size=300        --asprimary       --ondisk=vda
 part pv.01       --size=31      --grow                              --ondisk=vda
