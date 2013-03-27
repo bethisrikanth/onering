@@ -102,7 +102,7 @@ module App
 
           liquid 'boot/kickstart/base'.to_sym, :locals => {
             :device => (device.to_h rescue {}),
-            :config => Config.get('provisioning/boot')
+            :config => Config.get('provisioning.boot')
           }
         end
       end

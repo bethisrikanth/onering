@@ -5,7 +5,7 @@ module App
     class Base
       class<<self
         def load(name, config=nil)
-          config = Config.get("database/#{name}") unless config
+          config = Config.get("database.#{name}") unless config
           raise "Database driver required for #{name}" unless config['type']
           @_db = {} unless @_db
 

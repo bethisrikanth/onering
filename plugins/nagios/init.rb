@@ -104,13 +104,13 @@ module App
         return 404 unless nagios_host
         rv = nagios_host.to_h
 
-        if Config.get('nagios/url')
+        if Config.get('nagios.url')
           rv['alerts'].each_with_index do |alert, i|
             name = URI::encode(rv['name'])
             type = (alert['type'] == 'service' ? 2 : 1)
             ext  = (alert['type'] == 'service' ? '&service='+URI::encode(alert['name']) : '')
 
-            rv['alerts'][i]['url'] = "#{Config.get('nagios/url')}/nagios/cgi-bin/extinfo.cgi?type=#{type}&host=#{name}#{ext}"
+            rv['alerts'][i]['url'] = "#{Config.get('nagios.url')}/nagios/cgi-bin/extinfo.cgi?type=#{type}&host=#{name}#{ext}"
           end
         end
 

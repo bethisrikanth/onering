@@ -8,7 +8,7 @@ module App
     namespace '/api/glu' do
       get '/sync' do
         rv = []
-        config = Config.get('glu/config')
+        config = Config.get('glu.config')
         return 404 unless config && config['url']
         uri = URI.parse(config['url'])
 
@@ -16,7 +16,7 @@ module App
       # parse zookie - this gets the deployed versions as reported from the
       # Glu Agent in Zookeeper, via the "Zookie" REST API
       #
-        zk = Config.get('zookie/config')
+        zk = Config.get('zookie.config')
         zkuri = URI.parse(zk['url'])
         zk_versions = {}
 
