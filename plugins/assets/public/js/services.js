@@ -30,12 +30,6 @@ factory('DeviceNote', function($resource){
     severity: 'info'
   });
 }).
-factory('DeviceStat', function($resource){
-  return $resource('/api/devices/:id/stats', {
-    id: '@id',
-    severity: 'info'
-  });
-}).
 factory('Site', function($resource){
   return $resource('/api/devices/summary/by-site/rack/model/fqdn/?where=site/:site', {
     site: '@site'

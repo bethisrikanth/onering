@@ -1,34 +1,31 @@
 require 'model'
-require 'assets/models/device_stat'
+require 'assets/models/node_default'
 require 'assets/lib/helpers'
 
 class Device < App::Model::Base
   include App::Model::Taggable
 
+  set_collection_name "devices"
+
   VALID_STATUS = ['online', 'fault', 'allocatable', 'reserved', 'provisioning', 'installing']
   MANUAL_STATUS = ['fault', 'allocatable', 'reserved']
   NO_AUTOCLEAR_STATUS = ['provisioning', 'installing']
-  VALID_MAINT_STATUS = ['parts', 'service']
 
-  set_collection_name "devices"
 
+  before_validation :_compact
   before_validation :_mangle_id
   before_validation :_confine_status
-  before_validation :_confine_maintenance_status
-  before_save       :_compact
-#  validate          :_id_pattern_valid?
+  before_validation :_apply_defaults
 
   timestamps!
 
   key :name,               String
   key :parent_id,          String
   key :properties,         Hash
-  key :user_properties,    Hash
   key :tags,               Array
   key :aliases,            Array
   key :collected_at,       Time
   key :status,             String
-  key :maintenance_status, String
 
   def add_note(body, user_id)
     id = Time.now.to_i.to_s
@@ -86,14 +83,6 @@ class Device < App::Model::Base
       end
     end
 
-    def _confine_maintenance_status
-      if self.maintenance_status_changed?
-        if not VALID_MAINT_STATUS.include?(self.maintenance_status)
-          errors.add(:maintenance_status, "Maintenance Status must be one of #{VALID_MAINT_STATUS.join(', ')}")
-        end
-      end
-    end
-
     def _id_pattern_valid?
       errors.add(:id, "Device ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
     end
@@ -102,17 +91,30 @@ class Device < App::Model::Base
       self.properties = self.properties.compact
     end
 
+    def _apply_defaults
+      device = self.to_h
+      merges = []
+      except = ['id', 'name']
+
+      NodeDefault.matches(device, except).each do |m|
+        device = m.deep_merge(device, {:merge_hash_arrays => true})
+      end
+
+      self.from_h(device, false)
+      self
+    end
+
   class<<self
     include App::Helpers
 
   # urlsearch
-  #   perform a query formatted as a URL partial path component
+  # perform a query formatted as a URL partial path component
     def urlsearch(query)
       self.where(urlquerypath_to_mongoquery(query))
     end
 
   # list
-  #   list distinct values for a field
+  # list distinct values for a field
     def list(field, query=nil)
       field = case field
       when 'id' then '_' + field

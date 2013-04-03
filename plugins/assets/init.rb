@@ -2,12 +2,71 @@ require 'controller'
 require 'mongo_mapper'
 require 'assets/lib/helpers'
 require 'assets/models/device'
+require 'assets/models/node_default'
 
 module App
   class Base < Controller
     include Helpers
 
     namespace '/api/devices' do
+      namespace '/defaults' do
+        get '/sync' do
+          rv = {
+            :success => 0,
+            :time    => Time.now,
+            :errors  => []
+          }
+
+        # resync defaults
+          Device.all.each do |device|
+            begin
+              device.safe_save
+              rv[:success] += 1
+            rescue Exception => e
+              rv[:errors] << {
+                :id      => device.id,
+                :message => e.message
+              }
+            end
+          end
+
+          rv[:time] = (Time.now - rv[:time]).to_f
+
+          output(rv.compact)
+        end
+
+        get '/list' do
+          output(NodeDefault.all.to_a.collect{|i|
+            i.to_h
+          })
+        end
+
+        get '/:id' do
+          default = NodeDefault.find(params[:id])
+          return 404 unless default
+          output(default.to_h)
+        end
+
+        %w{
+          /?
+          /:id
+        }.each do |r|
+          post r do
+            default = (params[:id] ? NodeDefault.find(params[:id]) : NodeDefault.new())
+            return 404 unless default
+
+            json = JSON.parse(request.env['rack.input'].read)
+            json = [json] if json.is_a?(Hash)
+
+            json.each do |o|
+              default.from_json(o, false).safe_save
+            end
+
+            200
+          end
+        end
+      end
+
     # device by id
       get '/:id' do
         device = Device.find(params[:id])
@@ -24,30 +83,6 @@ module App
       delete '/:id' do
         Device.destroy(params[:id])
         200
-      end
-
-      %w{
-        /stats
-        /:id/stats
-      }.each do |route|
-        get route do
-          stat = DeviceStat.find(params[:id])
-          return 404 if not stat
-          output stat.to_h
-        end
-
-        post route do
-          json = JSON.parse(request.env['rack.input'].read)
-          json = [json] if json.is_a?(Hash)
-
-          json.each do |o|
-            id = (params[:id] || o['id'])
-            stat = DeviceStat.find_or_create(id)
-            stat.from_json(o['stats'], false).safe_save
-          end
-
-          200
-        end
       end
 
       get '/:id/parent' do
@@ -111,21 +146,6 @@ module App
         end
 
         output(device)
-      end
-
-
-      # /devices/find/stats
-      # search for devices stats by
-      %w{
-        /find/stats/?
-        /find/stats/*
-      }.each do |r|
-        get r do
-          qsq = (params[:q] || params[:query] || '')
-          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          stats = DeviceStat.where(urlquerypath_to_mongoquery(q,true,'metrics')).limit(params[:limit] || 1000)
-          output Device.find(stats.collect{|i| i['_id'] })
-        end
       end
 
       %w{

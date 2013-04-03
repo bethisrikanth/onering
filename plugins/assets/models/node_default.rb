@@ -1,43 +1,56 @@
 require 'model'
-require 'assets/models/device'
-require 'liquid_patches'
+require 'assets/lib/helpers'
 
 class NodeDefault < App::Model::Base
   set_collection_name "node_defaults"
 
-  TEMPLATE_ROOT = File.expand_path(File.join(ENV['PROJECT_ROOT'], 'config', 'plugins', 'assets', 'defaults'))
-  ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(TEMPLATE_ROOT)
-
   timestamps!
 
-  key :devices,  Array
-  key :priority, Integer
-  key :defaults, Hash
+  key :match, Array
+  key :apply, Hash
 
-  many :devices, :in => :devices
+  def match?(hash)
+    unless self.apply.nil? or self.apply.empty?
+      [*self.match].each do |query|
+        values = hash.get(query['field'])
 
-  def to_h
-    rv = super
-    @_templates ||= {}
+        [*values].each do |value|
+          case query['test']
+          when 'regex'
+            if value =~ Regexp.new(query['value'], Regexp::IGNORECASE)
+              return true
+            end
 
-    rv.each_recurse do |key, value, path|
-      path = path.join('.')
+          when 'exists'
+            return (!value.nil?)
 
-    # get or create/cache/get precomputed template
-      if value.is_a?(String)
-        unless @_templates.get(path)
-          @_templates.set(path, Liquid::Template.parse(value))
+          else
+            if value.to_s.strip.chomp == query['value'].to_s.strip.chomp
+              return true
+            end
+          end
         end
-        
-        tpl = @_templates.get(path)
-      end
-
-    # render the value if a template exists for it
-      if tpl
-        rv.set(path, (tpl.render(rv).to_s.strip.chomp rescue nil))
       end
     end
 
-    rv
-  end          
+    return false
+  end
+
+  class<<self
+    include App::Helpers
+
+    def matches(hash, except=[])
+      rv = []
+      self.all.each do |default|
+        apply = default.to_h['apply']
+        apply.reject!{|k,v|
+          except.include?(k)
+        }
+
+        rv << (apply if default.match?(hash) rescue nil)
+      end
+
+      rv.compact
+    end
+  end
 end

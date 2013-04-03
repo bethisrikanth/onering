@@ -66,7 +66,9 @@ module App
 
     # save, but throw an error if not valid
       def safe_save
-        save or raise Errors::ValidationError, errors.collect{|k,v| v }.join("; ")
+        save({
+          :safe => true
+        }) or raise Errors::ValidationError, errors.collect{|k,v| v }.join("; ")
       end
 
     # provide a difference between two documents (useful for audit history)
@@ -94,7 +96,6 @@ module App
           q
         end
 
-
         def find_or_create(ids, init={})
           rv = find(ids)
 
@@ -117,11 +118,6 @@ module App
           rv
         end
       end
-    end
-
-    class Embedded
-      include MongoMapper::EmbeddedDocument
-      include Utils
     end
 
     module Taggable
