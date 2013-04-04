@@ -143,9 +143,8 @@ class Device < App::Model::Base
         end
       }
 
-      puts query.inspect
-      results = (query.nil? ? self.fields(fields).all() : self.where(query).fields(fields)).to_a.collect{|i|
-        i.to_h
+      results = (query.nil? ? self.fields(fields) : self.where(query).fields(fields)).collect{|i|
+        i.to_h!
       }
 
       results.count_distinct(fields)

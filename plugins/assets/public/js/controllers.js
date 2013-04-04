@@ -339,27 +339,70 @@ function RackerController($scope, $window, Query){
 }
 
 
+function AssetManagerController($scope){
+
+}
 
 
-function WidgetFieldSummary($scope, $http, $window){
-  if(!$scope.currentField) $scope.currentField = 'status';
+function AssetDefaultsController($scope, $http, AssetDefault){
+  $scope.sortField = 'id';
+  $scope.sortReverse = false;
 
-  $scope.selectField = function(field, query){
-    if(!query) query = '';
+  $scope.add = function(){
+    var o = {
+      match: [],
+      apply: {}
+    };
 
-    $http.get('/api/devices/summary/by-'+field+'/?severity=info').success(function(data){
-      $scope.summary = data;
+    $scope.defaults.push(o);
+    $scope.edit(o);
+  }
+
+  $scope.remove = function(d){
+    if(d.id){
+      $http.delete('/api/devices/defaults/'+d.id).success(function(){
+        $scope.reload();
+      });
+
+    }else{
+      $scope.defaults.splice($scope.defaults.indexOf(d), 1);
+    }
+  }
+
+  $scope.edit = function(d){
+    $scope.current = d;
+  }
+
+  $scope.save = function(d){
+    console.log(d);
+
+    $http.post('/api/devices/defaults', d).success(function(){
+      $scope.reload();
     });
   }
 
-  $scope.$watch('currentField', function(value){
-    $scope.selectField(value);
-  });
-
   $scope.reload = function(){
-    $scope.selectField($scope.currentField);
+    AssetDefault.query(function(data){
+      $scope.defaults = data;
+      $scope.current = null;
+    });
   }
 
   $scope.reload();
-  $window.setInterval($scope.reload, 30000);
+}
+
+function TreeViewController($scope){
+  $scope.delete = function(node) {
+    node = {};
+  };
+
+  $scope.add = function(node) {
+    node = {
+      '(name)': null
+    };
+  };
+
+  $scope.isObject = function(node){
+    return $.isPlainObject(node);
+  }
 }

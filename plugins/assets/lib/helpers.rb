@@ -37,7 +37,6 @@ module App
           rv['$and'] << q
         end
 
-        puts rv
         return rv
       end
 

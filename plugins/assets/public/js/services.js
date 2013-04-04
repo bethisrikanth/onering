@@ -40,6 +40,9 @@ factory('SiteContact', function($resource){
     site: '@site'
   });
 }).
+factory('AssetDefault', function($resource){
+  return $resource('/api/devices/defaults/list');
+}).
 factory('Rack', function($resource){
   return $resource('/api/devices/summary/by-unit/fqdn/?where=site/:site/rack/:rack', {
     site: '@site',

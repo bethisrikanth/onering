@@ -147,6 +147,11 @@ filter('truncate', function () {
     }
   };
 }).
+filter('jsonify', function () {
+  return function(obj, indent){
+    return JSON.stringify(obj, null, (indent || 4));
+  };
+}).
 config(['$provide', function($provide) {
   $provide.factory('skipFilter', function(){
     return function(array, skip){

@@ -455,3 +455,8 @@ i.normal{
 .commits .background{
   fill: transparent;
 }
+
+
+.CodeMirror{
+  height: auto !important;
+}

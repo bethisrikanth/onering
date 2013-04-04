@@ -37,7 +37,9 @@ module App
 
         get '/list' do
           output(NodeDefault.all.to_a.collect{|i|
-            i.to_h
+            i = i.to_h
+            i['apply'] = i['apply'].coalesce(nil,nil,'.')
+            i
           })
         end
 
@@ -45,6 +47,13 @@ module App
           default = NodeDefault.find(params[:id])
           return 404 unless default
           output(default.to_h)
+        end
+
+        delete '/:id' do
+          default = NodeDefault.find(params[:id])
+          return 404 unless default
+          NodeDefault.destroy(params[:id])
+          200
         end
 
         %w{
@@ -59,6 +68,12 @@ module App
             json = [json] if json.is_a?(Hash)
 
             json.each do |o|
+              if o['apply']
+                apply = o['apply'].clone
+                o['apply'] = {}
+                apply.each{|k,v| o['apply'].set(k.split(/[\_\.]/), v) }
+              end
+
               default.from_json(o, false).safe_save
             end
 

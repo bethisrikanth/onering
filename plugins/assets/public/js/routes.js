@@ -28,5 +28,9 @@ config(['$routeProvider', function($routeProvider){
   when('/inf/show/:query', {
     templateUrl: 'views/devices.html',
     controller: QueryController
+  }).
+  when('/assets/manage', {
+    templateUrl: 'views/asset-manager.html',
+    controller:  AssetManagerController
   });
 }]);

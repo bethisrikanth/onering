@@ -15,6 +15,10 @@ module App
         }
       end
 
+      def to_h!
+        serializable_hash
+      end
+
     # populate the document from a Hash
       def from_h(hash, merge=true)
         raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)

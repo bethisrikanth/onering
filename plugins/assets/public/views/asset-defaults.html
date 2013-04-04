@@ -1,0 +1,131 @@
+<h3>Default Properties</h3>
+
+<div class="container" ng-controller="AssetDefaultsController">
+  <div class="row">
+    <div class="span12">
+      <button class="btn" ng-click="add()"><i class="icon-plus"></i>&nbsp;Add Rule</button>
+      <br />
+      <br />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12">
+      <table class="table table-condensed table-hover">
+        <thead>
+          <tr>
+            <th ng-click="sortField='match'; sortReverse=!sortReverse">If the asset matches this...</th>
+            <th ng-click="sortField='match'; sortReverse=!sortReverse">...then set these values on it:</th>
+            <th> </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="default in defaults | orderBy:sortField:sortReverse">
+            <td ng-click="edit(default)">
+              <span ng-repeat="rule in default.match">
+                <b>{{ rule.field }}</b> {{ rule.test || '=' }} {{ rule.value }}<br />
+              </span>
+            </td>
+            <td ng-click="edit(default)">
+              <span ng-repeat="(key,value) in default.apply">
+                <b>{{ key }}</b> = {{ value }}<br />
+              </span>
+            </td>
+
+            <td>
+              <a ng-click="remove(default)"><i class="icon-remove"> </i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- editor dialog -->
+  <div class="modal" ng-show="current">
+    <form>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Edit Asset Rule</h3>
+      </div>
+
+      <div class="modal-body">
+        <fieldset>
+          <legend>
+            <span>Search Criteria</span>
+            <a class="pull-right" ng-click="current.match.push({})"><i class="icon-plus"> </i></a>
+          </legend>
+
+          <span class="help-block">
+            Only assets whose properties match these criteria will have this rule applied to them.
+            <br />
+            <br />
+          </span>
+
+          <table>
+            <tbody>
+              <tr ng-repeat="match in current.match">
+                <td>
+                  <input type="text" class="input-medium" placeholder="property.key" ng-model="match.field">
+                </td>
+
+                <td>
+                  <select ng-model="match.test" class="input-small">
+                    <option value="">=</option>
+                    <option value="exists">exists</option>
+                    <option value="regex">matches</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input ng-hide="match.test == 'exists'" type="text" class="input-medium" placeholder="value" ng-model="match.value">
+                </td>
+
+                <td>
+                  <a ng-click="current.match.splice($index,1)"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Apply Properties
+            <a class="pull-right" ng-click="current.apply['(new)']=''"><i class="icon-plus"> </i></a>
+          </legend>
+
+          <span class="help-block">
+            Represents the object that will be merged with all matching assets whenever the asset is updated.
+            <br />
+            <br />
+          </span>
+
+          <table>
+            <tbody>
+              <tr ng-repeat="(key, value) in current.apply">
+                <td>
+                  <input type="text" class="input-medium" placeholder="property.key" ng-model="key" ng-model-onblur>
+                </td>
+
+                <td>
+                  <input type="text" class="input-medium" placeholder="value" ng-model="current.apply[key]" ng-model-onblur>
+                </td>
+
+                <td>
+                  <a ng-click="current.apply[key]=undefined"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+      </div>
+
+      <div class="modal-footer">
+        <input type="submit" class="btn btn-primary" data-dismiss="modal" value="Save" ng-click="save(current)">
+        <a class="btn" data-dismiss="modal" ng-click="current=null">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
