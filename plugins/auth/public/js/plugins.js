@@ -43,8 +43,6 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
   $rootScope.addError = function(object, code, severity){
     if($rootScope.errors.length > 0){
       for(var i in $rootScope.errors){
-        if(i == 'compact') continue;
-
         if($rootScope.errors[i].type == object.type && $rootScope.errors[i].message == object.message){
           return false;
         }

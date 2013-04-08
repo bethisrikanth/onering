@@ -14,8 +14,9 @@ factory('List', function($resource){
   });
 }).
 factory('Query', function($resource){
-  return $resource('/api/devices/find/tags/!disabled', {
-    query: '@query'
+  return $resource('/api/devices/find/:prefilter', {
+    prefilter: 'tags/not:disabled',
+    query:     '@query'
   });
 }).
 factory('Device', function($resource){

@@ -3,6 +3,8 @@ require 'hashlib'
 require 'net/http'
 
 class String
+  SI_UNITS=%w{b k m g t p e z y}
+
   def underscore
     self.gsub(/::/, '/').
     gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
@@ -15,22 +17,60 @@ class String
     !(self.chomp.strip =~ /^(?:true|on|yes|y|1)$/i).nil?
   end
 
-  def autotype(strip=true)
-    test = (strip ? self.to_s.strip.chomp : self)
-    return nil if test.empty?
+  def convert_to(to=nil)
+    case (to.to_sym rescue nil)
+    when :bool
+      return self.to_bool()
 
-    case test
+    when :date
+      return (Time.parse(self) rescue nil)
+
+    when :epoch
+      return (Time.at(Integer(self)) rescue nil)
+
+    when :float
+      return (Float(self) rescue nil)
+
+    when :int
+      return (Integer(self) rescue nil)
+
+    when :str
+      return self
+
+    when :bits
+      if self =~ /^([0-9]+)([bkmgtpezy])$/
+        return Integer($1) * (1024 ** (SI_UNITS.index($2).to_i))
+      else
+        return nil
+      end
+
+    when :bytes
+      if self =~ /^([0-9]+)([BKMGTPEZY])$/
+        return Integer($1) * (1024 ** (SI_UNITS.index($2.downcase).to_i))
+      else
+        return nil
+      end
+
+    else
+      return self
+    end
+  end
+
+  def autotype()
+    return nil if self.empty?
+
+    case self
   # float
     when /^[0-9]+\.[0-9]+$/
-      return test.to_f()
+      return self.to_f()
 
   # int
     when /^[0-9]+$/
-      return test.to_i()
+      return self.to_i()
 
   # bool
     when /^(?:true|on|yes|y|1|0|n|no|off|false)$/i
-      return test.to_bool()
+      return self.to_bool()
 
   # nulls
     when /^(?:null|nil|empty)$/i

@@ -62,7 +62,7 @@
                   <a tabindex="-1"><i class="icon-ok-circle"></i>&nbsp;&nbsp;Status</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li ng-repeat="status in statuses | orderBy:'count':true">
-                      <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || '^status' }}">
+                      <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status:null' }}">
                         <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
                         {{ (status.id || 'unknown') | titleize }}
                         <span>{{ status.count }}</span>
@@ -70,7 +70,7 @@
                     </li>
                   </ul>
                 </li>
-
+<!--
                 <li class="dropdown-submenu">
                   <a tabindex="-1"><i class="icon-wrench"></i>&nbsp;&nbsp;Maintenance</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
@@ -82,7 +82,7 @@
                       </a>
                     </li>
                   </ul>
-                </li>
+                </li> -->
 
                 <li class="dropdown-submenu" ng-show="alert_states">
                   <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>

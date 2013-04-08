@@ -19,12 +19,6 @@ String.prototype.titleize = function(){
   return this.replace(/_/g, ' ').toTitleCase();
 };
 
-Array.prototype.compact = function(){
-  return this.filter(function(i){
-    return i;
-  });
-}
-
 angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
