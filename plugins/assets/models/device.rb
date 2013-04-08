@@ -97,7 +97,7 @@ class Device < App::Model::Base
       except = ['id', 'name']
 
       NodeDefault.matches(device, except).each do |m|
-        device = m.deep_merge(device, {:merge_hash_arrays => true})
+        device = m.deep_merge(device)
       end
 
       self.from_h(device, false)
