@@ -74,7 +74,11 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
       }
     }
 
-    if(stack.length == 0){ return null }
+    if(stack.length == 0){
+      stack.push('str:id|str:name|tags');
+      stack.push(field);
+    }
+
     return stack.join('/');
   }
 

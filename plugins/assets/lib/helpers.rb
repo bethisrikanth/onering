@@ -5,7 +5,7 @@ module App
   # TODO: fix external references to this to stop this madness
     TOP_LEVEL_FIELDS = MongoUrlqueryParser::TOP_LEVEL_FIELDS
 
-    def urlquerypath_to_mongoquery(query, regex=true, autofield='properties')
+    def urlquerypath_to_mongoquery(query)
       if query
         query.gsub!(/(?:^\/|\/$)/, '')
         @@_parser ||= MongoUrlqueryParser.new()

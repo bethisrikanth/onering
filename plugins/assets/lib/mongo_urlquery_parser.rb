@@ -8,18 +8,18 @@ module App
     # process the whole query
       rule :mongo, many(:pair, :pairer) do
         def to_mongo_query()
-          {'$and' =>
+          return {'$and' =>
             pair.collect{|e|
               e.to_mongo_query
-            }
+            }.flatten
           }
         end
       end
 
     # process pairs of field/[value] parameters
-      rule :pair, many(:field, :fieldop_or), match?(:pairer), match?(:value) do
+      rule :pair, many(:field, :fieldop_or), :pairer?, :value? do
         def to_mongo_query
-          ({
+          return ({
             '$or' => field.collect{|f|
               f.to_mongo_query(value)
             }
@@ -28,7 +28,7 @@ module App
       end
 
     # process field name and modifiers
-      rule :field, match?(:field_modifier), :field_name do
+      rule :field, :field_modifier?, :field_name do
         def translate_field(field, prefix)
           case field
           when 'id'
@@ -52,8 +52,6 @@ module App
               case field_modifier.get_coercer.to_sym
               when :absent
                 return { fname => {'$exists' => false} }
-              when :null
-                return { fname => nil }
               end
             end
           else
@@ -66,12 +64,12 @@ module App
     # process coercion modifier
       rule :field_modifier, :coercer, :modifier do
         def get_coercer
-          coercer
+          return coercer
         end
       end
 
     # process test value and modifiers
-      rule :value, match?(:value_modifier_unary), match?(:value_value) do
+      rule :value, :value_modifier_unary?, :value_value? do
         def to_mongo_query(coerce=nil)
           return nil if value_value.nil?
 
@@ -85,10 +83,13 @@ module App
 
         # default to regex searches
           if rv.is_a?(String)
-            rv = {'$regex' => Regexp.quote(rv), '$options' => 'i'}
-          else
-            rv
+            rv.gsub!('.', '\\.')
+            rv.gsub!('*', '.*')
+
+            return {'$regex' => rv, '$options' => 'i'}
           end
+
+          return rv
         end
 
         def empty?
@@ -116,12 +117,11 @@ module App
       rule :coercer, /[a-z\_]+/
       rule :modifier, ":"
       rule :field_name, /[a-zA-Z0-9\_\.]+/
-      rule :fieldop_absent, "absent"
-      rule :fieldop_null,   "null"
       rule :fieldop_or, '|'
       rule :pairer, '/'
       rule :value_function_unary, /[a-z]+/
       rule :value_value, /[^\/]*/
+      rule :valueop_or, '|'
     end
   end
 end

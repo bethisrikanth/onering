@@ -326,16 +326,6 @@ module App
 
           output(filter_hash(rv, :properties))
         end
-
-        post r do
-          qsq = (params[:q] || params[:query] || '')
-          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          q = urlquerypath_to_mongoquery(q)
-          set = params[:set].split(';').collect{|i| i=i.split(':'); ["properties.#{i.first}", i.last] }
-
-          Device.set(q, Hash[set])
-          #Device.where(q).to_json
-        end
       end
 
 
