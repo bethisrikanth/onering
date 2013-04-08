@@ -230,10 +230,8 @@ module App
           device = Device.find(params[:id])
           return 404 if not device
 
-          device.properties ||= {}
-
           if action == 'set'
-            device.properties.set(params[:key], params[:value])
+            device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
           else
             device.properties.delete(params[:key])
           end

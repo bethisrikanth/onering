@@ -4,6 +4,7 @@
       <span class="label label-{{ device.status || 'unknown' }} hid">ID: <a target="_blank" href="/api/devices/{{ device.id }}">{{ device.id }}</a></span>
       <span class="label label-{{ device.status || 'unknown' }} status" ng-show="device.status"><a open-dialog="nodeTransitionState">{{ device.status | titleize }}</a></span>
       <span class="label" ng-show="device.maintenance_status"><i class="icon-{{ device.maintenance_status }} icon-white"></i> Needs {{ device.maintenance_status | titleize }}</span>
+      <span class="label label-important" ng-show="device.properties.monitor==false">Monitoring Disabled</span>
       <br />
       <h1>
         <span class="name">{{ device.name | section:'.':0:1 }}<i class="minor">.{{ device.name | section:'.':1 }}</i></span>
@@ -71,10 +72,13 @@
 
       <ul class="nav nav-list well">
         <li class="nav-header">Lifecycle</li>
-
         <li><a open-dialog="nodeTransitionState"><i class="icon-retweet"></i> Transition to State</a></li>
         <li><a open-dialog="nodeTransitionMaintState"><i class="icon-wrench"></i> Maintenance Status</a></li>
         <li><a open-dialog="nodeRedeploy"><i class="icon-repeat"></i> Redeploy Node</a></li>
+
+        <li class="nav-header">Operations</li>
+        <li ng-show="device.properties.monitor==false"><a ng-click="setProperty('monitor', 'true')"><i class="icon-tasks"></i> Resume Monitoring</a></li>
+        <li ng-show="device.properties.monitor==true"><a ng-click="setProperty('monitor', 'false')"><i class="icon-stop"></i> Suspend Monitoring</a></li>
 
         <li class="nav-header">Metadata</li>
         <!-- <li><a><i class="icon-book"></i> Update Inventory</a></li> -->

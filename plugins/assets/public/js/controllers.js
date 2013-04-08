@@ -261,6 +261,15 @@ function NodeController($scope, $http, $location, $routeParams, $window, Device,
     }
   };
 
+  $scope.setProperty = function(property, value){
+    console.log('set', property, value)
+    if($scope.device && property && value !== undefined){
+      $http.get('/api/devices/'+$scope.device.id+'/set/'+property+'/'+value).success(function(data){
+        $scope.reload();
+      });
+    }
+  };
+
   $scope.setMaintStatus = function(status){
     if($scope.device && status){
       $http.get('/api/devices/'+$scope.device.id+'/maintenance/'+status).success(function(data){

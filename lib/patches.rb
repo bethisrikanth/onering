@@ -19,6 +19,9 @@ class String
 
   def convert_to(to=nil)
     case (to.to_sym rescue nil)
+    when :auto
+      return self.autotype()
+
     when :bool
       return self.to_bool()
 

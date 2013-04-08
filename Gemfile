@@ -25,7 +25,7 @@ gem "net-ldap"
 gem "addressable"
 gem "ruby-pam", :git => "git://github.com/portertech/ruby-pam.git"
 gem "active_support"
-gem "hashlib", ">= 0.0.9"
+gem "hashlib", ">= 0.0.10"
 gem "babel_bridge"
 
 group :test, :development do
