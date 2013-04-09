@@ -88,7 +88,7 @@
                   <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li><a href="#/alerts/nagios"><i class="icon-list"></i> All Alerts</a></li>
-                    <li><a href="#/inf/show/monitor/false"><i class="icon-remove"></i> Unmonitored Hosts</a></li>
+                    <li><a href="#/inf/show/monitor:false"><i class="icon-remove"></i> Unmonitored Hosts</a></li>
                     <li class="divider"></li>
                     <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
                       <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
