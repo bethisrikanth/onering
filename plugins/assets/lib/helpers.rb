@@ -9,7 +9,9 @@ module App
       if query
         query.gsub!(/(?:^\/|\/$)/, '')
         @@_parser ||= MongoUrlqueryParser.new()
-        @@_parser.parse(query).to_mongo_query()
+        rv = @@_parser.parse(query).to_mongo_query()
+        puts rv.inspect
+        return rv
       end
     end
   end

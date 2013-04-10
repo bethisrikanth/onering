@@ -8,12 +8,12 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];
-    query = query.replace(/\s*(\:|==|<=|>=|<|>|!=|\))\s*/g, '$1').split(' ');
+    query = query.replace(/\s*(\:|==|<=|>=|<|>|!=|\)|after|before)\s*/g, '$1').split(' ');
 
 //  for each field being queried
     for(var i in query){
       var field = query[i];
-      var parts = field.match(/(?:\(([a-z\_]*)\))?\s*(.*)\s*(:|==|<=|>=|<|>|!=)\s*(.*)$/);
+      var parts = field.match(/(?:\(([a-z\_]*)\))?\s*(.*)\s*(:|==|<=|>=|<|>|!=|after|before)\s*(.*)$/);
 
     //if the field is valid
       if(parts){
@@ -60,7 +60,7 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
 
     //  fallback
         default:
-          break;
+          rv += q.comparator+':'; break;
         }
 
     //  add test value

@@ -2,7 +2,7 @@ require 'babel_bridge'
 module App
   module Helpers
     class MongoUrlqueryParser < BabelBridge::Parser
-      TOP_LEVEL_FIELDS = ['id', 'parent_id', 'name', 'tags', 'aliases', 'status']
+      TOP_LEVEL_FIELDS = ['id', 'parent_id', 'name', 'tags', 'aliases', 'status', 'updated_at', 'created_at', 'collected_at']
       DEFAULT_FIELD_PREFIX='properties'
 
     # process the whole query
@@ -55,7 +55,7 @@ module App
               end
             end
           else
-            return { fname => value.to_mongo_query(field_modifier.nil? ? nil : field_modifier.get_coercer) }
+            return { fname => value.to_mongo_query(field_modifier.nil? ? (fname =~ /_(?:at|or)$/i ? :date : nil) : field_modifier.get_coercer) }
           end
         end
       end
@@ -104,6 +104,12 @@ module App
           case value_function_unary.to_sym
           when :gt, :gte, :lt, :lte, :in, :nin
             return Hash["$#{value_function_unary}", value]
+
+          when :since
+            return Hash["$gte", value]
+
+          when :before
+            return Hash["$lte", value]
 
           when :not
             return Hash["$ne", value]

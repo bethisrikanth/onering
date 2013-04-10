@@ -1,6 +1,7 @@
 require 'deep_merge/rails_compat'
 require 'hashlib'
 require 'net/http'
+require 'time'
 
 class String
   SI_UNITS=%w{b k m g t p e z y}
@@ -26,7 +27,44 @@ class String
       return self.to_bool()
 
     when :date
-      return (Time.parse(self) rescue nil)
+      begin
+        case self
+        when 'yesterday'
+          return (Time.now - 1.days)
+
+        when 'now'
+          return Time.now
+
+        when 'tomorrow'
+          return (Time.now + 1.days)
+
+        when /([\-0-9]+)s$/i
+          return (Time.at(Time.now.to_i - Integer($1) ))
+
+        when /([\-0-9]+)m$/
+          return (Time.at(Time.now.to_i - (Integer($1) * 60) ))
+
+        when /([\-0-9]+)h$/i
+          return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60) ))
+
+        when /([\-0-9]+)d$/i
+          return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24) ))
+
+        when /([\-0-9]+)w$/i
+          return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 7) ))
+
+        when /([\-0-9]+)M$/
+          return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 30) ))
+
+        when /([\-0-9]+)y$/i
+          return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 365) ))
+
+        else
+          return Time.parse(self)
+        end
+      rescue Exception
+        return nil
+      end
 
     when :epoch
       return (Time.at(Integer(self)) rescue nil)
@@ -79,6 +117,10 @@ class String
     when /^(?:null|nil|empty)$/i
       return nil
     end
+
+  # dates
+    rv = (Time.parse(self) rescue nil)
+    return rv unless rv.nil?
 
     return self
   end
