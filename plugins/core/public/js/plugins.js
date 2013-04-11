@@ -58,9 +58,17 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
         case '!=':
           rv += 'not:'; break;
 
+    //  before
+        case 'before':
+          rv += 'before:'; break;
+
+    //  since
+        case 'since':
+          rv += 'since:'; break;
+
     //  fallback
         default:
-          rv += q.comparator+':'; break;
+          break;
         }
 
     //  add test value
@@ -79,6 +87,7 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
       stack.push(field);
     }
 
+    console.log(stack)
     return stack.join('/');
   }
 
