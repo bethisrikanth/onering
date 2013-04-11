@@ -20,7 +20,7 @@ module App
       end
 
     # populate the document from a Hash
-      def from_h(hash, merge=true)
+      def from_h(hash, merge=true, autotype=false)
         raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)
 
         if merge
@@ -48,7 +48,7 @@ module App
         end
 
       # automatically convert fields ending with _at or _on to Time
-        newhash.each_recurse do |k,v,p|
+        newhash.each_recurse! do |k,v,p|
           case k
           when /_(?:at|on)$/i
             if v == 'now'
@@ -57,7 +57,7 @@ module App
               (Time.parse(v) rescue v)
             end
           else
-            nil
+            v
           end
         end
 
@@ -69,13 +69,13 @@ module App
       end
 
     # populate the document from a JSON string
-      def from_json(json, merge=true)
+      def from_json(json, merge=true, autotype=false)
         json = JSON.parse(json) if json.is_a?(String)
         json = [json] if json.is_a?(Hash)
 
         if json
           json.each do |j|
-            from_h(j, merge)
+            from_h(j, merge, autotype)
           end
         end
 

@@ -96,8 +96,21 @@ class Device < App::Model::Base
       merges = []
       except = ['id', 'name']
 
-      NodeDefault.matches(device, except).each do |m|
-        device = m.deep_merge(device)
+      NodeDefault.defaults_for(self).each do |m|
+        apply = m.apply.reject{|k,v|
+          except.include?(k.to_s)
+        }
+
+      # autotype the properties being applied
+        apply.each_recurse! do |k,v,p|
+          v.autotype()
+        end
+
+        if m.force === true
+          device = device.deep_merge(apply)
+        else
+          device = apply.deep_merge(device)
+        end
       end
 
       self.from_h(device, false)

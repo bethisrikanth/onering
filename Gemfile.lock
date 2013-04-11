@@ -15,6 +15,7 @@ GEM
       i18n (~> 0.4.1)
     activesupport (3.0.0)
     addressable (2.3.3)
+    babel_bridge (0.5.3)
     backports (3.1.1)
     bson (1.8.3)
     bson_ext (1.8.3)
@@ -47,7 +48,7 @@ GEM
       json (>= 1.7.6)
     haml (4.0.1)
       tilt
-    hashlib (0.0.8)
+    hashlib (0.0.13)
     highline (1.6.16)
     i18n (0.4.2)
     json (1.7.7)
@@ -143,13 +144,14 @@ PLATFORMS
 DEPENDENCIES
   active_support
   addressable
+  babel_bridge
   bson_ext
   capybara
   cucumber
   cucumber-sinatra
   deep_merge
   haml
-  hashlib (>= 0.0.8)
+  hashlib (>= 0.0.13)
   json
   liquid
   mongo

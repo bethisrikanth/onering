@@ -384,7 +384,6 @@ function AssetDefaultsController($scope, $http, AssetDefault){
 
   $scope.save = function(d){
     console.log(d);
-
     $http.post('/api/devices/defaults', d).success(function(){
       $scope.reload();
     });
@@ -396,6 +395,20 @@ function AssetDefaultsController($scope, $http, AssetDefault){
       $scope.current = null;
     });
   }
+
+  $scope.addNewProperty = function(key){
+    $scope.newApplyKey = (key || '(new)');
+  }
+
+  $scope.$watch('newApplyKey', function(){
+    if($scope.newApplyKey && $scope.newApplyKey != '(new)'){
+      if($scope.current && $scope.current.apply){
+        console.log($scope.newApplyKey)
+        $scope.current.apply[$scope.newApplyKey] = null;
+        $scope.newApplyKey = null;
+      }
+    }
+  })
 
   $scope.reload();
 }

@@ -8,49 +8,41 @@ class NodeDefault < App::Model::Base
 
   key :match, Array
   key :apply, Hash
+  key :force, Boolean, :default => false
 
-  def match?(hash)
-    unless self.apply.nil? or self.apply.empty?
-      [*self.match].each do |query|
-        values = hash.get(query['field'])
+  def devices(filter=nil)
+    query = []
 
-        [*values].each do |value|
-          case query['test']
-          when 'regex'
-            if value =~ Regexp.new(query['value'], Regexp::IGNORECASE)
-              return true
-            end
-
-          when 'exists'
-            return (!value.nil?)
-
-          else
-            if value.to_s.strip.chomp == query['value'].to_s.strip.chomp
-              return true
-            end
-          end
-        end
+    if filter.is_a?(Hash)
+      filter.each do |k,v|
+        query << k
+        query << v
       end
+    elsif filter.is_a?(String)
+      query += filter.split('/')
     end
 
-    return false
+    [*self.match].each{|m|
+      query << (m['type'].nil? ? '' : m['type']+':')+m['field']
+      query << (m['test'].nil? ? '' : m['test']+':')+m['value'] if m['value']
+    }
+
+    Device.urlsearch(query.join('/'))
   end
 
   class<<self
-    include App::Helpers
-
-    def matches(hash, except=[])
+  # return all defaults that apply to the given device
+    def defaults_for(device)
       rv = []
-      self.all.each do |default|
-        apply = default.to_h['apply']
-        apply.reject!{|k,v|
-          except.include?(k)
-        }
 
-        rv << (apply if default.match?(hash) rescue nil)
+      NodeDefault.all.each do |default|
+        if (default.devices("str:id/#{device.id}").first.id rescue nil) == device.id
+          rv << default
+          next
+        end
       end
 
-      rv.compact
+      return rv
     end
   end
 end

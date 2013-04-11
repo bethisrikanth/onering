@@ -18,15 +18,17 @@ module App
           }
 
         # resync defaults
-          Device.all.each do |device|
-            begin
-              device.safe_save
-              rv[:success] += 1
-            rescue Exception => e
-              rv[:errors] << {
-                :id      => device.id,
-                :message => e.message
-              }
+          NodeDefault.all.each do |default|
+            default.devices.each do |device|
+              begin
+                device.safe_save
+                rv[:success] += 1
+              rescue Exception => e
+                rv[:errors] << {
+                  :id      => device.id,
+                  :message => e.message
+                }
+              end
             end
           end
 
@@ -74,7 +76,7 @@ module App
                 apply.each{|k,v| o['apply'].set(k.split(/[\_\.]/), v) }
               end
 
-              default.from_json(o, false).safe_save
+              default.from_json(o, false, true).safe_save
             end
 
             200
