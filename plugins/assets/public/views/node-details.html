@@ -1,6 +1,12 @@
 <table class="table table-condensed">
   <tbody>
     <tr>
+      <th>Class</th>
+      <td>
+        <a href="#/inf/show/provisioning.class:{{ device.properties.provisioning.class }}">{{ device.properties.provisioning.class }}</a><span ng-show="device.properties.provisioning.version">.<a href="#/inf/show/provisioning.class:{{ device.properties.provisioning.class }}%20provisioning.version:{{ device.properties.provisioning.version }}">v{{ device.properties.provisioning.version }}</a></span></td>
+    </tr>
+
+    <tr>
       <th>Model</th>
       <td>{{ device.properties.make }} {{ device.properties.model }}</td>
     </tr>

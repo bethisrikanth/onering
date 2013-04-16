@@ -4,8 +4,11 @@ require 'assets/lib/helpers'
 class NodeDefault < App::Model::Base
   set_collection_name "node_defaults"
 
+  before_validation :_compact
+
   timestamps!
 
+  key :name,  String, :unique => true
   key :match, Array
   key :apply, Hash
   key :force, Boolean, :default => false
@@ -45,4 +48,11 @@ class NodeDefault < App::Model::Base
       return rv
     end
   end
+
+
+  private
+    def _compact
+      self.match = self.match.collect{|m| m.compact }.compact
+      self.apply = self.apply.compact
+    end
 end

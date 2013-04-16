@@ -17,12 +17,18 @@ module App
       end
 
     # process pairs of field/[value] parameters
-      rule :pair, many(:field, :fieldop_or), :pairer?, :value? do
+      rule :pair, many(:field, :fieldop_or), :pairer?, :values? do
         def to_mongo_query
           return ({
             '$or' => field.collect{|f|
-              f.to_mongo_query(value)
-            }
+              if values.to_a.empty?
+                f.to_mongo_query(nil)
+              else
+                values.to_a.collect{|v|
+                  f.to_mongo_query(v)
+                }
+              end
+            }.flatten
           })
         end
       end
@@ -65,6 +71,12 @@ module App
       rule :field_modifier, :coercer, :modifier do
         def get_coercer
           return coercer
+        end
+      end
+
+      rule :values, many(:value, :valueop_or) do
+        def to_a
+          value
         end
       end
 
