@@ -359,6 +359,7 @@ function AssetDefaultsController($scope, $http, AssetDefault){
 
   $scope.add = function(){
     var o = {
+      name:  '',
       match: [],
       apply: {}
     };

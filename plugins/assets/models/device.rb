@@ -94,18 +94,31 @@ class Device < App::Model::Base
     def _apply_defaults
       device = self.to_h
       merges = []
-      except = ['id', 'name']
+      except = ['id', 'name', 'updated_at', 'created_at']
 
+    # get all defaults that apply to this node
       NodeDefault.defaults_for(self).each do |m|
+      # remove fields that cannot/should not be set by a rule
         apply = m.apply.reject{|k,v|
           except.include?(k.to_s)
         }
+
+      # prefix non-top-level keys with properties
+        apply = Hash[apply.select{|k,v|
+          App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+        }].merge({
+          'properties' => Hash[apply.reject{|k,v|
+            App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+          }]
+        })
 
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
           v.autotype()
         end
 
+      # force determines whether the applied default overrides the new object
+      # being save or can be overridden by it
         if m.force === true
           device = device.deep_merge(apply)
         else
