@@ -118,9 +118,13 @@ class String
       return nil
     end
 
-  # dates
-    rv = (Time.parse(self) rescue nil)
-    return rv unless rv.nil?
+  # dates :-(
+  #   ruby will readily just parse ANYTHING that contains numbers, so:
+  #   strings must be at least 60% numeric to be parsed as a date
+    if ((self.gsub(/\D+/,'').length.to_f / self.length.to_f) > 0.6)
+      rv = (Time.parse(self) rescue nil)
+      return rv unless rv.nil?
+    end
 
     return self
   end

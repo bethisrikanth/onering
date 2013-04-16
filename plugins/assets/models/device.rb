@@ -63,6 +63,10 @@ class Device < App::Model::Base
     }).to_a
   end
 
+  def defaults
+    NodeDefault.defaults_for(self)
+  end
+
   private
     def _mangle_id
       id = id.strip.downcase if id

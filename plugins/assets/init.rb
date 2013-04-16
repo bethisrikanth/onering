@@ -120,6 +120,17 @@ module App
       end
 
 
+      get '/:id/defaults' do
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        output(device.defaults.collect{|i|
+          i.to_h
+        })
+      end
+
+
     # child management operations
       get '/:id/children/:action/?*/?' do
         allowed_to? :update_asset, params[:id]

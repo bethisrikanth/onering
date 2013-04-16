@@ -28,7 +28,7 @@
 
     <div class="stat disk">
       <div class="container-fluid">
-        <div class="row-fluid mount" ng-repeat="disk in device.properties.metrics.disk | orderBy:'mount'">
+        <div class="row-fluid mount" ng-repeat="disk in device.properties.metrics.disk.mounts | orderBy:'mount'">
           <div class="span4">
             <div class="progress" title="{{ disk.percent_used }}% used">
               <div class="bar" style="width: {{ disk.percent_used }}%;"></div>
