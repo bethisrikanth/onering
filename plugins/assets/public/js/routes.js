@@ -9,6 +9,14 @@ config(['$routeProvider', function($routeProvider){
     templateUrl: 'views/summary.html',
     controller:  SummaryController
   }).
+  when('/compare', {
+    templateUrl: 'views/compare.html',
+    controller:  NodeCompareController
+  }).
+  when('/compare/:query/:fields', {
+    templateUrl: 'views/compare.html',
+    controller:  NodeCompareController
+  }).
   when('/node/:id', {
     templateUrl: 'views/node.html',
     controller:  NodeController

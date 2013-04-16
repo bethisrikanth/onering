@@ -55,6 +55,15 @@ directive('ngModelOnblur', function() {
     }
   };
 }).
+directive('popover', function(){
+  return {
+    link: function(scope, element, attr){
+      element.popover({
+        selector: '.popover-content'
+      });
+    }
+  }
+}).
 directive('openDialog', function(){
   return {
     link: function(scope, element, attr){

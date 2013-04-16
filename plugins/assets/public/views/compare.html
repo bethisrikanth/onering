@@ -1,0 +1,54 @@
+<div ng-controller="NodeCompareController">
+  <div class="container">
+    <div class="row">
+      <div class="span12">
+        <h1>Compare Nodes</h1>
+
+<!--         <label>Query:</label>
+        <input type="text" ng-model="query" ng-model-onenter> -->
+
+        <div ng-show="results">
+          <h4>Query: {{ query }} ({{ results.length }} results)</h4>
+
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th ng-click="sortField='name'; sortReverse=!sortReverse">Node</th>
+                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
+                <th ng-repeat="field in fields" ng-click="sortField=field;sortReverse=!sortReverse">
+                  {{ field }}
+                  <i ng-click="removeField(field)" class="icon-remove pull-right"> </i>
+                </th>
+                <td>
+                  <i class="icon-plus center"> </i>
+
+                  <script type="text/ng-template" id="addfield">
+                    <form ng-submit="addField(newField); newField=null">
+                      <fieldset>
+                        <label>Add Column</label>
+                        <input type="text" placeholder="ex.: field.name" ng-model="newField">
+                      </fieldset>
+
+                      <button type="submit" class="btn">Add</button>
+                    </form>
+                  </script>
+                </td>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="result in results | orderBy:['name']">
+                <td><a href="#/node/{{ result.id }}">{{ result.name }}</a></td>
+                <td class="status center">
+                  <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
+                </td>
+                <td ng-repeat="field in fields">{{ getProperty(result,'properties.'+field,'-') }}</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

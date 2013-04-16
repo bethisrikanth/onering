@@ -429,3 +429,32 @@ function TreeViewController($scope){
     return $.isPlainObject(node);
   }
 }
+
+function NodeCompareController($scope, $routeParams, Query){
+  $scope.query = ($routeParams.query ? $routeParams.query : null);
+  $scope.fields = ($routeParams.fields ? $routeParams.fields.split('|') : []);
+
+  $scope.reload = function(){
+    console.log('lol');
+
+    if($scope.fields.length > 0 && $scope.query){
+      Query.query({
+        query: $scope.prepareQuery($scope.query, $routeParams.raw),
+        only:  $scope.fields.join(',')
+      }, function(data){
+        $scope.results = data;
+      });
+    }
+  }
+
+  $scope.removeField = function(name){
+    $scope.fields.splice($scope.fields.indexOf(name),1);
+  }
+
+  $scope.addField = function(name){
+    $scope.fields = $scope.fields.push(name);
+  }
+
+  $scope.$watch('query', $scope.reload);
+  $scope.$watch('fields', $scope.reload);
+}

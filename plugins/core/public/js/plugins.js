@@ -91,6 +91,35 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
     return stack.join('/');
   }
 
+  $rootScope.getProperty = function(obj, path, fallback){
+    var root = obj;
+    path = path.split('.');
+
+    for(var i = 0; i < path.length; i++){
+      if(root.hasOwnProperty(path[i])){
+        root = root[path[i]];
+
+        if($.isArray(root)){
+          for(var j = 0; j < root.length; j++){
+            root = root[path[i]];
+          }
+        }else{
+          if(i == (path.length - 1)){
+            if(root){
+              return root;
+            }
+          }else{
+            continue;
+          }
+        }
+      }else{
+        return fallback;
+      }
+    }
+
+    return fallback;
+  }
+
   $rootScope.ping = function(){
     $http.get('/api').
     success(function(data){
