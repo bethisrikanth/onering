@@ -15,7 +15,7 @@ class Device < App::Model::Base
   before_validation :_compact
   before_validation :_mangle_id
   before_validation :_confine_status
-  before_validation :_apply_defaults
+  #before_validation :_apply_defaults
 
   timestamps!
 

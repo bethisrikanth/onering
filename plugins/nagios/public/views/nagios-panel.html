@@ -9,7 +9,7 @@
           <b>last checked</b> {{ alert.last_checked_at | timeAgo }}
           <a href="{{ alert.url }}" target="_blank" class="pull-right" ng-show="alert.url" title="View in Nagios">View in Nagios &raquo;</a>
         </span>
-        <b>{{ alert.plugin_output }}</b>
+        <b ng-bind-htmL="alert.plugin_output"></b>
         <span ng-show="alert.name">{{ alert.type | titleize }}: {{ alert.name }}</span>
       </div>
 
