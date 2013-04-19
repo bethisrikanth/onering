@@ -155,7 +155,59 @@ module App
     # TODO: url can be prefixed with a root (see Grape::API resource-do)
       def any(url, verbs=%w(get post put delete options head patch), opts={}, &block)
         verbs.each do |verb|
-          Sinatra::Base.send(verb, url, opts, &block)
+          if ENV['RACK_ENV'] === 'profile'
+            require 'rblineprof'
+
+            wrap = Proc.new do
+              profile = lineprof(/./) do
+                block.bind(self).call()
+              end
+
+
+              content_type 'text/plain'
+              rv  = "-- BEGIN DEEP PROFILE --\n"
+
+              profile.each do |file, samples|
+                rv += (file+"\n")
+
+                begin
+                  File.readlines(file).each_with_index do |line, num|
+                    wall, cpu, calls = samples[num+1]
+                    if calls && calls > 0
+                      rv += ("% 8.1fms + % 8.1fms (% 6d) |% 5d|  %s\n" % [cpu/1000.0, (wall-cpu)/1000.0, calls, (num+1), line.chomp])
+                    else
+                      rv += ("                                 |% 5d|  %s\n" % [(num+1), line.chomp])
+                    end
+                  end
+                rescue Exception => e
+                  rv += "ERROR: #{e.class.name}: #{e.message}\n"
+                end
+
+                rv += "\n\n"
+              end
+
+              rv += "\n"
+              rv += "-- SUMMARY --\n"
+
+              profile.each do |file, data|
+                total, child, exclusive = data[0]
+                rv += (file+"\n")
+
+                rv += ("  % 10.1fms in this file\n" % [exclusive/1000.0])
+                rv += ("  % 10.1fms in this file + children\n" % [total/1000.0])
+                rv += ("  % 10.1fms in children\n" % [child/1000.0])
+                rv += "\n"
+              end
+              rv += "-- END DEEP PROFILE --\n"
+
+              response.body = rv
+              200
+            end
+          else
+            wrap = block
+          end
+
+          Sinatra::Base.send(verb, url, opts, &wrap)
         end
       end
     end

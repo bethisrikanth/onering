@@ -195,7 +195,8 @@ module App
           device['collected_at'] = Time.now if json.delete('inventory')
 
         # load and save json
-          device.from_json(json).safe_save
+          d = device.from_json(json)
+          d.safe_save
 
           200
         end
