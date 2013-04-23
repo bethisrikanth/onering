@@ -1,0 +1,27 @@
+[{
+  "_id":   "facebeefe",
+  "name":  "tester",
+  "_type": "Automation::Job",
+  "tasks": [{
+    "type":       "log",
+    "parameters": {
+      "file": "/tmp/onering-worker.log"
+    }
+  }]
+},{
+  "_id":   "deadcafe",
+  "name": "test_log_assets",
+  "_type": "Automation::Job",
+  "tasks": [{
+    "type":   "assets",
+    "parameters": {
+      "action": "list",
+      "query":  "services/haproxy"
+    }
+  },{
+    "type":       "log",
+    "parameters": {
+      "file": "/tmp/onering-worker.log"
+    }
+  }]
+}]

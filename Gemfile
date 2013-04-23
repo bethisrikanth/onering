@@ -27,6 +27,10 @@ gem "ruby-pam", :git => "git://github.com/portertech/ruby-pam.git"
 gem "activesupport", ">= 3.2"
 gem "hashlib", ">= 0.0.13"
 gem "babel_bridge"
+gem "eventmachine"
+gem "msgpack"
+gem "beaneater"
+gem "rainbow"
 
 group :test, :development do
 #  gem "rack-webconsole"

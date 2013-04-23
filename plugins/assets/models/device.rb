@@ -140,8 +140,12 @@ class Device < App::Model::Base
 
   # urlsearch
   # perform a query formatted as a URL partial path component
-    def urlsearch(query)
-      self.where(urlquerypath_to_mongoquery(query))
+    def urlsearch(urlquery)
+      self.where(Device.to_mongo(urlquery))
+    end
+
+    def to_mongo(urlquery)
+      return urlquerypath_to_mongoquery(urlquery)
     end
 
   # list

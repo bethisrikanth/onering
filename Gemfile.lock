@@ -16,6 +16,7 @@ GEM
     addressable (2.3.4)
     babel_bridge (0.5.3)
     backports (3.3.0)
+    beaneater (0.3.0)
     bson (1.8.5)
     bson_ext (1.8.5)
       bson (~> 1.8.5)
@@ -40,6 +41,7 @@ GEM
       activemodel (~> 3.0)
       activesupport (~> 3.0)
       plucky (~> 0.5.2)
+    msgpack (0.5.4)
     multi_json (1.7.2)
     net-http-persistent (2.8)
     net-ldap (0.3.1)
@@ -58,6 +60,7 @@ GEM
     racksh (1.0.0)
       rack (>= 1.0)
       rack-test (>= 0.5)
+    rainbow (1.1.4)
     rake (10.0.4)
     rb-inotify (0.8.8)
       ffi (>= 0.5.0)
@@ -100,8 +103,10 @@ DEPENDENCIES
   activesupport (>= 3.2)
   addressable
   babel_bridge
+  beaneater
   bson_ext
   deep_merge
+  eventmachine
   haml
   hashlib (>= 0.0.13)
   json
@@ -109,10 +114,12 @@ DEPENDENCIES
   mongo
   mongo_ext
   mongo_mapper
+  msgpack
   net-ldap
   net-ping
   oats
   racksh
+  rainbow
   rake
   rb-inotify (= 0.8.8)
   rdiscount (= 1.6.8)

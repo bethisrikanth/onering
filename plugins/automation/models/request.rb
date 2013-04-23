@@ -13,5 +13,9 @@ module Automation
     key :source,     String
     key :user,       String
     key :finished,   Boolean, :default => false
+
+    def job()
+      return Job.find(self.job_id)
+    end
   end
 end

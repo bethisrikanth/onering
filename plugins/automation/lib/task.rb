@@ -1,3 +1,5 @@
+require 'hashlib'
+
 module Automation
   class Task
     TASKPATH = [
@@ -6,8 +8,37 @@ module Automation
       '/var/lib/onering/api/tasks'
     ]
 
+    def initialize(options={})
+      @options = options
+      @data = nil
+    end
+
+    def opt(key, default=nil)
+      return @options.get(key, default)
+    end
+
+    def opt!(key, default=nil)
+      rv = @options.get(key)
+      raise "Parameter '#{key}' is required" if rv.nil?
+      return rv
+    end
+
+    def data=(datum)
+      @data = datum
+    end
+
+    def execute(request)
+      rv = run(request)
+      return (rv.nil? ? @data : rv)
+    end
+
+
+    def error(message)
+      STDERR.log(message.foreground(:red))
+    end
+
   # task stub: implement this to perform the actions for a given task
-    def run(request, last_result=nil)
+    def run(request)
       raise "Not Implemented"
     end
 

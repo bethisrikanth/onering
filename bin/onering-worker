@@ -15,6 +15,7 @@ require 'patches'
 require 'model'
 require 'eventmachine'
 require 'msgpack'
+require 'rainbow'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
@@ -31,22 +32,65 @@ module Automation
     end
 
     def start()
+      puts "Worker started at #{Time.now.strftime("%Y-%m-%d %H:%M:%S %z")}, ready to process jobs.".foreground(:green)
+
       App::Queue.channel('onering').subscribe do |message|
+        header = {}
+        start = Time.now
+        success = true
+
         begin
-          raise "Invalid message format" if message.body.strip.empty?
+          raise "Invalid message format: empty request" if message.body.strip.empty?
           header = MessagePack.unpack(message.body)
 
-        # run job
-          Job.run(header)
+          raise "Invalid message format: field created_at is required" unless header['created_at']
+          header['created_at'] = (Time.parse(header['created_at']) rescue nil)
+          header['age'] = (Time.now.to_f - header['created_at'].to_f)
 
-        #rescue JobFail => e
+        # start handling
+          puts "Processing request #{header['request_id']}, added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)"
+          puts "Starting job ID #{header['job_id']}...".foreground(:green)
+
+        # run job
+          result = Job.run(header)
+
+        rescue JobAbort => e
+          STDERR.puts("[Job Aborted] #{e.message}".foreground(:yellow))
+          success = false
+
+        rescue JobFail => e
+          STDERR.puts("[Job Failed] #{e.message}".foreground(:red))
+          success = false
+
         rescue Exception => e
-          STDERR.puts("#{e.class.name}: #{e.message}")
-          message.delete()
+          STDERR.puts("[Job Error] #{e.class.name}: #{e.message}".foreground(:red))
+
+          e.backtrace.each do |b|
+            STDERR.puts("[Job Error]   #{b}".foreground(:red))
+          end
+
+          message.release()
+          success = false
+          message = nil
+
+        ensure
+          message.delete() unless message.nil?
+          puts "Finished job ID #{header['job_id']} (took #{"%.6f" % (Time.now - start).to_f} seconds)...".foreground(success ? :green : :red)
+
         end
       end
     end
   end
 end
 
-Automation::Worker.new.start()
+begin
+  Automation::Worker.new.start()
+
+rescue Interrupt
+  puts "Shutting down worker at #{Time.now.strftime("%Y-%m-%d %H:%M:%S %z")}"
+
+rescue Exception => e
+  STDERR.puts("[Worker Error] #{e.class.name}: #{e.message}".foreground(:red))
+  STDERR.puts("Exiting now".foreground(:red))
+  exit 1
+end

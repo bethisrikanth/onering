@@ -19,7 +19,6 @@ module App
         @_connector.call()
 
         EM.next_tick do
-
           EM.add_periodic_timer(App::Config.get('global.queue.recheck_interval', 2)) do
             begin
               @_pool.tubes['default'].peek(:ready)
@@ -66,11 +65,18 @@ module App
 
     def subscribe(&block)
       if block_given?
-        @_pool.jobs.register(@name) do |job|
-          yield job
-        end
+        begin
+          raise "Queue not connected" if @_pool.nil?
 
-        @_pool.jobs.process!
+          @_pool.jobs.register(@name) do |job|
+            yield job
+          end
+
+          @_pool.jobs.process!
+
+        rescue Beaneater::NotFoundError => e
+          retry
+        end
       end
     end
   end
