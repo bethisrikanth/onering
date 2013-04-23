@@ -1,6 +1,7 @@
 require 'model'
 require 'assets/models/node_default'
 require 'assets/lib/helpers'
+require 'automation/models/job'
 
 class Device < App::Model::Base
   include App::Model::Taggable

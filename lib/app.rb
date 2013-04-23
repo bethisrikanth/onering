@@ -6,10 +6,12 @@ require 'active_support'
 require 'mongo_patches'
 require 'config'
 require 'db'
+require 'queue'
 require 'utils'
 require 'patches'
 require 'model'
 require 'controller'
+require 'eventmachine'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
@@ -23,7 +25,8 @@ module App
 
     def initialize
       App::Config.load(ENV['PROJECT_ROOT'])
-      Database::Base.load_all
+      Database::Base.load_all()
+      Queue.setup()
       super
     end
 

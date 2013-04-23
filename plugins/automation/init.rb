@@ -1,39 +1,29 @@
 require 'controller'
 require 'assets/models/device'
-require 'automation/models/automation_request'
-require 'automation/models/automation_result'
+require 'automation/models/job'
 require 'automation/lib/helpers'
 
 module App
   class Base < Controller
     include Helpers
 
+    helpers do
+      Automation::Task.load_all()
+    end
+
     namespace '/api/automation' do
-      get '/find/*/run/*' do
-        qsq = (params[:q] || params[:query] || '')
-        q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-        devices = Device.urlsearch(q).limit(params[:limit] || 1000)
-        return 404 unless devices
-
-        commands = params[:splat].last
-        arguments = (params[:args] || '').split('|')
-
-        rv = proxy_command_to_sites(devices, commands, arguments)
-
-        rv.to_json
+      get '/test' do
+        output(Automation::Job.find_by_name('tester').request())
       end
 
-      get '/:id/run/*' do
-        device = Device.find(params[:id])
-        return 404 unless device
-
-        #content_type 'text/plain'
-
-        commands = params[:splat].first
-        arguments = (params[:args] || '').split('|')
-
-        rv = proxy_command_to_sites([device], commands, arguments)
-        rv.to_json
+      namespace '/jobs' do
+        get '/waiting' do
+          output(Automation::Request.where({
+            :finished => false
+          }).to_a.collect{|i|
+            i.to_h
+          })
+        end
       end
     end
   end

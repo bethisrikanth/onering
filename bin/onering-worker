@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+ENV['PROJECT_ROOT'] = File.expand_path(File.dirname(File.dirname(__FILE__)))
+
+$: << File.join(ENV['PROJECT_ROOT'], 'lib')
+$: << File.join(ENV['PROJECT_ROOT'], 'plugins')
+
+require 'rubygems'
+require 'active_support'
+require 'mongo_patches'
+require 'config'
+require 'db'
+require 'queue'
+require 'utils'
+require 'patches'
+require 'model'
+require 'eventmachine'
+require 'msgpack'
+
+# require plugins
+Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
+  name = File.basename(p)
+  require "#{name}/init"
+end
+
+module Automation
+  class Worker
+    def initialize()
+      App::Config.load(ENV['PROJECT_ROOT'])
+      App::Database::Base.load_all()
+      App::Queue.setup()
+    end
+
+    def start()
+      App::Queue.channel('onering').subscribe do |message|
+        begin
+          raise "Invalid message format" if message.body.strip.empty?
+          header = MessagePack.unpack(message.body)
+
+        # run job
+          Job.run(header)
+
+        #rescue JobFail => e
+        rescue Exception => e
+          STDERR.puts("#{e.class.name}: #{e.message}")
+          message.delete()
+        end
+      end
+    end
+  end
+end
+
+Automation::Worker.new.start()
