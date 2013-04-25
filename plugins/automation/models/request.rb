@@ -12,6 +12,7 @@ module Automation
     key :parameters,  Hash
     key :source,      String
     key :user,        String
+    key :anonymous,   Boolean, :default => false
     key :started_at,  Time, :default => nil
     key :finished_at, Time, :default => nil
     key :results,     Array

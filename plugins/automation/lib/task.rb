@@ -72,9 +72,9 @@ module Automation
         def register(path)
           name = File.basename(path, '.rb').to_sym
           @_tasks = {} unless @_tasks
-          return false if @_tasks[name]
+          return false if @_tasks[path]
 
-          @_tasks[name] = {
+          @_tasks[path] = {
             :name => name,
             :path => path
           }

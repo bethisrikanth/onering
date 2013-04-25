@@ -39,6 +39,8 @@ module Automation
     # generate unique request with specific details
       request = Request.create({
         :status     => :unqueued,
+        :anonymous  => options[:anonymous],
+        :tasks      => (options[:anonymous].nil? ? nil : self.tasks),
         :job_id     => self.id,
         :source     => options[:source],
         :parameters => (options[:parameters] || {}),
@@ -51,6 +53,8 @@ module Automation
       result = (App::Queue.channel('onering').push({
         :job_id     => self.id.to_s,
         :request_id => request.id.to_s,
+        :anonymous  => options[:anonymous],
+        :tasks      => (options[:anonymous].nil? ? nil : self.tasks),
         :source     => request.source,
         :parameters => request.parameters,
         :created_at => request.created_at.strftime("%Y-%m-%d %H:%M:%S %z"),
@@ -114,14 +118,23 @@ module Automation
             :status     => :running
           })
 
+
         # get job
-          job = Job.find(header['job_id'])
-          fail("Cannot find Job ID #{header['job_id']}") unless job
+          if header['anonymous'] === true
+            job = Job.new({
+              :id    => header['job_id'],
+              :tasks => header['tasks']
+            })
+          else
+            job = Job.find(header['job_id'])
+            fail("Cannot find Job ID #{header['job_id']}") unless job
+          end
 
         # merge header data with current job
           if job.parameters and not request.parameters.empty?
             header['parameters'] = job.parameters.deep_merge!(request.parameters)
           end
+
 
         # initial data is either provided in the request or inherited from the job definition
           last_task_result = (header['data'].nil? ? job.data : MessagePack.unpack(header['data']))

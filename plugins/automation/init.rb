@@ -116,6 +116,22 @@ module App
         get '/:name' do
         end
       end
+
+      namespace '/tasks' do
+        get '/:name/run' do
+          job = Automation::Job.new({
+            :id         => "anonymous",
+            :tasks      => [{
+              :type => params[:name]
+            }]
+          })
+
+          output(job.request({
+            :anonymous  => true,
+            :parameters => request.env['rack.request.query_hash']
+          }.compact))
+        end
+      end
     end
   end
 end
