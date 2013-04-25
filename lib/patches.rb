@@ -3,6 +3,24 @@ require 'hashlib'
 require 'net/http'
 require 'time'
 
+class TrueClass
+  def to_bool
+    self
+  end
+end
+
+class FalseClass
+  def to_bool
+    self
+  end
+end
+
+class NilClass
+  def to_bool
+    false
+  end
+end
+
 class String
   SI_UNITS=%w{b k m g t p e z y}
 
@@ -149,5 +167,48 @@ class Array
 
   def push_uniq(value)
     self << value unless include?(value)
+  end
+end
+
+
+
+
+class TeeIO
+  require 'stringio'
+  attr 'tee'
+
+  def initialize(tee, original)
+    @tee = tee
+    @original = original
+  end
+
+  def write(buf)
+  # write buffer to both outputs
+    @tee << buf
+    @original << buf
+  end
+end
+
+module Kernel
+  def capture
+    buffer = StringIO.new()
+    $stdout = buffer
+    $stderr = buffer
+    yield
+    return buffer.string
+  ensure
+    $stdout = STDOUT
+    $stderr = STDERR
+  end
+
+  def tee
+    buffer = StringIO.new()
+    $stdout = TeeIO.new(buffer, $stdout)
+    $stderr = TeeIO.new(buffer, $stderr)
+    yield
+    return buffer.string
+  ensure
+    $stdout = STDOUT
+    $stderr = STDERR
   end
 end

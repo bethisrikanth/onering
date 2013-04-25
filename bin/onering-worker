@@ -29,6 +29,7 @@ module Automation
       App::Config.load(ENV['PROJECT_ROOT'])
       App::Database::Base.load_all()
       App::Queue.setup()
+      Automation::Tasks::Base.load_all()
     end
 
     def start()
@@ -48,8 +49,7 @@ module Automation
           header['age'] = (Time.now.to_f - header['created_at'].to_f)
 
         # start handling
-          puts "Processing request #{header['request_id']}, added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)"
-          puts "Starting job ID #{header['job_id']}...".foreground(:green)
+          puts "Starting job ID #{header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
 
         # run job
           result = Job.run(header)
@@ -91,6 +91,9 @@ rescue Interrupt
 
 rescue Exception => e
   STDERR.puts("[Worker Error] #{e.class.name}: #{e.message}".foreground(:red))
+  e.backtrace.each do |b|
+    STDERR.puts("[Worker Error] #{b}".foreground(:red))
+  end
   STDERR.puts("Exiting now".foreground(:red))
   exit 1
 end

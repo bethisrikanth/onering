@@ -17,6 +17,8 @@ module Automation
   class TaskFail  < TaskTermination; end
   class TaskJump  < TaskTermination; end
 
+
+
   class Job < App::Model::Base
     set_collection_name "automation_jobs"
 
@@ -26,6 +28,12 @@ module Automation
     key :parameters, Hash
     key :tasks,      Array
     key :data
+
+    def requests()
+      Request.where({
+        :job_id => self.id
+      })
+    end
 
     def request(options={})
     # generate unique request with specific details
@@ -60,7 +68,12 @@ module Automation
           :id       => request.id.to_s,
           :job_id   => self.id.to_s,
           :queue_id => result[:id],
-          :status   => result[:status].downcase,
+          :status   => (
+            case result[:status].downcase.to_sym
+            when :inserted then :queued
+            else result[:status].downcase.to_sym
+            end
+          ),
           :body     => result[:body]
         }.compact)
       else
@@ -74,21 +87,36 @@ module Automation
 
 
     class<<self
-      def run(header, logger=STDERR)
+      def abort(message)
+        raise JobAbort.new(message)
+      end
+
+      def fail(message)
+        raise JobFail.new(message)
+      end
+
+      def log(message, severity=:info)
+        STDOUT.puts("[JOB] #{message}")
+      end
+
+      def run(header)
         require 'rainbow'
 
         begin
-          raise JobFail.new("Request is missing a Job ID")     unless header['job_id']
-          raise JobFail.new("Request is missing a Request ID") unless header['request_id']
+          fail("Request is missing a Job ID")     unless header['job_id']
+          fail("Request is missing a Request ID") unless header['request_id']
 
         # get request
           request = Request.find(header['request_id'])
-          raise JobFail.new("Cannot find Request ID #{header['request_id']}") unless request
-          request.set(:status => :running)
+          fail("Cannot find Request ID #{header['request_id']}") unless request
+          request.set({
+            :started_at => Time.now,
+            :status     => :running
+          })
 
         # get job
           job = Job.find(header['job_id'])
-          raise JobFail.new("Cannot find Job ID #{header['job_id']}") unless job
+          fail("Cannot find Job ID #{header['job_id']}") unless job
 
         # merge header data with current job
           if job.parameters and not request.parameters.empty?
@@ -99,20 +127,20 @@ module Automation
           last_task_result = (header['data'].nil? ? job.data : MessagePack.unpack(header['data']))
 
         # tell someone we tried to do dumb things
-          raise JobAbort.new("Job has no tasks defined, skipping") if job.tasks.empty?
+          abort("Job has no tasks defined, skipping") if job.tasks.empty?
 
 
         # process tasks
           job.tasks.each do |config|
           # merge data from header parameters into first task configuration
             if config === job.tasks.first
-              config['parameters'] = config['parameters'].deep_merge!(header['parameters'])
+              config['parameters'] = config.get('parameters',{}).deep_merge!(header.get('parameters',{}))
             end
 
           # build task instance
-            raise JobFail.new("Task configuration requires a type field") unless config['type']
-            task = (Automation.const_get("#{config['type'].capitalize}Task").new(config['parameters']) rescue nil)
-            raise JobFail.new("No such task of type '#{config['type']}'") unless task
+            fail("Task configuration requires a type field") unless config['type']
+            task = (config['type'].split('.').inject(Automation::Tasks){|k,name| k = k.const_get(name.capitalize) }).new(config['parameters'])
+            fail("No such task of type '#{config['type']}'") unless task
 
           # execute task
             begin
@@ -124,9 +152,9 @@ module Automation
             #
               data = [*last_task_result].flatten.compact
 
-              logger.puts("Starting #{config['type']} task with #{data.length} data elements")
+              log("Starting #{config['type']} task with #{data.length} data elements")
 
-            # no data input, just run the task
+            # no data specified, run the task once
               if data.empty?
                 results << task.execute(header)
 
@@ -134,8 +162,7 @@ module Automation
             # piece of data
               else
                 data.each do |datum|
-                  task.data = datum
-                  results << task.execute(header)
+                  results << task.execute(header, datum)
                 end
               end
 
@@ -144,7 +171,7 @@ module Automation
 
           # task aborted, continue to next task
             rescue TaskAbort => e
-              logger.puts("[Task Aborted] #{e.message}".foreground(:yellow))
+              log("[Task Aborted] #{e.message}", :warning)
               next
 
           # task requested a retry
@@ -154,17 +181,17 @@ module Automation
               config['retry_number']  += 1
 
               if config['retry_number'] <= config['retry_limit']
-                logger.puts("[Task Retrying] (#{config['retry_number']}/#{config['retry_limit']}) #{e.message}".foreground(:yellow))
+                log("[Task Retrying] (#{config['retry_number']}/#{config['retry_limit']}) #{e.message}", :warning)
                 retry
               else
-                logger.puts("[Task Failed] Too many retries (attempted #{config['retry_number']})".foreground(:red))
+                log("[Task Failed] Too many retries (attempted #{config['retry_number']})", :error)
                 last_task_result = nil
                 next
               end
 
           # task has failed, proceed to next task with null input
             rescue TaskFail => e
-              logger.puts("[Task Failed] #{e.message}".foreground(:red))
+              log("[Task Failed] #{e.message}", :error)
               last_task_result = nil
               next
             end
@@ -172,23 +199,22 @@ module Automation
 
         # we got here! success!
           request.set({
-            :finished => true,
-            :status   => :succeeded
+            :finished_at => Time.now,
+            :status      => :succeeded
           })
 
           return last_task_result
 
         rescue JobAbort => e
           request.set({
-            :finished => true,
-            :status   => :aborted
+            :finished_at => Time.now,
+            :status      => :aborted
           }) if request
 
           raise e
 
         rescue JobRetry => e
           request.set({
-            :finished => true,
             :status   => :retrying
           }) if request
 
@@ -196,8 +222,8 @@ module Automation
 
         rescue Exception => e
           request.set({
-            :finished => true,
-            :status   => :failed
+            :finished_at => Time.now,
+            :status      => :failed
           }) if request
 
           raise e

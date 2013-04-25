@@ -2,7 +2,7 @@ $: << File.join(ENV['PROJECT_ROOT'], 'lib')
 $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 require 'rubygems'
-require 'active_support'
+require 'oj'
 require 'mongo_patches'
 require 'config'
 require 'db'
@@ -10,8 +10,10 @@ require 'queue'
 require 'utils'
 require 'patches'
 require 'model'
+require 'msgpack'
 require 'controller'
 require 'eventmachine'
+require 'multi_json'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|

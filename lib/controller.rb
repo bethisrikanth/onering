@@ -100,7 +100,7 @@ module App
           rv = body.to_xml()
 
         else
-          rv = body.to_json
+          rv = MultiJson.dump(body)
         end
 
         [status, { 'Content-Type' => mime }, rv]

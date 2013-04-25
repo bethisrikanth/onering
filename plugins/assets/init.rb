@@ -3,6 +3,7 @@ require 'mongo_mapper'
 require 'assets/lib/helpers'
 require 'assets/models/device'
 require 'assets/models/node_default'
+require 'automation/models/job'
 
 module App
   class Base < Controller
@@ -11,30 +12,7 @@ module App
     namespace '/api/devices' do
       namespace '/defaults' do
         get '/sync' do
-          rv = {
-            :success => 0,
-            :time    => Time.now,
-            :errors  => []
-          }
-
-        # resync defaults
-          NodeDefault.all.each do |default|
-            default.devices.each do |device|
-              begin
-                device.safe_save
-                rv[:success] += 1
-              rescue Exception => e
-                rv[:errors] << {
-                  :id      => device.id,
-                  :message => e.message
-                }
-              end
-            end
-          end
-
-          rv[:time] = (Time.now - rv[:time]).to_f
-
-          output(rv.compact)
+          output(Automation::Job.find_by_name('assets-sync').request())
         end
 
         get '/list' do
@@ -181,24 +159,35 @@ module App
         /:id
       }.each do |route|
         post route do
-          json = JSON.parse(request.env['rack.input'].read)
-          halt 400, "Invalid JSON" unless json
+          job = Automation::Job.find_by_name('assets-update')
+          return 503 unless job
 
-          id = (params[:id] || json['id'])
+          data = request.env['rack.input'].read
 
-          allowed_to? :update_asset, id
+          if params[:id]
+            id = params[:id]
+          else
+            json = MultiJson.load(data)
+            id = json['id']
+          end
 
-          device = Device.find_or_create(id)
-          return 404 unless device
-
-        # update the collected_at timestamp if this is an inventory run
-          device['collected_at'] = Time.now if json.delete('inventory')
-
-        # load and save json
-          d = device.from_json(json)
-          d.safe_save
-
-          200
+          if params[:direct].to_bool === true
+            json = MultiJson.load(data) unless json
+            json['collected_at'] = Time.now if json['inventory'] === true
+            device = Device.find(id)
+            return 404 unless device
+            device.from_h(json)
+            device.safe_save
+            device.reload
+            output(device)
+          else
+            output(job.request({
+              :data       => data,
+              :parameters => {
+                :nodes => [id]
+              }
+            }))
+          end
         end
       end
 
@@ -209,7 +198,6 @@ module App
         post route do
           device = Device.find(params[:id])
           return 404 if not device
-
           device.add_note(request.env['rack.input'].read, @user.id)
           device.safe_save
 
@@ -251,8 +239,7 @@ module App
           end
 
           device.safe_save
-
-          output device.to_h
+          output(device)
         end
       end
 
@@ -277,7 +264,7 @@ module App
         device = Device.find(params[:id])
         tags.each{|t| device.tags.push_uniq(t) }
         device.safe_save
-        output device.to_h
+        output(device)
       end
 
 
@@ -286,7 +273,7 @@ module App
         device = Device.find(params[:id])
         tags.each{|t| device.tags.delete(t) }
         device.safe_save
-        output device.to_h
+        output(device)
       end
 
 
@@ -305,7 +292,7 @@ module App
           device.safe_save
         end
 
-        output device.to_h
+        output(device)
       end
 
     # maintenance_status
