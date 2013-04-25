@@ -69,10 +69,10 @@ module Automation
     # return IDs and statuses
       if result
         return ({
-          :id       => request.id.to_s,
-          :job_id   => self.id.to_s,
-          :queue_id => result[:id],
-          :status   => (
+          :request_id => request.id.to_s,
+          :job_id     => self.id.to_s,
+          :queue_id   => result[:id],
+          :status     => (
             case result[:status].downcase.to_sym
             when :inserted then :queued
             else result[:status].downcase.to_sym
@@ -82,9 +82,9 @@ module Automation
         }.compact)
       else
         return ({
-          :id       => request.id.to_s,
-          :job_id   => self.id.to_s,
-          :status   => :queue_failed
+          :request_id => request.id.to_s,
+          :job_id     => self.id.to_s,
+          :status     => :queue_failed
         })
       end
     end
@@ -101,6 +101,21 @@ module Automation
 
       def log(message, severity=:info)
         STDOUT.puts("[JOB] #{message}")
+      end
+
+      def run_task(name, options={})
+        job = Automation::Job.new({
+          :id         => 'anonymous',
+          :tasks      => [{
+            :type => name
+          }]
+        })
+
+        job.request({
+          :anonymous  => true,
+          :parameters => options[:parameters],
+          :data       => options[:data]
+        }.compact)
       end
 
       def run(header)
@@ -165,7 +180,11 @@ module Automation
             #
               data = [*last_task_result].flatten.compact
 
-              log("Starting #{config['type']} task with #{data.length} data elements")
+              if data.empty?
+                log("Starting #{config['type']} task")
+              else
+                log("Starting #{config['type']} task with #{data.length} data elements")
+              end
 
             # no data specified, run the task once
               if data.empty?

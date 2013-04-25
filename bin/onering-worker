@@ -49,7 +49,7 @@ module Automation
           header['age'] = (Time.now.to_f - header['created_at'].to_f)
 
         # start handling
-          puts "Starting job ID #{header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
+          puts "Starting job #{header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
 
         # run job
           result = Job.run(header)
@@ -75,7 +75,7 @@ module Automation
 
         ensure
           message.delete() unless message.nil?
-          puts "Finished job ID #{header['job_id']} (took #{"%.6f" % (Time.now - start).to_f} seconds)...".foreground(success ? :green : :red)
+          puts "Finished job #{header['job_id']} (took #{"%.6f" % (Time.now - start).to_f} seconds)...".foreground(success ? :green : :red)
 
         end
       end
