@@ -104,14 +104,12 @@ module Automation
       end
 
       def run_task(name, options={})
-        job = Automation::Job.new({
+        Automation::Job.new({
           :id         => 'anonymous',
           :tasks      => [{
             :type => name
           }]
-        })
-
-        job.request({
+        }).request({
           :anonymous  => true,
           :parameters => options[:parameters],
           :data       => options[:data]

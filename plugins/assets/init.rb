@@ -44,7 +44,7 @@ module App
             default = (params[:id] ? NodeDefault.find(params[:id]) : NodeDefault.new())
             return 404 unless default
 
-            json = JSON.parse(request.env['rack.input'].read)
+            json = MultiJson.load(request.env['rack.input'].read)
             json = [json] if json.is_a?(Hash)
 
             json.each do |o|

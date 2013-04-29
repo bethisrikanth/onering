@@ -1,7 +1,6 @@
 require 'controller'
 require 'assets/models/device'
 require 'automation/models/job'
-require 'automation/lib/helpers'
 
 module App
   class Base < Controller
