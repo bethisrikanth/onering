@@ -1,5 +1,0 @@
-# -----------------------------------------------------------------------------
-# pre: GPT disk label
-
-dd if=/dev/zero of=/dev/sda bs=512 count=1
-parted /dev/sda --script -- mklabel gpt

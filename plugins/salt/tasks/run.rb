@@ -12,7 +12,7 @@ module Automation
           plugin = opt!(:plugin)
           arguments = opt(:arguments, [])
 
-          fail("Arguments must be an array type") unless arguments.empty?
+          #fail("Arguments must be an array type") if arguments.empty?
 
           nodes = []
           nodes += Device.urlsearch(opt(:query)).fields('properties.site').to_a if opt(:query)
@@ -72,6 +72,10 @@ module Automation
           end
 
           log("Received #{rv.length} responses")
+
+          rv.each do |v|
+            log("OUT: #{v}")
+          end
 
           rv
         end

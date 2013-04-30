@@ -7,7 +7,7 @@ require 'net/http'
 module App
   class Base < Controller
     configure do
-      set :views, File.join(File.dirname(__FILE__), 'views')
+      set :views, File.join(ENV['PROJECT_ROOT'], 'config', 'templates')
       ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(settings.views)
     end
 
@@ -100,7 +100,11 @@ module App
             device.safe_save
           end
 
-          liquid 'boot/kickstart/base'.to_sym, :locals => {
+          script_type = device.properties.get('provisioning.family')
+
+          raise "Property 'provisioning.family' is required" unless script_type
+
+          liquid "automation/#{script_type.downcase}/base", :locals => {
             :device => (device.to_h rescue {}),
             :config => Config.get('provisioning.boot')
           }

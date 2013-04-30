@@ -53,6 +53,6 @@ class NodeDefault < App::Model::Base
   private
     def _compact
       self.match = self.match.collect{|m| m.compact }.compact
-      self.apply = self.apply.compact
+      self.apply = self.apply
     end
 end
