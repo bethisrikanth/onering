@@ -68,6 +68,16 @@ class Device < App::Model::Base
     NodeDefault.defaults_for(self)
   end
 
+  def get(field, default=nil)
+    field = case field
+    when 'id' then '_' + field
+    when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
+    else "properties.#{field}"
+    end
+
+    return self.to_h.get(field, default)
+  end
+
   private
     def _mangle_id
       id = id.strip.downcase if id
@@ -119,7 +129,11 @@ class Device < App::Model::Base
 
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
-          v.autotype()
+          if v.is_a?(String) and v[0] == '@'
+            self.get(v[1..-1], v.autotype())
+          else
+            v.autotype()
+          end
         end
 
       # force determines whether the applied default overrides the new object
