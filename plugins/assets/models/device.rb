@@ -17,6 +17,7 @@ class Device < App::Model::Base
   before_validation :_mangle_id
   before_validation :_confine_status
   before_validation :_apply_defaults
+  before_validation :_resolve_references
 
   timestamps!
 
@@ -71,7 +72,7 @@ class Device < App::Model::Base
   def get(field, default=nil)
     field = case field
     when 'id' then '_' + field
-    when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
+    when Regexp.new("^(#{App::Helpers::TOP_LEVEL_FIELDS.join('|')})$") then field
     else "properties.#{field}"
     end
 
@@ -130,7 +131,7 @@ class Device < App::Model::Base
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
           if v.is_a?(String) and v[0] == '@'
-            self.get(v[1..-1], v.autotype())
+            self.get(v[1..-1])
           else
             v.autotype()
           end
@@ -146,6 +147,25 @@ class Device < App::Model::Base
       end
 
       self.from_h(device, false)
+      self
+    end
+
+    def _resolve_references
+      properties = self.to_h.get('properties').clone
+
+      properties.each_recurse do |k,v,p|
+        if v.is_a?(String) and v[0] == '@'
+          properties.set(p, self.get(v[1..-1]))
+        end
+      end
+
+      require 'pp'
+      pp properties
+
+      self.from_h({
+        'properties' => properties
+      }, false)
+
       self
     end
 
