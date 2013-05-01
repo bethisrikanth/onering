@@ -159,9 +159,6 @@ class Device < App::Model::Base
         end
       end
 
-      require 'pp'
-      pp properties
-
       self.from_h({
         'properties' => properties
       }, false)
