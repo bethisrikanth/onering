@@ -26,10 +26,58 @@ function LogoutController($scope, $http, $rootScope, $window){
 }
 
 
-function UserProfileController($scope, $http, CurrentUser){
-  CurrentUser.get({}, function(data){
-    $scope.user = data;
-  })
+function UserProfileController($scope, $http, $dialog, CurrentUser){
+  $scope.reload = function(){
+    CurrentUser.get({}, function(data){
+      $scope.user = data;
+    })
+  }
+
+  $scope.createKeyDialog = function(){
+    var $parent = $scope;
+
+    var d = $dialog.dialog({
+      backdrop:    true,
+      keyboard:    true,
+      templateUrl: 'createKeyDialog',
+      controller:  function($scope, $dialog){
+        $scope.save = function(response){
+          $parent.reload();
+          $parent.showKeyDialog($scope.key_name, response.data.split(/\n{2,}/))
+          $scope.close();
+        }
+
+        $scope.close = function(){
+          d.close()
+        };
+      }
+    });
+
+    d.open()
+  };
+
+  $scope.showKeyDialog = function(name, data){
+    var $parent = $scope;
+
+    var d = $dialog.dialog({
+      backdrop:    true,
+      keyboard:    true,
+      templateUrl: 'showKeyDialog',
+      controller:  function($scope, $dialog){
+        $scope.name = name;
+        $scope.private_key = data[0].trim();
+        $scope.public_key  = data[1].trim();
+
+        $scope.close = function(){
+          d.close()
+        };
+      }
+    });
+
+    d.open()
+  };
+
+  $scope.reload();
 }
 
 

@@ -1,4 +1,5 @@
 require 'openssl'
+require 'digest/md5'
 require 'auth/helpers/helpers'
 require 'sinatra/session'
 
@@ -173,6 +174,26 @@ module App
           200
         end
 
+      # set user gravatar image
+        get '/:id/gravatar' do
+          id = (params[:id] == 'current' ? @user.id : params[:id])
+          allowed_to? :get_user, id
+
+          user = User.find(id)
+          return 404 unless user
+
+          email = (user.email || user.id+'@'+Config.get('global.email.default_domain'))
+          gravatar_id = user.options.get('gravatar_id')
+          gravatar_id = Digest::MD5.hexdigest(email.strip) unless gravatar_id
+
+          if gravatar_id
+            qs = request.env['rack.request.query_hash'].collect{|k,v| "#{k}=#{v}" }.join('&')
+            redirect ["http://www.gravatar.com/avatar/#{gravatar_id}", qs].compact.join('?')
+          else
+            halt 404, "Unable to calculate Gravatar ID"
+          end
+        end
+
       # update user type
         get '/:id/type/:type' do
           id = (params[:id] == 'current' ? @user.id : params[:id])
@@ -244,8 +265,9 @@ module App
 
           # save this key
             user.client_keys[params[:name]] = {
-              :name => params[:name],
-              :public_key => client_cert.to_pem
+              :name       => params[:name],
+              :public_key => client_cert.to_pem,
+              :created_at => Time.now
             }
 
             user.safe_save
@@ -254,21 +276,21 @@ module App
 
           # allow saving the certificate in various container formats
             case params[:cert]
-            when 'pem'
-            # optionally return the cert inline (default is to download)
-              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.pem" unless params[:inline]
-              return key.to_pem + "\n\n" + client_cert.to_pem
-            else
+            when 'pkcs12'
             # optionally return the cert inline (default is to download)
               headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.p12" unless params[:inline]
               return OpenSSL::PKCS12.create(params[:name], params[:name], key, client_cert).to_der rescue nil
+            else
+            # optionally return the cert inline (default is to download)
+              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.pem" unless params[:inline]
+              return key.to_pem + "\n\n" + client_cert.to_pem
             end
           else
             halt 403, "Cannot download previously-generated key"
           end
         end
 
-        get '/:id/keys/:name/remove' do
+        delete '/:id/keys/:name' do
           id = (params[:id] == 'current' ? @user.id : params[:id])
 
           #allowed_to? :remove_api_key, id

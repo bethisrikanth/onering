@@ -13,7 +13,7 @@ config(function($httpProvider){
         //  only reject severe issues
             switch(response.data.error.severity){
               case 'ignore':
-                return response;
+                return $q.reject(response);
 
               case 'debug':
               case 'info':

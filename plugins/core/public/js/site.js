@@ -1,5 +1,7 @@
 angular.module('app', [
   'ui',
+  'ui.bootstrap',
+  'rest',
   'corePlugin',
   'authPlugin',
   'assetsPlugin',

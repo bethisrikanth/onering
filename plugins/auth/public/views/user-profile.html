@@ -1,11 +1,131 @@
-<div class="container">
+<div class="container" ng-controller="UserProfileController">
   <div class="row">
     <div class="span2">
-      <img src="/img/avatar.png" class="img-polaroid" width="256" height="256" />
+      <img src="/api/users/current/gravatar?s=256" class="img-polaroid" width="256" height="256" />
     </div>
 
     <div class="offset1 span9">
       <h1>{{ user.id }}</h1>
+
+      <table class="table-condensed table-plain">
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <td>{{ user.name }}</td>
+          </tr>
+
+          <tr>
+            <th>Last Logged In</th>
+            <td><span title="{{ user.logged_in_at }}">{{ user.logged_in_at | timeAgo }}</span></td>
+          </tr>
+
+          <tr>
+            <th>Authentication Type</th>
+            <td>{{ user.type.replace('User','') | titleize }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+      <br />
+      <br />
+
+      <h4>Client Keys ({{ user.client_keys | length }})</h4>
+      <table class="table table-condensed table-striped">
+        <thead>
+          <tr>
+            <th colspan="10">
+              <button ng-click="createKeyDialog()" class="btn"><i class="icon-plus"> </i> Add Key</button>
+            </th>
+          </tr>
+
+          <tr>
+            <th>Name</th>
+            <th>Created At</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="(name, key) in user.client_keys">
+            <td>{{ name }}</td>
+            <td>{{ key.created_at }}</td>
+            <td>
+              <a rest="/api/users/current/keys/{{ name }}" rest-method="delete" rest-severity="warning" rest-success="reload()" title="Delete key '{{ name }}'">
+                <i class="icon-remove"> </i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
+
+
+<script type="text/ng-template" id="createKeyDialog">
+  <div class="modal-header">
+    <h1>Create New Key</h1>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Client keys are used by external applications (e.g.: the onering command line tool, curl) to authenticate you to the system before performing an action.  You may generate as many keys as you desire.  It is recommended that you generate one key per application used so that should a key be compromised, it can be revoked without affacting your other applications.
+    </p>
+
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="key_name">Key Name</label>
+        <div class="controls">
+          <input type="text" id="key_name" ng-model="key_name" placeholder="Key Name"></input>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="save(response)" class="btn btn-primary">Create Key</button>
+    <button class="btn btn-danger" ng-click="close()">Cancel</button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="showKeyDialog">
+  <div class="modal-header">
+    <h1>Private Key "{{ name }}"</h1>
+  </div>
+
+  <div class="modal-body">
+    <tabs>
+      <pane heading="Private Key" active="true">
+        <p>
+          This is your private key.  Copy the text below into a new file (e.g <i>~/.onering/client.pem</i>) which can be used by client applications, such as the Onering client (<i>gem install onering-client</i>) to authenticate you to the system without a username and password.
+        </p>
+
+        <br />
+
+        <div class="alert alert-error">
+          <b>NOTE: This will only be displayed once!</b>
+          <br />
+          If you lose this key, you will have to delete it and create a new one.
+        </div>
+
+        <pre>{{ private_key }}</pre>
+      </pane>
+
+      <pane heading="Public Key">
+        <p>
+          This is your public key.  It is used by the Onering server to authenticate your private key.  This can be retrieved at any time and used to verify your private key as genuine.
+        </p>
+
+        <br />
+
+        <pre>{{ public_key }}</pre>
+      </pane>
+    </tabs>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn" ng-click="close()">Close</button>
+  </div>
+</script>

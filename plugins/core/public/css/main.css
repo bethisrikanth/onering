@@ -367,6 +367,10 @@ i.normal{
   color: #999;
 }
 
+th{
+  text-align: left;
+}
+
 .table-stacked tbody{
   border-top-width: 0px !important;
 }
