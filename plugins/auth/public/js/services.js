@@ -1,7 +1,7 @@
 angular.module('authService', ['ngResource']).
 factory('User', function($resource){
-  return $resource('/api/users/:user', {
-    user: '@user'
+  return $resource('/api/users/:id', {
+    id: '@id'
   });
 }).
 factory('CurrentUser', function($resource){

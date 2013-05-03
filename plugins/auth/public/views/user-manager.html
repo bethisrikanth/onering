@@ -15,6 +15,8 @@
               <button class="btn"><i class="icon-plus"> </i> Add User</button>
             </div>
 
+            <br />
+
             <table class="table table-condensed table-hover">
               <thead>
                 <tr>
@@ -39,7 +41,7 @@
 
             <script type="text/ng-template" id="userDialog">
               <div class="modal-header">
-                <h1>Edit User</h1>
+                <h3>Edit User</h3>
               </div>
 
               <div class="modal-body">
@@ -70,7 +72,7 @@
 
                         <ul class="dropdown-menu">
                           <li ng-repeat="group in groups">
-                            <a rest="/api/groups/{{ group.id }}/add/{{ user.id }}" rest-success="reload()">{{ group.id }}</a>
+                            <a>{{ group.name }}</a>
                           </li>
                         </ul>
                       </div>
@@ -80,6 +82,7 @@
               </div>
 
               <div class="modal-footer">
+                <button class="btn btn-primary" rest="/api/users/{{ user.id }}" rest-data="user" rest-method="post" rest-success="reload(); close()">Save</button>
                 <button class="btn btn-danger" ng-click="close()">Cancel</button>
               </div>
             </script>

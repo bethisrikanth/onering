@@ -1,7 +1,7 @@
 <div class="container" ng-controller="UserProfileController">
   <div class="row">
     <div class="span2">
-      <img src="/api/users/current/gravatar?s=256" class="avatar img-polaroid" width="256" height="256" onerror="this.src='/img/blank.gif'" />
+      <img ng-src="/api/users/current/gravatar?s=256" class="avatar img-polaroid" width="256" height="256" onerror="this.src='/img/blank.gif'" />
     </div>
 
     <div class="offset1 span9">
@@ -65,7 +65,7 @@
 
 <script type="text/ng-template" id="createKeyDialog">
   <div class="modal-header">
-    <h1>Create New Key</h1>
+    <h3>Create New Key</h3>
   </div>
 
   <div class="modal-body">
@@ -92,12 +92,12 @@
 
 <script type="text/ng-template" id="showKeyDialog">
   <div class="modal-header">
-    <h1>Private Key "{{ name }}"</h1>
+    <h3>View Key "{{ name }}"</h3>
   </div>
 
   <div class="modal-body">
     <tabs>
-      <pane heading="Private Key">
+      <pane heading="Private Key" ng-show="private_key">
         <p>
           This is your private key.  Copy the text below into a new file (e.g <i>~/.onering/client.pem</i>) which can be used by client applications, such as the Onering client (<i>gem install onering-client</i>) to authenticate you to the system without a username and password.
         </p>
@@ -113,7 +113,7 @@
         <pre>{{ private_key }}</pre>
       </pane>
 
-      <pane heading="Public Key">
+      <pane heading="Public Key" ng-show="public_key">
         <p>
           This is your public key.  It is used by the Onering server to authenticate your private key.  This can be retrieved at any time and used to verify your private key as genuine.
         </p>

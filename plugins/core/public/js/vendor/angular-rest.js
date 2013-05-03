@@ -1,6 +1,8 @@
 angular.module('rest', [])
 .directive('rest', function() {
   return {
+    restrict: 'EA',
+
     scope: {
       rest:         '@',
       restMethod:   '@',

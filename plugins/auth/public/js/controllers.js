@@ -82,6 +82,9 @@ function UserProfileController($scope, $http, $dialog, CurrentUser){
 
 
 function UserManagerController($scope, $http, $dialog, User, UserType, UserList, GroupList, CapabilityList){
+  $scope.sortField = 'id';
+
+
   $scope.reloadUsers = function(){
     UserList.query({}, function(data){
       $scope.users = data;
