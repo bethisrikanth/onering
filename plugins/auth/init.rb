@@ -97,7 +97,7 @@ module App
       # get user types list
         get '/list/types' do
           allowed_to? :list_users
-          output(User.list(:_type))
+          output(User.list(:_type).collect{|i| i.gsub('User','').downcase }.compact.reject{|i| i.empty? })
         end
 
       # perform session login
@@ -153,7 +153,7 @@ module App
           if json
           # remove certain fields
             json.delete_if{|k,v|
-              k =~ /(?:^_?id$|^_?type$|_at$)/
+              k =~ /(?:^_?id$|_at$)/
             }
 
             user = User.find_or_create(id)
@@ -192,19 +192,6 @@ module App
           else
             halt 404, "Unable to calculate Gravatar ID"
           end
-        end
-
-      # update user type
-        get '/:id/type/:type' do
-          id = (params[:id] == 'current' ? @user.id : params[:id])
-
-          allowed_to? :update_user_type, id, params[:type]
-
-          user = User.find(id)
-          return 404 unless user
-          user._type = params[:type]
-          user.safe_save
-          output(user)
         end
 
       # generate a new client key for this user

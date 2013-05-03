@@ -11,83 +11,12 @@
       <div class="span12">
         <tabs>
           <pane heading="Users">
-            <div class="btn-group">
-              <button class="btn"><i class="icon-plus"> </i> Add User</button>
-            </div>
-
-            <br />
-
-            <table class="table table-condensed table-hover">
-              <thead>
-                <tr>
-                  <th>&nbsp;</th>
-                  <th ng-click="sortField='id'; sortReverse=!sortReverse">User ID</th>
-                  <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                  <th ng-hide="userPaneUser" ng-click="sortField='type'; sortReverse=!sortReverse">Authentication Type</th>
-                  <th ng-hide="userPaneUser" ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Logged In</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr ng-repeat="user in users | orderBy:sortField:sortReverse">
-                  <td class="center"><input type="checkbox"></input></td>
-                  <td class="id"><a ng-click="userDialog(user)">{{ user.id }}</a></td>
-                  <td>{{ user.name }}</td>
-                  <td ng-hide="userPaneUser">{{ user.type | replace:'User':'' | titleize }}</td>
-                  <td ng-hide="userPaneUser">{{ user.logged_in_at &amp;&amp; (user.logged_in_at | timeAgo) || '-' }}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <script type="text/ng-template" id="userDialog">
-              <div class="modal-header">
-                <h3>Edit User</h3>
-              </div>
-
-              <div class="modal-body">
-                <h1>
-                  <img src="/api/users/{{ user.id }}/gravatar?s=64" class="avatar img-polaroid pull-left" width="64" height="64" onerror="this.src='/img/blank.gif'" />
-                  <span style="margin-left: 0.5em;">{{ user.id }}</span>
-                </h1>
-
-                <form class="clearfix form-horizontal">
-                  <br />
-                  <br />
-
-                  <div class="control-group">
-                    <label class="control-label">Name</label>
-                    <div class="controls">
-                      <input type="text" ng-model="user.name" placeholder="First Last"></input>
-                    </div>
-                  </div>
-
-                  <div class="control-group">
-                    <label class="control-label">Groups</label>
-
-                    <div class="controls">
-                      <div class="dropdown">
-                        <a class="dropdown-toggle">
-                          {{ user.groups.join(', ') }}
-                        </a>
-
-                        <ul class="dropdown-menu">
-                          <li ng-repeat="group in groups">
-                            <a>{{ group.name }}</a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-              <div class="modal-footer">
-                <button class="btn btn-primary" rest="/api/users/{{ user.id }}" rest-data="user" rest-method="post" rest-success="reload(); close()">Save</button>
-                <button class="btn btn-danger" ng-click="close()">Cancel</button>
-              </div>
-            </script>
+            <div ng-include="'views/user-manager-users.html'"></div>
           </pane>
 
+          <pane heading="Devices">
+            <div ng-include="'views/user-manager-devices.html'"></div>
+          </pane>
         </tabs>
       </div>
   </div>

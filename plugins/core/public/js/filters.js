@@ -19,6 +19,23 @@ String.prototype.titleize = function(){
   return this.replace(/_/g, ' ').toTitleCase();
 };
 
+Array.prototype.diff = function(a) {
+  return this.filter(function(i) {return !(a.indexOf(i) > -1);});
+};
+
+Array.prototype.collect = function(key) {
+  var rv = [];
+
+
+  if(typeof(key) == 'string'){
+    for(var i = 0; i < this.length; i++){
+      rv.push(this[i][key]);
+    }
+  }
+
+  return rv;
+};
+
 angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
@@ -216,6 +233,16 @@ config(['$provide', function($provide) {
         }
       });
       return rv;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('diffFilter', function(){
+    return function(array,other){
+      if (!(array instanceof Array)) array = [];
+      if (!(other instanceof Array)) other = [];
+
+      return array.diff(other);
     }
   });
 }]).

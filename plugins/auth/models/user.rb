@@ -50,10 +50,15 @@ class User < App::Model::Base
 
   def to_h
     rv = super
-    rv[:type] = _type
+    rv[:type] = _type.gsub('User','').downcase
     rv[:groups] = groups() unless groups().empty?
     rv[:capabilities] = capabilities() unless capabilities().empty?
     rv
+  end
+
+  def from_h(h, merge=true, autotype=false)
+    h['_type'] = (h['type'].capitalize+'User') if h['type']
+    super(h, merge, autotype)
   end
 
   def authenticate!(options={})

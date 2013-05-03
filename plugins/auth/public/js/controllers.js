@@ -89,6 +89,10 @@ function UserManagerController($scope, $http, $dialog, User, UserType, UserList,
     UserList.query({}, function(data){
       $scope.users = data;
     });
+
+    $http.get('/api/users/list/types').success(function(data){
+      $scope.userTypes = data;
+    });
   }
 
   $scope.reloadGroups = function(){
@@ -112,6 +116,8 @@ function UserManagerController($scope, $http, $dialog, User, UserType, UserList,
       controller:  function($scope, $dialog, User){
         $scope.user = user;
         $scope.groups = $parent.groups;
+        $scope.userTypes = $parent.userTypes;
+        $scope.parent = $parent;
 
         $scope.reload = function(){
           User.get({
@@ -122,6 +128,7 @@ function UserManagerController($scope, $http, $dialog, User, UserType, UserList,
         }
 
         $scope.close = function(){
+          $parent.reload();
           d.close()
         };
       }
