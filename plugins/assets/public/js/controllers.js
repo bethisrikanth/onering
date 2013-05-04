@@ -175,6 +175,9 @@ function RackController($scope, $http, $routeParams, Rack){
 }
 
 function NodeController($scope, $http, $location, $routeParams, $window, Device, DeviceNote, NagiosHost){
+  $scope.diskTab = 'mounts';
+  $scope.opt = {};
+
   $scope.reload = function(){
     Device.get({
       id: $routeParams.id

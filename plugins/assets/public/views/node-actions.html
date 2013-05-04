@@ -1,1 +1,9 @@
 <h4>Actions</h4>
+
+<ul class="nav nav-list well">
+  <li class="nav-header">Operations</li>
+  <li>
+    <a ng-show="node.properties.monitor" rest="/api/devices/{{node.id}}/set/monitor/false" rest-success="reload()"><i class="icon-remove"> </i> Suspend Monitoring</a>
+    <a ng-hide="node.properties.monitor" rest="/api/devices/{{node.id}}/set/monitor/true"  rest-success="reload()"><i class="icon-tasks"> </i> Resume Monitoring</a>
+  </li>
+</ul>

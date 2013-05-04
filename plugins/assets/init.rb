@@ -87,9 +87,6 @@ module App
           :id        => 'system',
           :template  => 'node-pane-system'
         },{
-          :id        => 'chef',
-          :template  => 'node-pane-chef'
-        },{
           :id        => 'apps',
           :title     => 'Applications',
           :template  => 'node-pane-apps'

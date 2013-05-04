@@ -44,30 +44,34 @@ filter('titleize', function(){
   };
 }).
 filter('autosize', function(){
-  return function(bytes){
+  return function(bytes,fixTo){
     bytes = parseInt(bytes);
     fuzz = 0.99;
+    if(typeof(fixTo)=='undefined') fixTo = 2;
 
     if(bytes >=   (Math.pow(1024,8) * fuzz))
-      return (bytes / Math.pow(1024,8)).toFixed(2) + ' YiB';
+      return (bytes / Math.pow(1024,8)).toFixed(fixTo) + ' YiB';
 
     else if(bytes >=   (Math.pow(1024,7) * fuzz))
-      return (bytes / Math.pow(1024,7)).toFixed(2) + ' ZiB';
+      return (bytes / Math.pow(1024,7)).toFixed(fixTo) + ' ZiB';
 
     else if(bytes >=   (Math.pow(1024,6) * fuzz))
-      return (bytes / Math.pow(1024,6)).toFixed(2) + ' EiB';
+      return (bytes / Math.pow(1024,6)).toFixed(fixTo) + ' EiB';
 
     else if(bytes >=   (Math.pow(1024,5) * fuzz))
-      return (bytes / Math.pow(1024,5)).toFixed(2) + ' PiB';
+      return (bytes / Math.pow(1024,5)).toFixed(fixTo) + ' PiB';
 
     else if(bytes >=   (Math.pow(1024,4) * fuzz))
-      return (bytes / Math.pow(1024,4)).toFixed(2) + ' TiB';
+      return (bytes / Math.pow(1024,4)).toFixed(fixTo) + ' TiB';
 
     else if(bytes >=   (1073741824 * fuzz))
-      return (bytes / 1073741824).toFixed(2) + ' GiB';
+      return (bytes / 1073741824).toFixed(fixTo) + ' GiB';
 
     else if(bytes >=   (1048576 * fuzz))
-      return (bytes / 1048576).toFixed(2) + ' KiB';
+      return (bytes / 1048576).toFixed(fixTo) + ' MiB';
+
+    else if(bytes >=   (1024 * fuzz))
+      return (bytes / 1024).toFixed(fixTo) + ' KiB';
 
     else
       return bytes + ' bytes';

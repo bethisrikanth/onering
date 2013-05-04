@@ -1,0 +1,112 @@
+<div class="widget-title">Disks</div>
+
+<div class="widget-content">
+  <ul class="nav nav-pills">
+    <li ng-show="node.properties.metrics.disk.mounts" ng-class="(diskTab=='mounts' &amp;&amp; 'active' || '')">
+      <a ng-click="diskTab='mounts'">Mounts</a>
+    </li>
+    <li ng-show="node.properties.metrics.disk.lvm" ng-class="(diskTab=='lvm' &amp;&amp; 'active' || '')">
+      <a ng-click="diskTab='lvm'">LVM</a>
+    </li>
+    <li ng-show="node.properties.metrics.disk.zfs" ng-class="(diskTab=='zfs' &amp;&amp; 'active' || '')">
+      <a ng-click="diskTab='zfs'">ZFS</a>
+    </li>
+    <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(diskTab=='mdraid' &amp;&amp; 'active' || '')">
+      <a ng-click="diskTab='mdraid'">MDRaid</a>
+    </li>
+    <li ng-show="node.properties.metrics.disk.physical" ng-class="(diskTab=='physical' &amp;&amp; 'active' || '')">
+      <a ng-click="diskTab='physical'">Physical</a>
+    </li>
+  </ul>
+
+  <div>
+    <div ng-show="diskTab=='mounts'">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Mount Point</th>
+            <th>Filesystem</th>
+            <th>Device</th>
+            <th>Size</th>
+            <th>Used %</th>
+            <th> <th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="mount in node.properties.metrics.disk.mounts | orderBy:'mount'">
+            <td>{{ mount.mount }}</td>
+            <td>{{ mount.filesystem }}</td>
+            <td>{{ mount.device }}</td>
+            <td>{{ mount.total | autosize }}</td>
+            <td>
+              <div class="progress" style="margin: 0;">
+                <div class="bar" style="width: {{ mount.percent_used }}%;"></div>
+              </div>
+            </td>
+            <td>{{ mount.percent_used }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-show="diskTab=='lvm'">
+      <div ng-repeat="vg in node.properties.metrics.disk.lvm.groups | orderBy: 'name'">
+        <div class="widget-header" ng-click="vg.collapse=!vg.collapse">
+          <b title="UUID: {{ vg.uuid }}">Volume Group: {{ vg.name }}</b><br />
+          &nbsp;&nbsp;{{ vg.extents.size | autosize:0 }} Extents, {{ vg.extents.allocated }}/{{ vg.extents.total }} Used
+          <span class="pull-right">
+            <i ng-hide="vg.collapse" class="icon-chevron-up"> </i>
+            <i ng-show="vg.collapse" class="icon-chevron-down"> </i>
+          </span>
+        </div>
+
+        <div class="container-fluid" collapse="vg.collapse">
+          <div class="row-fluid">
+            <div class="span6">
+              <table class="table table-striped">
+                <caption class="align-left"><b>Logical Volumes</b></caption>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Extents</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr ng-repeat="lv in vg.volumes | orderBy:'name'">
+                    <td>{{ lv.name }}</td>
+                    <td>{{ lv.size | autosize:0 }}</td>
+                    <td>{{ lv.extents }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="span6">
+              <table class="table table-striped">
+                <caption class="align-left"><b>Physical Volumes</b></caption>
+                <thead>
+                  <tr>
+                    <th>Device</th>
+                    <th>Size</th>
+                    <th>Free Extents</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr ng-repeat="pv in vg.disks | orderBy:'name'">
+                    <td>{{ pv.name }}</td>
+                    <td>{{ pv.size | autosize:0 }}</td>
+                    <td>{{ pv.extents.free }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -26,7 +26,8 @@
               <span class="label label-important">Offline</span>
             </td>
             <td class="center" style="padding:0">
-              <span class="label label-{{ node.properties.alert_state || 'success' }}">{{ node.properties.alert_state || 'Clear' }}</span>
+              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">{{ node.properties.alert_state || 'Clear' }}</span>
+              <span ng-hide="node.properties.monitor" class="label label-important">Disabled</span>
             </td>
           </tr>
         </tbody>
@@ -44,9 +45,9 @@
     </div>
 
     <div class="span2">
-      <div class="well" ng-include="'views/node-notes.html'"></div>
+      <div ng-include="'views/node-notes.html'"></div>
 
-      <div class="well" ng-include="'views/node-actions.html'"></div>
+      <div ng-include="'views/node-actions.html'"></div>
     </div>
   </div>
 </div>
