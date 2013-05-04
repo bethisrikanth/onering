@@ -80,6 +80,27 @@ module App
         200
       end
 
+
+    # device pane configurations
+      get '/:id/panes' do
+        output([{
+          :id        => 'system',
+          :template  => 'node-pane-system'
+        },{
+          :id        => 'chef',
+          :template  => 'node-pane-chef'
+        },{
+          :id        => 'apps',
+          :title     => 'Applications',
+          :template  => 'node-pane-apps'
+        },{
+          :id        => 'config',
+          :title     => 'Configuration',
+          :template  => 'node-pane-config'
+        }])
+      end
+
+
       get '/:id/parent' do
         allowed_to? :get_asset, params[:id]
         device = Device.find(params[:id])

@@ -11,7 +11,7 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
     query = query.replace(/\s*(\:|==|<=|>=|<|>|!=|\)|after|before)\s*/g, '$1').split(' ');
 
 //  for each field being queried
-    for(var i in query){
+    for(var i = 0; i < query.length; i++){
       var field = query[i];
       var parts = field.match(/(?:\(([a-z\_]*)\))?\s*(.*)\s*(:|==|<=|>=|<|>|!=|after|before)\s*(.*)$/);
 

@@ -1,6 +1,5 @@
 function QueryController($scope, $http, $window, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
-  $scope.params = $route.current.$route.params;
   $scope.time_left = 0;
 
   $scope.reload = function(){
@@ -176,158 +175,18 @@ function RackController($scope, $http, $routeParams, Rack){
 }
 
 function NodeController($scope, $http, $location, $routeParams, $window, Device, DeviceNote, NagiosHost){
-  $scope.id = $routeParams.id;
-  $scope.note = null;
-  $scope.hidAsAColor = false;
-  $scope.newtags = [];
-  $scope.alert_init_limit = 3;
-  $scope.alert_show_limit = $scope.alert_init_limit;
-  $scope.alert_load_age = 0;
-  $scope.current_net_tab = 'system';
-  $scope.deleteConfirmId = null;
-  $scope.redeployConfirmId = null;
-
-  $scope.reload = function(id){
-    var id = id || $scope.id;
-
+  $scope.reload = function(){
     Device.get({
-      id: id
+      id: $routeParams.id
     }, function(data){
-      $scope.device = data;
+      $scope.node = data;
     });
 
-    $scope.reloadAlerts(id);
-    $scope.load_time = new Date();
-  };
-
-  $scope.reloadAlerts = function(id){
-    $scope.alert_load_age = 0;
-
-    NagiosHost.get({
-      id: (id || $scope.id)
-    }, function(data){
-      $scope.nagios_alerts = [];
-
-      if(data.alerts){
-        $scope.nagios_alerts = data.alerts;
-      }
+    $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
+      $scope.panes = data;
     });
   }
 
-  $scope.updateAlertAge = function(){
-    $scope.alert_load_age += 1;
-    try { $scope.$apply(); }catch(e){ }
-  };
-
-  $scope.saveNote = function(note_id){
-    if($scope.note){
-      if($scope.device && $scope.device.properties){
-        if(!$scope.device.properties.notes)
-          $scope.device.properties.notes = [];
-
-        DeviceNote.save({
-          id: $scope.device.id
-        }, $scope.note, function(){
-          if(note_id)
-            $scope.deleteNote(note_id);
-
-          $scope.old_note_id = null;
-          $scope.note = null;
-          $scope.reload($scope.device.id);
-        });
-      }
-    }
-  };
-
-  $scope.editNote = function(note_id){
-    $scope.old_note_id = note_id;
-    $scope.note = $scope.device.properties.notes[note_id].body;
-  };
-
-  $scope.deleteNote = function(note_id){
-    DeviceNote.delete({
-      id: $scope.device.id,
-      note_id: note_id
-    }, function(){
-      $scope.reload($scope.device.id);
-    })
-  };
-
-  $scope.setStatus = function(status){
-    if($scope.device && status){
-      $http.get('/api/devices/'+$scope.device.id+'/status/'+status).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.setProperty = function(property, value){
-    console.log('set', property, value)
-    if($scope.device && property && value !== undefined){
-      $http.get('/api/devices/'+$scope.device.id+'/set/'+property+'/'+value).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.setMaintStatus = function(status){
-    if($scope.device && status){
-      $http.get('/api/devices/'+$scope.device.id+'/maintenance/'+status).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.tag = function(value){
-    if($scope.device && typeof(value) == 'string' && $.trim(value).length > 0){
-      $http.get('/api/devices/'+$scope.device.id+'/tag/'+value).success(function(){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.untag = function(value){
-    if($scope.device && value && typeof(value) == 'string'){
-      $http.get('/api/devices/'+$scope.device.id+'/untag/'+value).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.saveTags = function(){
-    for(var i in $scope.newtags){
-      $scope.tag($scope.newtags[i]);
-    }
-
-    $scope.newtags = [];
-  };
-
-  $scope.deleteNode = function(){
-    if($scope.device){
-      if($scope.deleteConfirmId){
-        if($scope.device.id == $scope.deleteConfirmId){
-          $http.delete('/api/devices/'+$scope.device.id).success(function(){
-            $location.path('/inf');
-          });
-        }
-      }
-    }
-  }
-
-  $scope.redeployNode = function(){
-    if($scope.device){
-      if($scope.redeployConfirmId){
-        if($scope.device.id == $scope.redeployConfirmId){
-          $http.get('/api/provision/'+$scope.device.id+'/boot/install').success(function(){
-            $scope.reload();
-          })
-        }
-      }
-    }
-  }
-
-  $window.setInterval($scope.updateAlertAge, 1000);
-  $window.setInterval($scope.reload, 60000);
   $scope.reload();
 }
 
