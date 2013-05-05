@@ -87,7 +87,6 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
       stack.push(field);
     }
 
-    console.log(stack)
     return stack.join('/');
   }
 

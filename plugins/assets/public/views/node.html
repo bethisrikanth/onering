@@ -1,8 +1,13 @@
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span12">
-      <h2 style="margin: 0; font-size: x-large">{{ node.name | section:'.':0:1 }}<span style="font-size: medium; color: grey;">.{{ node.name | section:'.':1 }}</span></h2>
+    <div class="span2 center">
+      <h2 style="margin: 0; font-size: x-large">{{ node.name | section:'.':0:1 }}</h2>
+      <h4 style="margin: 0; color: grey;">{{ node.name | section:'.':1 }}</h4>
       <br />
+    </div>
+
+    <div class="span10">
+
     </div>
   </div>
 
@@ -26,7 +31,7 @@
               <span class="label label-important">Offline</span>
             </td>
             <td class="center" style="padding:0">
-              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">{{ node.properties.alert_state || 'Clear' }}</span>
+              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">{{ (node.properties.alert_state | titleize) || 'Clear' }}</span>
               <span ng-hide="node.properties.monitor" class="label label-important">Disabled</span>
             </td>
           </tr>

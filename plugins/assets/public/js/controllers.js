@@ -29,7 +29,6 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   }
 
   $scope.setAutoReload = function(interval){
-    console.log(interval)
     if(interval){
       if($scope.autoreload_id) $scope.clearAutoReload();
       $scope.autoreload_id = $window.setInterval($scope.reload, interval);
@@ -79,8 +78,6 @@ function OverviewController($scope, Summary){
     for(var s in data){
       $scope.graphs.overview = $scope.summary_to_graphite(data);
     }
-
-    console.log($scope.graphs);
   });
 }
 
@@ -174,19 +171,51 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $location, $routeParams, $window, Device, DeviceNote, NagiosHost){
-  $scope.diskTab = 'mounts';
-  $scope.opt = {};
+function NodeController($scope, $http, $location, $routeParams, $window, $position, Device, DeviceNote, NagiosHost){
+  $scope.opt = {
+    diskTab:    'mounts',
+    netTab:     'interfaces',
+    graphsFrom: '-6hours',
+    graphTimes: [{
+      label: '2h',
+      value: '-2hours'
+    },{
+      label: '6h',
+      value: '-6hours'
+    },{
+      label: '24h',
+      value: '-1days'
+    },{
+      label: '3d',
+      value: '-3days'
+    },{
+      label: '1w',
+      value: '-1week'
+    }]
+  };
+
+  $scope.isMasterInterface = function(i){
+    if(i.master)
+      return false;
+    return true;
+  }
 
   $scope.reload = function(){
+//  device
     Device.get({
       id: $routeParams.id
     }, function(data){
       $scope.node = data;
     });
 
+//  pane configuration
     $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
       $scope.panes = data;
+    });
+
+//  active alerts
+    $http.get('/api/nagios/'+$routeParams.id+'?severity=ignore').success(function(data){
+      $scope.nagios = data;
     });
   }
 
@@ -246,7 +275,6 @@ function AssetDefaultsController($scope, $http, AssetDefault){
   }
 
   $scope.save = function(d){
-    console.log(d);
     $http.post('/api/devices/defaults', d).success(function(){
       $scope.reload();
     });
@@ -266,7 +294,6 @@ function AssetDefaultsController($scope, $http, AssetDefault){
   $scope.$watch('newApplyKey', function(){
     if($scope.newApplyKey && $scope.newApplyKey != '(new)'){
       if($scope.current && $scope.current.apply){
-        console.log($scope.newApplyKey)
         $scope.current.apply[$scope.newApplyKey] = null;
         $scope.newApplyKey = null;
       }
@@ -297,8 +324,6 @@ function NodeCompareController($scope, $routeParams, Query){
   $scope.fields = ($routeParams.fields ? $routeParams.fields.split('|') : []);
 
   $scope.reload = function(){
-    console.log('lol');
-
     if($scope.fields.length > 0 && $scope.query){
       Query.query({
         query: $scope.prepareQuery($scope.query, $routeParams.raw),

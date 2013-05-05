@@ -2,25 +2,25 @@
 
 <div class="widget-content">
   <ul class="nav nav-pills">
-    <li ng-show="node.properties.metrics.disk.mounts" ng-class="(diskTab=='mounts' &amp;&amp; 'active' || '')">
-      <a ng-click="diskTab='mounts'">Mounts</a>
+    <li ng-show="node.properties.metrics.disk.mounts" ng-class="(opt.diskTab=='mounts' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='mounts'">Mounts</a>
     </li>
-    <li ng-show="node.properties.metrics.disk.lvm" ng-class="(diskTab=='lvm' &amp;&amp; 'active' || '')">
-      <a ng-click="diskTab='lvm'">LVM</a>
+    <li ng-show="node.properties.metrics.disk.lvm" ng-class="(opt.diskTab=='lvm' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='lvm'">LVM</a>
     </li>
-    <li ng-show="node.properties.metrics.disk.zfs" ng-class="(diskTab=='zfs' &amp;&amp; 'active' || '')">
-      <a ng-click="diskTab='zfs'">ZFS</a>
+    <li ng-show="node.properties.metrics.disk.zfs" ng-class="(opt.diskTab=='zfs' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='zfs'">ZFS</a>
     </li>
-    <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(diskTab=='mdraid' &amp;&amp; 'active' || '')">
-      <a ng-click="diskTab='mdraid'">MDRaid</a>
+    <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(opt.diskTab=='mdraid' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='mdraid'">MDRaid</a>
     </li>
-    <li ng-show="node.properties.metrics.disk.physical" ng-class="(diskTab=='physical' &amp;&amp; 'active' || '')">
-      <a ng-click="diskTab='physical'">Physical</a>
+    <li ng-show="node.properties.metrics.disk.physical" ng-class="(opt.diskTab=='physical' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='physical'">Physical</a>
     </li>
   </ul>
 
   <div>
-    <div ng-show="diskTab=='mounts'">
+    <div ng-show="opt.diskTab=='mounts'">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -28,8 +28,8 @@
             <th>Filesystem</th>
             <th>Device</th>
             <th>Size</th>
-            <th>Used %</th>
-            <th> <th>
+            <th>Used</th>
+            <th>%<th>
           </tr>
         </thead>
 
@@ -50,7 +50,7 @@
       </table>
     </div>
 
-    <div ng-show="diskTab=='lvm'">
+    <div ng-show="opt.diskTab=='lvm'">
       <div ng-repeat="vg in node.properties.metrics.disk.lvm.groups | orderBy: 'name'">
         <div class="widget-header" ng-click="vg.collapse=!vg.collapse">
           <b title="UUID: {{ vg.uuid }}">Volume Group: {{ vg.name }}</b><br />

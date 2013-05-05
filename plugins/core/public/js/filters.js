@@ -227,11 +227,17 @@ config(['$provide', function($provide) {
 }]).
 config(['$provide', function($provide) {
   $provide.factory('propertyFilter', function(){
-    return function(array,key,exclude){
+    return function(array,key,value,exclude){
       if (!(array instanceof Array)) return array;
       rv = array.filter(function(i){
         if($.isPlainObject(i)){
-          return (exclude ? !i.hasOwnProperty(key) : i.hasOwnProperty(key));
+          var v = (exclude ? !i.hasOwnProperty(key) : i.hasOwnProperty(key));
+
+          if(v && typeof(value) != 'null' && typeof(value) != 'undefined' && i[key] == value){
+            return true;
+          }else{
+            return false;
+          }
         }else{
           return array;
         }

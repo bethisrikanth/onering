@@ -103,6 +103,10 @@ body .modal {
   background-color: #CCC;
 }
 
+.table tbody+tbody{
+  border: 0px;
+}
+
 .notes-tip{
   list-style-type: none;
   margin-left: 0;
