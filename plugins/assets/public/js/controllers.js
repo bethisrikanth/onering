@@ -202,9 +202,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
 
   $scope.reload = function(){
 //  device
-    Device.get({
-      id: $routeParams.id
-    }, function(data){
+    $http.get('/api/devices/'+$routeParams.id).success(function(data){
       $scope.node = data;
     });
 

@@ -130,11 +130,7 @@ class Device < App::Model::Base
 
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
-          if v.is_a?(String) and v[0] == '@'
-            self.get(v[1..-1])
-          else
-            v.autotype()
-          end
+          v.autotype()
         end
 
       # force determines whether the applied default overrides the new object
