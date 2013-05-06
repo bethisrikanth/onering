@@ -107,13 +107,8 @@ body .modal {
   border: 0px;
 }
 
-.notes-tip{
-  list-style-type: none;
-  margin-left: 0;
-}
-
-.notes-tip li{
-  padding-bottom: 0.25em;
+.notes .note+.note{
+  margin-top: 1em;
 }
 
 .content > header{

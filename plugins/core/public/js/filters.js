@@ -44,9 +44,9 @@ filter('titleize', function(){
   };
 }).
 filter('autosize', function(){
-  return function(bytes,fixTo){
+  return function(bytes,fixTo,fuzz){
     bytes = parseInt(bytes);
-    fuzz = 0.99;
+    fuzz = (angular.isUndefined(fuzz) ? 0.99 : +fuzz);
     if(typeof(fixTo)=='undefined') fixTo = 2;
 
     if(bytes >=   (Math.pow(1024,8) * fuzz))

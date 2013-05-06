@@ -1,18 +1,6 @@
-<div class="container-fluid">
+<div class="container-fluid" ng-show="node">
   <div class="row-fluid">
     <div class="span2 center">
-      <h2 style="margin: 0; font-size: x-large">{{ node.name | section:'.':0:1 }}</h2>
-      <h4 style="margin: 0; color: grey;">{{ node.name | section:'.':1 }}</h4>
-      <br />
-    </div>
-
-    <div class="span10">
-
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <div class="span2">
       <table class="table table-condensed">
         <thead>
           <tr>
@@ -31,17 +19,60 @@
               <span class="label label-important">Offline</span>
             </td>
             <td class="center" style="padding:0">
-              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">{{ (node.properties.alert_state | titleize) || 'Clear' }}</span>
-              <span ng-hide="node.properties.monitor" class="label label-important">Disabled</span>
+              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
+                {{ (node.properties.alert_state | titleize) || 'Clear' }}
+              </span>
+              <span ng-hide="node.properties.monitor" class="label label-inverse">Disabled</span>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
 
+    <div class="span7">
+      <h5 style="margin: 0" ng-show="node.parent_id">
+        <a style="color: inherit" ng-show="node.parent" href="#/node/{{node.parent.id}}">{{ node.parent.name }}</a>
+        <a style="color: inherit" ng-hide="node.parent" href="#/node/{{node.parent_id}}">{{ node.parent_id }}</a>
+      </h5>
+      <h3 style="margin: 0; line-height: 34px;">
+        <span ng-show="node.parent_id">&#9492;&nbsp;&nbsp;</span>
+        {{ node.name | section:'.':0:1 }}<span style="font-size: smaller; color: grey;">.{{ node.name | section:'.':1 }}</span>
+      </h3>
+      <div style="margin-bottom: 1em; line-height: 30px">
+        <span>
+          <b>Tags: </b>
+          <span
+            ng-repeat="tag in node.tags"
+            class="label label-inverse"
+            style="margin-right: 0.5em; cursor: default"
+          >
+            {{ tag }}&nbsp;&nbsp;<span rest="/api/devices/{{node.id}}/untag/{{tag}}" rest-success="reload()">&times;</span>
+          </span>
+        </span>
+
+        <i class="icon-plus-sign" ng-hide="opt.showTagEditor" ng-click="opt.showTagEditor=true"> </i>
+
+        <div class="input-prepend input-append" ng-show="opt.showTagEditor" style="height: 18px">
+          <span class="add-on" ng-click="opt.newTag=null;opt.showTagEditor=false"><i class="icon-plus-sign"> </i></span>
+          <input class="input-medium" type="text" ng-model="opt.newTag" typeahead="t for t in tags | filter:$viewValue">
+          <button class="btn btn-primary" rest="/api/devices/{{node.id}}/tag/{{opt.newTag}}" rest-success="reload(); opt.showTagEditor=false; opt.newTag=null"><i class="icon-white icon-ok"> </i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="span3">
+      <br />
+      <i class="icon-time"> </i> <b>Last Inventory: </b>{{ node.collected_at | timeAgo }}<br />
+      <i class="icon-refresh"> </i> <b>Refreshed: </b>{{ opt.lastLoadTime | timeAgo }}<br />
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span2">
       <div ng-include="'views/node-details.html'"></div>
     </div>
 
-    <div class="span8">
+    <div class="span7">
       <tabs>
         <pane ng-repeat="pane in panes" heading="{{ pane.title || (pane.id | titleize) }}">
           <div class="{{ pane.id }}" ng-include="'views/panes/'+pane.template+'.html'"></div>
@@ -49,7 +80,7 @@
       </tabs>
     </div>
 
-    <div class="span2">
+    <div class="span3">
       <div ng-include="'views/node-notes.html'"></div>
 
       <div ng-include="'views/node-actions.html'"></div>

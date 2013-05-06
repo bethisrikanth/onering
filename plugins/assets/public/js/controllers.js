@@ -173,9 +173,11 @@ function RackController($scope, $http, $routeParams, Rack){
 
 function NodeController($scope, $http, $location, $routeParams, $window, $position, Device, DeviceNote, NagiosHost){
   $scope.opt = {
-    diskTab:    'mounts',
-    netTab:     'interfaces',
-    graphsFrom: '-6hours',
+    diskTab:      'mounts',
+    netTab:       'interfaces',
+    graphsFrom:   '-6hours',
+    newNote:      null,
+    lastLoadTime: null,
     graphTimes: [{
       label: '2h',
       value: '-2hours'
@@ -194,6 +196,11 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     }]
   };
 
+//  pane configuration
+  $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
+    $scope.panes = data;
+  });
+
   $scope.isMasterInterface = function(i){
     if(i.master)
       return false;
@@ -204,19 +211,44 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
 //  device
     $http.get('/api/devices/'+$routeParams.id).success(function(data){
       $scope.node = data;
-    });
+      $scope.opt.lastLoadTime = new Date();
 
-//  pane configuration
-    $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
-      $scope.panes = data;
+  //  load parent
+      if($scope.node && $scope.node.parent_id){
+        $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
+          $scope.node.parent = data[0];
+        });
+      }
     });
 
 //  active alerts
     $http.get('/api/nagios/'+$routeParams.id+'?severity=ignore').success(function(data){
       $scope.nagios = data;
     });
+
+//  all tags
+    $http.get('/api/devices/list/tags').success(function(data){
+      $scope.tags = data;
+    });
   }
 
+  $scope.$watch('opt.newNote', function(value){
+    if(value !== null){
+      $http.post('/api/devices/'+$routeParams.id+'/notes', value).success(function(){
+        $scope.opt.newNote = null;
+      });
+
+      $scope.reload();
+    }
+  });
+
+  $scope.tick = function(){
+    $scope.opt.currentTime = new Date();
+  }
+
+
+  $window.setInterval($scope.tick, 1000);
+  $window.setInterval($scope.reload, 60000);
   $scope.reload();
 }
 

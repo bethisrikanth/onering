@@ -9,34 +9,40 @@ angular.module('rickshaw', [])
       from:   '@',
       to:     '@',
       width:  '@',
-      height: '@'
+      height: '@',
+      min:    '@',
+      max:    '@',
+      target: '@'
     },
 
     controller: function($scope, $element, $attrs, $http){
-
     },
 
     link: function($scope, $element, $attrs) {
-      $scope.$watch('from', function(value){
-        $scope.url = $.jurlp($scope.url).query({
-          from: value
-        }).href;
-      });
+      $scope.checkAndBuild = function(){
+        if($scope.url_base && $scope.url_targets.length > 0){
+          $scope.buildGraph($scope.url_base + '&' + $scope.url_targets.join('&'));
+        }
+      }
 
-      $scope.$watch('url', function(value){
+      $scope.buildGraph = function(url){
+        console.log(url);
         delete $scope.graph;
 
-        if($attrs.colors)
+        if(!angular.isUndefined($attrs.colors)){
           var colors = $attrs.colors.split(',');
+        }
+
+        $scope.palette = new Rickshaw.Color.Palette( { scheme: 'spectrum2001' } );
 
         $scope.graph = new Rickshaw.Graph.Ajax({
           element:  $element[0],
           renderer: ($scope.type || 'line'),
           width:    ($scope.width || $element.parent().width()),
           height:   ($scope.height || $element.parent().height()),
-          dataURL:  $.jurlp(value).query({
-            format: 'json'
-          }).href,
+          min:      $scope.min,
+          max:      $scope.max,
+          dataURL:  url,
           onData:   function(d){
             var data = [];
 
@@ -56,7 +62,7 @@ angular.module('rickshaw', [])
               data.push({
                 data:  points,
                 name:  d[i].target,
-                color: (colors[i % colors.length] || 'grey')
+                color: (colors[i] || $scope.palette.color())
               })
             }
 
@@ -65,6 +71,31 @@ angular.module('rickshaw', [])
         })
 
         $element.empty();
+      };
+
+      $scope.$watch('target', function(value){
+        if(!angular.isUndefined(value)){
+          var url = [];
+          value = value.split('|');
+
+          for(var i = 0; i < value.length; i++){
+            url.push('target='+value[i]);
+          }
+
+          $scope.url_targets = url;
+
+          $scope.checkAndBuild();
+        }
+      });
+
+      $scope.$watch('url', function(value){
+        if(!angular.isUndefined(value)){
+          $scope.url_base = $.jurlp(value).query({
+            format: 'json'
+          }).href;
+
+          $scope.checkAndBuild();
+        }
       });
     }
   }

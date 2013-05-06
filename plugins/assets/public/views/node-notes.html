@@ -1,1 +1,26 @@
 <h4>Notes</h4>
+
+<div class="notes well" ng-show="node.properties.notes">
+  <div ng-repeat="(note_id, note) in node.properties.notes" class="note">
+    <div class="header">
+      <div class="pull-right">
+        <i title="Remove this comment" class="icon-remove" rest="/api/devices/{{node.id}}/notes/{{note_id}}" rest-method="delete" rest-success="reload()"> </i>
+      </div>
+
+      <img class="img-polaroid pull-left" ng-src="/api/users/{{note.user_id || 'onering'}}/gravatar?s=32" style="margin: 0 0.5em 0 0" width="32" height="32" />
+      <b>{{ note.user_id || '(system)' }}</b>
+      <br />
+      <span style="font-size: smaller; color: grey">{{ note.created_at | date:'short' }}</span>
+
+
+      <div class="clearfix"></div>
+    </div>
+
+    <p style="margin: 0.5em 0.25em 0 0.25em">{{ note.body }}</p>
+  </div>
+
+</div>
+
+<textarea style="width: 94%" ng-model="opt.newNote" ng-model-onenter placeholder="Write a comment..."></textarea>
+<br />
+<br />
