@@ -61,7 +61,7 @@
               </td>
             </tr>
 
-            <tr>
+            <tr ng-show="node.properties.booted_at">
               <th>Booted</th>
               <td>
                 {{ node.properties.booted_at | timeAgo }}
