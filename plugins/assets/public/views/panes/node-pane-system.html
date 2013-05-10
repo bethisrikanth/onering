@@ -62,9 +62,9 @@
             </tr>
 
             <tr>
-              <th>Uptime</th>
+              <th>Booted</th>
               <td>
-                {{ node.properties.booted_at | timeDuration:['days:d','hours:h','minutes:m'] }}
+                {{ node.properties.booted_at | timeAgo }}
               </td>
             </tr>
           </tbody>
