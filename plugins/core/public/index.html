@@ -59,9 +59,9 @@
 
               <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="min-width: 220px;">
                 <li ng-repeat="site in sites | orderBy:'-count'">
-                  <a href="#site/{{ site.id }}">
+                  <a href="#/inf/show/site:{{ site.id || 'null' }}">
                     {{ (site.id | uppercase) || '(empty)' }}
-                    <span class="badge">{{ site.count }}</span>
+                    <span class="badge menu-count">{{ site.count }}</span>
                   </a>
                 </li>
 
@@ -73,8 +73,9 @@
                     <li ng-repeat="status in statuses | orderBy:'count':true">
                       <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status:null' }}">
                         <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
-                        {{ (status.id || 'unknown') | titleize }}
-                        <span>{{ status.count }}</span>
+                        <span ng-show="status.id=='online'">Active</span>
+                        <span ng-hide="status.id=='online'">{{ (status.id || 'unknown') | titleize }}</span>
+                        <span class="badge menu-count">{{ status.count }}</span>
                       </a>
                     </li>
                   </ul>
@@ -103,7 +104,7 @@
                       <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
                         <img ng-src="/img/alerts/{{ alert_state.id }}.png" />
                         {{ (alert_state.id) | titleize }}
-                        <span>{{ alert_state.count }}</span>
+                        <span class="badge menu-count">{{ alert_state.count }}</span>
                       </a>
                     </li>
                   </ul>

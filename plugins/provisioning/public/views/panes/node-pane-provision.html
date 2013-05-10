@@ -49,6 +49,7 @@
         <div ng-show="opt.editProvisioning" ng-include="'views/node-actions-provision-form.html'"></div>
 
         <div class="pull-right">
+          <a target="_blank" class="btn" href="/api/provision/{{node.id}}"><i class="icon-ok icon-list"> </i> View Script</a>
           <button ng-show="opt.editProvisioning" class="btn btn-primary" ng-click="opt.editProvisioning=false; save()"><i class="icon-ok icon-white"> </i> Save</button>
           <button ng-hide="opt.editProvisioning" class="btn" ng-click="reload(); opt.editProvisioning=true"><i class="icon-pencil"> </i> Edit</button>
         </div>
@@ -85,9 +86,10 @@
           </tbody>
         </table>
 
+        <div class="widget-header"><b>Change Boot Profile</b></div>
         <div>
           <select style="margin-bottom:0" class="input-medium" ng-model="opt.newPxeProfile" ng-options="v.id as (v.name || (v.id | titleize)) for v in pxeProfiles"></select>
-          <button class="btn btn-primary pull-right" rest="/api/provision/{{node.id}}/boot/set/{{opt.newPxeProfile}}" rest-success="reload()"><i class="icon-ok icon-white"> </i> Set Profile</button>
+          <button class="btn btn-primary" rest="/api/provision/{{node.id}}/boot/set/{{opt.newPxeProfile}}" rest-success="reload()"><i class="icon-ok icon-white"> </i></button>
         </div>
 
         <div class="clearfix"></div>

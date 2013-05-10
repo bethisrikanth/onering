@@ -1,6 +1,15 @@
-<div class="container-fluid widget-pane">
+<div class="container-fluid" ng-hide="node.properties.glu">
   <div class="row-fluid">
-    <div class="span6" ng-show="node.properties.services">
+    <div class="span12 center">
+      <img src="http://angular-ui.github.io/Under_construction.gif">
+      <img src="http://www.pennsbury.k12.pa.us/pennsbury/Member's%20Area/Clip%20Art/under-construction-sign-animated.gif">
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid widget-pane" ng-show="node.properties.glu">
+  <div class="row-fluid">
+    <div class="span6" ng-show="false">
       <div class="widget-title">System Services</div>
 
       <div class="widget-content widget-expand">

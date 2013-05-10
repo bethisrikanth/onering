@@ -21,12 +21,15 @@
           </thead>
 
           <tbody>
-            <tr ng-repeat="alert in nagios.alerts | orderBy:opt.alert_sort:opt.alert_sort_desc" class="{{ alert.acknowledged &amp;&amp; 'acknowledged' || '' }}">
+            <tr ng-repeat="alert in nagios.alerts | orderBy:['type',opt.alert_sort]:opt.alert_sort_desc" class="{{ alert.acknowledged &amp;&amp; 'acknowledged' || '' }}">
               <td class="alert_state center">
                 <span title="{{ alert.current_state | titleize }}" class="label label-{{ alert.current_state }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               </td>
               <td>
-                <a target="_blank" href="{{ alert.url }}">{{ alert.name }}</a>
+                <a target="_blank" href="{{ alert.url }}">
+                  <span ng-show="alert.type=='host'">Host Check</span>
+                  <span ng-hide="alert.type=='host'">{{ alert.name }}</span>
+                </a>
               </td>
               <td><span ng-bind-html-unsafe="alert.plugin_output"></span></td>
               <td>{{ alert.last_alert_at | timeAgo }}</td>
@@ -37,7 +40,7 @@
     </div>
   </div>
 
-  <div class="row-fluid">
+  <div class="row-fluid" ng-show="node.properties.metrics">
     <div class="span12">
       <div class="widget-title">
         System Information
