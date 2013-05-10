@@ -11,10 +11,54 @@ module App
       ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(settings.views)
     end
 
+    helpers do
+      def get_macs(device)
+        macs = []
+
+        device.properties.get('network.interfaces').each do |iface|
+          if ['eth0', 'eth1'].include?(iface['name'])
+            macs << {
+              :interface => iface['name'],
+              :mac       => iface['mac']
+            } if iface['mac']
+          end
+        end
+
+        return macs.sort{|a,b| a[:interface] <=> b[:interface] }
+      end
+    end
+
     namespace '/api/provision' do
+      get '/:id/boot/profile' do
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        rv = []
+        pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
+        macs = get_macs(device)
+
+        macs.each do |mac|
+          response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/profile"))
+          rv << (MultiJson.load(response.body).merge(mac) rescue nil)
+        end
+
+        rv.compact.to_json
+      end
+
+      get '/:id/boot/profile/list' do
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
+        response = Net::HTTP.get_response(URI("#{pxed}/profiles/list"))
+        rv = (MultiJson.load(response.body) rescue [])
+
+        rv.compact.to_json
+      end
+
       %w{
         /:id/boot/?
-        /:id/boot/:profile/?
+        /:id/boot/set/:profile/?
       }.each do |r|
         get r do
           device = Device.find(params[:id])
@@ -23,27 +67,22 @@ module App
           if device.properties['site']
             pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
             uses_default = true
-            macs = []
-
-            device.properties.get('network.interfaces').each do |iface|
-              if ['eth0', 'eth1'].include?(iface['name'])
-                macs << "01-#{iface['mac'].downcase.gsub(':', '-')}" if iface['mac']
-              end
-            end
+            macs = get_macs(device)
 
             rv  = "# ============================================================================= \n"
             rv += "# pxed server at #{pxed}, site #{device.properties['site'].upcase}\n"
             rv += "# ============================================================================= \n"
-            rv += "#\n"
+            rv += "\n\n"
 
-            macs.compact.uniq.each do |mac|
-              rv += "# PXE configuration for device #{mac}\n"
-              rv += "#\n"
+            macs.each do |mac|
+              rv += "# ----------------------------------------------------------------------------- \n"
+              rv += "# PXE configuration for device #{mac[:interface]} (#{mac[:mac]})\n"
+              rv += "# ----------------------------------------------------------------------------- \n"
 
               if params[:profile]
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/#{mac}/link/#{params[:profile]}"))
+                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/link/#{params[:profile]}"))
               else
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/#{mac}"))
+                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}"))
               end
 
               if response.code.to_i < 400
@@ -51,7 +90,7 @@ module App
                 rv += response.body
               end
 
-              rv += "#\n"
+              rv += "\n\n"
             end
 
             if uses_default

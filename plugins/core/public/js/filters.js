@@ -36,6 +36,23 @@ Array.prototype.collect = function(key) {
   return rv;
 };
 
+Array.prototype.firstWith = function(key, value){
+  for(var i = 0; i < this.length; i++){
+    if(this[i].hasOwnProperty(key)){
+
+      if(angular.isUndefined(value)){
+        return this[i];
+      }else{
+        if(this[i][key] == value){
+          return this[i];
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
@@ -47,7 +64,7 @@ filter('autosize', function(){
   return function(bytes,fixTo,fuzz){
     bytes = parseInt(bytes);
     fuzz = (angular.isUndefined(fuzz) ? 0.99 : +fuzz);
-    if(typeof(fixTo)=='undefined') fixTo = 2;
+    if(angular.isUndefined(fuzz)) fixTo = 2;
 
     if(bytes >=   (Math.pow(1024,8) * fuzz))
       return (bytes / Math.pow(1024,8)).toFixed(fixTo) + ' YiB';
@@ -78,9 +95,10 @@ filter('autosize', function(){
   }
 }).
 filter('autospeed', function(){
-  return function(speed, unit){
+  return function(speed,unit,fixTo,fuzz){
     speed = parseInt(speed);
-    fuzz = 0.99;
+    fuzz = (angular.isUndefined(fuzz) ? 0.99 : +fuzz);
+    if(angular.isUndefined(fuzz)) fixTo = 2;
 
     if(unit){
       switch(unit.toUpperCase()){
@@ -100,19 +118,19 @@ filter('autospeed', function(){
     }
 
     if(speed >= 1000000000000*fuzz)
-      return (speed/1000000000000)+' THz';
+      return (speed/1000000000000).toFixed(fixTo)+' THz';
 
     else if(speed >= 1000000000*fuzz)
-      return (speed/1000000000)+' GHz';
+      return (speed/1000000000).toFixed(fixTo)+' GHz';
 
     else if(speed >= 1000000*fuzz)
-      return (speed/1000000)+' MHz';
+      return (speed/1000000).toFixed(fixTo)+' MHz';
 
     else if(speed >= 1000*fuzz)
-      return (speed/1000)+' KHz';
+      return (speed/1000).toFixed(fixTo)+' KHz';
 
     else
-      return speed + ' Hz';
+      return speed.toFixed(fixTo) + ' Hz';
   };
 }).
 filter('fix', function(){
@@ -123,6 +141,37 @@ filter('fix', function(){
 filter('timeAgo', function(){
   return function(date){
     return moment(Date.parse(date)).fromNow();
+  };
+}).
+filter('timeDuration', function(){
+  return function(date,unit,delim){
+    var rv = [];
+    var start = moment(date);
+    var now = moment();
+
+    if(!angular.isArray(unit)){
+      unit = [unit];
+    }
+
+    for(var i = 0; i < unit.length; i++){
+      var upair = unit[i];
+      var u = unit[i];
+
+      if(u.indexOf(':') > 0){
+        u = upair.split(':').splice(-1,1)[0];
+        unit[i] = upair.split(':')[0];
+      }
+
+      var v = now.diff(start, unit[i]);
+
+      if(v == 0)
+        continue;
+
+      rv.push(v.toString()+u);
+      start.add(unit[i], v-1);
+    }
+
+    return rv.join(delim || ' ');
   };
 }).
 filter('section', function(){

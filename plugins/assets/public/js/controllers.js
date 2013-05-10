@@ -53,7 +53,7 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.reload();
 }
 
-function SummaryController($scope, $http, $routeParams, $route, Summary){
+function SummaryController($scope, $http, $routeParams, $route){
   $scope.params = ($route.current.$route.params || {});
   $scope.field = $routeParams.field || $scope.params.field;
   $scope.orderProp = 'total';
@@ -65,20 +65,22 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
   });
 }
 
-function OverviewController($scope, Summary){
-  $scope.graphs = {
-    'default': {
-
-    }
+function OverviewController($scope, $http){
+  var status_weights = {
+    'online':      2000,
+    'reserved':    1000,
+    'allocatable': 100
   };
 
-  Summary.query({
-    field: 'status'
-  }, function(data){
-    for(var s in data){
-      $scope.graphs.overview = $scope.summary_to_graphite(data);
-    }
-  });
+  $scope.infrastructure = {};
+
+  $scope.reload = function(){
+    $http.get('/api/devices/summary/by-site/status').success(function(data){
+
+    });
+  }
+
+  $scope.reload();
 }
 
 function DeviceListController($scope, $http, $timeout, Device, DeviceNote){
@@ -171,13 +173,43 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $location, $routeParams, $window, $position, Device, DeviceNote, NagiosHost){
+function NodeController($scope, $http, $location, $routeParams, $window, $position, $dialog){
   $scope.opt = {
-    diskTab:      'mounts',
-    netTab:       'interfaces',
-    graphsFrom:   '-6hours',
-    newNote:      null,
-    lastLoadTime: null,
+    diskTab:           'mounts',
+    netTab:            'interfaces',
+    graphsFrom:        '-6hours',
+    editProvisioning:  true,
+    provision: {
+      formHelp: {},
+      families: [{
+        label: 'RedHat / CentOS',
+        value: 'redhat'
+      },{
+        label: 'Debian / Ubuntu',
+        value: 'debian'
+      }],
+      diskStrategies: [{
+        label: 'Mirrored',
+        value: 'mirror'
+      },{
+        label: 'Single / HW RAID',
+        value: 'single'
+      },{
+        label: 'Hadoop Datanode',
+        value: 'hadoop'
+      },{
+        label: 'Xen Virtual Machine',
+        value: 'single-vm-xen'
+      },{
+        label: 'KVM Virtual Machine',
+        value: 'single-vm-kvm'
+      },{
+        label: 'Monolithic',
+        value: 'monolithic'
+      }]
+    },
+    newNote:           null,
+    lastLoadTime:      null,
     graphTimes: [{
       label: '2h',
       value: '-2hours'
@@ -201,6 +233,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     $scope.panes = data;
   });
 
+  $scope.hiddenPanes = function(pane){
+    return !(pane.hidden === true);
+  }
+
   $scope.isMasterInterface = function(i){
     if(i.master)
       return false;
@@ -208,28 +244,47 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   }
 
   $scope.reload = function(){
-//  device
-    $http.get('/api/devices/'+$routeParams.id).success(function(data){
-      $scope.node = data;
-      $scope.opt.lastLoadTime = new Date();
+    if(!angular.isUndefined($routeParams.id)){
+  //  device
+      $http.get('/api/devices/'+$routeParams.id).success(function(data){
+        $scope.node = data;
+        $scope.opt.lastLoadTime = new Date();
 
-  //  load parent
-      if($scope.node && $scope.node.parent_id){
-        $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
-          $scope.node.parent = data[0];
-        });
-      }
-    });
+    //  load parent
+        if($scope.node && $scope.node.parent_id){
+          $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
+            $scope.node.parent = data[0];
+          });
+        }
+      });
 
-//  active alerts
-    $http.get('/api/nagios/'+$routeParams.id+'?severity=ignore').success(function(data){
-      $scope.nagios = data;
-    });
+  //  active alerts
+      $http.get('/api/nagios/'+$routeParams.id+'?severity=ignore').success(function(data){
+        $scope.nagios = data;
+      });
 
-//  all tags
-    $http.get('/api/devices/list/tags').success(function(data){
-      $scope.tags = data;
-    });
+  //  all tags
+      $http.get('/api/devices/list/tags').success(function(data){
+        $scope.tags = data;
+      });
+
+  //  boot profiles
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
+        $scope.pxeboot = data;
+        $scope.opt.newPxeProfile = data[0].id;
+      });
+
+  //  boot profile list
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
+        $scope.pxeProfiles = data;
+      });
+    }
+  }
+
+  $scope.save = function(){
+    $http.post('/api/devices/'+$routeParams.id+'?direct=true', $scope.node).success(function(){
+      $scope.reload();
+    })
   }
 
   $scope.$watch('opt.newNote', function(value){
@@ -245,7 +300,6 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   $scope.tick = function(){
     $scope.opt.currentTime = new Date();
   }
-
 
   $window.setInterval($scope.tick, 1000);
   $window.setInterval($scope.reload, 60000);

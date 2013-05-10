@@ -107,6 +107,10 @@ body .modal {
   border: 0px;
 }
 
+.table-plain th, .table-plain td{
+  border: 0px;
+}
+
 .notes .note+.note{
   margin-top: 1em;
 }

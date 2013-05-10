@@ -4,25 +4,25 @@
       <table class="table table-condensed">
         <thead>
           <tr>
-            <th style="padding:0" class="center" title="Represents the status of this device">Status</th>
-            <th style="padding:0" class="center" title="Whether the device is online and remotely controllable">Control</th>
-            <th style="padding:0" class="center" title="The state of external monitoring for this device">Monitor</th>
+            <th style="padding: 0" class="center" title="Represents the status of this device">Status</th>
+            <th style="padding: 0" class="center" title="Whether the device is online and remotely controllable">Control</th>
+            <th style="padding: 0" class="center" title="The state of external monitoring for this device">Monitor</th>
           </tr>
         </thead>
 
         <tbody>
           <tr>
-            <td class="center" style="padding:0">
-              <span class="label label-{{ node.status || 'unknown' }}">{{ (node.status || 'unknown') | titleize }}</span>
+            <td class="center" style="padding:0; width: 33%">
+              <span style="width: 90%" class="label label-{{ node.status || 'unknown' }}">{{ (node.status || 'unknown') | titleize }}</span>
             </td>
-            <td class="center" style="padding:0">
-              <span class="label label-important">Offline</span>
+            <td class="center" style="padding:0; width: 33%">
+              <span style="width: 90%" class="label label-important">Offline</span>
             </td>
-            <td class="center" style="padding:0">
-              <span ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
+            <td class="center" style="padding:0; width: 33%">
+              <span style="width: 90%" ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
                 {{ (node.properties.alert_state | titleize) || 'Clear' }}
               </span>
-              <span ng-hide="node.properties.monitor" class="label label-inverse">Disabled</span>
+              <span style="width: 90%" ng-hide="node.properties.monitor" class="label label-inverse">Disabled</span>
             </td>
           </tr>
         </tbody>
@@ -34,10 +34,21 @@
         <a style="color: inherit" ng-show="node.parent" href="#/node/{{node.parent.id}}">{{ node.parent.name }}</a>
         <a style="color: inherit" ng-hide="node.parent" href="#/node/{{node.parent_id}}">{{ node.parent_id }}</a>
       </h5>
+
       <h3 style="margin: 0; line-height: 34px;">
-        <span ng-show="node.parent_id">&#9492;&nbsp;&nbsp;</span>
-        {{ node.name | section:'.':0:1 }}<span style="font-size: smaller; color: grey;">.{{ node.name | section:'.':1 }}</span>
+        <span ng-show="node.parent_id">&#9492;</span>
+        <span ng-hide="node.status == 'allocatable'">
+          {{ node.name | section:'.':0:1 }}<span style="font-size: smaller; color: grey;">.{{ node.name | section:'.':1 }}</span>
+        </span>
+        <span ng-show="node.status == 'allocatable'">
+          <span style="font-size: smaller; color: grey;">{{ node.id }}</span>&nbsp;&nbsp;{{ node.properties.make &amp;&amp; (node.properties.make + ' ' + node.properties.model) || 'Node' }}
+          <span ng-show="node.properties.provisioning.hostname">
+            <span style="font-size: medium">becoming</span> {{ node.properties.provisioning.hostname }}<span style="font-size: smaller; color: grey;">.{{ node.properties.site }}.{{ node.properties.domain }}</span>
+          </span>
+        </span>
       </h3>
+
+
       <div style="margin-bottom: 1em; line-height: 30px">
         <span>
           <b>Tags: </b>
@@ -53,7 +64,7 @@
         <i class="icon-plus-sign" ng-hide="opt.showTagEditor" ng-click="opt.showTagEditor=true"> </i>
 
         <div class="input-prepend input-append" ng-show="opt.showTagEditor" style="height: 18px">
-          <span class="add-on" ng-click="opt.newTag=null;opt.showTagEditor=false"><i class="icon-plus-sign"> </i></span>
+          <span class="add-on" ng-click="opt.newTag=null;opt.showTagEditor=false"><i class="icon-remove-circle"> </i></span>
           <input class="input-medium" type="text" ng-model="opt.newTag" typeahead="t for t in tags | filter:$viewValue">
           <button class="btn btn-primary" rest="/api/devices/{{node.id}}/tag/{{opt.newTag}}" rest-success="reload(); opt.showTagEditor=false; opt.newTag=null"><i class="icon-white icon-ok"> </i></button>
         </div>
@@ -62,8 +73,10 @@
 
     <div class="span3">
       <br />
+      <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
       <i class="icon-time"> </i> <b>Last Inventory: </b>{{ node.collected_at | timeAgo }}<br />
       <i class="icon-refresh"> </i> <b>Refreshed: </b>{{ opt.lastLoadTime | timeAgo }}<br />
+
     </div>
   </div>
 
@@ -74,7 +87,7 @@
 
     <div class="span7">
       <tabs>
-        <pane ng-repeat="pane in panes" heading="{{ pane.title || (pane.id | titleize) }}">
+        <pane ng-repeat="pane in panes | filter:hiddenPanes" heading="{{ pane.title || (pane.id | titleize) }}" active="(pane.active || pane.default)">
           <div class="{{ pane.id }}" ng-include="'views/panes/'+pane.template+'.html'"></div>
         </pane>
       </tabs>

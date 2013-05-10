@@ -20,7 +20,7 @@
 
     <tr>
       <th>Type</th>
-      <td>{{ node.properties.virtual &amp;&amp; 'Virtual Machine' || 'Physical Machine' }}</td>
+      <td>{{ node.properties.virtual.toString() == 'true' &amp;&amp; 'Virtual Machine' || 'Physical Machine' }}</td>
     </tr>
 
     <tr ng-hide="node.properties.virtual">

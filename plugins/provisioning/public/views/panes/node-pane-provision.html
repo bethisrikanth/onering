@@ -1,0 +1,97 @@
+<div class="container-fluid widget-pane">
+  <div class="row-fluid">
+    <div class="offset1 span6">
+      <div class="widget-title">
+        Configure Installation
+      </div>
+      <div class="widget-content widget-expand">
+        <table class="table table-plain table-condensed" ng-hide="opt.editProvisioning">
+          <tbody>
+            <tr>
+              <th>Hostname</th>
+              <td>{{ node.properties.provisioning.hostname }}</td>
+
+              </td>
+            </tr>
+
+            <tr>
+              <th>IP Address</th>
+              <td>{{ node.properties.provisioning.network.ip }}</td>
+            </tr>
+
+            <tr>
+              <th>Netmask</th>
+              <td>{{ node.properties.provisioning.network.netmask }}</td>
+            </tr>
+
+            <tr>
+              <th>Gateway</th>
+              <td>{{ node.properties.provisioning.network.gateway }}</td>
+            </tr>
+
+            <tr>
+              <th>DNS</th>
+              <td>{{ node.properties.provisioning.network.dns }}</td>
+            </tr>
+
+            <tr>
+              <th>Platform</th>
+              <td>{{ node.properties.provisioning.family }}</td>
+            </tr>
+
+            <tr>
+              <th>Disk Strategy</th>
+              <td>{{ node.properties.provisioning.disk.strategy }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div ng-show="opt.editProvisioning" ng-include="'views/node-actions-provision-form.html'"></div>
+
+        <div class="pull-right">
+          <button ng-show="opt.editProvisioning" class="btn btn-primary" ng-click="opt.editProvisioning=false; save()"><i class="icon-ok icon-white"> </i> Save</button>
+          <button ng-hide="opt.editProvisioning" class="btn" ng-click="reload(); opt.editProvisioning=true"><i class="icon-pencil"> </i> Edit</button>
+        </div>
+
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+    <div class="span4">
+      <div class="widget-title">Boot Configuration</div>
+      <div class="widget-content widget-expand">
+        <div class="widget-header">
+          <b>PXE Boot Profiles</b>
+          <a class="pull-right" title="View PXE Configuration" target="_blank" href="/api/provision/{{node.id}}/boot"><i class="icon-list-alt"> </i></a>
+        </div>
+
+        <table class="table table-condensed table-plain">
+          <tbody>
+            <tr ng-repeat="pxe in pxeboot">
+              <th style="padding:0">
+                <span ui-if="pxeboot.length > 1">
+                  <span ng-show="$index == 0">&#9484;</span>
+                  <span ng-show="$index > 0 &amp;&amp; $index < (pxeboot.length-1)">&#9500;</span>
+                  <span ng-show="$index == (pxeboot.length-1)">&#9492;</span>
+                </span>
+              </th>
+              <th style="padding:0; width:25%">{{ pxe.interface }}</th>
+              <td style="padding:0; width:65%">
+                <span style="padding-right: 6px" popover="{{ pxe.description || 'The '+(pxe.id | titleize)+' boot profile' }}" popover-trigger="mouseenter" popover-placement="right">
+                  {{ pxe.name || (pxe.id | titleize) }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div>
+          <select style="margin-bottom:0" class="input-medium" ng-model="opt.newPxeProfile" ng-options="v.id as (v.name || (v.id | titleize)) for v in pxeProfiles"></select>
+          <button class="btn btn-primary pull-right" rest="/api/provision/{{node.id}}/boot/set/{{opt.newPxeProfile}}" rest-success="reload()"><i class="icon-ok icon-white"> </i> Set Profile</button>
+        </div>
+
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>

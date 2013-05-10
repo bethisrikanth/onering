@@ -1,37 +1,24 @@
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-      <h1>Infrastructure Overview</h1>
-      <br />
-      <br />
+      <h3>System Overview</h3>
     </div>
   </div>
 
   <div class="row-fluid">
-    <div class="span2" ng-include="'views/widget-field-summary.html'" />
-    <div class="span2" ng-include="'views/widget-field-summary.html'" />
-    <div class="span8" ng-include="'views/widget-nagios.html'" />
+    <div class="span12">
+
+      <div class="container-fluid widget-pane">
+        <div class="row-fluid">
+          <div class="span2">
+            <div class="widget-title"></div>
+            <div class="widget-content">
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-
-<!--   <div class="row-fluid">
-    <div class="span4">
-      <div class="popover widget widget-field-summary" ng-controller="WidgetFieldSummary">
-        <h2 class="popover-title">ODB Connections / sec.</h2>
-        <div class="popover-content">
-          GRAPHS
-        </div>
-      </div>
-    </div>
-
-    <div class="span8">
-      <div class="popover widget widget-field-summary" ng-controller="WidgetFieldSummary">
-        <h2 class="popover-title">Chef Status</h2>
-        <div class="popover-content">
-          CHEF
-        </div>
-      </div>
-    </div>
-
-<!--     <div class="span8" ng-include="'views/widget-chef.html'" data-field="status" /> -->
-  </div> -->
 </div>

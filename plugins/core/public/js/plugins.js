@@ -3,7 +3,7 @@ angular.module('corePlugin', [
   'coreDirectives',
   'coreRoutes'
 ]).
-run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
+run(['$rootScope', '$window', '$http', '$dialog', function($rootScope, $window, $http, $dialog){
   $rootScope.online = true;
 
   $rootScope.prepareQuery = function(query, raw){
@@ -130,6 +130,56 @@ run(['$rootScope', '$window', '$http', function($rootScope, $window, $http){
       $rootScope.$broadcast('offline');
     });
   }
+
+  $rootScope.openDialog = function(tpl, parent, controller){
+    if(angular.isFunction(controller)){
+      var subcontroller = controller;
+    }
+
+    var d = $dialog.dialog({
+      backdrop:    true,
+      keyboard:    true,
+      templateUrl: tpl,
+      controller:  function($scope, $dialog){
+        if(!angular.isUndefined(parent)){
+          $scope.parent = parent;
+        }
+
+        $scope.close = function(){
+          d.close()
+        };
+
+        if(!angular.isUndefined(subcontroller)){
+          subcontroller($scope, $dialog);
+        }
+      }
+    })
+
+    d.open();
+  }
+
+  $rootScope.validateIpAddress = function(value){
+    if(!angular.isUndefined(value)){
+      if(value.match(/^\s*[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\s*$/)){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  $rootScope.validateDotless = function(value){
+    if(!angular.isUndefined(value)){
+      return (value.indexOf('.') < 0)
+    }
+
+    return false;
+  }
+
+  $rootScope.setTitle = function(value){
+    $scope.title = value;
+  }
+
 
   $window.setInterval($rootScope.ping, 15000);
 }]);

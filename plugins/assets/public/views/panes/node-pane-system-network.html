@@ -9,7 +9,7 @@
 
   <div>
     <div ng-show="opt.netTab=='interfaces'">
-      <table class="table table-plain">
+      <table class="table table-hover">
         <thead>
           <tr>
             <th>Interface</th>
@@ -39,9 +39,9 @@
           </tr>
 
           <tr ng-repeat="slave in node.properties.network.interfaces | filter:{master:interface.name}">
-            <td></td>
+            <td>&#9492;&nbsp;&nbsp;</td>
             <td>
-              <span title="This interface is a slave to master interface {{ interface.name }}">&#9492;&nbsp;&nbsp;<i>{{ slave.name }}</i></span>
+              <span title="This interface is a slave to master interface {{ interface.name }}"><i>{{ slave.name }}</i></span>
             </td>
             <td>{{ slave.mac }}</td>
             <td>

@@ -83,18 +83,35 @@ module App
 
     # device pane configurations
       get '/:id/panes' do
-        output([{
-          :id        => 'system',
-          :template  => 'node-pane-system'
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        rv = [{
+          :id         => 'system',
+          :template   => 'node-pane-system'
         },{
-          :id        => 'apps',
-          :title     => 'Applications',
-          :template  => 'node-pane-apps'
+          :id         => 'config',
+          :title      => 'Configuration',
+          :template   => 'node-pane-config'
         },{
-          :id        => 'config',
-          :title     => 'Configuration',
-          :template  => 'node-pane-config'
-        }])
+          :id       => 'apps',
+          :title    => 'Applications',
+          :template => 'node-pane-apps'
+        },{
+          :id         => 'provision',
+          :title      => 'Provisioning',
+          :template   => 'node-pane-provision'
+        }]
+
+        if ['allocatable', 'installing'].include?(device.status.to_s)
+          rv[rv.index{|i| i[:id] == 'provision' }][:default] = true
+          rv[rv.index{|i| i[:id] == 'apps'      }][:hidden] = true
+        else
+          rv[rv.index{|i| i[:id] == 'system' }][:default] = true
+        end
+
+        output(rv)
       end
 
 
@@ -177,9 +194,6 @@ module App
         /:id
       }.each do |route|
         post route do
-          job = Automation::Job.find_by_name('assets-update')
-          return 503 unless job
-
           data = request.env['rack.input'].read
 
           if params[:id]
@@ -199,6 +213,9 @@ module App
             device.reload
             output(device)
           else
+            job = Automation::Job.find_by_name('assets-update')
+            return 503 unless job
+
             output(job.request({
               :data       => data,
               :parameters => {

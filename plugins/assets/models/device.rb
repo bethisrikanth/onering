@@ -28,6 +28,7 @@ class Device < App::Model::Base
   key :aliases,            Array
   key :collected_at,       Time
   key :status,             String
+  key :maintenance_status, String
 
   def add_note(body, user_id)
     id = Time.now.to_i.to_s

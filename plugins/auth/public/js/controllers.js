@@ -41,12 +41,6 @@ function UserProfileController($scope, $http, $dialog, CurrentUser){
       keyboard:    true,
       templateUrl: 'createKeyDialog',
       controller:  function($scope, $dialog){
-        $scope.save = function(response){
-          $parent.reload();
-          $parent.showKeyDialog($scope.key_name, response.data.split(/\n{2,}/))
-          $scope.close();
-        }
-
         $scope.close = function(){
           d.close()
         };

@@ -40,6 +40,40 @@
   <div class="row-fluid">
     <div class="span6">
       <div class="widget-title">
+        System Information
+      </div>
+
+      <div class="widget-content">
+        <table class="table table-condensed table-plain">
+          <tbody>
+            <tr>
+              <th>CPU</th>
+              <td>
+                <b>{{ node.properties.metrics.cpu.count}}</b> CPUs @ <b>{{ node.properties.metrics.cpu.speed | autospeed:'M':1 }}</b>
+              </td>
+            </tr>
+
+            <tr>
+              <th>Memory</th>
+              <td>
+                <b>{{ node.properties.metrics.memory.total | autosize:0 }}</b> RAM,
+                <span ng-show="node.properties.metrics.memory.swap > 0"><b>{{ node.properties.metrics.memory.swap | autosize:0 }}</b> Swap</span>
+              </td>
+            </tr>
+
+            <tr>
+              <th>Uptime</th>
+              <td>
+                {{ node.properties.booted_at | timeDuration:['days:d','hours:h','minutes:m'] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="span6">
+      <div class="widget-title">
         Utilization
         <span class="pull-right" ng-show="node.properties.metrics">
           <span ng-repeat="time in opt.graphTimes" ng-class="'badge '+(opt.graphsFrom==time.value &amp;&amp; 'badge-info')" ng-click="opt.graphsFrom=time.value">{{ time.label || time.value }}</span>
@@ -63,7 +97,6 @@
 
         <div
           graph
-          id="test"
           url="http://graphite.outbrain.com/render"
           target="asPercent(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.load.load.midterm,{{ node.properties.metrics.cpu.count || 1 }})|asPercent(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.memory.memory-free,collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.memory.memory-used)"
           from="{{ opt.graphsFrom }}"
@@ -71,43 +104,6 @@
           min="0"
           max="100"
           colors="#0088CC,#B94A48"
-        ></div>
-      </div>
-
-      <div class="widget-content center" ng-hide="node.properties.metrics">
-        <h4>No metrics collected</h4>
-      </div>
-    </div>
-
-    <div class="span6">
-      <div class="widget-title">
-        Bandwidth
-        <span class="pull-right" ng-show="node.properties.metrics">
-          <span ng-repeat="time in opt.graphTimes" ng-class="'badge '+(opt.graphsFrom==time.value &amp;&amp; 'badge-info')" ng-click="opt.graphsFrom=time.value">{{ time.label || time.value }}</span>
-        </span>
-      </div>
-      <div class="widget-content" ng-show="node.properties.metrics">
-        <div class="widget-header">
-          <span class="pull-left">
-            <b style="color: #468847;">&#9473;&nbsp;&nbsp;</b>
-            Receive
-          </span>
-
-          <span class="pull-right">
-            <b style="color: #E68906;">&#9473;&nbsp;&nbsp;</b>
-            Transmit
-          </span>
-
-          <div class="clearfix"></div>
-        </div>
-        <div
-          graph
-          id="test"
-          url="http://graphite.outbrain.com/render"
-          target="nonNegativeDerivative(average(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.interface-*.if_octets.rx))|scale(nonNegativeDerivative(average(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.interface-*.if_octets.tx)),-1)"
-          from="{{ opt.graphsFrom }}"
-          height="115"
-          colors="#468847,#E68906"
         ></div>
       </div>
 

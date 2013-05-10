@@ -62,7 +62,6 @@ module App
         end
 
         newhash.each do |k,v|
-          puts "SETTING #{k} = #{v.get('monitor').class.name} #{v.get('monitor')}" rescue nil
           send("#{k}=", v) rescue nil
         end
 

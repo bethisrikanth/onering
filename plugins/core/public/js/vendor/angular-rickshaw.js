@@ -26,7 +26,6 @@ angular.module('rickshaw', [])
       }
 
       $scope.buildGraph = function(url){
-        console.log(url);
         delete $scope.graph;
 
         if(!angular.isUndefined($attrs.colors)){
