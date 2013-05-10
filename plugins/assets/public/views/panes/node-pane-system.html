@@ -60,13 +60,6 @@
                 <span ng-show="node.properties.metrics.memory.swap > 0"><b>{{ node.properties.metrics.memory.swap | autosize:0 }}</b> Swap</span>
               </td>
             </tr>
-
-            <tr ng-show="node.properties.booted_at">
-              <th>Booted</th>
-              <td>
-                {{ node.properties.booted_at | timeAgo }}
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
