@@ -175,6 +175,7 @@ function RackController($scope, $http, $routeParams, Rack){
 
 function NodeController($scope, $http, $location, $routeParams, $window, $position, $dialog){
   $scope.opt = {
+    ping:              null,
     diskTab:           'mounts',
     netTab:            'interfaces',
     graphsFrom:        '-6hours',
@@ -277,6 +278,13 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   //  boot profile list
       $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
         $scope.pxeProfiles = data;
+      });
+
+  //  Give me a ping, Vasili.  One ping only please...
+      $http.get('/api/salt/devices/'+$routeParams.id+'/ping').success(function(){
+        $scope.opt.ping = true;
+      }).error(function(){
+        $scope.opt.ping = false;
       });
     }
   }

@@ -38,12 +38,12 @@
   </div>
 
   <div class="row-fluid">
-    <div class="span6">
+    <div class="span12">
       <div class="widget-title">
         System Information
       </div>
 
-      <div class="widget-content">
+      <div class="widget-content widget-expand">
         <table class="table table-condensed table-plain">
           <tbody>
             <tr>
@@ -69,46 +69,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <div class="span6">
-      <div class="widget-title">
-        Utilization
-        <span class="pull-right" ng-show="node.properties.metrics">
-          <span ng-repeat="time in opt.graphTimes" ng-class="'badge '+(opt.graphsFrom==time.value &amp;&amp; 'badge-info')" ng-click="opt.graphsFrom=time.value">{{ time.label || time.value }}</span>
-        </span>
-      </div>
-
-      <div class="widget-content" ng-show="node.properties.metrics">
-        <div class="widget-header">
-          <span class="pull-left">
-            <b style="color: #0088CC;">&#9473;&nbsp;&nbsp;</b>
-            <b>{{ node.properties.metrics.cpu.count }}</b> CPUs
-          </span>
-
-          <span class="pull-right">
-            <b style="color: #B94A48;">&#9473;&nbsp;&nbsp;</b>
-            <b>{{ node.properties.metrics.memory.total | autosize }}</b> RAM
-          </span>
-
-          <div class="clearfix"></div>
-        </div>
-
-        <div
-          graph
-          url="http://graphite.outbrain.com/render"
-          target="asPercent(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.load.load.midterm,{{ node.properties.metrics.cpu.count || 1 }})|asPercent(collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.memory.memory-free,collectd.machines.{{ node.properties.site.toLowerCase() }}.{{ node.name | section:'.':0:1 }}.memory.memory-used)"
-          from="{{ opt.graphsFrom }}"
-          height="115"
-          min="0"
-          max="100"
-          colors="#0088CC,#B94A48"
-        ></div>
-      </div>
-
-      <div class="widget-content center" ng-hide="node.properties.metrics">
-        <h4>No metrics collected</h4>
       </div>
     </div>
   </div>

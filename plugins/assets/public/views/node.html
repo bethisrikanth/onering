@@ -13,10 +13,15 @@
         <tbody>
           <tr>
             <td class="center" style="padding:0; width: 33%">
-              <span style="width: 90%" class="label label-{{ node.status || 'unknown' }}">{{ (node.status || 'unknown') | titleize }}</span>
+              <span style="width: 90%" class="label label-{{ node.status || 'unknown' }}">
+                <span ng-show="node.status=='online'">Active</span>
+                <span ng-hide="node.status=='online'">{{ (node.status || 'unknown') | titleize }}</span>
+              </span>
             </td>
             <td class="center" style="padding:0; width: 33%">
-              <span style="width: 90%" class="label label-important">Offline</span>
+              <span ng-show="opt.ping==null"  style="width: 90%" class="label">Unknown</span>
+              <span ng-show="opt.ping==true"  style="width: 90%" class="label label-success">Online</span>
+              <span ng-show="opt.ping==false" style="width: 90%" class="label label-important">Offline</span>
             </td>
             <td class="center" style="padding:0; width: 33%">
               <span style="width: 90%" ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
