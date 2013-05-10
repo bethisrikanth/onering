@@ -281,7 +281,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
       });
 
   //  Give me a ping, Vasili.  One ping only please...
-      $http.get('/api/salt/devices/'+$routeParams.id+'/ping').success(function(){
+      $http.get('/api/salt/devices/'+$routeParams.id+'/ping?severity=ignore').success(function(){
         $scope.opt.ping = true;
       }).error(function(){
         $scope.opt.ping = false;
