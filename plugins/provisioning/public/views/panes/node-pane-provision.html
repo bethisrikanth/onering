@@ -92,7 +92,11 @@
           <button class="btn btn-primary" rest="/api/provision/{{node.id}}/boot/set/{{opt.newPxeProfile}}" rest-success="reload()"><i class="icon-ok icon-white"> </i></button>
         </div>
 
-        <button class="btn btn-danger disabled" style="width: 100%; margin-top: 2em"><i class="icon-off icon-white"> </i> Reboot Machine</button>
+        <button ng-show="node.status=='allocatable'" rest="/api/provision/{{node.id}}/set/action/reboot" rest-success="reload()" class="btn btn-danger" style="width: 100%; margin-top: 2em">
+          <i class="icon-off icon-white"> </i> Reboot Machine
+        </button>
+
+        <button ng-hide="node.status=='allocatable'" class="btn btn-danger disabled" style="width: 100%; margin-top: 2em"><i class="icon-off icon-white"> </i> Reboot Machine</button>
 
         <div class="clearfix"></div>
       </div>
