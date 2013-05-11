@@ -292,6 +292,7 @@ module App
 
           user = User.find(id)
           return 404 unless user
+          return 404 unless user.client_keys.keys.include?(params[:name])
 
           user.client_keys.delete(params[:name])
           user.safe_save

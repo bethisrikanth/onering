@@ -48,7 +48,7 @@
 
     <tr ng-show="node.properties.ipmi_ip">
       <th>IPMI</th>
-      <td>{{ node.properties.ipmi_ip }}</td>
+      <td><a target="_blank" href="https://{{ node.properties.ipmi_ip }}">{{ node.properties.ipmi_ip }}</a></td>
     </tr>
 
     <tr ng-show="node.properties.model">

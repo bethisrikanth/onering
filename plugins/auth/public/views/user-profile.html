@@ -35,7 +35,7 @@
         <thead>
           <tr>
             <th colspan="10">
-              <button ng-click="createKeyDialog()" class="btn"><i class="icon-plus"> </i> Add Key</button>
+              <button ng-click="openDialog('createKeyDialog', this)" class="btn"><i class="icon-plus"> </i> Add Key</button>
             </th>
           </tr>
 
@@ -84,7 +84,7 @@
   </div>
 
   <div class="modal-footer">
-    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="save(response)" class="btn btn-primary">Create Key</button>
+    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="showKeyDialog(response)" class="btn btn-primary">Create Key</button>
     <button class="btn btn-danger" ng-click="close()">Cancel</button>
   </div>
 </script>

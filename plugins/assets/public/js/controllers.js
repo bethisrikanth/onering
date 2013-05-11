@@ -290,6 +290,8 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         $scope.opt.ping = false;
       });
     }
+
+    $scope.$broadcast('reload');
   }
 
   $scope.save = function(){
