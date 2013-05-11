@@ -272,7 +272,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   //  boot profiles
       $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
         $scope.pxeboot = data;
-        $scope.opt.newPxeProfile = data[0].id;
+
+        if(data[0]){
+          $scope.opt.newPxeProfile = data[0].id;
+        }
       });
 
   //  boot profile list

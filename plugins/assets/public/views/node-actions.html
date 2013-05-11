@@ -16,6 +16,10 @@
   <li ng-hide="node.properties.monitor">
     <a rest="/api/devices/{{node.id}}/set/monitor/true"  rest-success="reload()"><i class="icon-tasks"> </i> Resume Monitoring</a>
   </li>
+
+  <li rest-show="/api/users/{{node.id}}/keys/system">
+    <a rest="/api/users/{{node.id}}/keys/system" rest-method="delete" rest-success="reload()"><i class="icon-lock"> </i> Delete Client Key</a>
+  </li>
 </ul>
 
 
