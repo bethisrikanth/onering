@@ -314,6 +314,12 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     $scope.opt.currentTime = new Date();
   }
 
+  $scope.ConsoleDialogController = function($scope){
+    $scope.console = function(addr, port){
+      return '<iframe src="http://'+addr+':'+(port || '2600')+'" frameborder="0" scrolling="no" style="width:100%; height:100%"></iframe>';
+    }
+  }
+
   $window.setInterval($scope.tick, 1000);
   $window.setInterval($scope.reload, 60000);
   $scope.reload();
