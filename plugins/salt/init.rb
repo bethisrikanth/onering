@@ -33,11 +33,11 @@ module App
 
       get '/run/:plugin' do
         output(Automation::Job.run_task('salt.run', {
-          :parameters => {
+          :parameters => (request.env['rack.request.query_hash'].merge({
             :plugin => params[:plugin],
             :query  => (params[:q] || params[:query]),
-            :nodes  => params[:nodes]
-          }.compact
+            :nodes  => params[:nodes].split('|')
+          })).compact
         }))
       end
 
@@ -47,7 +47,7 @@ module App
             :plugin    => params[:plugin],
             :arguments => MultiJson.load(request.env['rack.input'].read),
             :query     => (params[:q] || params[:query]),
-            :nodes     => params[:nodes]
+            :nodes     => params[:nodes].split('|')
           }.compact
         }))
       end
