@@ -18,7 +18,11 @@
   </li>
 
   <li rest-show="/api/users/{{node.id}}/keys/system">
-    <a rest="/api/users/{{node.id}}/keys/system" rest-method="delete" rest-success="reload()"><i class="icon-lock"> </i> Delete Client Key</a>
+    <a rest="/api/users/{{node.id}}/keys/system" rest-method="delete" rest-success="reload()">
+      <i class="icon-lock"> </i>
+      <span ng-show="node.status=='installing'" style="color:red">Delete Client Key</span>
+      <span ng-hide="node.status=='installing'">Delete Client Key</span>
+    </a>
   </li>
 
   <li rest-show="http://{{node.properties.ip}}:2600">
