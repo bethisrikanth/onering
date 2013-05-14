@@ -303,10 +303,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   $scope.$watch('opt.newNote', function(value){
     if(value !== null){
       $http.post('/api/devices/'+$routeParams.id+'/notes', value).success(function(){
+        $scope.reload();
         $scope.opt.newNote = null;
       });
 
-      $scope.reload();
     }
   });
 

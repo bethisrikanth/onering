@@ -1,33 +1,32 @@
 <div class="container-fluid" ng-show="node">
   <div class="row-fluid">
     <div class="span2 center">
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th style="padding: 0" class="center" title="Represents the status of this device">Status</th>
-            <th style="padding: 0" class="center" title="Whether the device is online and remotely controllable">Control</th>
-            <th style="padding: 0" class="center" title="The state of external monitoring for this device">Monitor</th>
-          </tr>
-        </thead>
-
+      <table class="table table-condensed table-plain">
         <tbody>
           <tr>
+            <th style="padding:0; font-size:smaller" title="Represents the status of this device">Allocation Status</th>
             <td class="center" style="padding:0; width: 33%">
-              <span style="width: 90%" class="label label-{{ node.status || 'unknown' }}">
+              <span style="width: 100%" class="label label-{{ node.status || 'unknown' }}">
                 <span ng-show="node.status=='online'">Active</span>
                 <span ng-hide="node.status=='online'">{{ (node.status || 'unknown') | titleize }}</span>
               </span>
             </td>
+          </tr>
+          <tr>
+            <th style="padding:0; font-size:smaller" title="Whether the device is online and remotely controllable">Remote Control</th>
             <td class="center" style="padding:0; width: 33%">
-              <span ng-show="opt.ping==null"  style="width: 90%" class="label">Unknown</span>
-              <span ng-show="opt.ping==true"  style="width: 90%" class="label label-success">Online</span>
-              <span ng-show="opt.ping==false" style="width: 90%" class="label label-important">Offline</span>
+              <span ng-show="opt.ping==null"  style="width: 100%" class="label">Unknown</span>
+              <span ng-show="opt.ping==true"  style="width: 100%" class="label label-success">Online</span>
+              <span ng-show="opt.ping==false" style="width: 100%" class="label label-important">Offline</span>
             </td>
+          </tr>
+          <tr>
+            <th style="padding:0; font-size:smaller" title="The state of external monitoring for this device">Monitoring</th>
             <td class="center" style="padding:0; width: 33%">
-              <span style="width: 90%" ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
+              <span style="width: 100%" ng-show="node.properties.monitor" class="label label-{{ node.properties.alert_state || 'success' }}">
                 {{ (node.properties.alert_state | titleize) || 'Clear' }}
               </span>
-              <span style="width: 90%" ng-hide="node.properties.monitor" class="label label-inverse">Disabled</span>
+              <span style="width: 100%" ng-hide="node.properties.monitor" class="label label-inverse">Disabled</span>
             </td>
           </tr>
         </tbody>
