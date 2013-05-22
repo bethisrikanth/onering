@@ -2,6 +2,12 @@
 
 <ul class="nav nav-list well">
   <li class="nav-header">Lifecycle</li>
+  <li ng-show="node.status != 'reserved'">
+    <a rest="/api/devices/{{node.id}}/status/reserved" rest-success="reload()"><i class="icon-bookmark"></i> Reserve Node</a></a>
+  </li>
+  <li ng-show="node.status == 'reserved'">
+    <a rest="/api/devices/{{node.id}}/status/clear" rest-success="reload()"><i class="icon-circle-arrow-up"></i> Release Reservation</a></a>
+  </li>
   <li>
     <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a></a>
   </li>

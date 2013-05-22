@@ -77,7 +77,7 @@ angular.module('rest', [])
           $http({
             method: (method ? method.toUpperCase() : 'GET'),
             url:    url,
-            data:   (angular.isUndefined(data) ? null : JSON.stringify(data())),
+            data:   (angular.isUndefined(data) ? null : JSON.stringify(data)),
             params: {
               severity: ($attrs.restSeverity || 'ignore')
             }
