@@ -196,6 +196,12 @@ module Automation
                 end
               end
 
+            # push the result data into the request object
+              request.push(:results => {
+                :task   => config['type'],
+                :output => results
+              })
+
             # set next input to current result(s)
               last_task_result = results
 

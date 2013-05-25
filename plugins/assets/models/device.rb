@@ -28,6 +28,7 @@ class Device < App::Model::Base
   key :aliases,            Array
   key :collected_at,       Time
   key :status,             String
+  key :maintenance_status, String
 
   def add_note(body, user_id)
     id = Time.now.to_i.to_s
@@ -130,11 +131,7 @@ class Device < App::Model::Base
 
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
-          if v.is_a?(String) and v[0] == '@'
-            self.get(v[1..-1])
-          else
-            v.autotype()
-          end
+          v.autotype()
         end
 
       # force determines whether the applied default overrides the new object

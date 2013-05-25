@@ -80,6 +80,41 @@ module App
         200
       end
 
+
+    # device pane configurations
+      get '/:id/panes' do
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        rv = [{
+          :id         => 'system',
+          :template   => 'node-pane-system'
+        },{
+          :id         => 'config',
+          :title      => 'Configuration',
+          :template   => 'node-pane-config'
+        },{
+          :id       => 'apps',
+          :title    => 'Applications',
+          :template => 'node-pane-apps'
+        },{
+          :id         => 'provision',
+          :title      => 'Provisioning',
+          :template   => 'node-pane-provision'
+        }]
+
+        if ['allocatable', 'installing'].include?(device.status.to_s)
+          rv[rv.index{|i| i[:id] == 'provision' }][:default] = true
+          rv[rv.index{|i| i[:id] == 'apps'      }][:hidden] = true
+        else
+          rv[rv.index{|i| i[:id] == 'system' }][:default] = true
+        end
+
+        output(rv)
+      end
+
+
       get '/:id/parent' do
         allowed_to? :get_asset, params[:id]
         device = Device.find(params[:id])
@@ -159,9 +194,6 @@ module App
         /:id
       }.each do |route|
         post route do
-          job = Automation::Job.find_by_name('assets-update')
-          return 503 unless job
-
           data = request.env['rack.input'].read
 
           if params[:id]
@@ -181,6 +213,9 @@ module App
             device.reload
             output(device)
           else
+            job = Automation::Job.find_by_name('assets-update')
+            return 503 unless job
+
             output(job.request({
               :data       => data,
               :parameters => {
@@ -282,16 +317,22 @@ module App
       get '/:id/status/:status' do
         device = Device.find(params[:id])
         return 404 if not device
-        if params[:status] == 'unknown'
+        case params[:status]
+        when 'unknown'
           if (Device::VALID_STATUS - Device::MANUAL_STATUS - Device::NO_AUTOCLEAR_STATUS).include?(device.status)
             device.unset(:status)
             device.reload
           end
+
+        when 'clear', 'null'
+          device.unset(:status)
+          device.reload          
+
         else
           device.status = params[:status]
-          device.safe_save
         end
 
+        device.safe_save
         output(device)
       end
 

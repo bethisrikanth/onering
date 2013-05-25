@@ -1,6 +1,5 @@
 function QueryController($scope, $http, $window, $route, $location, $routeParams, Query){
   $scope.query = $routeParams.query;
-  $scope.params = $route.current.$route.params;
   $scope.time_left = 0;
 
   $scope.reload = function(){
@@ -30,7 +29,6 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   }
 
   $scope.setAutoReload = function(interval){
-    console.log(interval)
     if(interval){
       if($scope.autoreload_id) $scope.clearAutoReload();
       $scope.autoreload_id = $window.setInterval($scope.reload, interval);
@@ -55,7 +53,7 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.reload();
 }
 
-function SummaryController($scope, $http, $routeParams, $route, Summary){
+function SummaryController($scope, $http, $routeParams, $route){
   $scope.params = ($route.current.$route.params || {});
   $scope.field = $routeParams.field || $scope.params.field;
   $scope.orderProp = 'total';
@@ -67,22 +65,22 @@ function SummaryController($scope, $http, $routeParams, $route, Summary){
   });
 }
 
-function OverviewController($scope, Summary){
-  $scope.graphs = {
-    'default': {
-
-    }
+function OverviewController($scope, $http){
+  var status_weights = {
+    'online':      2000,
+    'reserved':    1000,
+    'allocatable': 100
   };
 
-  Summary.query({
-    field: 'status'
-  }, function(data){
-    for(var s in data){
-      $scope.graphs.overview = $scope.summary_to_graphite(data);
-    }
+  $scope.infrastructure = {};
 
-    console.log($scope.graphs);
-  });
+  $scope.reload = function(){
+    $http.get('/api/devices/summary/by-site/status').success(function(data){
+
+    });
+  }
+
+  $scope.reload();
 }
 
 function DeviceListController($scope, $http, $timeout, Device, DeviceNote){
@@ -175,158 +173,154 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $location, $routeParams, $window, Device, DeviceNote, NagiosHost){
-  $scope.id = $routeParams.id;
-  $scope.note = null;
-  $scope.hidAsAColor = false;
-  $scope.newtags = [];
-  $scope.alert_init_limit = 3;
-  $scope.alert_show_limit = $scope.alert_init_limit;
-  $scope.alert_load_age = 0;
-  $scope.current_net_tab = 'system';
-  $scope.deleteConfirmId = null;
-  $scope.redeployConfirmId = null;
-
-  $scope.reload = function(id){
-    var id = id || $scope.id;
-
-    Device.get({
-      id: id
-    }, function(data){
-      $scope.device = data;
-    });
-
-    $scope.reloadAlerts(id);
-    $scope.load_time = new Date();
+function NodeController($scope, $http, $location, $routeParams, $window, $position, $dialog){
+  $scope.opt = {
+    ping:              null,
+    diskTab:           'mounts',
+    netTab:            'interfaces',
+    graphsFrom:        '-6hours',
+    editProvisioning:  true,
+    provision: {
+      formHelp: {},
+      families: [{
+        label: 'RedHat / CentOS',
+        value: 'redhat'
+      },{
+        label: 'Debian / Ubuntu',
+        value: 'debian'
+      }],
+      diskStrategies: [{
+        label: 'Mirrored',
+        value: 'mirror'
+      },{
+        label: 'Single / HW RAID',
+        value: 'single'
+      },{
+        label: 'Hadoop Datanode',
+        value: 'hadoop'
+      },{
+        label: 'Xen Virtual Machine',
+        value: 'single-vm-xen'
+      },{
+        label: 'KVM Virtual Machine',
+        value: 'single-vm-kvm'
+      },{
+        label: 'Monolithic',
+        value: 'monolithic'
+      }]
+    },
+    newNote:           null,
+    lastLoadTime:      null,
+    graphTimes: [{
+      label: '2h',
+      value: '-2hours'
+    },{
+      label: '6h',
+      value: '-6hours'
+    },{
+      label: '24h',
+      value: '-1days'
+    },{
+      label: '3d',
+      value: '-3days'
+    },{
+      label: '1w',
+      value: '-1week'
+    }]
   };
 
-  $scope.reloadAlerts = function(id){
-    $scope.alert_load_age = 0;
+//  pane configuration
+  $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
+    $scope.panes = data;
+  });
 
-    NagiosHost.get({
-      id: (id || $scope.id)
-    }, function(data){
-      $scope.nagios_alerts = [];
-
-      if(data.alerts){
-        $scope.nagios_alerts = data.alerts;
-      }
-    });
+  $scope.hiddenPanes = function(pane){
+    return !(pane.hidden === true);
   }
 
-  $scope.updateAlertAge = function(){
-    $scope.alert_load_age += 1;
-    try { $scope.$apply(); }catch(e){ }
-  };
+  $scope.isMasterInterface = function(i){
+    if(i.master)
+      return false;
+    return true;
+  }
 
-  $scope.saveNote = function(note_id){
-    if($scope.note){
-      if($scope.device && $scope.device.properties){
-        if(!$scope.device.properties.notes)
-          $scope.device.properties.notes = [];
+  $scope.reload = function(){
+    if(!angular.isUndefined($routeParams.id)){
+  //  device
+      $http.get('/api/devices/'+$routeParams.id).success(function(data){
+        $scope.node = data;
+        $scope.opt.lastLoadTime = new Date();
 
-        DeviceNote.save({
-          id: $scope.device.id
-        }, $scope.note, function(){
-          if(note_id)
-            $scope.deleteNote(note_id);
-
-          $scope.old_note_id = null;
-          $scope.note = null;
-          $scope.reload($scope.device.id);
-        });
-      }
-    }
-  };
-
-  $scope.editNote = function(note_id){
-    $scope.old_note_id = note_id;
-    $scope.note = $scope.device.properties.notes[note_id].body;
-  };
-
-  $scope.deleteNote = function(note_id){
-    DeviceNote.delete({
-      id: $scope.device.id,
-      note_id: note_id
-    }, function(){
-      $scope.reload($scope.device.id);
-    })
-  };
-
-  $scope.setStatus = function(status){
-    if($scope.device && status){
-      $http.get('/api/devices/'+$scope.device.id+'/status/'+status).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.setProperty = function(property, value){
-    console.log('set', property, value)
-    if($scope.device && property && value !== undefined){
-      $http.get('/api/devices/'+$scope.device.id+'/set/'+property+'/'+value).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.setMaintStatus = function(status){
-    if($scope.device && status){
-      $http.get('/api/devices/'+$scope.device.id+'/maintenance/'+status).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.tag = function(value){
-    if($scope.device && typeof(value) == 'string' && $.trim(value).length > 0){
-      $http.get('/api/devices/'+$scope.device.id+'/tag/'+value).success(function(){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.untag = function(value){
-    if($scope.device && value && typeof(value) == 'string'){
-      $http.get('/api/devices/'+$scope.device.id+'/untag/'+value).success(function(data){
-        $scope.reload();
-      });
-    }
-  };
-
-  $scope.saveTags = function(){
-    for(var i in $scope.newtags){
-      $scope.tag($scope.newtags[i]);
-    }
-
-    $scope.newtags = [];
-  };
-
-  $scope.deleteNode = function(){
-    if($scope.device){
-      if($scope.deleteConfirmId){
-        if($scope.device.id == $scope.deleteConfirmId){
-          $http.delete('/api/devices/'+$scope.device.id).success(function(){
-            $location.path('/inf');
+    //  load parent
+        if($scope.node && $scope.node.parent_id){
+          $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
+            $scope.node.parent = data[0];
           });
         }
-      }
-    }
-  }
+      });
 
-  $scope.redeployNode = function(){
-    if($scope.device){
-      if($scope.redeployConfirmId){
-        if($scope.device.id == $scope.redeployConfirmId){
-          $http.get('/api/provision/'+$scope.device.id+'/boot/install').success(function(){
-            $scope.reload();
-          })
+  //  active alerts
+      $http.get('/api/nagios/'+$routeParams.id+'?severity=ignore').success(function(data){
+        $scope.nagios = data;
+      });
+
+  //  all tags
+      $http.get('/api/devices/list/tags').success(function(data){
+        $scope.tags = data;
+      });
+
+  //  boot profiles
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
+        $scope.pxeboot = data;
+
+        if(data[0]){
+          $scope.opt.newPxeProfile = data[0].id;
         }
-      }
+      });
+
+  //  boot profile list
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
+        $scope.pxeProfiles = data;
+      });
+
+  //  Give me a ping, Vasili.  One ping only please...
+      $http.get('/api/salt/devices/'+$routeParams.id+'/ping?severity=ignore').success(function(){
+        $scope.opt.ping = true;
+      }).error(function(){
+        $scope.opt.ping = false;
+      });
+    }
+
+    $scope.$broadcast('reload');
+  }
+
+  $scope.save = function(){
+    $http.post('/api/devices/'+$routeParams.id+'?direct=true', $scope.node).success(function(){
+      $scope.reload();
+    })
+  }
+
+  $scope.$watch('opt.newNote', function(value){
+    if(value !== null){
+      $http.post('/api/devices/'+$routeParams.id+'/notes', value).success(function(){
+        $scope.reload();
+        $scope.opt.newNote = null;
+      });
+
+    }
+  });
+
+  $scope.tick = function(){
+    $scope.opt.currentTime = new Date();
+  }
+
+  $scope.ConsoleDialogController = function($scope){
+    $scope.console = function(addr, port){
+      return '<iframe src="http://'+addr+':'+(port || '2600')+'" frameborder="0" scrolling="no" style="width:100%; height:100%"></iframe>';
     }
   }
 
-  $window.setInterval($scope.updateAlertAge, 1000);
+  $window.setInterval($scope.tick, 1000);
   $window.setInterval($scope.reload, 60000);
   $scope.reload();
 }
@@ -384,7 +378,6 @@ function AssetDefaultsController($scope, $http, AssetDefault){
   }
 
   $scope.save = function(d){
-    console.log(d);
     $http.post('/api/devices/defaults', d).success(function(){
       $scope.reload();
     });
@@ -404,7 +397,6 @@ function AssetDefaultsController($scope, $http, AssetDefault){
   $scope.$watch('newApplyKey', function(){
     if($scope.newApplyKey && $scope.newApplyKey != '(new)'){
       if($scope.current && $scope.current.apply){
-        console.log($scope.newApplyKey)
         $scope.current.apply[$scope.newApplyKey] = null;
         $scope.newApplyKey = null;
       }
@@ -435,8 +427,6 @@ function NodeCompareController($scope, $routeParams, Query){
   $scope.fields = ($routeParams.fields ? $routeParams.fields.split('|') : []);
 
   $scope.reload = function(){
-    console.log('lol');
-
     if($scope.fields.length > 0 && $scope.query){
       Query.query({
         query: $scope.prepareQuery($scope.query, $routeParams.raw),

@@ -1,0 +1,58 @@
+<div class="widget-title">Networking</div>
+
+<div class="widget-content">
+  <ul class="nav nav-pills">
+    <li ng-show="node.properties.network.interfaces" ng-class="(opt.netTab=='interfaces' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.netTab='interfaces'">Interfaces</a>
+    </li>
+  </ul>
+
+  <div>
+    <div ng-show="opt.netTab=='interfaces'">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Interface</th>
+            <th> </th>
+            <th>MAC</th>
+            <th>Addresses</th>
+            <th>Switch</th>
+            <th>Port</th>
+          </tr>
+        </thead>
+
+        <tbody ng-repeat="interface in node.properties.network.interfaces | filter:isMasterInterface | orderBy:'name'">
+          <tr>
+            <td>{{ interface.name }}</td>
+            <td>
+              <span ng-show="interface.bonding">
+                <i>Bonded</i>
+              </span>
+            </td>
+            <td>{{ interface.mac }}</td>
+            <td>
+              <span ng-show="interface.addresses == null || interface.addresses.length == 0">&mdash;</span>
+              <div ng-repeat="address in interface.addresses">{{ address.ip }}</div>
+            </td>
+            <td>{{ interface.switch.name || interface.switch.ip || '&mdash;' }}</td>
+            <td>{{ interface.switch.port || interface.switch.port_name || '&mdash;' }}</td>
+          </tr>
+
+          <tr ng-repeat="slave in node.properties.network.interfaces | filter:{master:interface.name}">
+            <td>&#9492;&nbsp;&nbsp;</td>
+            <td>
+              <span title="This interface is a slave to master interface {{ interface.name }}"><i>{{ slave.name }}</i></span>
+            </td>
+            <td>{{ slave.mac }}</td>
+            <td>
+              <span ng-show="slave.addresses == null || slave.addresses.length == 0">&mdash;</span>
+              <div ng-repeat="address in slave.addresses">{{ address.ip }}</div>
+            </td>
+            <td>{{ slave.switch.name || slave.switch.ip || '&mdash;' }}</td>
+            <td>{{ slave.switch.port || slave.switch.port_name || '&mdash;' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

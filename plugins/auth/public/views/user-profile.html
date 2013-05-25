@@ -35,7 +35,7 @@
         <thead>
           <tr>
             <th colspan="10">
-              <button ng-click="createKeyDialog()" class="btn"><i class="icon-plus"> </i> Add Key</button>
+              <button ng-click="openDialog('createKeyDialog', this)" class="btn"><i class="icon-plus"> </i> Add Key</button>
             </th>
           </tr>
 
@@ -70,7 +70,7 @@
 
   <div class="modal-body">
     <p>
-      Client keys are used by external applications (e.g.: the onering command line tool, curl) to authenticate you to the system before performing an action.  You may generate as many keys as you desire.  It is recommended that you generate one key per application used so that should a key be compromised, it can be revoked without affacting your other applications.
+      Client keys are used by external applications (e.g.: the Onering command line tool, curl) to authenticate you to the system before performing an action.  You may generate as many keys as you desire.  It is recommended that you generate one key per application so that, should a key be compromised, it can be revoked without effecting other applications.
     </p>
 
     <form class="form-horizontal">
@@ -84,7 +84,7 @@
   </div>
 
   <div class="modal-footer">
-    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="save(response)" class="btn btn-primary">Create Key</button>
+    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="showKeyDialog(response)" class="btn btn-primary">Create Key</button>
     <button class="btn btn-danger" ng-click="close()">Cancel</button>
   </div>
 </script>

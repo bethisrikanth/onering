@@ -39,7 +39,7 @@ function ProvisioningController($scope, $http, $window, $timeout, Query, Device)
       $scope.selected = {};
 
       Query.query({
-        query: 'status/provisioning|installing'
+        query: 'status/allocatable|installing'
       }, function(data){
         if(data.length == 0){
           $scope.noresults = true;

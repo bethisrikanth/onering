@@ -1,157 +1,92 @@
+<h4>Overview</h4>
 <table class="table table-condensed">
   <tbody>
     <tr>
-      <th>Class</th>
+      <th>ID</th>
       <td>
-        <a href="#/inf/show/provisioning.class:{{ device.properties.provisioning.class }}">{{ device.properties.provisioning.class }}</a><span ng-show="device.properties.provisioning.version">.<a href="#/inf/show/provisioning.class:{{ device.properties.provisioning.class }}%20provisioning.version:{{ device.properties.provisioning.version }}">v{{ device.properties.provisioning.version }}</a></span></td>
-    </tr>
-
-    <tr>
-      <th>Model</th>
-      <td>{{ device.properties.make }} {{ device.properties.model }}</td>
-    </tr>
-
-    <tr ng-show="device.properties.serial">
-      <th>Service Tag</th>
-      <td>
-        <a target="_blank" href="#/inf/show/serial:{{ device.properties.serial }}">{{ device.properties.serial }}</a>
-        [<a target="_blank" href="http://www.dell.com/support/troubleshooting/us/en/19/Servicetag/{{ device.properties.serial }}">Support</a>]
+        <a target="_blank" href="/api/devices/{{node.id}}">{{ node.id }}</a>
       </td>
     </tr>
 
     <tr>
       <th>Datacenter</th>
-      <td><a target="_blank" href="#/site/{{ device.properties.site }}">{{ device.properties.site | uppercase }}</a></td>
-    </tr>
-
-    <tr ng-show="device.properties.environment">
-      <th>Environment</th>
-      <td><a target="_blank" href="#/inf/show/environment:{{ device.properties.environment }}">{{ device.properties.environment | titleize }}</a></td>
+      <td><a href="#/node/find/site:{{node.properties.site}}">{{ node.properties.site | uppercase }}</a></td>
     </tr>
 
     <tr>
+      <th>Class</th>
+      <td><a href="#/inf/show/provisioning.class:{{ node.properties.provisioning.class }}">{{ node.properties.provisioning.class | titleize }}</a></td>
+    </tr>
+
+    <tr>
+      <th>Type</th>
+      <td>{{ node.properties.virtual.toString() == 'true' &amp;&amp; 'Virtual Machine' || 'Physical Machine' }}</td>
+    </tr>
+
+    <tr ng-hide="node.properties.virtual">
       <th>Location</th>
       <td>
-        <span>
-          <a
-            href="#/inf/show/site:{{ device.properties.site }}%20rack:{{ device.properties.rack }}"
-            target="_blank"
-            ng-show="device.properties.site &amp;&amp; device.properties.rack"
-          >Rack {{ device.properties.rack | uppercase }}</a>
-          <span ng-hide="device.properties.rack">Rack &mdash;</span>
-        </span>
+        <span ng-show="node.properties.rack">Rack <a href="#/node/find/rack:{{node.properties.rack}}">{{ node.properties.rack }}</a></span>
+        <span ng-hide="node.properties.rack">Rack &mdash;</span>
 
-        <span>
-          /
-          <a
-            href="#/inf/show/site:{{ device.properties.site }}%20rack:{{ device.properties.rack }}%20unit:{{ device.properties.unit }}"
-            target="_blank"
-            ng-show="device.properties.site &amp;&amp; device.properties.rack &amp;&amp; device.properties.unit"
-          >
-            U{{ device.properties.unit }}
-          </a>
-          <span ng-hide="device.properties.unit">U&mdash;</span>
-        </span>
+        <span ng-show="node.properties.unit">/ U <a href="#/node/find/rack:{{node.properties.rack}}%unit:{{node.properties.unit}}">{{node.properties.unit }}</a></span>
+        <span ng-hide="node.properties.unit">/ U &mdash;</span>
 
-        <span ng-show="device.properties.slot">/ Slot {{ device.properties.slot }}</span>
+        <span ng-show="node.properties.slot">/ Slot {{ node.properties.slot }}</span>
       </td>
     </tr>
 
-    <tr ng-show="device.properties.chassis_label">
-      <th>Chassis</th>
-      <td>{{ device.properties.chassis_label }}</td>
-    </tr>
-
-    <tr ng-show="device.properties.ip">
+    <tr>
       <th>IP</th>
-      <td>{{ device.properties.ip }}</td>
+      <td>{{ node.properties.ip }}</td>
     </tr>
 
-    <tr ng-show="device.properties.mac">
+    <tr>
       <th>MAC</th>
-      <td>{{ device.properties.mac }}</td>
+      <td>{{ node.properties.mac }}</td>
     </tr>
 
-    <tr ng-show="device.properties.ipmi_ip">
-      <th>IPMI Address</th>
-      <td><a target="_blank" href="http://{{ device.properties.ipmi_ip }}">{{ device.properties.ipmi_ip }}</a></td>
+    <tr ng-show="node.properties.ipmi_ip">
+      <th>IPMI</th>
+      <td><a target="_blank" href="https://{{ node.properties.ipmi_ip }}">{{ node.properties.ipmi_ip }}</a></td>
     </tr>
 
-    <tr ng-show="device.properties.distro">
-      <th>Distribution</th>
-      <td>
-        <a href="#/inf/show/distro:{{ device.properties.distro }}">{{ device.properties.distro | titleize }}</a>
-        <a href="#/inf/show/distro:{{ device.properties.distro }}%20version:{{ device.properties.version }}">{{ device.properties.version }}</a>
-      </td>
+    <tr ng-show="node.properties.model">
+      <th>Model</th>
+      <td>{{ node.properties.make }} {{ node.properties.model }}</td>
     </tr>
 
-    <tr ng-show="device.properties.kernel">
-      <th>Kernel</th>
-      <td>{{ device.properties.kernel }}</td>
-    </tr>
-
-    <tr ng-show="device.properties.bios_version">
-      <th>BIOS Version</th>
-      <td>{{ device.properties.bios_version }}</td>
-    </tr>
   </tbody>
 </table>
 
+<br />
+<br />
 
-<div ng-show="device.properties.network">
-  <h3>Network</h3>
 
-  <div ng-repeat="interface in device.properties.network.interfaces">
-    <h5>{{ interface.name }}</h5>
+<h4>Configuration</h4>
+<table class="table table-condensed">
+  <tbody>
+    <tr>
+      <th>Distribution</th>
+      <td>
+        <a target="_blank" href="#/node/find/distro:{{ node.properties.distro }}">{{ node.properties.distro | titleize }}</a>
+        <a target="_blank" href="#/node/find/distro:{{ node.properties.distro }}%20version:{{ node.properties.version }}">{{ node.properties.version }}</a>
+      </td>
+    </tr>
 
-    <table class="table table-condensed table-stacked">
-      <tbody ng-repeat="address in interface.addresses">
-        <tr>
-          <th><span ng-show="$index==0">Address</span></th>
-          <th>IP</th>
-          <td>{{ address.ip }}<span ng-show="address.family=='inet6'">&nbsp;(IPv6)</span></td>
-        </tr>
+    <tr>
+      <th>Kernel</th>
+      <td><abbr title="{{ node.properties.kernel }}">{{ node.properties.kernel | section:'-':0:1 }}</abbr></td>
+    </tr>
 
-        <tr ng-show="address.netmask">
-          <th> </th>
-          <th>Mask</th>
-          <td>{{ address.netmask }}</td>
-        </tr>
-      </tbody>
+    <tr ng-show="node.properties.serial">
+      <th>Serial</th>
+      <td>{{ node.properties.serial }}</td>
+    </tr>
 
-      <tbody>
-        <th>MAC</th>
-        <th> </th>
-        <td>
-          {{ interface.mac }}
-          <!-- <span ng-show="checkPxeStatus(interface.mac)">
-            <a href="http://pxe.{{ device.properties.site }}.outbrain.com/devices/{{ interface.mac }}"><i class="icon-info-sign"></i></a>
-          </span> -->
-        </td>
-      </tbody>
-
-      <tbody ng-show="interface.switch">
-        <tr>
-          <th>Switch</th>
-          <th>Name</th>
-          <td>{{ interface.switch.name }}</td>
-        </tr>
-        <tr>
-          <th> </th>
-          <th>IP</th>
-          <td>{{ interface.switch.ip }}</td>
-        </tr>
-        <tr>
-          <th> </th>
-          <th>Port</th>
-          <td><abbr title="{{ interface.switch.port_name }}">{{ interface.switch.port }}</abbr></td>
-        </tr>
-        <tr>
-          <th> </th>
-          <th>Address</th>
-          <td>{{ interface.switch.port_mac }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    <tr ng-show="node.properties.bios_version">
+      <th>BIOS Version</th>
+      <td>{{ node.properties.bios_version }}</td>
+    </tr>
+  </tbody>
+</table>

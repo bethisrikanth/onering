@@ -194,11 +194,19 @@ module App
           end
         end
 
+      # test for the presence of the given key
+        head '/:id/keys/:name' do
+          id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
+          user = User.find(id)
+          return 404 unless user
+
+          halt 200 if user.client_keys.keys.include?(params[:name])
+          halt 404
+        end
+
       # generate a new client key for this user
         get '/:id/keys/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
-
-          STDERR.puts @bootstrapUser.inspect
 
         # this is also where pre-validated devices go to retrieve their API key
           if @bootstrapUser === true and not id === 'current'
@@ -284,6 +292,7 @@ module App
 
           user = User.find(id)
           return 404 unless user
+          return 404 unless user.client_keys.keys.include?(params[:name])
 
           user.client_keys.delete(params[:name])
           user.safe_save

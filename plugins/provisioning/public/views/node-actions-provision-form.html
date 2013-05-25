@@ -1,0 +1,65 @@
+<table class="table table-condensed table-plain">
+  <tbody>
+    <tr>
+      <th>Hostname</th>
+      <td>
+        <input required type="text" class="input-medium" ng-model="node.properties.provisioning.hostname" ui-validate="validateDotless(node.properties.provisioning.hostname)">
+        <span class="help-inline">{{ opt.provision.formHelp.hostname }}</span>
+      </td>
+    </div>
+
+    <tr>
+      <th>IP Address</th>
+      <td>
+        <input required type="text" class="input-medium" ng-model="node.properties.provisioning.network.ip" ui-validate="validateIpAddress($value)">
+        <span class="help-inline">{{ opt.provision.formHelp.network_ip }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Netmask</th>
+      <td>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.netmask" ui-validate="validateIpAddress($value)">
+        <span class="help-inline">{{ opt.provision.formHelp.network_netmask }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Gateway</th>
+      <td>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.gateway" ui-validate="validateIpAddress($value)">
+        <span class="help-inline">{{ opt.provision.formHelp.network_gateway }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <th>DNS</th>
+      <td>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.dns" ui-validate="validateIpAddress($value)">
+        <span class="help-inline">{{ opt.provision.formHelp.network_dns }}</span>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Platform</th>
+      <td>
+        <select
+          class="input-large"
+          ng-model="node.properties.provisioning.family"
+          ng-options="v.value as v.label for v in opt.provision.families">
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <th>Disk Layout</th>
+      <td>
+        <select
+          class="input-large"
+          ng-model="node.properties.provisioning.disk.strategy"
+          ng-options="v.value as v.label for v in opt.provision.diskStrategies">
+        </select>
+      </td>
+    </tr>
+  </tbody>
+</table>
