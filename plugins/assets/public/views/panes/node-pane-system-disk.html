@@ -14,6 +14,9 @@
     <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(opt.diskTab=='mdraid' &amp;&amp; 'active' || '')">
       <a ng-click="opt.diskTab='mdraid'">MDRaid</a>
     </li>
+    <li ng-show="node.properties.metrics.virident" ng-class="(opt.diskTab=='virident' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.diskTab='virident'">Virident</a>
+    </li>
     <li ng-show="node.properties.metrics.disk.physical" ng-class="(opt.diskTab=='physical' &amp;&amp; 'active' || '')">
       <a ng-click="opt.diskTab='physical'">Physical</a>
     </li>
@@ -38,7 +41,7 @@
             <td>{{ mount.mount }}</td>
             <td>{{ mount.filesystem }}</td>
             <td>{{ mount.device }}</td>
-            <td>{{ mount.total | autosize }}</td>
+            <td>{{ mount.total | autosize:2 }}</td>
             <td>
               <progress style="margin: 0" value="mount.percent_used"></progress>
             </td>
@@ -120,5 +123,36 @@
         </div>
       </div>
     </div>
+
+    <div ng-show="opt.diskTab=='virident'">
+      <div ng-repeat="card in node.properties.metrics.virident | orderBy:'name'">
+        <table class="table table-striped table-plain">
+          <thead>
+            <tr>
+              <th>Card: {{ card.name }}</th>
+              <td colspan="2">{{ card.description }} &mdash; {{ card.model }} ({{ card.temperature }}&deg;)</td>
+              <td> </td>
+            </tr>
+
+            <tr>
+              <th>Partition</th>
+              <th>Size</th>
+              <th>State</th>
+              <th>Life Remaining %</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="partition in card.partitions">
+              <td>{{ partition.name }}</td>
+              <td>{{ partition.size | autosize:2 }}</td>
+              <td>{{ partition.state | titleize }}</td>
+              <td>{{ partition.life_remaining }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
