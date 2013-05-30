@@ -5,4 +5,8 @@
   "users": [
     "onering"
   ]
+},{
+  "_id":   "users",
+  "_type": "Group",
+  "name":  "Users"
 }]

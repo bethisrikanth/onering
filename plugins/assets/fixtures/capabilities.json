@@ -40,6 +40,7 @@
     "query_assets"
   ],
   "groups": [
+    "users",
     "admins"
   ]
 },{
@@ -49,5 +50,8 @@
   "capabilities": [
     "get_asset",
     "query_assets"
+  ],
+  "groups": [
+    "users"
   ]
 }]
