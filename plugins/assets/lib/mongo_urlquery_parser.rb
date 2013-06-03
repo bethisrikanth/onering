@@ -33,8 +33,8 @@ module App
         end
       end
 
-    # process field name and modifiers
-      rule :field, :field_modifier?, :field_name do
+    # process field name, modifiers, and prefilters
+      rule :field, :field_modifier?, :field_name_pre, :field_prefilter?, :field_name_post? do
         def translate_field(field, prefix)
           case field
           when 'id'
@@ -47,22 +47,53 @@ module App
         end
 
         def to_mongo_query(value=nil)
-          fname = translate_field(field_name.to_s, DEFAULT_FIELD_PREFIX)
+          fname_pre = translate_field(field_name_pre.to_s, DEFAULT_FIELD_PREFIX)
+          fname = fname_pre + field_name_post.to_s
+          rv = nil
 
         # no value
           if value.empty?
           # check for unary modifiers
             if field_modifier.nil?
-              return { fname => {'$exists' => true} }
+              rv = { fname => {'$exists' => true} }
             else
               case field_modifier.get_coercer.to_sym
               when :absent
-                return { fname => {'$exists' => false} }
+                rv = { fname => {'$exists' => false} }
               end
             end
           else
-            return { fname => value.to_mongo_query(field_modifier.nil? ? (fname =~ /_(?:at|or)$/i ? :date : nil) : field_modifier.get_coercer) }
+            rv = { fname => value.to_mongo_query(field_modifier.nil? ? (fname =~ /_(?:at|or)$/i ? :date : nil) : field_modifier.get_coercer) }
           end
+
+        # process prefilter
+          if field_prefilter.nil?
+            return rv
+          else
+            return field_prefilter.to_mongo_query(fname_pre, field_name_post.to_s.gsub(/^\./,''), rv)
+          end
+        end
+      end
+
+
+      rule :field_prefilter, :field_prefilter_start, :field_prefilter_subfield, :field_prefilter_op_eql, :field_prefilter_value, :field_prefilter_end do
+        def to_mongo_query(array_base, first_field_name, field_query)
+          return field_query if array_base.nil?
+
+          field_prefilter_query = field_prefilter_value.to_s
+          field_prefilter_query.gsub!('.', '\\.')
+          field_prefilter_query.gsub!('*', '.*')
+          field_prefilter_query = {'$regex' => field_prefilter_query, '$options' => 'i'}
+
+        # wrap the incoming field_query with an elemMatch condition that includes the query + the prefilter constraint
+          return {
+            array_base => {
+              '$elemMatch' => {
+                first_field_name              => field_query.values.first,
+                field_prefilter_subfield.to_s => field_prefilter_query
+              }
+            }
+          }
         end
       end
 
@@ -132,14 +163,20 @@ module App
       end
 
 
-      rule :coercer, /[a-z\_]+/
-      rule :modifier, ":"
-      rule :field_name, /[a-zA-Z0-9\_\.]+/
-      rule :fieldop_or, '|'
-      rule :pairer, '/'
-      rule :value_function_unary, /[a-z]+/
-      rule :value_value, /[^\/]*/
-      rule :valueop_or, '|'
+      rule :coercer,                  /[a-z\_]+/
+      rule :modifier,                 ':'
+      rule :field_name_pre,           /[a-zA-Z0-9\_\.]+/
+      rule :field_name_post,          /[a-zA-Z0-9\_\.]+/
+      rule :fieldop_or,               '|'
+      rule :field_prefilter_start,    '['
+      rule :field_prefilter_subfield, /[a-zA-Z0-9\_\.]+/
+      rule :field_prefilter_op_eql,   '='
+      rule :field_prefilter_value,    /\w+/
+      rule :field_prefilter_end,      ']'
+      rule :pairer,                   '/'
+      rule :value_function_unary,     /[a-z]+/
+      rule :value_value,              /[^\/]*/
+      rule :valueop_or,               '|'
     end
   end
 end
