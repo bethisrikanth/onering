@@ -23,6 +23,21 @@ module App
       set :session_secret, File.read(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key'))
     end
 
+    helpers do
+      def user_authenticate(user, password)
+        if user.authenticate!({
+          :password => password
+        })
+          user.logged_in_at = Time.now
+          user.safe_save
+
+          return user
+        end
+
+        return nil
+      end
+    end
+
   # session based authentication
     before do
       unless anonymous?(request.path)
@@ -65,11 +80,29 @@ module App
           end
         end
 
-      # if two-factor is enabled or SSL client key was not present
-        if (@user && @user.options['two_factor']) or (not @user and not @bootstrapUser)
-          session_start!
-          session! unless session?
-          @user = User.find(session[:user]) if session[:user]
+      # if SSL client key was not present...
+        if not @user and not @bootstrapUser
+          case request.env['HTTP_X_AUTH_MECHANISM'].to_s.downcase
+          when 'basic'
+            auth = Rack::Auth::Basic::Request.new(request.env)
+
+            if auth.provided? and auth.basic? and auth.credentials
+              user = User.find(auth.credentials.first)
+              halt 401 if user.nil?
+
+              user = user_authenticate(user, auth.credentials.last)
+              halt 401 if user.nil?
+
+              @user = user
+            else
+              response['WWW-Authenticate'] = "Basic realm=\"Onering on #{ENV['SERVER_NAME']}\""
+              halt 401
+            end
+          else
+            session_start!
+            session! unless session?
+            @user = User.find(session[:user]) if session[:user]
+          end
         end
 
         halt 401, "Invalid authentication request" unless @user or @bootstrapUser
@@ -106,18 +139,15 @@ module App
 
           if json
             user = User.find(json['username'])
-            halt 401, 'Invalid username' unless user
+            halt 401, 'Invalid credentials' unless user
+
+            user = user_authenticate(user, json['password'])
 
           # and user/pass were good...
-            if user.authenticate!({
-              :password => json['password']
-            })
-              user.logged_in_at = Time.now
-              user.safe_save
-              @user = session[:user] = user.id
-
+            if user.nil?
+              halt 401, 'Invalid credentials'
             else
-              halt 401, 'Incorrect password'
+              @user = session[:user] = user.id
             end
           else
             halt 400
