@@ -30,37 +30,42 @@
       <br />
       <br />
 
+      <h4>API Tokens ({{ user.tokens | length }})</h4>
+      <div ng-include="'views/user-profile-api-tokens.html'"></div>
+
       <h4>Client Keys ({{ user.client_keys | length }})</h4>
-      <table class="table table-condensed table-striped">
-        <thead>
-          <tr>
-            <th colspan="10">
-              <button ng-click="openDialog('createKeyDialog', this)" class="btn"><i class="icon-plus"> </i> Add Key</button>
-            </th>
-          </tr>
+      <div ng-include="'views/user-profile-client-keys.html'"></div>
 
-          <tr>
-            <th>Name</th>
-            <th>Created At</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr ng-repeat="(name, key) in user.client_keys">
-            <td>{{ name }}</td>
-            <td>{{ key.created_at }}</td>
-            <td>
-              <a rest="/api/users/current/keys/{{ name }}" rest-method="delete" rest-severity="warning" rest-success="reload()" title="Delete key '{{ name }}'">
-                <i class="icon-remove"> </i>
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </div>
 </div>
+
+
+<script type="text/ng-template" id="generateToken">
+  <div class="modal-header">
+    <h3>Create New API Token</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      API Tokens are used by external applications (e.g.: the Onering command line tool, curl) to authenticate you to the system before performing an action.  You may generate as many keys as you desire.
+    </p>
+
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="key_name">Token Name</label>
+        <div class="controls">
+          <input type="text" id="key_name" ng-model="key_name" placeholder="Key Name"></input>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button rest="/api/users/current/tokens/{{ key_name }}" rest-success="parent.reload(); close()" class="btn btn-primary">Create Token</button>
+    <button class="btn btn-danger" ng-click="close()">Cancel</button>
+  </div>
+</script>
 
 
 <script type="text/ng-template" id="createKeyDialog">
@@ -84,7 +89,7 @@
   </div>
 
   <div class="modal-footer">
-    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="showKeyDialog(response)" class="btn btn-primary">Create Key</button>
+    <button rest="/api/users/current/keys/{{ key_name }}" rest-success="parent.showKeyDialog(response)" class="btn btn-primary">Create Key</button>
     <button class="btn btn-danger" ng-click="close()">Cancel</button>
   </div>
 </script>

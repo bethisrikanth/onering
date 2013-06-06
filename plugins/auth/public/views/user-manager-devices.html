@@ -3,14 +3,15 @@
     <tr>
       <th>&nbsp;</th>
       <th ng-click="sortField='id'; sortReverse=!sortReverse">Device ID</th>
-      <th ng-hide="userPaneUser" ng-click="sortField='logged_in_at'; sortReverse=!sortReverse">Last Logged In</th>
+      <th ng-click="sortField='created_at'; sortReverse=!sortReverse">Created At</th>
     </tr>
   </thead>
 
   <tbody>
-    <tr ng-repeat="result in deviceResults | orderBy:sortField:sortReverse">
+    <tr ng-repeat="result in devices | orderBy:sortField:sortReverse">
       <td class="center"><input type="checkbox"></input></td>
       <td class="id"><a>{{ result.id }}</a></td>
+      <td class="created_at">{{ result.created_at | date:'short' }}</td>
     </tr>
   </tbody>
 </table>

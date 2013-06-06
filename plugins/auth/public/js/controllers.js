@@ -26,11 +26,25 @@ function LogoutController($scope, $http, $rootScope, $window){
 }
 
 
-function UserProfileController($scope, $http, $dialog, CurrentUser){
-  $scope.reload = function(){
-    CurrentUser.get({}, function(data){
-      $scope.user = data;
-    })
+function UserProfileController($scope, $http, $dialog, $timeout, CurrentUser){
+  $scope.reload = function(delay){
+    var _reload = function(){
+      CurrentUser.get({}, function(data){
+        $scope.user = data;
+      })
+    }
+
+    if(angular.isUndefined(delay)){
+      _reload();
+    }else{
+      if(!angular.isArray(delay)){
+        delay = [delay];
+      }
+
+      for(var i = 0; i < delay.length; i++){
+        $timeout(_reload, delay[i]);
+      }
+    }
   }
 
   $scope.showKeyDialog = function(name, data){
@@ -66,6 +80,10 @@ function UserManagerController($scope, $http, $dialog, User, UserType, UserList,
     UserList.query({}, function(data){
       $scope.users = data;
     });
+
+    $http.get('/api/users/list/machines').success(function(data){
+      $scope.devices = data;
+    })
 
     $http.get('/api/users/list/types').success(function(data){
       $scope.userTypes = data;

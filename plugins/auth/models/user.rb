@@ -8,6 +8,7 @@ class User < App::Model::Base
   key :name,         String
   key :email,        String
   key :client_keys,  Hash
+  key :tokens,       Array
   key :options,      Hash
   key :logged_in_at, Time
 
@@ -69,6 +70,49 @@ class User < App::Model::Base
     send("capability_#{key}", args)
   # rescue
   #   false
+  end
+
+  def token(name)
+    return self.tokens[name] if self.tokens.include?(name)
+
+    def generate()
+      begin
+        require 'securerandom'
+        return SecureRandom.hex(32)[0...32]
+      rescue LoadError
+        pool = [(0..9),('a'..'f')].map{|i| i.to_a}.flatten
+        return (0..32).map{ pool[rand(pool.length)] }.join
+      end
+    end
+
+    i = 0
+
+    while true do
+      token = generate()
+
+      if i < 3
+        unique = User.where({ 'tokens.key' => token }).to_a.empty?
+
+        if unique
+          if self.tokens.select{|i| i['name'] == name }.empty?
+            self.tokens << {
+              :name => name,
+              :key  => token
+            }
+            self.safe_save
+            return token
+          else
+            return self.tokens.select{|i| i['name'] == name }.first['key']
+          end
+        end
+
+        i += 1
+      else
+        raise "Cannot generate token, too many duplicates"
+      end
+    end
+
+    return nil
   end
 
   class<<self

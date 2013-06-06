@@ -82,7 +82,9 @@ module App
 
       # if SSL client key was not present...
         if not @user and not @bootstrapUser
-          case request.env['HTTP_X_AUTH_MECHANISM'].to_s.downcase
+          mechanism = (request.env['HTTP_X_AUTH_MECHANISM'] || (params[:token].nil? ? nil : 'token')).to_s.downcase
+
+          case mechanism
           when 'basic'
             auth = Rack::Auth::Basic::Request.new(request.env)
 
@@ -98,6 +100,23 @@ module App
               response['WWW-Authenticate'] = "Basic realm=\"Onering on #{ENV['SERVER_NAME']}\""
               halt 401
             end
+
+          when 'token'
+            if params[:token] =~ /[0-9a-f]{32,64}/
+              user = User.where({
+                'tokens.key' => params[:token]
+              }).to_a
+
+              if user.length == 1
+                @user = user.first
+              else
+                halt 401, "Invalid API token specified"
+              end
+            else
+              halt 401, "Invalid API token specified"
+            end
+
+
           else
             session_start!
             session! unless session?
@@ -124,7 +143,11 @@ module App
           allowed_to? :list_machines
           output(User.all({
             :_type => Config.get('global.authentication.machine_user_type', 'DeviceUser')
-          }).collect{|i| i.to_h })
+          }).collect{|i| {
+            :id         => i.id,
+            :created_at => i.created_at,
+            :updated_at => i.updated_at
+          } })
         end
 
       # get user types list
@@ -234,6 +257,28 @@ module App
           halt 404
         end
 
+      # generate a new API token
+        get '/:id/tokens/:name' do
+          id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
+          user = User.find(id)
+          return 404 unless user
+
+          content_type 'text/plain'
+          user.token(params[:name])
+        end
+
+
+        delete '/:id/tokens/:name' do
+          id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
+          user = User.find(id)
+          return 404 unless user
+
+          user.tokens.delete_if{|i| i['name'] == params[:name] }
+          user.safe_save
+
+          200
+        end
+
       # generate a new client key for this user
         get '/:id/keys/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
@@ -303,11 +348,11 @@ module App
             case params[:cert]
             when 'pkcs12'
             # optionally return the cert inline (default is to download)
-              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.p12" unless params[:inline]
+              headers 'Content-Disposition' => "attachment; filename=#{user.id}-#{params[:name]}.p12" unless params[:download].to_bool
               return OpenSSL::PKCS12.create(params[:name], params[:name], key, client_cert).to_der rescue nil
             else
-            # optionally return the cert inline (default is to download)
-              headers 'Content-Disposition' => "attachment; filename=#{params[:name]}.pem" unless params[:inline]
+            # optionally download the PEM (default is to display)
+              headers 'Content-Disposition' => "attachment; filename=#{user.id}-#{params[:name]}.pem" if params[:download].to_bool
               return key.to_pem + "\n\n" + client_cert.to_pem
             end
           else

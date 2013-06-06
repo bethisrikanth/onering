@@ -1,0 +1,38 @@
+<table class="table table-condensed table-striped">
+  <thead>
+    <tr>
+      <th colspan="10" style="border:0">
+        <button ng-hide="generateSslKey" ng-click="generateSslKey=true" class="btn"><i class="icon-plus"> </i> Generate SSL Key</button>
+        <div class="input-append" ng-show="generateSslKey">
+          <input class="input-medium" type="text" ng-model="newKeyName">
+          <button class="btn btn-danger" ng-click="newKeyName=null;generateSslKey=false">
+            <i class="icon-white icon-remove"></i>
+          </button>
+          <a class="btn btn-primary" target="_blank" href="/api/users/{{user.id}}/keys/{{newKeyName}}?download=true" ng-click="generateSslKey=false;reload([500,1000,2000,3500])">
+            <i class="icon-white icon-ok"></i>
+          </a>
+        </div>
+        <br />
+        <br />
+      </th>
+    </tr>
+
+    <tr ng-hide="user.client_keys | empty">
+      <th style="border:0">Name</th>
+      <th style="border:0">Created At</th>
+      <th style="border:0">&nbsp;</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="(name, key) in user.client_keys">
+      <td>{{ name }}</td>
+      <td>{{ key.created_at }}</td>
+      <td>
+        <a rest="/api/users/{{user.id}}/keys/{{ name }}" rest-method="delete" rest-severity="warning" rest-success="reload()" title="Delete key '{{ name }}'">
+          <i class="icon-remove"> </i>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
