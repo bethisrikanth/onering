@@ -41,13 +41,18 @@
 
       <h3 style="margin: 0; line-height: 34px;">
         <span ng-show="node.parent_id">&#9492;</span>
-        <span ng-hide="node.status == 'allocatable'">
+        <span ng-hide="node.status == 'allocatable' || node.status == 'installing'">
           {{ node.name | section:'.':0:1 }}<span style="font-size: smaller; color: grey;">.{{ node.name | section:'.':1 }}</span>
         </span>
-        <span ng-show="node.status == 'allocatable'">
+        <span ng-show="node.status == 'allocatable' || node.status == 'installing'">
           <span style="font-size: smaller; color: grey;">{{ node.id }}</span>&nbsp;&nbsp;{{ node.properties.make &amp;&amp; (node.properties.make + ' ' + node.properties.model) || 'Node' }}
           <span ng-show="node.properties.provisioning.hostname">
-            <span style="font-size: medium">becoming</span> {{ node.properties.provisioning.hostname }}<span style="font-size: smaller; color: grey;">.{{ node.properties.site }}.{{ node.properties.domain }}</span>
+            <span ng-switch="node.status">
+              <span ng-switch-when="allocatable" style="font-size: medium">will become</span>
+              <span ng-switch-when="installing" style="font-size: medium">becoming</span>
+              <span ng-switch-default style="font-size: medium">&mdash;</span>
+            </span>
+            {{ node.properties.provisioning.hostname }}<span style="font-size: smaller; color: grey;">.{{ node.properties.site }}.{{ node.properties.domain }}</span>
           </span>
         </span>
       </h3>
@@ -78,8 +83,9 @@
     <div class="span3">
       <br />
       <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
+      <i class="icon-circle-arrow-right"> </i> <b>First Registered: </b>{{ node.created_at | timeAgo }}<br />
       <i class="icon-time"> </i> <b>Last Inventory: </b>{{ node.collected_at | timeAgo }}<br />
-      <i class="icon-refresh"> </i> <b>Refreshed: </b>{{ opt.lastLoadTime | timeAgo }}<br />
+      <i class="icon-refresh"> </i> <b>Page Refreshed: </b>{{ opt.lastLoadTime | timeAgo }}<br />
 
     </div>
   </div>
