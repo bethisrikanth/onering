@@ -13,7 +13,7 @@ module App
         return YAML.dump(nodes.collect{|node|
           {
             'nodename'  => node.get('rundeck.name', node.id),
-            'hostname'  => (node.get('fqdn', node.name) || node.id),
+            'hostname'  => (node.get(Config.get('automation.rundeck.fields.hostname') || 'fqdn') || node.name || node.id),
             'username'  => node.get('rundeck.user', Config.get('automation.rundeck.user', 'rundeck')),
             'tags'      => node.tags,
             'osVersion' => node.get('version'),
