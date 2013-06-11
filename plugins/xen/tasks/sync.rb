@@ -25,6 +25,8 @@ module Automation
               end
             end
           end
+
+          return nil
         end
       end
     end
