@@ -6,7 +6,7 @@ module Automation
       class Sync < Base
         def run(request)
           rv = []
-          config = Config.get('glu.config')
+          config = App::Config.get('glu.config')
           fail("Cannot continue without Glu JSON URL") unless config && config['url']
           uri = URI.parse(config['url'])
 
@@ -15,7 +15,7 @@ module Automation
         # Glu Agent in Zookeeper, via the "Zookie" REST API (internal Outbrain tool)
         #
 
-          zk = Config.get('zookie.config')
+          zk = App::Config.get('zookie.config')
           zkuri = URI.parse(zk['url'])
           zk_versions = {}
 
@@ -26,7 +26,7 @@ module Automation
             request.basic_auth zk['username'], zk['password'] if zk['username'] && zk['password']
             response = http.request(request)
 
-            zk_json = JSON.parse(response.body)
+            zk_json = MultiJson.load(response.body)
             fail("Invalid Zookie response") unless zk_json['children']
 
             def get_leaf(base)
@@ -74,7 +74,7 @@ module Automation
             request.basic_auth config['username'], config['password'] if config['username'] && config['password']
             response = http.request(request)
 
-            glu_json = JSON.parse(response.body)
+            glu_json = MultiJson.load(response.body)
             fail("Invalid glu.json format") unless glu_json['entries']
 
             glu_agents = {}
