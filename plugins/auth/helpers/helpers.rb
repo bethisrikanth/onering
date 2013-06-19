@@ -8,6 +8,7 @@ module App
         ^/api/users/machine/?.*$
         ^/api/provision/?.*$
         ^/api/rundeck/nodes/?.*$
+        ^/api/ipxe/boot/?.*$
       }.each do |p|
         return true if path =~ Regexp.new(p)
       end
