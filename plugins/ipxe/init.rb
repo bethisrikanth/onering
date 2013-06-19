@@ -12,6 +12,8 @@ module App
 
     namespace '/api/ipxe' do
       get '/boot' do
+        content_type 'text/plain'
+
         if params[:mac] and not params[:mac].empty?
           device = Device.urlsearch("mac/#{params[:mac]}").to_a.first
         elsif params[:uuid] and not params[:uuid].empty?

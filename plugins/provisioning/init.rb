@@ -99,6 +99,7 @@ module App
               rv += (Net::HTTP.get(URI("#{pxed}/devices/default")) rescue '')
             end
 
+            content_type 'text/plain'
             rv
           else
             raise "Cannot provision device #{device.id} without specifying a site"
@@ -165,6 +166,7 @@ module App
         device = Device.find(params[:id])
         return 404 unless device
 
+
         rv = device.properties.get('provisioning.action')
 
         if params[:clear] == 'true'
@@ -174,6 +176,7 @@ module App
           end
         end
 
+        content_type 'text/plain'
         rv
       end
 
