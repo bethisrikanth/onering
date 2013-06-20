@@ -14,7 +14,9 @@ module App
       get '/boot' do
         content_type 'text/plain'
 
-        if params[:mac] and not params[:mac].empty?
+        if params[:id]
+          device = Device.find(params[:id])
+        elsif params[:mac] and not params[:mac].empty?
           device = Device.urlsearch("mac/#{params[:mac]}").to_a.first
         elsif params[:uuid] and not params[:uuid].empty?
           device = Device.urlsearch("uuid/#{params[:uuid]}").to_a.first

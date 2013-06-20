@@ -62,29 +62,12 @@
       <div class="widget-title">Boot Configuration</div>
       <div class="widget-content widget-expand">
         <div class="widget-header">
-          <b>PXE Boot Profiles</b>
+          <b>Current Boot Profile</b>
           <a class="pull-right" title="View PXE Configuration" target="_blank" href="/api/provision/{{node.id}}/boot"><i class="icon-list-alt"> </i></a>
         </div>
 
-        <table class="table table-condensed table-plain">
-          <tbody>
-            <tr ng-repeat="pxe in pxeboot">
-              <th style="padding:0">
-                <span ui-if="pxeboot.length > 1">
-                  <span ng-show="$index == 0">&#9484;</span>
-                  <span ng-show="$index > 0 &amp;&amp; $index < (pxeboot.length-1)">&#9500;</span>
-                  <span ng-show="$index == (pxeboot.length-1)">&#9492;</span>
-                </span>
-              </th>
-              <th style="padding:0; width:25%">{{ pxe.interface }}</th>
-              <td style="padding:0; width:65%">
-                <span style="padding-right: 6px">
-                  {{ pxe.name || (pxe.id | titleize) }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <h4 class="center">{{ node.properties.provisioning.boot.profile || 'Not Set' }}</h4>
+        <br />
 
         <div class="widget-header"><b>Change Boot Profile</b></div>
         <div>

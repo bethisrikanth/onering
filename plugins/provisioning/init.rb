@@ -64,46 +64,17 @@ module App
           device = Device.find(params[:id])
           return 404 unless device
 
-          if device.properties['site']
-            pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-            uses_default = true
-            macs = get_macs(device)
-
-            rv  = "# ============================================================================= \n"
-            rv += "# pxed server at #{pxed}, site #{device.properties['site'].upcase}\n"
-            rv += "# ============================================================================= \n"
-            rv += "\n\n"
-
-            macs.each do |mac|
-              rv += "# ----------------------------------------------------------------------------- \n"
-              rv += "# PXE configuration for device #{mac[:interface]} (#{mac[:mac]})\n"
-              rv += "# ----------------------------------------------------------------------------- \n"
-
-              if params[:profile]
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/link/#{params[:profile]}"))
-              else
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}"))
-              end
-
-              if response.code.to_i < 400
-                uses_default = false
-                rv += response.body
-              end
-
-              rv += "\n\n"
-            end
-
-            if uses_default
-              rv += "# Default PXE configuration\n"
-              rv += "#\n"
-              rv += (Net::HTTP.get(URI("#{pxed}/devices/default")) rescue '')
-            end
-
-            content_type 'text/plain'
-            rv
-          else
-            raise "Cannot provision device #{device.id} without specifying a site"
+          if params[:profile]
+            device.properties.set('provisioning.boot.profile', params[:profile])
+            device.safe_save()
+            device.reload()
           end
+
+          status, headers, body = call env.merge({
+            'PATH_INFO'    => '/api/ipxe/boot',
+            'QUERY_STRING' => "id=#{device.id}"
+          })
+          [status, headers, body]
         end
       end
 
