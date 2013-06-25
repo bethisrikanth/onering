@@ -1,6 +1,7 @@
 require 'liquid_patches'
 require 'controller'
 require 'assets/models/device'
+require 'provisioning/models/asset_request'
 require 'uri'
 require 'net/http'
 
@@ -29,6 +30,49 @@ module App
     end
 
     namespace '/api/provision' do
+      namespace '/request' do
+        get '/find' do
+          assets = AssetRequest.all()
+          return 404 unless assets
+          output(assets.collect{|i| i.to_h })
+        end
+
+        get '/list/:field' do
+          assets = AssetRequest.list(params[:field])
+          return 404 unless assets
+          output(assets.collect{|i| i.to_h })
+        end
+
+        get '/:id' do
+          asset = AssetRequest.find(params[:id])
+          return 404 unless asset
+          output(asset.to_h)
+        end
+
+
+        %w{
+          /?
+          /:id
+        }.each do |r|
+          post r do
+            if params[:id]
+              asset = AssetRequest.find(params[:id])
+              return 404 unless asset
+            else
+              asset = AssetRequest.new()
+            end
+
+            json = MultiJson.load(request.env['rack.input'].read)
+            asset.from_json(json)
+
+            asset.safe_save()
+
+            200
+          end
+        end
+      end
+
+
       get '/:id/boot/profile' do
         device = Device.find(params[:id])
         return 404 unless device

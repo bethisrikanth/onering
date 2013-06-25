@@ -1,5 +1,5 @@
 angular.module('app', [
-  'ui',
+  'ui.utils',
   'ui.bootstrap',
   'rest',
   'rickshaw',

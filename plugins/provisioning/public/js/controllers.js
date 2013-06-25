@@ -188,7 +188,7 @@ function ProvisioningRequestController($scope, $http, $routeParams){
         nydc1:  0,
         chidc1: 0,
         ladc1:  0
-      }
+      };
     };
   }
 }
