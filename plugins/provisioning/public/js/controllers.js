@@ -179,7 +179,7 @@ function ProvisioningRequestController($scope, $http, $routeParams){
   })
 
   if($routeParams && $routeParams.id){
-    $http.get('/api/provisioning/requests/'+$routeParams.id).success(function(data){
+    $http.get('/api/provision/request/'+$routeParams.id).success(function(data){
       $scope.request = data;
     });
   }else{
@@ -188,7 +188,7 @@ function ProvisioningRequestController($scope, $http, $routeParams){
         nydc1:  0,
         chidc1: 0,
         ladc1:  0
-      };
+      }
     };
   }
 }
