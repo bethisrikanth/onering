@@ -114,6 +114,18 @@ module App
         output(rv)
       end
 
+    # arbitrary configuration trees
+      get '/:id/config/?*' do
+        allowed_to? :get_asset, params[:id]
+        device = Device.find(params[:id])
+        return 404 unless device
+
+        rv = device.properties.get(['config']+params[:splat].first.split('/'))
+        return 404 if rv.nil? or (rv.respond_to?(:empty?) and rv.empty?)
+
+        output(rv)
+      end
+
 
       get '/:id/parent' do
         allowed_to? :get_asset, params[:id]
@@ -326,7 +338,7 @@ module App
 
         when 'clear', 'null'
           device.unset(:status)
-          device.reload          
+          device.reload
 
         else
           device.status = params[:status]

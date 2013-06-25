@@ -151,8 +151,15 @@ class Device < App::Model::Base
       properties = self.to_h.get('properties').clone
 
       properties.each_recurse do |k,v,p|
-        if v.is_a?(String) and v[0] == '@'
-          properties.set(p, self.get(v[1..-1]))
+        if v.is_a?(String)
+          case v
+          when /^@/ then
+            properties.set(p, self.get(v[1..-1]))
+          when /^%\((\w+):(.*)\)$/ then
+            value = properties.get($1)
+            value = (value.match(Regexp.new($2)).captures.first rescue nil) unless value.nil?
+            properties.set(p, value)
+          end
         end
       end
 
