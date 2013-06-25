@@ -159,3 +159,36 @@ function ProvisioningNodeController($scope, $http){
     provisioningSetNextAction(action, $scope.device.id, $scope, $http);
   }
 }
+
+
+function ProvisioningRequestController($scope, $http, $routeParams){
+// teams
+  $scope.teams = [
+    'Core',
+    'Data Management',
+    'Homepage',
+    'Operations',
+    'Recommendations',
+    'QA',
+    'Visual Revenue',
+  ];
+
+// roles
+  $http.get('/api/devices/list/role').success(function(data){
+    $scope.roles = data;
+  })
+
+  if($routeParams && $routeParams.id){
+    $http.get('/api/provisioning/requests/'+$routeParams.id).success(function(data){
+      $scope.request = data;
+    });
+  }else{
+    $scope.request = {
+      quantity: {
+        nydc1:  0,
+        chidc1: 0,
+        ladc1:  0
+      }
+    };
+  }
+}

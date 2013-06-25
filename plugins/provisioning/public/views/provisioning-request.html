@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <h1>Asset Request Form</h1>
+      <br />
+    </div>
+  </div>
+
+  <form>
+    <div class="row">
+      <div class="span12">
+        <div class="form-horizontal">
+          <div class="control-group">
+            <label class="control-label">Requester</label>
+
+            <div class="controls">
+              <input class="input-medium" type="text" value="{{ user.name || user.id }}" disabled></input>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Owning Team</label>
+
+            <div class="controls">
+              <select ng-model="request.team" ng-options="team for team in teams | filter:$viewValue"></select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Machine Role</label>
+
+            <div class="controls">
+              <input class="input-medium" type="text" ng-model="request.service" typeahead="role for role in roles | filter:$viewValue">
+              <span class="help-inline">What type of machine will this be?  <i>(e.g.: adse, odb, hpr)</i></span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Quantity</label>
+
+            <div class="controls">
+              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.nydc1" placeholder="NYDC1"></input>
+              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.chidc1" placeholder="CHIDC1"></input>
+              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.ladc1" placeholder="LADC1"></input>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Notes</label>
+
+            <div class="controls">
+              <textarea ng-model="request.notes"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" rest="/api/provisioning/requests" rest-method="post" rest-data="request">Submit Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
