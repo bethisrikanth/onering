@@ -47,9 +47,12 @@ module Automation
           raise "Invalid message format: field created_at is required" unless header['created_at']
           header['created_at'] = (Time.parse(header['created_at']) rescue nil)
           header['age'] = (Time.now.to_f - header['created_at'].to_f)
+          
+        # get job by id for logging
+          job = Job.find(header['job_id']) unless header['job_id'] == 'anonymous'
 
         # start handling
-          puts "Starting job #{header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
+          puts "Starting job #{job.name rescue 'unknown-'+header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
 
         # run job
           result = Job.run(header)
@@ -75,7 +78,7 @@ module Automation
 
         ensure
           message.delete() unless message.nil?
-          puts "Finished job #{header['job_id']} (took #{"%.6f" % (Time.now - start).to_f} seconds)...".foreground(success ? :green : :red)
+          puts "Finished job #{job.name rescue 'unknown-'+header['job_id']} (took #{"%.6f" % (Time.now - start).to_f} seconds)...".foreground(success ? :green : :red)
 
         end
       end
