@@ -1,6 +1,7 @@
 require 'config'
 require 'socket'
 require 'msgpack'
+require 'statsd'
 
 module App
   class Log
@@ -14,21 +15,26 @@ module App
             @_prefix = @_prefix.sub(pattern, (IO.popen(pattern[2..-2] + " 2> /dev/null").read.lines.first.chomp))
           end
         end
+
+        @_statsd = Statsd.new(Config.get('global.metrics.host', '127.0.0.1'), Config.get('global.metrics.port', 8125))
+        @_statsd.namespace = @_prefix.gsub(/\.$/,'')
       end
 
     # default value of one makes events very simple to log
-      def observe(metric, value=1, time=Time.now)
-        # begin
-          payload = {
-            'metric'=> "#{@_prefix}#{metric}",
-            'value' => value.to_f,
-            'time'  => time.to_i
-          }
+      def increment(metric)
+        @_statsd.increment(metric)
+      end
 
-          App::Queue.channel(App::Config.get('global.metrics.queue', 'onering-metrics')) << payload
-        # rescue
-        #   return false
-        # end
+      def decrement(metric)
+        @_statsd.decrement(metric)
+      end
+
+      def gauge(metric, value)
+        @_statsd.gauge(metric, value)
+      end
+
+      def timing(metric, time_ms)
+        @_statsd.timing(metric, time_ms)
       end
     end
   end

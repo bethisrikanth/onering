@@ -41,9 +41,9 @@ module App
         response.body = rv.string()
         response.body << "-- END PROFILE --"
       else
-        App::Log.observe("api.requests.status.#{response.status}")
-        App::Log.observe("api.requests.all.count")
-        App::Log.observe("api.requests.all.time", ( (Time.now.to_f*1000.0).to_i - (@_start.to_f * 1000.0).to_i))
+        App::Log.increment("api.requests.status.#{response.status}")
+        App::Log.increment("api.requests.all.count")
+        App::Log.timing("api.requests.all.time", ( (Time.now.to_f*1000.0).to_i - (@_start.to_f * 1000.0).to_i))
       end
     end
 

@@ -32,6 +32,7 @@ gem "eventmachine"
 gem "msgpack"
 gem "beaneater"
 gem "rainbow"
+gem "statsd-ruby"
 
 group :test, :development do
 #  gem "rack-webconsole"

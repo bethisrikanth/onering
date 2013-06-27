@@ -68,7 +68,7 @@ module Automation
 
     # return IDs and statuses
       if result
-        App::Log.observe("worker.requests.queued")
+        App::Log.increment("worker.requests.queued")
 
         return ({
           :request_id => request.id.to_s,
@@ -83,7 +83,7 @@ module Automation
           :body     => result[:body]
         }.compact)
       else
-        App::Log.observe("worker.requests.queuefail")
+        App::Log.increment("worker.requests.queuefail")
 
         return ({
           :request_id => request.id.to_s,
@@ -183,13 +183,13 @@ module Automation
             #
               data = [*last_task_result].flatten.compact
 
-              App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.started")
+              App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.started")
 
               if data.empty?
                 log("Starting #{config['type']} task")
               else
                 log("Starting #{config['type']} task with #{data.length} data elements")
-                App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.data_elements", data.length)
+                App::Log.gauge("worker.tasks.#{config['type'].gsub('.','-')}.data_elements", data.length)
               end
 
             # no data specified, run the task once
@@ -214,13 +214,13 @@ module Automation
               last_task_result = results
 
             # log task runtime
-              App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.runtime", (Time.now.to_i - task_started_at.to_i))
-              App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.succeeded")
+              App::Log.timing("worker.tasks.#{config['type'].gsub('.','-')}.runtime", ((Time.now.to_f - task_started_at.to_f) * 1000.0))
+              App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.succeeded")
 
           # task aborted, continue to next task
             rescue TaskAbort => e
               log("[Task Aborted] #{e.message}", :warning)
-              App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.aborted")
+              App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.aborted")
               next
 
           # task requested a retry
@@ -231,11 +231,11 @@ module Automation
 
               if config['retry_number'] <= config['retry_limit']
                 log("[Task Retrying] (#{config['retry_number']}/#{config['retry_limit']}) #{e.message}", :warning)
-                App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.retries")
+                App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.retries")
                 retry
               else
                 log("[Task Failed] Too many retries (attempted #{config['retry_number']})", :error)
-                App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.failed")
+                App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.failed")
                 last_task_result = nil
                 next
               end
@@ -244,7 +244,7 @@ module Automation
             rescue TaskFail => e
               log("[Task Failed] #{e.message}", :error)
               last_task_result = nil
-              App::Log.observe("worker.tasks.#{config['type'].gsub('.','-')}.failed")
+              App::Log.increment("worker.tasks.#{config['type'].gsub('.','-')}.failed")
               next
             end
 

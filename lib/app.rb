@@ -32,7 +32,7 @@ module App
       App::Log.setup()
       Database::Base.load_all()
       Queue.setup()
-      App::Log.observe("api.process.started")
+      App::Log.increment("api.process.started")
       super
     end
 
