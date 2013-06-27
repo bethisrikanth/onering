@@ -31,10 +31,23 @@ module App
 
     namespace '/api/provision' do
       namespace '/request' do
-        get '/find' do
-          assets = AssetRequest.all()
-          return 404 unless assets
-          output(assets.collect{|i| i.to_h })
+        %w{
+          /find/?
+          /find/*
+        }.each do |r|
+          get r do
+            if params[:splat].nil?
+              assets = AssetRequest.all()
+            else
+              k,v = params[:splat].first.split('/')
+              assets = AssetRequest.where({
+                k => v
+              })
+            end
+
+            return 404 unless assets
+            output(assets.collect{|i| i.to_h })
+          end
         end
 
         get '/list/:field' do
@@ -63,8 +76,10 @@ module App
             end
 
             json = MultiJson.load(request.env['rack.input'].read)
+            json['user_id'] = @user.id
+            note = json.delete('notes')
             asset.from_json(json)
-
+            asset.notes << note
             asset.safe_save()
 
             200

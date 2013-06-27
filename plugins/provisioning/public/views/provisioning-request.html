@@ -8,7 +8,7 @@
 
   <form>
     <div class="row">
-      <div class="span12">
+      <div class="span8">
         <div class="form-horizontal">
           <div class="control-group">
             <label class="control-label">Requester</label>
@@ -57,6 +57,28 @@
             <button type="submit" class="btn btn-primary" rest="/api/provision/request" rest-method="post" rest-data="request">Submit Request</button>
           </div>
         </div>
+      </div>
+
+      <div class="span4">
+        <h4>My Machine Requests</h4>
+
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th>Qty.</th>
+              <th>Role</th>
+              <th>Team</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="request in requestsMine">
+              <td>{{ request.quantity.nydc1 + request.quantity.chidc1 + request.quantity.ladc1 }}</td>
+              <td>{{ request.role }}</td>
+              <td>{{ request.team }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </form>

@@ -1,4 +1,5 @@
 require 'yaml'
+require 'hashlib'
 
 module App
   class ConfigKeyError < Exception; end

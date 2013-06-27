@@ -30,9 +30,9 @@ module App
     def initialize
       App::Config.load(ENV['PROJECT_ROOT'])
       App::Log.setup()
-      App::Log.observe("api.process.started")
       Database::Base.load_all()
       Queue.setup()
+      App::Log.observe("api.process.started")
       super
     end
 

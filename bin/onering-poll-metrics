@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+ENV['PROJECT_ROOT'] = File.expand_path(File.dirname(File.dirname(__FILE__)))
+
+$: << File.join(ENV['PROJECT_ROOT'], 'lib')
+$: << File.join(ENV['PROJECT_ROOT'], 'plugins')
+
+require 'config'
+require 'queue'
+require 'msgpack'
+require 'rainbow'
+
+
+module Onering
+  class MetricsPoller
+    def initialize()
+      App::Config.load(ENV['PROJECT_ROOT'])
+      App::Queue.setup()
+    end
+
+    def poll()
+      messages = App::Queue.channel(App::Config.get('global.metrics.queue', 'onering-metrics')).read()
+
+      messages.each do |message|
+        begin
+          message = MessagePack.unpack(message.body)
+
+          if message['metric'] and message['value']
+            puts "#{message['metric']} #{(message['value'] || 1.0).to_f} #{message['time'] || Time.now.to_i}"
+          end
+        rescue
+          next
+        end
+      end
+    end
+  end
+end
+
+begin
+  Onering::MetricsPoller.new.poll()
+
+rescue Interrupt
+  exit 255
+
+rescue Exception => e
+  STDERR.puts("[Worker Error] #{e.class.name}: #{e.message}".foreground(:red))
+  e.backtrace.each do |b|
+    STDERR.puts("[Worker Error] #{b}".foreground(:red))
+  end
+  STDERR.puts("Exiting now".foreground(:red))
+
+  App::Log.observe("worker.process.crashes")
+  exit 1
+end

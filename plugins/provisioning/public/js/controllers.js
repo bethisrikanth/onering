@@ -130,7 +130,7 @@ function ProvisioningController($scope, $http, $window, $timeout, Query, Device)
         }
 
         Device.save({
-          id: i.id,
+           id: i.id,
           properties: i.properties
         }, function(){
           $scope.saved = 'Changes saved';
@@ -177,6 +177,11 @@ function ProvisioningRequestController($scope, $http, $routeParams){
   $http.get('/api/devices/list/role').success(function(data){
     $scope.roles = data;
   })
+
+// my requests
+  $http.get('/api/provision/request/find/user_id/'+$scope.user.id).success(function(data){
+    $scope.requestsMine = data;
+  });
 
   if($routeParams && $routeParams.id){
     $http.get('/api/provision/request/'+$routeParams.id).success(function(data){

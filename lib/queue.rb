@@ -37,6 +37,7 @@ module App
       end
 
       def channel(name=nil)
+        @_tubes ||= {}
         @_tubes[name] ||= Channel.new(name, @_pool)
         @_tubes[name]
       end
@@ -61,6 +62,20 @@ module App
 
     def <<(data)
       push(data)
+    end
+
+    def read()
+      rv = []
+      while @_tube.peek(:ready) do
+        begin
+          v = @_tube.reserve()
+          rv << v
+        ensure
+          v.delete()
+        end
+      end
+
+      return rv
     end
 
     def subscribe(&block)
