@@ -89,11 +89,11 @@ module Automation
 
         ensure
           message.delete() unless message.nil?
-          time_to_complete = ((Time.now - start).to_f * 1000.0)
+          time_to_complete = (Time.now - start).to_f
           puts "Finished job #{job.name rescue 'unknown-'+header['job_id']} (took #{"%.6f" % time_to_complete} seconds)...".foreground(success ? :green : :red)
 
           App::Log.increment("worker.jobs.#{job_name}.succeeded")
-          App::Log.timing("worker.jobs.#{job_name}.runtime", time_to_complete)
+          App::Log.timing("worker.jobs.#{job_name}.runtime", (time_to_complete * 1000.0))
         end
       end
     end
