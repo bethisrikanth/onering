@@ -1,15 +1,8 @@
-require 'liquid_patches'
 require 'controller'
 require 'assets/models/device'
 
 module App
   class Base < Controller
-    configure do
-      set :views, File.join(ENV['PROJECT_ROOT'], 'config', 'templates')
-      ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(settings.views)
-    end
-
-
     namespace '/api/ipxe' do
       get '/boot' do
         content_type 'text/plain'

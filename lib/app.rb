@@ -5,6 +5,7 @@ require 'rubygems'
 require 'oj'
 require 'mongo_patches'
 require 'config'
+require 'log'
 require 'db'
 require 'queue'
 require 'utils'
@@ -14,6 +15,7 @@ require 'msgpack'
 require 'controller'
 require 'eventmachine'
 require 'multi_json'
+require 'liquid_patches'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
@@ -27,6 +29,8 @@ module App
 
     def initialize
       App::Config.load(ENV['PROJECT_ROOT'])
+      App::Log.setup()
+      App::Log.observe("api.process.started")
       Database::Base.load_all()
       Queue.setup()
       super
@@ -44,6 +48,9 @@ module App
       #enable  :raise_errors
       disable :raise_errors
       disable :debug
+      set     :views, File.join(ENV['PROJECT_ROOT'], 'config', 'templates')
+
+      ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(settings.views)
     end
 
     error do
