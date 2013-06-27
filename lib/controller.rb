@@ -20,6 +20,7 @@ module App
 
     before do
       headers 'Access-Control-Allow-Headers' => 'origin, x-requested-with, accept'
+      @_start = Time.now
 
     # handle query modifiers
       App::Model::Base.query_limit = params[:limit].to_i if params[:limit]
@@ -39,6 +40,10 @@ module App
         Profiler__.print_profile(rv)
         response.body = rv.string()
         response.body << "-- END PROFILE --"
+      else
+        App::Log.observe("api.requests.status.#{response.status}")
+        App::Log.observe("api.requests.all.count")
+        App::Log.observe("api.requests.all.time", ( (Time.now.to_f*1000.0).to_i - (@_start.to_f * 1000.0).to_i))
       end
     end
 

@@ -43,7 +43,7 @@ module App
         unless @_prefix.empty?
           @_prefix.scan(/\$\([^\)]+\)/).each do |pattern|
             pattern.strip!
-            @_prefix = @_prefix.sub(pattern, (IO.popen(pattern[2..-2] + " 2> /dev/null").read.lines.first.chomp rescue ''))
+            @_prefix = @_prefix.sub(pattern, (IO.popen(pattern[2..-2] + " 2> /dev/null").read.lines.first.chomp))
           end
         end
       end
