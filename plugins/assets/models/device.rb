@@ -80,6 +80,53 @@ class Device < App::Model::Base
     return self.to_h.get(field, default)
   end
 
+
+  def push(key, value, coerce=:auto)
+    current_value = self.properties.get(key)
+    new_value = value.convert_to(coerce)
+
+  # creation
+    if current_value.nil?
+      self.properties.set(key, [new_value])
+
+  # append to existing array
+    elsif current_value.is_a?(Array)
+    # dont append duplicates
+      if current_value.select{|i| i.to_s == new_value.to_s }.empty?
+        self.properties.set(key, current_value+[new_value])
+      end
+
+  # convert scalar -> vector
+    else
+      self.properties.set(key, ([current_value]+[new_value]))
+    end
+
+    self
+  end
+
+  def pop(key)
+    current_value = self.properties.get(key)\
+
+    if current_value.nil?
+      return nil
+
+    elsif current_value.is_a?(Array)
+      rv = current_value.pop()
+
+      if current_value.empty?
+        self.properties.unset(key)
+      else
+        self.properties.set(key, current_value)
+      end
+
+    else
+      rv = current_value
+      self.properties.unset(key)
+    end
+
+    return rv
+  end
+
   private
     def _mangle_id
       id = id.strip.downcase if id

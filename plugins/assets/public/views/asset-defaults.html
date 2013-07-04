@@ -19,6 +19,7 @@
             <th ng-click="sortField='match'; sortReverse=!sortReverse">If the asset matches this...</th>
             <th ng-click="sortField='match'; sortReverse=!sortReverse">...then set these values on it:</th>
             <th><abbr title="Controls whether the values applied here will overwrite existing values">Overwrite?</abbr></th>
+            <th><abbr title="Controls whether this rule is enabled or not">Enabled?</abbr></th>
             <th> </th>
           </tr>
         </thead>
@@ -42,6 +43,10 @@
 
             <td>
               <input type="checkbox" ng-model="default.force" ng-change="default.dirty=true"></input>
+            </td>
+
+            <td>
+              <input type="checkbox" ng-model="default.enabled" ng-change="default.dirty=true"></input>
             </td>
 
             <td>

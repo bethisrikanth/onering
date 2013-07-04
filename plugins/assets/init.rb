@@ -350,7 +350,6 @@ module App
 
     # get device property
       get '/:id/get/*' do
-        content_type 'text/plain'
         device = Device.find(params[:id])
         return 404 if not device
         rv = []
@@ -358,7 +357,26 @@ module App
           rv << (device.properties.get(key) || ' ').to_s
         end
 
-        rv.join("\n")
+        output(rv)
+      end
+
+    # vector operations
+      get '/:id/push/:key/:value/?' do
+        device = Device.find(params[:id])
+        return 404 if not device
+
+        device.push(params[:key], params[:value], params[:coerce])
+        device.safe_save
+        output(device)
+      end
+
+      get '/:id/pop/:key/?' do
+        device = Device.find(params[:id])
+        return 404 if not device
+
+        rv = device.pop(params[:key])
+        device.safe_save
+        output(rv)
       end
 
 

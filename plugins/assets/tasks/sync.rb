@@ -13,7 +13,7 @@ module Automation
           }
 
         # resync defaults
-          NodeDefault.all.each do |default|
+          NodeDefault.where(:enabled => true).each do |default|
             devices = default.devices.to_a
             next unless devices.length > 0
 

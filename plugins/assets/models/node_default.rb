@@ -8,10 +8,11 @@ class NodeDefault < App::Model::Base
 
   timestamps!
 
-  key :name,  String, :unique => true
-  key :match, Array
-  key :apply, Hash
-  key :force, Boolean, :default => false
+  key :name,    String, :unique => true
+  key :match,   Array
+  key :apply,   Hash
+  key :force,   Boolean, :default => false
+  key :enabled, Boolean, :default => true
 
   def devices(filter=nil)
     query = []
@@ -38,7 +39,7 @@ class NodeDefault < App::Model::Base
     def defaults_for(device)
       rv = []
 
-      NodeDefault.all.each do |default|
+      NodeDefault.where(:enabled => true).each do |default|
         if (default.devices("str:id/#{device.id}").first.id rescue nil) == device.id
           rv << default
           next
