@@ -62,6 +62,63 @@ module App
         end
       end
 
+
+      # /devices/find
+      # search for devices by fields
+      %w{
+        /find/?
+        /find/*
+      }.each do |r|
+        get r do
+          qsq = (params[:q] || params[:query] || '')
+          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
+          rv = Device.urlsearch(q).limit(params[:limit] || 1000).to_a
+
+          output(filter_hash(rv, :properties))
+        end
+      end
+
+
+    # show devices that haven't been updated
+      %w{
+        /list/stale/?
+        /list/stale/:age
+      }.each do |r|
+        get r do
+          output(Device.list('id', {
+            'collected_at' => {
+              '$lte' => (params[:age] || 4).to_i.hours.ago
+            }
+          }))
+        end
+      end
+
+    # /devices/list
+    # list field values
+      %w{
+        /list/:field/?
+        /list/:field/where/*
+      }.each do |r|
+        get r do
+          q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
+          output Device.list(params[:field], urlquerypath_to_mongoquery(q))
+        end
+      end
+
+
+    # /devices/summary
+      %w{
+        /summary/by-:field/?
+        /summary/by-:field/*/?
+      }.each do |r|
+        get r do
+          q = urlquerypath_to_mongoquery(params[:where] || params[:q])
+          rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
+          output rv
+        end
+      end
+
+
     # device by id
       get '/:id' do
         device = Device.find(params[:id])
@@ -271,23 +328,24 @@ module App
 
 
     # set devices properties
-      %w{
-        set
-        unset
-      }.each do |action|
-        get "/:id/#{action}/:key/:value" do
-          device = Device.find(params[:id])
-          return 404 if not device
+      get "/:id/set/:key/:value" do
+        device = Device.find(params[:id])
+        return 404 if not device
 
-          if action == 'set'
-            device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
-          else
-            device.properties.delete(params[:key])
-          end
+        device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
 
-          device.safe_save
-          output(device)
-        end
+        device.safe_save
+        output(device)
+      end
+
+      get "/:id/unset/:key" do
+        device = Device.find(params[:id])
+        return 404 if not device
+
+        device.properties.delete(params[:key])
+
+        device.safe_save
+        output(device)
       end
 
     # get device property
@@ -362,62 +420,6 @@ module App
         end
 
         output device.to_h
-      end
-
-
-      # /devices/find
-      # search for devices by fields
-      %w{
-        /find/?
-        /find/*
-      }.each do |r|
-        get r do
-          qsq = (params[:q] || params[:query] || '')
-          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          rv = Device.urlsearch(q).limit(params[:limit] || 1000).to_a
-
-          output(filter_hash(rv, :properties))
-        end
-      end
-
-
-    # show devices that haven't been updated
-      %w{
-        /list/stale/?
-        /list/stale/:age
-      }.each do |r|
-        get r do
-          output(Device.list('id', {
-            'collected_at' => {
-              '$lte' => (params[:age] || 4).to_i.hours.ago
-            }
-          }))
-        end
-      end
-
-    # /devices/list
-    # list field values
-      %w{
-        /list/:field/?
-        /list/:field/where/*
-      }.each do |r|
-        get r do
-          q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
-          output Device.list(params[:field], urlquerypath_to_mongoquery(q))
-        end
-      end
-
-
-    # /devices/summary
-      %w{
-        /summary/by-:field/?
-        /summary/by-:field/*/?
-      }.each do |r|
-        get r do
-          q = urlquerypath_to_mongoquery(params[:where] || params[:q])
-          rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
-          output rv
-        end
       end
     end
   end
