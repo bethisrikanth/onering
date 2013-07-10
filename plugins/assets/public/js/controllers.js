@@ -269,20 +269,19 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         $scope.tags = data;
       });
 
+  //  boot profiles
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
+        $scope.pxeboot = data;
+
+        if(data[0]){
+          $scope.opt.newPxeProfile = data[0].id;
+        }
+      });
+
   //  boot profile list
-      $scope.pxeProfiles = [{
-        id:   'local',
-        name: 'Local Disk'
-      },{
-        id:   'skyhook',
-        name: 'Skyhook'
-      },{
-        id:   'install-centos-59',
-        name: 'Install CentOS 5.9'
-      },{
-        id:   'install-ubuntu-1204',
-        name: 'Install Ubuntu 12.04'
-      }]
+      $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
+        $scope.pxeProfiles = data;
+      });
 
   //  Give me a ping, Vasili.  One ping only please...
       // $http.get('/api/salt/devices/'+$routeParams.id+'/ping?severity=ignore').success(function(){
