@@ -56,6 +56,11 @@
       <td>{{ node.properties.make }} {{ node.properties.model }}</td>
     </tr>
 
+    <tr ng-show="node.properties.mbmodel">
+      <th>Baseboard</th>
+      <td>{{ node.properties.mbmake }} {{ node.properties.mbmodel }}</td>
+    </tr>
+
   </tbody>
 </table>
 
