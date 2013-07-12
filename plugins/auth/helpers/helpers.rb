@@ -6,7 +6,8 @@ module App
         ^/api/?$
         ^/api/users/login/?$
         ^/api/users/machine/?.*$
-        ^/api/provision/?.*$
+        ^/api/provision/?$
+        ^/api/provision/.*/boot/?.*$
         ^/api/rundeck/nodes/?.*$
         ^/api/ipxe/boot/?.*$
       }.each do |p|
