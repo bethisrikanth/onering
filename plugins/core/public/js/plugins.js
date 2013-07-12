@@ -3,8 +3,17 @@ angular.module('corePlugin', [
   'coreDirectives',
   'coreRoutes'
 ]).
-run(['$rootScope', '$window', '$http', '$dialog', function($rootScope, $window, $http, $dialog){
+run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootScope, $window, $http, $dialog, $location){
   $rootScope.online = true;
+
+  $rootScope.go = function(path){
+    $location.path(path);
+    try{
+      $rootScope.$apply(function(){
+        $rootScope.$broadcast('location-changed', path);
+      });
+    }catch(e){ ; }
+  };
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];

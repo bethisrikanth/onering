@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <h1>Asset Requests</h1>
+      <br />
+      <div>
+        <a class="btn" href="#/provisioning/request"><i class="icon-plus"> </i> New Request</a>
+      </div>
+      <br />
+      <br />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12">
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>Total</th>
+            <th>NY</th>
+            <th>CHI</th>
+            <th>LA</th>
+            <th>Role</th>
+            <th>Team</th>
+            <th>Requested By</th>
+            <th>Date Requested</th>
+            <th>Notes</th>
+            <th> </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="request in requests">
+            <td>{{ request.total }}</td>
+            <td>{{ request.quantity.nydc1 }}</td>
+            <td>{{ request.quantity.chidc1 }}</td>
+            <td>{{ request.quantity.ladc1 }}</td>
+            <td>{{ request.service | uppercase }}</td>
+            <td>{{ request.team }}</td>
+            <td>{{ request.user_id }}</td>
+            <td>{{ request.created_at | timeAgo }}</td>
+            <td>
+              <span ng-show="request.notes.length">{{ request.notes.length }}</span>
+            </td>
+            <td><a href="#/provisioning/request/{{ request.id }}"><i class="icon-pencil"> </i></a></td>
+            <td><a rest="/api/provision/request/{{ request.id }}" rest-method="delete" rest-success="reload()"><i class="icon-remove"> </i></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </form>
+</div>

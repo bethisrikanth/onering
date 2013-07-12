@@ -173,27 +173,42 @@ function ProvisioningRequestController($scope, $http, $routeParams){
     'Visual Revenue',
   ];
 
-// roles
-  $http.get('/api/devices/list/role').success(function(data){
-    $scope.roles = data;
-  })
+  $scope.reload = function(){
+  // roles
+    $http.get('/api/devices/list/role').success(function(data){
+      $scope.roles = data;
+    })
 
-// my requests
-  $http.get('/api/provision/request/find/user_id/'+$scope.user.id).success(function(data){
-    $scope.requestsMine = data;
-  });
-
-  if($routeParams && $routeParams.id){
-    $http.get('/api/provision/request/'+$routeParams.id).success(function(data){
-      $scope.request = data;
+  // my requests
+    $http.get('/api/provision/request/find/user_id/'+$scope.user.id).success(function(data){
+      $scope.requestsMine = data;
     });
-  }else{
-    $scope.request = {
-      quantity: {
-        nydc1:  0,
-        chidc1: 0,
-        ladc1:  0
-      }
-    };
+
+    if($routeParams && $routeParams.id){
+      $http.get('/api/provision/request/'+$routeParams.id).success(function(data){
+        $scope.request = data;
+      });
+    }else{
+      $scope.request = {
+        quantity: {
+          nydc1:  0,
+          chidc1: 0,
+          ladc1:  0
+        }
+      };
+    }
   }
+
+  $scope.reload();
+}
+
+
+function ProvisioningRequestListController($scope, $http, $routeParams){
+  $scope.reload = function(){
+    $http.get('/api/provision/request/find').success(function(data){
+      $scope.requests = data;
+    });
+  }
+
+  $scope.reload();
 }

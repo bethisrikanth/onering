@@ -1,7 +1,16 @@
 <div class="container">
   <div class="row">
     <div class="span12">
-      <h1>Asset Request Form</h1>
+      <h1>
+        Asset Request Form
+        <span ng-show="request.id"> - Editing</span>
+      </h1>
+      <br />
+      <div>
+        <a class="btn" href="#/provisioning/request"><i class="icon-plus"> </i> New Request</a>
+        <a class="btn" href="#/provisioning/request/list"><i class="icon-list"> </i> Show Requests</a>
+      </div>
+      <br />
       <br />
     </div>
   </div>
@@ -22,7 +31,7 @@
             <label class="control-label">Owning Team</label>
 
             <div class="controls">
-              <select ng-model="request.team" ng-options="team for team in teams | filter:$viewValue"></select>
+              <select required ng-model="request.team" ng-options="team for team in teams | filter:$viewValue"></select>
             </div>
           </div>
 
@@ -30,7 +39,7 @@
             <label class="control-label">Machine Role</label>
 
             <div class="controls">
-              <input class="input-medium" type="text" ng-model="request.service" typeahead="role for role in roles | filter:$viewValue">
+              <input required class="input-medium" type="text" ng-model="request.service" typeahead="role for role in roles | filter:$viewValue">
               <span class="help-inline">What type of machine will this be?  <i>(e.g.: adse, odb, hpr)</i></span>
             </div>
           </div>
@@ -39,46 +48,84 @@
             <label class="control-label">Quantity</label>
 
             <div class="controls">
-              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.nydc1" placeholder="NYDC1"></input>
-              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.chidc1" placeholder="CHIDC1"></input>
-              <input class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.ladc1" placeholder="LADC1"></input>
+              <input required class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.nydc1" placeholder="NYDC1"></input>
+              <span class="help-inline input-small">NYDC1</span>
+            </div>
+
+            <div class="controls">
+              <input required class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.chidc1" placeholder="CHIDC1"></input>
+              <span class="help-inline input-small">CHIDC1</span>
+            </div>
+
+            <div class="controls">
+              <input required class="input-small" type="text" ui-validate="angular.isNumber($value)" ng-model="request.quantity.ladc1" placeholder="LADC1"></input>
+              <span class="help-inline input-small">LADC1</span>
             </div>
           </div>
 
           <div class="control-group">
-            <label class="control-label">Notes</label>
+            <label class="control-label">Add Note</label>
 
             <div class="controls">
-              <textarea ng-model="request.notes"></textarea>
+              <textarea ng-model="request._note"></textarea>
             </div>
           </div>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary" rest="/api/provision/request" rest-method="post" rest-data="request">Submit Request</button>
+          <div class="control-group">
+            <button ng-show="request.id" type="submit" class="btn btn-danger pull-left" rest="/api/provision/request/{{request.id}}" rest-method="delete" rest-data="request" rest-success="go('/provisioning/request')">Cancel Request</button>
+
+            <button ng-show="request.id" type="submit" class="btn btn-primary pull-right" rest="/api/provision/request" rest-method="post" rest-data="request" rest-success="go('/provisioning/request')">Submit Request</button>
+
+            <button ng-hide="request.id" type="submit" class="btn btn-primary pull-right" rest="/api/provision/request" rest-method="post" rest-data="request" rest-success="reload()">Submit Request</button>
           </div>
         </div>
       </div>
 
       <div class="span4">
-        <h4>My Machine Requests</h4>
+        <div ng-show="request.notes.length > 0">
+          <h4>Request Notes</h4>
 
-        <table class="table table-condensed">
-          <thead>
-            <tr>
-              <th>Qty.</th>
-              <th>Role</th>
-              <th>Team</th>
-            </tr>
-          </thead>
+          <div class="notes well" ng-show="request.notes">
+            <div ng-repeat="note in request.notes" class="note">
+              <div class="header">
+                <img class="img-polaroid pull-left" ng-src="/api/users/{{note.user_id || 'onering'}}/gravatar?s=32" style="margin: 0 0.5em 0 0" width="32" height="32" />
+                <b>{{ note.user_id || '(system)' }}</b>
+                <br />
+                <span style="font-size: smaller; color: grey">{{ note.created_at | date:'short' }}</span>
 
-          <tbody>
-            <tr ng-repeat="request in requestsMine">
-              <td>{{ request.quantity.nydc1 + request.quantity.chidc1 + request.quantity.ladc1 }}</td>
-              <td>{{ request.role }}</td>
-              <td>{{ request.team }}</td>
-            </tr>
-          </tbody>
-        </table>
+
+                <div class="clearfix"></div>
+              </div>
+
+              <p style="margin: 0.5em 0.25em 0 0.25em">{{ note.body }}</p>
+            </div>
+
+          </div>
+        </div>
+
+        <div ng-show="requestsMine &amp;&amp; requestsMine.length > 0">
+          <h4>My Machine Requests</h4>
+
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Qty.</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th> </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="request in requestsMine">
+                <td><abbr title="NY: {{request.quantity.nydc1}}, CHI: {{request.quantity.chidc1}}, LA: {{request.quantity.ladc1}}">{{ request.total }}</abbr></td>
+                <td>{{ request.service | uppercase }}</td>
+                <td>{{ request.team }}</td>
+                <td><a href="#/provisioning/request/{{ request.id }}"><i class="icon-pencil"> </i></a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </form>

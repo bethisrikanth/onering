@@ -62,6 +62,11 @@ module App
           output(asset.to_h)
         end
 
+        delete '/:id' do
+          AssetRequest.destroy(params[:id])
+          200
+        end
+
 
         %w{
           /?
@@ -77,9 +82,18 @@ module App
 
             json = MultiJson.load(request.env['rack.input'].read)
             json['user_id'] = @user.id
-            note = json.delete('notes')
+
+            json.delete('notes')
+            note = json.delete('_note')
+
             asset.from_json(json)
-            asset.notes << note
+
+            asset.notes << {
+              'created_at' => Time.now.strftime('%Y-%m-%d %H:%M:%S %z'),
+              'user_id'    => @user.id,
+              'body'       => note
+            } unless note.nil?
+
             asset.safe_save()
 
             200
