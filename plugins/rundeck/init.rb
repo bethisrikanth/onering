@@ -13,20 +13,20 @@ module App
         return YAML.dump(nodes.collect{|node|
           rv = {
             'nodename'  => node.get('rundeck.name', node.id),
-            'hostname'  => (node.get(Config.get('automation.rundeck.fields.hostname') || 'fqdn') || node.name || node.id),
+            'hostname'  => (node.get(params[:hostname] || Config.get('automation.rundeck.fields.hostname') || 'fqdn') || node.name || node.id),
             'username'  => (params[:username] || node.get('rundeck.user', Config.get('automation.rundeck.user', 'rundeck'))),
             'tags'      => node.tags,
             'osVersion' => node.get('version'),
             'osName'    => node.get('distro'),
             'osArch'    => node.get('arch')
           }
-	
+
           Config.get('automation.rundeck.fields',{}).each do |field, value|
             next if field.to_s == 'hostname'
             value = node.get(value)
             rv[field] = value
           end
- 
+
           rv.compact
         })
       end
