@@ -78,6 +78,11 @@ module App
           output(rv)
         end
 
+      # remove all successful jobs from the database
+        get '/purge' do
+          output(Automation::Job.run_task('auto.purge'))
+        end
+
         get '/:id/requeue' do
           job_request = Automation::Request.find(params[:id])
           return 404 unless job_request

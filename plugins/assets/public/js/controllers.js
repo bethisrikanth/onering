@@ -426,6 +426,8 @@ function TreeViewController($scope){
 function NodeCompareController($scope, $routeParams, Query){
   $scope.query = ($routeParams.query ? $routeParams.query : null);
   $scope.fields = ($routeParams.fields ? $routeParams.fields.split('|') : []);
+  $scope.sortField = 'name';
+  $scope.sortReverse = false;
 
   $scope.reload = function(){
     if($scope.fields.length > 0 && $scope.query){
