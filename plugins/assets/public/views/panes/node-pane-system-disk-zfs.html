@@ -17,7 +17,7 @@
             <tr>
               <th>Filesystem</th>
               <th>Used</th>
-              <th>% of Pool</th>
+              <th>%</th>
             </tr>
           </thead>
 
@@ -32,7 +32,7 @@
                 </span>
               </td>
               <td>{{ fs.size.used | autosize:2 }}</td>
-              <td>{{ ((fs.size.used / pool.size.total) * 100.0) | fix:2 }} %</td>
+              <td>{{ ((fs.size.used / (fs.size.used+fs.size.free)) * 100.0) | fix:2 }} %</td>
             </tr>
           </tbody>
         </table>
