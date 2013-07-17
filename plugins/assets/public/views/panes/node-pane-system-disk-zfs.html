@@ -82,9 +82,18 @@
               <td> </td>
               <td>&#9492;&nbsp;&nbsp;</td>
               <td><tt>{{ device.device || device.name }}</tt></td>
-              <td> </td>
-              <td> </td>
-              <td> </td>
+              <td>
+                <span ng-show="device.errors.read > 0"><b style="color:red">{{ device.errors.read }}</b></span>
+                <span ng-hide="device.errors.read > 0">{{ device.errors.read }}</span>
+              </td>
+              <td>
+                <span ng-show="device.errors.write > 0"><b style="color:red">{{ device.errors.write }}</b></span>
+                <span ng-hide="device.errors.write > 0">{{ device.errors.write }}</span>
+              </td>
+              <td>
+                <span ng-show="device.errors.checksum > 0"><b style="color:red">{{ device.errors.checksum }}</b></span>
+                <span ng-hide="device.errors.checksum > 0">{{ device.errors.checksum }}</span>
+              </td>
             </tr>
           </tbody>
         </table>
