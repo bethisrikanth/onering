@@ -4,7 +4,8 @@
       <div class="widget-header">
         <b>ZPool: {{ pool.name }}</b>
         <br />
-        {{ pool.size.used | autosize:0 }} used, {{ pool.size.total | autosize:0 }} total
+        <progress style="margin: 0; height: 10px; width: 96px; display: inline-block;" value="pool.size.percent_used"></progress>
+        &nbsp;{{ pool.size.percent_used }} % &nbsp;&ndash;&nbsp;&nbsp;{{ pool.size.used | autosize:0 }} used, {{ pool.size.total | autosize:0 }} total
       </div>
     </div>
 
@@ -72,7 +73,7 @@
 
             <tr ng-repeat="device in vdev.devices | orderBy:['device']">
               <td> </td>
-              <td></td>
+              <td>&#9492;&nbsp;&nbsp;</td>
               <td><tt>{{ device.device || device.name }}</tt></td>
               <td> </td>
               <td> </td>
