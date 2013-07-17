@@ -22,7 +22,7 @@
           </thead>
 
           <tbody>
-            <tr ng-repeat="fs in node.properties.metrics.zfs.filesystems | filter:{name:'obstore/'}">
+            <tr ng-repeat="fs in node.properties.metrics.zfs.filesystems | filter:{name:pool.name+'/'}">
               <td>
                 <span ng-show="fs.mountpoint != '/'+fs.name">
                   <abbr title="Name: {{ fs.name }}"><tt>{{ fs.mountpoint || fs.name }}</tt></abbr>
