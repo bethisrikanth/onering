@@ -8,7 +8,7 @@
     <li ng-show="node.properties.metrics.disk.lvm" ng-class="(opt.diskTab=='lvm' &amp;&amp; 'active' || '')">
       <a ng-click="opt.diskTab='lvm'">LVM</a>
     </li>
-    <li ng-show="node.properties.metrics.disk.zfs" ng-class="(opt.diskTab=='zfs' &amp;&amp; 'active' || '')">
+    <li ng-show="node.properties.metrics.zfs" ng-class="(opt.diskTab=='zfs' &amp;&amp; 'active' || '')">
       <a ng-click="opt.diskTab='zfs'">ZFS</a>
     </li>
     <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(opt.diskTab=='mdraid' &amp;&amp; 'active' || '')">
@@ -23,136 +23,16 @@
   </ul>
 
   <div>
-    <div ng-show="opt.diskTab=='mounts'">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Mount Point</th>
-            <th>Filesystem</th>
-            <th>Device</th>
-            <th>Size</th>
-            <th>Used</th>
-            <th>%<th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr ng-repeat="mount in node.properties.metrics.disk.mounts | orderBy:'mount'">
-            <td>{{ mount.mount }}</td>
-            <td>{{ mount.filesystem }}</td>
-            <td>{{ mount.device }}</td>
-            <td>{{ mount.total | autosize:2 }}</td>
-            <td>
-              <progress style="margin: 0" value="mount.percent_used"></progress>
-            </td>
-            <td>{{ mount.percent_used }}%</td>
-          </tr>
-        </tbody>
-      </table>
+    <div ng-show="opt.diskTab=='mounts'" ng-include="'views/panes/node-pane-system-disk-mounts.html'">
     </div>
 
-    <div ng-show="opt.diskTab=='lvm'">
-      <div ng-repeat="vg in node.properties.metrics.disk.lvm.groups | orderBy: 'name'">
-        <div class="widget-header" ng-click="vg.collapse=!vg.collapse">
-          <b title="UUID: {{ vg.uuid }}">Volume Group: {{ vg.name }}</b>
-          <br />
-          <progress style="margin: 0; height: 10px; width: 96px; display: inline-block;" value="(vg.extents.allocated/vg.extents.total)*100.0"></progress>
-          &nbsp;&nbsp;{{ (vg.size - (vg.extents.allocated * vg.extents.size)) | autosize:0 }} can be allocated, {{ vg.extents.size | autosize:0 }} extent size
-          <span class="pull-right">
-            <i ng-hide="vg.collapse" class="icon-chevron-up"> </i>
-            <i ng-show="vg.collapse" class="icon-chevron-down"> </i>
-          </span>
-        </div>
-
-        <div class="container-fluid" collapse="vg.collapse">
-          <div class="row-fluid">
-            <div class="span6">
-              <table class="table table-striped table-condensed">
-                <caption class="align-left"><b>Logical Volumes</b></caption>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Size</th>
-                    <th>Extents</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr ng-repeat="lv in vg.volumes | orderBy:'name'">
-                    <td>{{ lv.name }}</td>
-                    <td>{{ lv.size | autosize:0 }}</td>
-                    <td>{{ lv.extents }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="span6">
-              <table class="table table-striped table-condensed">
-                <caption class="align-left">
-                  <b>Physical Volumes</b>
-                </caption>
-                <thead>
-                  <tr>
-                    <th>Device</th>
-                    <th>Size</th>
-                    <th>Allocatable</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <tr ng-repeat="pv in vg.disks | orderBy:'name'">
-                    <td>{{ pv.name }}</td>
-                    <td>
-                      {{ pv.size | autosize:2 }}
-                      <br />
-                      {{ pv.extents.total }} extents
-                      <span ng-show="pv.extents.size != vg.extents.size">
-                        @ {{ pv.extents.size | autosize:0 }} ea.
-                      </span>
-                    </td>
-                    <td>
-                      {{ (pv.size - (pv.extents.allocated * pv.extents.size)) | autosize:2:1 }}
-                      <br />
-                      {{ pv.extents.free }} extents
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div ng-show="opt.diskTab=='lvm'" ng-include="'views/panes/node-pane-system-disk-lvm.html'">
     </div>
 
-    <div ng-show="opt.diskTab=='virident'">
-      <div ng-repeat="card in node.properties.metrics.virident | orderBy:'name'">
-        <table class="table table-striped table-plain">
-          <thead>
-            <tr>
-              <th>Card: {{ card.name }}</th>
-              <td colspan="2">{{ card.description }} &mdash; {{ card.model }} ({{ card.temperature }}&deg;)</td>
-              <td> </td>
-            </tr>
-
-            <tr>
-              <th>Partition</th>
-              <th>Size</th>
-              <th>State</th>
-              <th>Life Remaining %</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr ng-repeat="partition in card.partitions">
-              <td>{{ partition.name }}</td>
-              <td>{{ partition.size | autosize:2 }}</td>
-              <td>{{ partition.state | titleize }}</td>
-              <td>{{ partition.life_remaining }}%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div ng-show="opt.diskTab=='virident'" ng-include="'views/panes/node-pane-system-disk-virident.html'">
     </div>
 
+    <div ng-show="opt.diskTab=='zfs'" ng-include="'views/panes/node-pane-system-disk-zfs.html'">
+    </div>
   </div>
 </div>

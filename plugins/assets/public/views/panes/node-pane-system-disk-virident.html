@@ -1,0 +1,27 @@
+<div ng-repeat="card in node.properties.metrics.virident | orderBy:'name'">
+  <table class="table table-striped table-plain">
+    <thead>
+      <tr>
+        <th>Card: <tt>{{ card.name }}</tt></th>
+        <td colspan="2">{{ card.description }} &mdash; {{ card.model }} ({{ card.temperature }}&deg;)</td>
+        <td> </td>
+      </tr>
+
+      <tr>
+        <th>Partition</th>
+        <th>Size</th>
+        <th>State</th>
+        <th>Life Remaining %</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="partition in card.partitions">
+        <td><tt>{{ partition.name }}</tt></td>
+        <td>{{ partition.size | autosize:2 }}</td>
+        <td>{{ partition.state | titleize }}</td>
+        <td>{{ partition.life_remaining }}%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

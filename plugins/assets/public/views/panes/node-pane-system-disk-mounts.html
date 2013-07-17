@@ -1,0 +1,25 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Mount Point</th>
+      <th>Filesystem</th>
+      <th>Device</th>
+      <th>Size</th>
+      <th>Used</th>
+      <th>%<th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="mount in node.properties.metrics.disk.mounts | orderBy:'mount'">
+      <td><tt>{{ mount.mount }}</tt></td>
+      <td>{{ mount.filesystem }}</td>
+      <td><tt>{{ mount.device }}</tt></td>
+      <td>{{ mount.total | autosize:2 }}</td>
+      <td>
+        <progress style="margin: 0" value="mount.percent_used"></progress>
+      </td>
+      <td>{{ mount.percent_used }}%</td>
+    </tr>
+  </tbody>
+</table>
