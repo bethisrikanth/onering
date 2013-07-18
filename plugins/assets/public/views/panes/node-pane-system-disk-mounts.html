@@ -14,7 +14,7 @@
     <tr ng-repeat="mount in node.properties.metrics.disk.mounts | orderBy:'mount'">
       <td><tt>{{ mount.mount }}</tt></td>
       <td>{{ mount.filesystem }}</td>
-      <td><tt>{{ mount.device }}</tt></td>
+      <td><abbr title="UUID: {{ mount.uuid }}"><tt>{{ mount.device }}</tt></abbr></td>
       <td>{{ mount.total | autosize:2 }}</td>
       <td>
         <progress style="margin: 0" value="mount.percent_used"></progress>
