@@ -92,7 +92,7 @@ run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootSco
     }
 
     if(stack.length == 0){
-      stack.push('str:id|str:name|tags');
+      stack.push('str:id|str:name|str:dns.name|tags');
       stack.push(field);
     }
 
