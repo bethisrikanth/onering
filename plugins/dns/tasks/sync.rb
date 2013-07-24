@@ -60,7 +60,7 @@ module Automation
           end
 
           records.each do |ip, node|
-            devices = Device.urlsearch("ip|network.interfaces.addresses.ip/#{ip}").to_a
+            devices = Device.urlsearch("ip|network.interfaces.addresses.ip/^#{ip}$").to_a
 
             devices.each do |device|
               device.properties.set(:dns, node[:records])
