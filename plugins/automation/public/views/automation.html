@@ -80,6 +80,14 @@
               </table>
             </div>
           </div>
+
+          <div class="span4">
+            <div class="widget-title">Actions</div>
+              <button class="btn" rest="/api/automation/requests/flush" rest-success="reload()"><i class="icon-fire"> </i>&nbsp;&nbsp;Flush Queue</button>
+              <button class="btn" rest="/api/automation/requests/purge" rest-success="reload()"><i class="icon-trash"> </i>&nbsp;&nbsp;Purge Finished Jobs</button>
+              <button class="btn" rest="/api/automation/requests/nuke" rest-success="reload()"><i class="icon-ban-circle"> </i>&nbsp;&nbsp;Purge All</button>
+            </div>
+          </div>
         </div>
       </div>
 
