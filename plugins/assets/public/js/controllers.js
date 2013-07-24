@@ -179,6 +179,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     diskTab:           'mounts',
     netTab:            'interfaces',
     graphsFrom:        '-6hours',
+    dns_sort:          ['type', 'name'],
     editProvisioning:  true,
     provision: {
       formHelp: {},

@@ -1,8 +1,33 @@
-<div class="container-fluid">
+<div class="container-fluid widget-pane">
   <div class="row-fluid">
-    <div class="span12 center">
-      <img src="http://angular-ui.github.io/Under_construction.gif">
-      <img src="http://www.pennsbury.k12.pa.us/pennsbury/Member's%20Area/Clip%20Art/under-construction-sign-animated.gif">
+    <div class="span12" ng-show="node.properties.dns">
+      <div class="widget-title" ng-click="opt.alert_collapse=!opt.alert_collapse">
+        DNS Records
+      </div>
+
+      <div class="widget-content widget-expand">
+        <table class="table table-condensed">
+          <thead>
+            <tr>
+              <th ng-click="opt.dns_sort='name'; opt.dns_sort_desc=!opt.dns_sort_desc">Name</th>
+              <th ng-click="opt.dns_sort='type'; opt.dns_sort_desc=!opt.dns_sort_desc">Type</th>
+              <th ng-click="opt.dns_sort='ttl'; opt.dns_sort_desc=!opt.dns_sort_desc">TTL</th>
+              <th ng-click="opt.dns_sort='target'; opt.dns_sort_desc=!opt.dns_sort_desc">Target</th>
+              <th ng-click="opt.dns_sort='zone'; opt.dns_sort_desc=!opt.dns_sort_desc">Zone</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="record in node.properties.dns | orderBy:opt.dns_sort:opt.dns_sort_desc">
+              <td>{{ record.name }}</td>
+              <td>{{ record.type | uppercase }}</td>
+              <td>{{ record.ttl }}</td>
+              <td>{{ record.target }}<span ng-show="record.type=='cname'">.</span></td>
+              <td>{{ record.zone }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
