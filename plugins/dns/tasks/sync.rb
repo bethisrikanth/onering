@@ -2,12 +2,12 @@ require 'assets/models/device'
 
 module Automation
   module Tasks
-    module Bind
+    module Dns
       class Sync < Base
         def run(request)
           axfr = {}
 
-          App::Config.get('bind.sync_zones',[]).each do |zone|
+          App::Config.get('dns.sync_zones',[]).each do |zone|
             log("Beginning sync for DNS zone #{zone}")
 
             IO.popen("host -t AXFR -W 10 #{zone}").lines.each do |line|
