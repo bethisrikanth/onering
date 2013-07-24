@@ -6,6 +6,10 @@ function GlobalController($scope, $http, $rootScope, $window){
   });
 }
 
+function IndexController($scope){
+  $scope.tgt = "http://graphite.outbrain.com/render/?format=json&target=services.prod.onering.ring-10001-prod-nydc1.worker.tasks.*.runtime.mean";
+}
+
 function ErrorController($scope, $location){
   $scope.$watch('errors', function(n){
     if($scope.errors.length == 0){

@@ -2,7 +2,7 @@ angular.module('app', [
   'ui.utils',
   'ui.bootstrap',
   'rest',
-  'rickshaw',
+  'radian',
   'corePlugin',
   'authPlugin',
   'assetsPlugin',

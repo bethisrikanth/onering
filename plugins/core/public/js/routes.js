@@ -6,6 +6,7 @@ config(['$routeProvider', function($routeProvider) {
     controller:  ErrorController
   }).
   otherwise({
-    templateUrl: 'views/index.html'
+    templateUrl: 'views/index.html',
+    controller:  IndexController
   });
 }]);
