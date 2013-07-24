@@ -60,6 +60,7 @@ module Automation
           end
 
           records.each do |ip, node|
+            next if ip =~ /^127\.0\./
             devices = Device.urlsearch("ip|network.interfaces.addresses.ip/^#{ip}$").to_a
 
             devices.each do |device|
