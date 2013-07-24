@@ -83,6 +83,11 @@ module App
           output(Automation::Job.run_task('auto.purge'))
         end
 
+      # remove everything from the database
+        get '/nuke' do
+          output(Automation::Job.run_task('auto.nuke'))
+        end
+
         get '/:id/requeue' do
           job_request = Automation::Request.find(params[:id])
           return 404 unless job_request

@@ -296,6 +296,25 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('pluckFilter', function(){
+    return function(array,key){
+      if (!(array instanceof Array)) return array;
+
+      rv = []
+
+      for(var i = 0; i < array.length; i++){
+        if(angular.isObject(array[i])){
+          if(array[i].hasOwnProperty(key)){
+            rv.push(array[i][key]);
+          }
+        }
+      }
+
+      return rv;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('diffFilter', function(){
     return function(array,other){
       if (!(array instanceof Array)) array = [];

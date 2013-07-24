@@ -6,6 +6,7 @@ angular.module('app', [
   'corePlugin',
   'authPlugin',
   'assetsPlugin',
+  'automationPlugin',
   'nagiosPlugin',
   'provisioningPlugin',
   'chefPlugin'

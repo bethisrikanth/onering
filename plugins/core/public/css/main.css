@@ -47,11 +47,33 @@ body .modal {
   margin-bottom: 1em;
 }
 
-.label-online{
-  background-color: #468847;
+
+
+.text-succeeded{
+  color: #468847;
+}
+
+.text-queue_failed{
+  color: #B94A48;
+}
+
+.text-failed{
+  color: #B94A48;
+}
+
+.text-running{
+  color: #3A87AD;
+}
+
+.text-queued{
+  color: #F89406;
 }
 
 .label-fault{
+  background-color: #B94A48;
+}
+
+.label-failed{
   background-color: #B94A48;
 }
 
@@ -62,6 +84,12 @@ body .modal {
 .label-maintenance{
   background-color: #F89406;
 }
+
+
+.label-online{
+  background-color: #468847;
+}
+
 
 .label-degraded{
   background-color: #F89406;
