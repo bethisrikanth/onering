@@ -23,7 +23,7 @@
               <td>{{ record.type | uppercase }}</td>
               <td>{{ record.ttl }}</td>
               <td>{{ record.target }}<span ng-show="record.type=='cname'">.</span></td>
-              <td>{{ record.zone }}</td>
+              <td><abbr title="Zone {{ record.zone }} via nameserver {{ record.nameserver }}">{{ record.description || record.rule }}</abbr></td>
             </tr>
           </tbody>
         </table>
