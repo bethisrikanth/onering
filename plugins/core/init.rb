@@ -44,7 +44,6 @@ module App
           :backend_server_string => request.env['SERVER_SOFTWARE'],
           :remote_addr => (request.env['HTTP_X_REAL_IP'] || request.env['REMOTE_ADDR']),
           :request_url => request.url,
-          :current_user => (@user ? @user.id : nil),
           :ssl => {
             :verified  => (request.env['HTTP_X_CLIENT_VERIFY'] == 'SUCCESS'),
             :subject =>   (request.env['HTTP_X_SSL_SUBJECT'] ? Hash[request.env['HTTP_X_SSL_SUBJECT'].to_s.sub(/^\//,'').split('/').collect{|i| i.split('=') }] : nil),
