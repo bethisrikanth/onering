@@ -89,7 +89,7 @@ module Automation
 
           records.each do |ip, node|
             next if ip =~ /^127\.0\./
-            devices = Device.urlsearch("ip|network.interfaces.addresses.ip/^#{ip}$").to_a
+            devices = Device.urlsearch("ip|network.ip/^#{ip}$").to_a
 
             devices.each do |device|
               device.properties.set(:dns, node[:records])
