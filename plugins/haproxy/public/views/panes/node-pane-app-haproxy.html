@@ -1,0 +1,53 @@
+<div class="container-fluid widget-pane">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="widget-title">
+        HAProxy Service
+      </div>
+
+
+      <div class="widget-content widget-expand" ng-repeat="instance in node.properties.haproxy | orderBy:'name'"  >
+        <div class="widget-header">
+          <h4>Instance: {{ instance.name }}</h4>
+          <span ng-show="instance.description">{{ instance.description }}</span>
+        </div>
+
+        <table class="table table-condensed table-plain table-hover">
+          <thead>
+            <tr>
+              <th ng-click="opt.haproxy_sort_pool_reverse=!opt.haproxy_sort_pool_reverse">Pool</th>
+              <th><abbr title="status">S</abbr></th>
+              <th>Node</th>
+              <th>Downtime</th>
+            </tr>
+          </thead>
+
+          <tbody ng-repeat="pool in instance.pools | orderBy:'name':opt.haproxy_sort_pool_reverse">
+            <tr ng-click="pool._expand=true" ng-hide="pool._expand">
+              <td>{{ pool.name }}</td>
+              <td>{{ (((pool.services | filter:{'online':true}).length / pool.services.length) * 100.0) | fix:0 }}%</td>
+              <td>
+                <span class="text-error" ng-show="(pool.services | filter:{'online':false}).length > 0">{{ (pool.services | filter:{'online':false}).length }} nodes down, {{ pool.services.length }} up</span>
+              </td>
+              <td>-</td>
+            </tr>
+
+            <tr ng-click="pool._expand=false" ng-repeat="service in pool.services" ng-show="pool._expand" class="{{ service.online==false &amp;&amp; 'error' }}">
+              <td><b><span ng-show="$index==0">{{ pool.name }}</span></b></td>
+              <td>
+                <i ng-show="service.online" class="icon-circle text-success"> </i>
+                <i ng-hide="service.online" class="icon-circle text-error"> </i>
+              </td>
+              <td><a target="_blank" href="#/inf/show/name|fqdn|dns.name:{{ service.name }}">{{ service.name }}</a></td>
+              <td>
+                {{ service.downtime }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
