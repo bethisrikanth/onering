@@ -6,7 +6,7 @@
       </div>
 
       <div class="widget-content widget-expand">
-        <table class="table table-condensed">
+        <table class="table table-condensed table-hover">
           <thead>
             <tr>
               <th ng-click="opt.dns_sort='name'; opt.dns_sort_desc=!opt.dns_sort_desc">Name</th>
@@ -23,7 +23,7 @@
               <td>{{ record.type | uppercase }}</td>
               <td>{{ record.ttl }}</td>
               <td>{{ record.target }}<span ng-show="record.type=='cname'">.</span></td>
-              <td>{{ record.zone }}</td>
+              <td title="{{ record.description }} via nameserver {{ record.nameserver }}">{{ record.zone }}</td>
             </tr>
           </tbody>
         </table>

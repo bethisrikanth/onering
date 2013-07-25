@@ -7,34 +7,62 @@ module Automation
         def run(request)
           axfr = {}
 
-          App::Config.get('dns.sync_zones',[]).each do |zone|
-            log("Beginning sync for DNS zone #{zone}")
+          App::Config.get('dns.sync', {}).each do |rule, config|
+            log("Beginning DNS zone sync for rule #{rule}")
 
-            IO.popen("host -t AXFR -W 10 #{zone}").lines.each do |line|
-              next unless line =~ /\s+IN\s+(?:CNAME|A|TXT|SRV|PTR)\s+/
-              line = line.strip.chomp.gsub(/\s+/, ' ')
+            config['zones'].each do |zone|
+              catch(:nextzone) do
+                config['nameservers'].each do |ns|
+                  IO.popen("host -t AXFR -W 5 #{zone} #{ns}") do |io|
+                    dump = io.read
+                    io.close
 
-              name, ttl, x, type, target = line.split(' ', 5)
+                    if $?.to_i == 0
+                      log("Zone transfer of #{zone} from nameserver #{ns} was successful, scanning records")
 
-              name = name.gsub(/\.$/,'')
-              type = type.downcase.to_sym
-              ttl = ttl.to_i
-              target = target.gsub(/(?:\"|\.$)/,'')
+                      dump.lines.each do |line|
+                        next unless line =~ /\s+IN\s+(?:CNAME|A|TXT|SRV|PTR)\s+/
+                        line = line.strip.chomp.gsub(/\s+/, ' ')
 
-              axfr[type] ||= {}
+                        name, ttl, x, type, target = line.split(' ', 5)
 
-              axfr[type][name] = {
-                :name   => name,
-                :type   => type,
-                :ttl    => ttl,
-                :target => target,
-                :zone   => zone
-              }
+                        name = name.gsub(/\.$/,'')
+                        type = type.downcase.to_sym
+                        ttl = ttl.to_i
+                        target = target.gsub(/(?:\"|\.$)/,'')
+
+                        axfr[type] ||= {}
+
+                        axfr[type][name] = {
+                          :name        => name,
+                          :type        => type,
+                          :ttl         => ttl,
+                          :target      => target,
+                          :zone        => zone,
+                          :nameserver  => ns,
+                          :rule        => rule,
+                          :description => config['label']
+                        }.compact
+                      end
+
+                      throw :nextzone
+                    else
+                      log("Unable to transfer zone #{zone} from nameserver #{ns}, moving on...", :warn)
+                      next
+                    end
+                  end
+                end
+              end
             end
 
-            log("Retrieved #{axfr.inject(0){|s,i| s+=i[1].length }} records from #{zone}")
           end
 
+          log("Retrieved #{axfr.inject(0){|s,i| s+=i[1].length }} records")
+
+          if opt(:noop)
+            log("No-op flag set, skipping node sync")
+            return nil
+          end
 
           log("Syncing records to nodes")
 
@@ -61,7 +89,7 @@ module Automation
 
           records.each do |ip, node|
             next if ip =~ /^127\.0\./
-            devices = Device.urlsearch("ip|network.interfaces.addresses.ip/^#{ip}$").to_a
+            devices = Device.urlsearch("ip|network.ip/^#{ip}$").to_a
 
             devices.each do |device|
               device.properties.set(:dns, node[:records])
