@@ -47,6 +47,12 @@
     </a>
   </li>
 
+  <li>
+    <a rest="/api/devices/{{node.id}}" rest-method="delete" rest-success="reload()">
+      <i class="icon-fire"> </i> Destroy Node Data
+    </a>
+  </li>
+
   <li rest-show="http://{{node.properties.ip}}:2600">
     <a ng-click="openDialog('console',this,ConsoleDialogController)"><i class="icon-chevron-right"> </i> Open Remote Console</a>
   </li>
