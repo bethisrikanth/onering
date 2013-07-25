@@ -31,9 +31,9 @@
               </td>
               <td>
                 <span ng-show="(pool.services | filter:{'online':false}).length > 0">
-                  <span class="text-error">{{ (pool.services | filter:{'online':false}).length }} nodes down</span>, {{ pool.services.length }} up
+                  <span class="text-error">{{ (pool.services | filter:{'online':false}).length }} down</span>, {{ pool.services.length }} up
                 </span>
-                <span class="text-success" ng-hide="(pool.services | filter:{'online':false}).length > 0">{{ pool.services.length }} nodes up</span>
+                <span class="text-success" ng-hide="(pool.services | filter:{'online':false}).length > 0">{{ pool.services.length }} up</span>
               </td>
               <td>-</td>
             </tr>
