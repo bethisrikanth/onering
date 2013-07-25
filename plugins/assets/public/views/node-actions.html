@@ -2,12 +2,6 @@
 
 <ul class="nav nav-list well">
   <li class="nav-header">Lifecycle</li>
-  <li ng-show="node.status != 'reserved'">
-    <a rest="/api/devices/{{node.id}}/status/reserved" rest-success="reload()"><i class="icon-bookmark"></i> Reserve Node</a></a>
-  </li>
-  <li ng-show="node.status == 'reserved'">
-    <a rest="/api/devices/{{node.id}}/status/clear" rest-success="reload()"><i class="icon-circle-arrow-up"></i> Release Reservation</a></a>
-  </li>
   <li>
     <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a></a>
   </li>
@@ -15,17 +9,39 @@
     <a ng-click="panes.firstWith('id', 'provision').active=true"><i class="icon-repeat"></i> Redeploy Node</a></a>
   </li>
 
-  <li class="nav-header">Operations</li>
-  <li ng-show="node.properties.monitor">
-    <a rest="/api/devices/{{node.id}}/set/monitor/false" rest-success="reload()"><i class="icon-remove"> </i> Suspend Monitoring</a>
+  <li class="nav-header">Flags</li>
+
+  <li ng-show="node.properties.reserved">
+    <a rest="/api/devices/{{node.id}}/set/reserved/false" rest-success="reload()">
+      <i class="icon-bookmark text-reserved"> </i> Release Reservation
+    </a>
   </li>
-  <li ng-hide="node.properties.monitor">
-    <a rest="/api/devices/{{node.id}}/set/monitor/true"  rest-success="reload()"><i class="icon-tasks"> </i> Resume Monitoring</a>
+  <li ng-hide="node.properties.reserved">
+    <a rest="/api/devices/{{node.id}}/set/reserved/true" rest-success="reload()"><i class="icon-bookmark-empty text-success"> </i> Reserve Node</a>
   </li>
 
+  <li ng-show="node.properties.monitor">
+    <a rest="/api/devices/{{node.id}}/set/monitor/false" rest-success="reload()">
+      <i class="icon-bar-chart text-success"> </i> Disable Monitoring
+    </a>
+  </li>
+  <li ng-hide="node.properties.monitor">
+    <a rest="/api/devices/{{node.id}}/set/monitor/true" rest-success="reload()"><i class="icon-bar-chart text-error"> </i> Enable Monitoring</a>
+  </li>
+
+  <li ng-show="node.properties.orchestrate">
+    <a rest="/api/devices/{{node.id}}/set/orchestrate/false" rest-success="reload()">
+      <i class="icon-sitemap text-success"> </i> Disable Remote Control
+    </a>
+  </li>
+  <li ng-hide="node.properties.orchestrate">
+    <a rest="/api/devices/{{node.id}}/set/orchestrate/true"  rest-success="reload()"><i class="icon-sitemap text-error"> </i> Enable Remote Control</a>
+  </li>
+
+  <li class="nav-header">Operations</li>
   <li rest-show="/api/users/{{node.id}}/keys/system">
     <a rest="/api/users/{{node.id}}/keys/system" rest-method="delete" rest-success="reload()">
-      <i class="icon-lock"> </i>
+      <i class="icon-key"> </i>
       <span ng-show="node.status=='installing'" style="color:red">Delete Client Key</span>
       <span ng-hide="node.status=='installing'">Delete Client Key</span>
     </a>

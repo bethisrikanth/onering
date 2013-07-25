@@ -10,6 +10,10 @@
                 <span ng-show="node.status=='online'">Active</span>
                 <span ng-hide="node.status=='online'">{{ (node.status || 'unknown') | titleize }}</span>
               </span>
+
+              <span ng-show="node.properties.reserved" style="width: 100%" class="label label-reserved">
+                <i class="icon-bookmark" title="This node has been reserved"> </i>&nbsp;&nbsp;Reserved
+              </span>
             </td>
           </tr>
 <!--           <tr>

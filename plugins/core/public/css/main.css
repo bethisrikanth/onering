@@ -47,10 +47,22 @@ body .modal {
   margin-bottom: 1em;
 }
 
+.nav-list.well a{
+  color: #333 !important;
+}
 
+.nav-list.well a i{
+  display:    inline-block;
+  width:      16px;
+  text-align: center;
+}
 
 .text-succeeded{
   color: #468847;
+}
+
+.text-reserved{
+  color: #7C3AAD;
 }
 
 .text-queue_failed{
@@ -228,6 +240,11 @@ div.autocomplete.help{
 .logo{
   padding: 0px !important;
   text-align: center;
+}
+
+@-webkit-keyframes rotation {
+    from {-webkit-transform: rotate(0deg);}
+    to   {-webkit-transform: rotate(359deg);}
 }
 
 .logo i{
