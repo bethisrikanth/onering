@@ -25,7 +25,10 @@
           <tbody ng-repeat="pool in instance.pools | orderBy:'name':opt.haproxy_sort_pool_reverse">
             <tr ng-click="pool._expand=true" ng-hide="pool._expand">
               <td>{{ pool.name }}</td>
-              <td>{{ (((pool.services | filter:{'online':true}).length / pool.services.length) * 100.0) | fix:0 }}%</td>
+              <td>
+                <span ng-show="pool.services.length > 0">{{ (((pool.services | filter:{'online':true}).length / pool.services.length) * 100.0) | fix:0 }}%</span>
+                <span ng-hide="pool.services.length > 0"><i>empty</i></span>
+              </td>
               <td>
                 <span class="text-error" ng-show="(pool.services | filter:{'online':false}).length > 0">{{ (pool.services | filter:{'online':false}).length }} nodes down, {{ pool.services.length }} up</span>
               </td>
