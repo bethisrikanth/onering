@@ -9,7 +9,7 @@
       <div class="widget-content widget-expand" ng-repeat="instance in node.properties.haproxy | orderBy:'name'"  >
         <div class="widget-header">
           <h4>Instance: {{ instance.name }}</h4>
-          <span ng-show="instance.description">{{ instance.description }}</span>
+          <span ng-show="instance.description">{{ instance.description | titleize }}</span>
         </div>
 
         <table class="table table-condensed table-plain table-hover">
