@@ -30,7 +30,10 @@
                 <span ng-hide="pool.services.length > 0"><i>empty</i></span>
               </td>
               <td>
-                <span class="text-error" ng-show="(pool.services | filter:{'online':false}).length > 0">{{ (pool.services | filter:{'online':false}).length }} nodes down, {{ pool.services.length }} up</span>
+                <span ng-show="(pool.services | filter:{'online':false}).length > 0">
+                  <span class="text-error">{{ (pool.services | filter:{'online':false}).length }} nodes down</span>, {{ pool.services.length }} up
+                </span>
+                <span class="text-success" ng-hide="(pool.services | filter:{'online':false}).length > 0">{{ pool.services.length }} nodes up</span>
               </td>
               <td>-</td>
             </tr>
