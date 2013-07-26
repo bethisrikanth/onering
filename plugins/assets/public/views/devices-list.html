@@ -60,7 +60,7 @@
 
             <tbody>
               <tr ng-repeat="device in results | orderBy:sortField:sortReverse">
-                <td class="id"><a tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+                <td class="id"><a target="_blank" tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
                 <td class="status center">
                   <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
                 </td>

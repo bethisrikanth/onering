@@ -1,5 +1,6 @@
 require 'controller'
 require 'assets/models/device'
+require 'hardware/models/rack'
 
 module App
   class Base < Controller
@@ -8,7 +9,7 @@ module App
         /list/racks/:site/?
         /list/racks/:site/:rack/?
       }.each do |r|
-        get r do#ne#ne
+        get r do#ne
 
         end
       end
