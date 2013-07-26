@@ -57,6 +57,34 @@ body .modal {
   text-align: center;
 }
 
+.text-online{
+  color: #468847;
+}
+
+.text-degraded{
+  color: #F89406;
+}
+
+.text-reserved{
+  color: #7C3AAD;
+}
+
+.text-provisioning{
+  color: #F89406;
+}
+
+.text-allocatable{
+  color: #3A87AD;
+}
+
+.text-installing{
+  color: #3A87AD;
+}
+
+.text-unknown{
+  color: #999;
+}
+
 .text-succeeded{
   color: #468847;
 }
@@ -101,7 +129,6 @@ body .modal {
 .label-online{
   background-color: #468847;
 }
-
 
 .label-degraded{
   background-color: #F89406;
@@ -256,16 +283,27 @@ div.autocomplete.help{
   width: 32px;
 }
 
-.site div.rack{
-  min-height: 250px;
+.rack .unit tr:last-child .info{
+  border-bottom: 1px solid #DDD;
 }
 
-.site .rack .nav li{
-  font-size: 12px;
+.rack .unit:hover{
+  background-color: #DDD;
 }
 
-.site .rack .nav li .badge{
-  float: right;
+.rack .gutter{
+  border-right: 1px solid #CCC;
+  width:   24px;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.rack .info{
+  padding-left: 0.5em;
+}
+
+.rack .status{
+  font-size: 8px;
 }
 
 .node header h1{

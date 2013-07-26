@@ -178,7 +178,11 @@ class Device < App::Model::Base
 
       # autotype the properties being applied
         apply.each_recurse! do |k,v,p|
-          v.autotype()
+          if v.is_a?(Array)
+            v.collect{|i| (i.autotype() rescue i) }
+          else
+            v.autotype()
+          end
         end
 
       # force determines whether the applied default overrides the new object

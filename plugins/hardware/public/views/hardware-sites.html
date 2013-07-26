@@ -1,0 +1,73 @@
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <h1>Datacenters</h1>
+
+      <tabs>
+        <pane ng-repeat="site in sites | orderBy:0" heading="{{ site | uppercase }}">
+          <div class="container-fluid widget-pane">
+            <div class="row-fluid">
+              <div class="span4">
+                <div class="widget-title">Site Overview</div>
+
+                <div class="widget-content">
+                  overview
+                </div>
+              </div>
+
+              <div class="span4">
+                <div class="widget-title">Contact Information</div>
+
+                <div class="widget-content">
+                  overview
+                </div>
+              </div>
+
+              <div class="span4">
+                <div class="widget-title">Services</div>
+
+                <div class="widget-content">
+                  overview
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2>Racks</h2>
+
+          <div class="container-fluid widget-pane">
+            <div class="row-fluid">
+              <div class="span3 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
+                <div class="widget-title">
+                  {{ rack.name }}
+                  <span class="pull-right">
+                    <a ng-show="rack._view=='front'" ng-click="rack._view='back'">Back</a>
+                    <a ng-hide="rack._view=='front'" ng-click="rack._view='front'">Front</a>
+                  </span>
+                </div>
+
+                <table style="width:100%">
+                  <tbody ng-repeat="unit in rack.units" class="unit">
+                    <tr ng-repeat="u in unit.unit">
+                      <td class="gutter">{{ u }}</td>
+                      <td class="info">
+                        <span ng-show="$index==0">
+                          <span ng-repeat="slot in unit.physical.layout.slots.order[rack._view]">
+                            {{ slot }}
+                            <i class="status icon-circle text-{{ unit.nodes[slot].status }}"> </i>
+                            <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </pane>
+      </tabs>
+    </div>
+  </div>
+</div>

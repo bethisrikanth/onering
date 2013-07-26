@@ -168,6 +168,11 @@ class Array
   def push_uniq(value)
     self << value unless include?(value)
   end
+
+  def nil_empty()
+    return nil if self.empty?
+    self
+  end
 end
 
 

@@ -1,5 +1,4 @@
 require 'controller'
-require 'assets/models/device'
 require 'hardware/models/rack'
 
 module App
@@ -10,7 +9,21 @@ module App
         /list/racks/:site/:rack/?
       }.each do |r|
         get r do#ne
+          if params[:rack]
+            rv = Hardware::Rack.where({
+              '$and' => [{
+                :site => params[:site]
+              },{
+                :name => params[:rack]
+              }]
+            }).first.to_h
+          else
+            rv = Hardware::Rack.where({
+              :site => params[:site]
+            }).collect{|i| i.to_h }.sort{|a,b| a['name'] <=> b['name'] }
+          end
 
+          output(rv)
         end
       end
     end
