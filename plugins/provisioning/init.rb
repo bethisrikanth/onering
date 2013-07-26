@@ -35,7 +35,7 @@ module App
           /find/?
           /find/*
         }.each do |r|
-          get r do
+          get r do#ne
             if params[:splat].nil?
               assets = AssetRequest.all()
             else
@@ -133,7 +133,7 @@ module App
         /:id/boot/?
         /:id/boot/set/:profile/?
       }.each do |r|
-        get r do
+        get r do#ne
           device = Device.find(params[:id])
           return 404 unless device
 
@@ -184,7 +184,7 @@ module App
         /?
         /:id
       }.each do |r|
-        get r do
+        get r do#ne
           content_type 'text/plain'
           if params[:id]
             device = Device.find(params[:id])

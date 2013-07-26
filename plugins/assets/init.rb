@@ -69,7 +69,7 @@ module App
         /find/?
         /find/*
       }.each do |r|
-        get r do
+        get r do#ne
           qsq = (params[:q] || params[:query] || '')
           q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           rv = Device.urlsearch(q).limit(params[:limit] || 1000).to_a
@@ -84,7 +84,7 @@ module App
         /list/stale/?
         /list/stale/:age
       }.each do |r|
-        get r do
+        get r do#ne
           output(Device.list('id', {
             'collected_at' => {
               '$lte' => (params[:age] || 4).to_i.hours.ago
@@ -99,7 +99,7 @@ module App
         /list/:field/?
         /list/:field/where/*
       }.each do |r|
-        get r do
+        get r do#ne
           q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
           output Device.list(params[:field], urlquerypath_to_mongoquery(q))
         end
@@ -111,7 +111,7 @@ module App
         /summary/by-:field/?
         /summary/by-:field/*/?
       }.each do |r|
-        get r do
+        get r do#ne
           q = urlquerypath_to_mongoquery(params[:where] || params[:q])
           rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
           output rv
