@@ -28,7 +28,7 @@ GEM
     ffi (1.8.1)
     haml (4.0.2)
       tilt
-    hashlib (0.0.15)
+    hashlib (0.0.19)
     i18n (0.6.1)
     liquid (2.5.0)
     listen (0.7.3)
@@ -108,7 +108,7 @@ DEPENDENCIES
   deep_merge
   eventmachine
   haml
-  hashlib (>= 0.0.15)
+  hashlib (>= 0.0.19)
   liquid
   mongo
   mongo_ext

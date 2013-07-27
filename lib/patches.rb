@@ -32,6 +32,11 @@ class String
     downcase
   end
 
+  def nil_empty()
+    return nil if self.empty?
+    self
+  end
+
   def to_bool
     !(self.chomp.strip =~ /^(?:true|on|yes|y|1)$/i).nil?
   end

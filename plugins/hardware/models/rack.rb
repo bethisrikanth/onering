@@ -1,6 +1,7 @@
 require 'set'
 require 'model'
 require 'assets/models/device'
+require 'organization/models/contact'
 
 module Hardware
   class Rack < App::Model::Base
@@ -22,7 +23,7 @@ module Hardware
 
       (1..self.height).to_a.reverse.collect do |u|
         nodes = devices.select{|i| [*i.properties.get(:unit, 0)].include?(u) }
-        device_units = nodes.collect{|i| [*i.properties.get(:unit, 1)] }.flatten
+        device_units = nodes.collect{|i| [*i.properties.get(:unit, 1)] }.flatten.collect{|i| i.to_i }
 
         unless seen.include?(u)
           seen += device_units
@@ -58,9 +59,15 @@ module Hardware
     end
 
     def serializable_hash(options = {})
-      super(options).merge({
-        :units => self.units()
-      })
+      contact_id = self.vendor.get('contact_id')
+      contact = Contact.find(contact_id).to_h if contact_id
+
+      super(options).deep_merge!({
+        'units' => self.units(),
+        'vendor' => {
+          'contact' => contact
+        }
+      }.compact)
     end
   end
 end

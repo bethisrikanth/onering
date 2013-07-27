@@ -36,29 +36,44 @@
 
           <h2>Racks</h2>
 
-          <div class="container-fluid widget-pane">
+          <div>
+            <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site,vendor:{}}"><i class="icon-plus"> </i> Add Rack</button>
+
+            <br />
+            <br />
+          </div>
+
+          <div class="container-fluid widget-pane" ng-hide="racks[site].length == 0">
             <div class="row-fluid">
-              <div class="span3 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
+              <div class="span2 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
                 <div class="widget-title">
                   {{ rack.name }}
                   <span class="pull-right">
                     <a ng-show="rack._view=='front'" ng-click="rack._view='back'">Back</a>
                     <a ng-hide="rack._view=='front'" ng-click="rack._view='front'">Front</a>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span title="Edit this rack" ng-click="editRack=rack">
+                      <i class="icon-pencil"> </i>
+                    </span>
+
+                    <span title="Delete this rack definition" rest="/api/hardware/rack/{{site}}/{{rack.name}}" rest-method="delete" rest-success="reload()">
+                      <i class="icon-remove"> </i>
+                    </span>
                   </span>
                 </div>
 
                 <table style="width:100%">
                   <tbody ng-repeat="unit in rack.units" class="unit">
-                    <tr ng-repeat="u in unit.unit">
+                    <tr ng-repeat="u in unit.unit" ng-switch on="$index">
                       <td class="gutter">{{ u }}</td>
-                      <td class="info">
-                        <span ng-show="$index==0">
-                          <span ng-repeat="slot in unit.physical.layout.slots.order[rack._view]">
-                            {{ slot }}
+                      <td class="info" ng-switch-when="0" rowspan="{{ unit.height }}">
+                        <div width="100%">
+                          <div class="slot" style="width: {{ 98.0 / unit.physical.layout.slots.columns }}%" ng-repeat="slot in unit.physical.layout.slots.order[rack._view || 'back']">
+                            <label>{{ slot }}</label>
                             <i class="status icon-circle text-{{ unit.nodes[slot].status }}"> </i>
                             <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
-                          </span>
-                        </span>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -66,6 +81,74 @@
               </div>
             </div>
           </div>
+
+          <div class="center" ng-show="racks[site].length == 0">
+            <h2>No racks defined</h2>
+            <br />
+            <p>
+              Click the <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site}"><i class="icon-plus"> </i> Add Rack</button> button to create a new rack definition.
+            </p>
+          </div>
+
+          <div class="modal" ng-show="editRack">
+            <div class="modal-header">
+              <h3>Rack Editor</h3>
+            </div>
+
+            <div class="modal-body">
+              <form class="form-horizontal">
+                <div class="control-group">
+                  <label class="control-label" for="name">Site</label>
+                  <div class="controls">
+                    <input disabled type="text" ng-model="editRack.site"></input>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="name">Rack Number</label>
+                  <div class="controls">
+                    <input type="text" id="name" ng-model="editRack.name" placeholder="e.g.: 101"></input>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="name">Height</label>
+                  <div class="controls">
+                    <input type="text" id="height" ng-model="editRack.height" placeholder="e.g.: 42"></input>
+                  </div>
+                </div>
+
+                <h4>Vendor Information</h4>
+
+                <div class="control-group">
+                  <label class="control-label" for="name">Vendor Rack Name</label>
+                  <div class="controls">
+                    <input type="text" id="height" ng-model="editRack.vendor.name"></input>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="name">Rack Label</label>
+                  <div class="controls">
+                    <input type="text" id="height" ng-model="editRack.vendor.name"></input>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="name">Vendor Location</label>
+                  <div class="controls">
+                    <input type="text" id="height" ng-model="editRack.vendor.contact_id" typeahead="c.id as (c.name+' '+c.vendor_site) for c in contacts | filter:$viewValue"></input>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="modal-footer">
+              <button rest="/api/hardware/rack/{{ site }}/{{ editRack.name }}" rest-method="post" rest-data="editRack" rest-success="reload(); editRack=null" class="btn btn-primary">Save</button>
+              <button class="btn btn-danger" ng-click="editRack=null; close()">Cancel</button>
+            </div>
+          </div>
+
         </pane>
       </tabs>
     </div>
