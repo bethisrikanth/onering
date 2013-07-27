@@ -1,4 +1,8 @@
 function HardwareSitesController($scope, $http){
+  $scope.opt = {
+    view: 'rear'
+  };
+
   $scope.racks = {};
 
   $scope.reload = function(){

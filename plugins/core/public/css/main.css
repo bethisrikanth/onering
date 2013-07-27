@@ -99,6 +99,11 @@ body .modal {
   color: #F89406;
 }
 
+.text-warning{
+  background-color: #F89406;
+}
+
+
 .text-allocatable{
   color: #3A87AD;
 }
@@ -124,6 +129,10 @@ body .modal {
 }
 
 .text-failed{
+  color: #B94A48;
+}
+
+.text-critical{
   color: #B94A48;
 }
 
@@ -320,9 +329,17 @@ div.autocomplete.help{
 
 .rack .unit tr .info .slot{
   border-right: 1px solid #DDD;
+  border-top: 1px solid #DDD;
   float: left;
 }
 
+.rack .unit tr .info .slot.toprow{
+  border-top: 0;
+}
+
+.rack .unit tr .info .slot.endcap{
+  border-right: 0;
+}
 
 .rack .unit tr:hover .info,
 .rack .unit:hover tr:last-child .gutter{
@@ -497,7 +514,7 @@ i.normal{
   border-color: #b94a48;
 }
 
-.label-critical, .badeg-critical{
+.label-critical, .badge-critical{
   background-color: #b94a48;
 }
 

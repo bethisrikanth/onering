@@ -38,7 +38,8 @@
 
           <div>
             <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site,vendor:{}}"><i class="icon-plus"> </i> Add Rack</button>
-
+            <button class="btn" ng-show="opt.view=='front'" ng-click="opt.view='rear'"><i class="icon-chevron-right"> </i> Front View</button>
+            <button class="btn" ng-hide="opt.view=='front'" ng-click="opt.view='front'"><i class="icon-chevron-left"> </i>Rear View</button>
             <br />
             <br />
           </div>
@@ -48,9 +49,9 @@
               <div class="span2 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
                 <div class="widget-title">
                   {{ rack.name }}
+                  <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
+
                   <span class="pull-right">
-                    <a ng-show="rack._view=='front'" ng-click="rack._view='back'">Back</a>
-                    <a ng-hide="rack._view=='front'" ng-click="rack._view='front'">Front</a>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span title="Edit this rack" ng-click="editRack=rack">
                       <i class="icon-pencil"> </i>
@@ -67,12 +68,37 @@
                     <tr ng-repeat="u in unit.unit" ng-switch on="$index">
                       <td class="gutter">{{ u }}</td>
                       <td class="info" ng-switch-when="0" rowspan="{{ unit.height }}">
-                        <div width="100%">
-                          <div class="slot" style="width: {{ 98.0 / unit.physical.layout.slots.columns }}%" ng-repeat="slot in unit.physical.layout.slots.order[rack._view || 'back']">
+                        <div width="100%" ng-show="unit.nodes">
+                          <div
+                            ng-show="unit.physical.layout.slots.order[opt.view]"
+                            class="
+                              slot
+                              {{ ((($index+1) % (unit.physical.layout.slots.count / unit.physical.layout.slots.rows)) == 0) &amp;&amp; 'endcap' }}
+                              {{ ($index < unit.physical.layout.slots.columns) &amp;&amp; 'toprow' }}
+                            "
+                            style="width: {{ 95.0 / unit.physical.layout.slots.columns }}%"
+                            ng-repeat="slot in unit.physical.layout.slots.order[opt.view]"
+                          >
                             <label>{{ slot }}</label>
-                            <i class="status icon-circle text-{{ unit.nodes[slot].status }}"> </i>
+                            <span class="status" ng-hide="unit.nodes[slot-1].empty">
+                              <i title="Status" class="icon-circle text-{{ unit.nodes[slot-1].status || 'unknown' }}"> </i>
+                              <i title="Monitoring" ng-show="unit.nodes[slot-1].properties.alert_state" class="icon-circle text-{{ unit.nodes[slot-1].status || 'unknown' }}"> </i>
+                            </span>
+
+                            <i ng-show="unit.nodes[slot-1].empty" class="status icon-circle-blank text-unknown"> </i>
                             <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
                           </div>
+
+                          <div
+                            ng-hide="unit.physical.layout.slots.order[opt.view]"
+                            style="width: 95%"
+                          >
+                            <i>{{ unit.make }} {{ unit.model }} does not have a {{ opt.view }} view defined</i>
+                          </div>
+                        </div>
+
+                        <div width="100%" ng-hide="unit.nodes">
+                          .
                         </div>
                       </td>
                     </tr>

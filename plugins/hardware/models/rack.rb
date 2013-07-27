@@ -16,41 +16,64 @@ module Hardware
 
 
     def units()
-      devices = Device.urlsearch("site/#{self.site}/rack/#{self.name}/virtual/not:true").to_a
+      devices = Device.urlsearch("str:site/#{self.site}/str:rack/#{self.name}/virtual/not:true").to_a
       seen = Set.new()
 
       rv = []
 
+
       (1..self.height).to_a.reverse.collect do |u|
-        nodes = devices.select{|i| [*i.properties.get(:unit, 0)].include?(u) }
-        device_units = nodes.collect{|i| [*i.properties.get(:unit, 1)] }.flatten.collect{|i| i.to_i }
+        nodes = devices.select{|i| [*i.properties.get(:unit, 0)].map(&:to_i).include?(u) }
+        physical = (nodes.reject{|i| i.properties.get(:physical).nil? }.first.to_h || {}).get('properties.physical',{})
+
+        if physical.get('layout.height')
+          node_units = ((u - physical.get('layout.height').to_i + 1)..u).to_a
+        else
+          node_units = nodes.collect{|i| [*i.properties.get(:unit, 0)] }.flatten.collect{|i| i.to_i }
+        end
 
         unless seen.include?(u)
-          seen += device_units
+          seen += node_units
 
-          unit = device_units.sort.reverse.uniq
+        # Hax: extract values from things
+          unit = node_units.sort.reverse.uniq
           height = (unit.empty? ? 1 : (unit.max - unit.min) + 1)
           make  = nodes.collect{|i| i.properties.get(:make) }.uniq
           model = nodes.collect{|i| i.properties.get(:model) }.uniq
 
+        # Hax II: normalize them
           unit = (unit.empty? ? [u] : unit)
           height = (height == 0 ? 1 : height)
           make = make.first if make.length == 1
           model = model.first if model.length == 1
+          slots = {}
 
+        # create slot objects keyed on slot number
+          nodes.each{|i|
+            slots[i.properties.get(:slot)] = i.to_h.reject{|k,v| k == 'properties'}.merge({
+              :empty      => false,
+              :properties => {
+                :slot        => i.properties.get(:slot),
+                :alert_state => i.properties.get(:alert_state)
+              }
+            })
+          }
+
+        # push rack object onto rack
           rv << {
             :unit     => unit,
             :height   => height,
             :make     => make.nil_empty,
             :model    => model.nil_empty,
-            :physical => (nodes.reject{|i| i.properties.get(:physical).nil? }.first.to_h || {}).get('properties.physical'),
-            :nodes    => nodes.collect{|i|
-              i.to_h.reject{|k,v| k == 'properties'}.merge({
+            :physical => physical,
+            :nodes    => (1..physical.get('layout.slots.count',0)).to_a.collect{|i|
+              slots[i] || {
+                :empty => true,
                 :properties => {
-                  :slot     => i.properties.get(:slot)
+                  :slot => i
                 }
-              })
-            }.sort{|a,b| a[:properties][:slot] <=> b[:properties][:slot] }.nil_empty
+              }
+            }.sort{|a,b| a.get('properties.slot') <=> b.get('properties.slot') }.nil_empty
           }.compact
         end
       end
