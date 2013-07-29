@@ -104,7 +104,8 @@ DEPENDENCIES
   addressable
   babel_bridge
   beaneater
-  bson_ext
+  bson (= 1.8.5)
+  bson_ext (= 1.8.5)
   deep_merge
   eventmachine
   haml
