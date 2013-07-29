@@ -326,7 +326,7 @@ div.autocomplete.help{
   padding-left: 4px;
 }
 
-.rack .unit tr .empty .info{
+.rack .unit tr .info.empty{
   border-bottom: 0;
 }
 
