@@ -326,6 +326,10 @@ div.autocomplete.help{
   padding-left: 4px;
 }
 
+.rack .unit tr .empty .info{
+  border-bottom: 0;
+}
+
 .rack .unit tr .occupied{
   background-color: #EEE;
 }
