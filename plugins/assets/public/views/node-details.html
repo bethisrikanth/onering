@@ -30,7 +30,7 @@
         <span ng-show="node.properties.rack">Rack <a href="#/node/find/rack:{{node.properties.rack}}">{{ node.properties.rack }}</a></span>
         <span ng-hide="node.properties.rack">Rack &mdash;</span>
 
-        <span ng-show="node.properties.unit">/ U <a href="#/node/find/rack:{{node.properties.rack}}%20unit:{{node.properties.unit}}">{{node.properties.unit }}</a></span>
+        <span ng-show="node.properties.unit">/ U <a href="#/node/find/rack:{{node.properties.rack}}%20unit:{{node.properties.unit[0]}}">{{ node.properties.unit | join:',' }}</a></span>
         <span ng-hide="node.properties.unit">/ U &mdash;</span>
 
         <span ng-show="node.properties.slot">/ Slot {{ node.properties.slot }}</span>
