@@ -44,7 +44,7 @@ fi
 
 echo -e '\033[32mRetrieving validation certificate\033[0m'
 mkdir -p /etc/onering
-curl -s -f 'http://onering.outbrain.com/validation.pem' > /etc/onering/validation.pem
+curl -s -f -L 'http://onering.outbrain.com/validation.pem' > /etc/onering/validation.pem
 
 echo -e '\033[32mPerforming inventory\033[0m'
 
