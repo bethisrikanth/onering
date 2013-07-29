@@ -71,7 +71,7 @@
                     <tbody ng-repeat="unit in rack.units" class="unit" ng-click="opt.current_unit={site:site,rack:rack,unit:unit}">
                       <tr ng-repeat="u in unit.unit" ng-switch on="$index">
                         <td class="gutter">{{ u }}</td>
-                        <td class="info" ng-switch-when="0" rowspan="{{ unit.height }}">
+                        <td class="info {{ unit.nodes &amp;&amp; 'occupied' || 'empty' }}" ng-switch-when="0" rowspan="{{ unit.height }}">
                           <div width="100%" ng-show="unit.nodes">
                             <div
                               ng-show="unit.physical.layout.slots.order[opt.view || 'default']"
@@ -107,9 +107,6 @@
                                 <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '&nbsp;' }}</label>
                               </span>
                             </span>
-                          </div>
-
-                          <div width="100%" ng-hide="unit.nodes" class="empty">
                           </div>
                         </td>
                       </tr>
