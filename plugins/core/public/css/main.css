@@ -319,11 +319,16 @@ div.autocomplete.help{
 }
 
 .rack .unit tr .info{
+  background-color: #EEE;
   border-bottom: 1px solid #DDD;
   border-spacing: 0;
   border-collapse: collapse;
   padding: 0;
   padding-left: 4px;
+}
+
+.rack .unit tr .empty{
+  background-color: white;
 }
 
 .rack .unit tr .info .slot{
