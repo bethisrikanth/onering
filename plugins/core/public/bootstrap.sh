@@ -42,6 +42,10 @@ if [ ! -s /etc/hardware.id -o "$(cat /etc/hardware.id 2> /dev/null | grep hardwa
   echo -e "\033[34mCreated hardware ID file: $(cat /etc/hardware.id)\033[0m"
 fi
 
+echo -e '\033[32mRetrieving validation certificate\033[0m'
+mkdir -p /etc/onering
+curl -s -f 'http://onering.outbrain.com/validation.pem' > /etc/onering/validation.pem
+
 echo -e '\033[32mPerforming inventory\033[0m'
 
 for i in 1 2; do
