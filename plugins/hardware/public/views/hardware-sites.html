@@ -3,6 +3,9 @@
   <div class="row-fluid">
     <div class="span12">
       <h1>Datacenters</h1>
+      <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
+      <br />
+      <br />
 
       <tabs>
         <pane ng-repeat="site in sites | orderBy:0" heading="{{ site | uppercase }}">
@@ -47,7 +50,7 @@
 
             <div class="container-fluid widget-pane" ng-hide="racks[site].length == 0">
               <div class="row-fluid">
-                <div class="span2 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
+                <div class="span3 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
                   <div class="widget-title">
                     {{ rack.name }}
                     <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
@@ -65,45 +68,48 @@
                   </div>
 
                   <table style="width:100%">
-                    <tbody ng-repeat="unit in rack.units" class="unit">
+                    <tbody ng-repeat="unit in rack.units" class="unit" ng-click="opt.current_unit={site:site,rack:rack,unit:unit}">
                       <tr ng-repeat="u in unit.unit" ng-switch on="$index">
                         <td class="gutter">{{ u }}</td>
                         <td class="info" ng-switch-when="0" rowspan="{{ unit.height }}">
                           <div width="100%" ng-show="unit.nodes">
                             <div
-                              ng-show="unit.physical.layout.slots.order[opt.view]"
+                              ng-show="unit.physical.layout.slots.order[opt.view || 'default']"
                               class="
                                 slot
                                 {{ ((($index+1) % (unit.physical.layout.slots.count / unit.physical.layout.slots.rows)) == 0) &amp;&amp; 'endcap' }}
                                 {{ ($index < unit.physical.layout.slots.columns) &amp;&amp; 'toprow' }}
                               "
                               style="width: {{ 95.0 / unit.physical.layout.slots.columns }}%"
-                              ng-repeat="slot in unit.physical.layout.slots.order[opt.view]"
+                              ng-repeat="slot in unit.physical.layout.slots.order[opt.view || 'default']"
                             >
-                              <label>{{ slot }}</label>
+                              <!-- physical info present, non-empty -->
                               <span class="status" ng-hide="unit.nodes[slot-1].empty">
-                                <i title="Status" class="icon-circle text-{{ unit.nodes[slot-1].status || 'unknown' }}"> </i>
-                                <i title="Monitoring" ng-show="unit.nodes[slot-1].properties.alert_state" class="icon-circle text-{{ unit.nodes[slot-1].status || 'unknown' }}"> </i>
+                                <label class="label label-{{ unit.nodes[slot-1].status || 'unknown' }}">{{ slot }}</label>
                               </span>
 
-                              <i ng-show="unit.nodes[slot-1].empty" class="status icon-circle-blank text-unknown"> </i>
+                              <!-- physical info present, empty -->
+                              <span class="status" ng-show="unit.nodes[slot-1].empty">
+                                <label class="label label-inverse">{{ slot }}</label>
+                              </span>
+
+
                               <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
                             </div>
 
                             <span
-                              ng-hide="unit.physical.layout.slots.order[opt.view]"
+                              ng-hide="unit.physical.layout.slots.order[opt.view || 'default']"
                               style="width: 95%"
                               ng-repeat="node in unit.nodes"
                             >
+                              <!-- physical info absent, non-empty -->
                               <span class="status">
-                                <i title="Status" class="icon-circle text-{{ node.status || 'unknown' }}"> </i>
-                                <i title="Monitoring" ng-show="node.properties.alert_state" class="icon-circle text-{{ node.status || 'unknown' }}"> </i>
+                                <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '&nbsp;' }}</label>
                               </span>
                             </span>
                           </div>
 
                           <div width="100%" ng-hide="unit.nodes">
-
                           </div>
                         </td>
                       </tr>
@@ -189,5 +195,58 @@
         </pane>
       </tabs>
     </div>
+  </div>
+</div>
+
+<!-- rack unit view -->
+<div class="modal" ng-show="opt.current_unit">
+  <div class="modal-header">
+    <h3>{{ opt.current_unit.site | uppercase }}: Rack {{ opt.current_unit.rack.name }}, U{{ opt.current_unit.unit.unit | min }}</h3>
+  </div>
+
+  <div class="modal-body">
+    <dl>
+      <dt>Model</dt>
+      <dd>{{ opt.current_unit.unit.make }} {{ opt.current_unit.unit.model }}</dd>
+    </dl>
+
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
+          <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
+          <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
+          <th ng-click="sortField='properties.alert_state'; sortReverse=!sortReverse" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
+          <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
+          <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
+          <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-repeat="node in opt.current_unit.unit.nodes | orderBy:'properties.slot'" class="{{ node.name == null &amp;&amp; 'error' }}">
+          <td><b>{{ node.properties.slot || ' ' }}</b></td>
+          <td><a ng-show="node.id" target="_blank" href="#/node/{{node.id}}">{{ node.id }}</a></td>
+          <td>
+            <i class="icon icon-circle text-{{node.status}}" title="{{node.status|titleize}}"> </i>
+          </td>
+          <td>
+            <i ng-show="node.properties.alert_state" class="icon icon-circle text-{{node.properties.alert_state}}" title="{{node.properties.alert_state|titleize}}"> </i>
+          </td>
+          <td>
+            <span ng-show="node.name">{{ node.name }}</span>
+            <span ng-hide="node.name"><i>missing</i></span>
+          </td>
+          <td>{{ node.properties.ip }}</td>
+          <td>
+            <span ng-show="node.collected_at">{{ node.collected_at | timeAgo }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" ng-click="opt.current_unit=null">Close</button>
   </div>
 </div>

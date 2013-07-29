@@ -318,6 +318,7 @@ config(['$provide', function($provide) {
         }
       }
 
+      console.log(rv);
       return rv;
     }
   });

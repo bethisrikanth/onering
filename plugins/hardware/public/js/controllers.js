@@ -1,7 +1,8 @@
 function HardwareSitesController($scope, $http){
   $scope.opt = {
-    view:    'rear',
-    loading: true
+    view:        'rear',
+    loading:      true,
+    current_unit: null
   };
 
   $scope.racks = {};

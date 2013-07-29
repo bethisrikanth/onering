@@ -52,10 +52,9 @@ module Hardware
           nodes.each{|i|
             slots[i.properties.get(:slot, 0)] = i.to_h.reject{|k,v| k == 'properties'}.merge({
               :empty      => false,
-              :properties => {
-                :slot        => i.properties.get(:slot),
-                :alert_state => i.properties.get(:alert_state)
-              }.compact
+              :properties => Hash[[:slot, :alert_state, :ip].collect{|j|
+                [j, i.properties.get(j)]
+              }.compact]
             })
           }
 
