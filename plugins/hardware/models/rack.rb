@@ -50,30 +50,35 @@ module Hardware
 
         # create slot objects keyed on slot number
           nodes.each{|i|
-            slots[i.properties.get(:slot)] = i.to_h.reject{|k,v| k == 'properties'}.merge({
+            slots[i.properties.get(:slot, 0)] = i.to_h.reject{|k,v| k == 'properties'}.merge({
               :empty      => false,
               :properties => {
                 :slot        => i.properties.get(:slot),
                 :alert_state => i.properties.get(:alert_state)
-              }
+              }.compact
             })
           }
+
+          rack_nodes = (1..physical.get('layout.slots.count', 0)).to_a.collect{|i|
+            slots[i] || {
+              :empty => true,
+              :properties => {
+                :slot => i
+              }
+            }
+          }
+
+          rack_nodes = slots.values if rack_nodes.empty?
+
 
         # push rack object onto rack
           rv << {
             :unit     => unit,
             :height   => height,
-            :make     => make.nil_empty,
-            :model    => model.nil_empty,
+            :make     => (make.nil? ? nil : make.nil_empty),
+            :model    => (model.nil? ? nil : model.nil_empty),
             :physical => physical,
-            :nodes    => (1..physical.get('layout.slots.count',0)).to_a.collect{|i|
-              slots[i] || {
-                :empty => true,
-                :properties => {
-                  :slot => i
-                }
-              }
-            }.sort{|a,b| a.get('properties.slot') <=> b.get('properties.slot') }.nil_empty
+            :nodes    => rack_nodes.sort{|a,b| a.get('properties.slot') <=> b.get('properties.slot') }.nil_empty
           }.compact
         end
       end

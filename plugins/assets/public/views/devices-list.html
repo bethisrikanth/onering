@@ -83,7 +83,7 @@
                   <input ng-show="editing" class="rack" type="text" ng-model="device.properties.rack">
                 </td>
                 <td>
-                  <span ng-hide="editing">{{ device.properties.unit | join:',' }}</span>
+                  <span ng-hide="editing">{{ device.properties.unit | min }}</span>
                   <input ng-show="editing" class="unit" type="text" ng-model="device.properties.unit">
                 </td>
                 <td>{{ device.properties.slot }}</td>

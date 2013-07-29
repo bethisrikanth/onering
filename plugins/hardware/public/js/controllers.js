@@ -1,11 +1,14 @@
 function HardwareSitesController($scope, $http){
   $scope.opt = {
-    view: 'rear'
+    view:    'rear',
+    loading: true
   };
 
   $scope.racks = {};
 
   $scope.reload = function(){
+    $scope.opt.loading = true;
+
     $http.get('/api/devices/list/site').success(function(data){
       $scope.sites = data;
     });
@@ -19,6 +22,7 @@ function HardwareSitesController($scope, $http){
     angular.forEach($scope.sites, function(i){
       $http.get('/api/hardware/rack/'+i).success(function(data){
         $scope.racks[i] = data;
+        $scope.opt.loading = false;
       });
     });
   });

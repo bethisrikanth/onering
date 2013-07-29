@@ -139,7 +139,7 @@ module App
 
           if device.properties['site']
             pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-            raise [500, "Cannot generate boot profile, no PXEd server defined for site #{device.properties['site'].downcase}"] unless pxed
+            return [500, "Cannot generate boot profile, no PXEd server defined for site #{device.properties['site'].downcase}"] unless pxed
             uses_default = true
             macs = get_macs(device)
 

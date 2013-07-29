@@ -53,6 +53,14 @@ Array.prototype.firstWith = function(key, value){
   return null;
 }
 
+Array.prototype.max = function() {
+  return Math.max.apply(null, this);
+};
+
+Array.prototype.min = function() {
+  return Math.min.apply(null, this);
+};
+
 angular.module('coreFilters', ['ng']).
 filter('titleize', function(){
   return function(text){
@@ -333,6 +341,32 @@ config(['$provide', function($provide) {
         return Object.keys(obj).length;
       }else if(typeof(obj) == 'string'){
         return obj.length;
+      }else{
+        return null;
+      }
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('minFilter', function(){
+    return function(obj,field){
+      if(obj instanceof Array){
+        return obj.min();
+      }else if($.isPlainObject(obj) && angular.isDefined(field) && obj[field] instanceof Array){
+        return obj[field].min();
+      }else{
+        return null;
+      }
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('maxFilter', function(){
+    return function(obj,field){
+      if(obj instanceof Array){
+        return obj.max();
+      }else if($.isPlainObject(obj) && angular.isDefined(field) && obj[field] instanceof Array){
+        return obj[field].max();
       }else{
         return null;
       }

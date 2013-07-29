@@ -4,6 +4,12 @@ require 'hardware/models/rack'
 module App
   class Base < Controller
     namespace '/api/hardware' do
+      namespace '/sites' do
+        get '/?' do
+          output(Hardware::Rack.list('site'))
+        end
+      end
+
       namespace '/rack' do
         get '/:site/?' do
           output(Hardware::Rack.where({
