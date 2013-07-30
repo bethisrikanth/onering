@@ -379,6 +379,7 @@ div.autocomplete.help{
 
 .rack .status{
   font-size: 12px;
+  margin-bottom: 0;
 }
 
 .rack .status .label{
