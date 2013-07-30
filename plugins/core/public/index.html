@@ -59,6 +59,12 @@
               </a>
 
               <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="min-width: 220px;">
+                <li>
+                  <a href="#/hardware/sites"><i class="icon-building"> </i>&nbsp;Datacenters</a>
+                </li>
+
+                <li class="divider"></li>
+
                 <li ng-repeat="site in sites | orderBy:'-count'">
                   <a href="#/inf/show/site:{{ site.id || 'null' }}">
                     {{ (site.id | uppercase) || '(empty)' }}

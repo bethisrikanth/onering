@@ -20,7 +20,36 @@ function ErrorController($scope, $location){
 
 
 function NavigationController($scope, $rootScope, $http, $route, $window, $routeParams, Summary, List, CurrentUser){
+  $scope.menuquery = function(query, template){
+    var rv = [];
+
+    if(angular.isDefined(query) && angular.isDefined(template)){
+      var rv = [{
+        name: 'Test',
+        counter: 0,
+        href: '#/lol'
+      }];
+
+      // $http.get(query).success(function(data){
+      //   angular.forEach(data, function(i){
+      //     rv.push({
+      //       name: 'Test',
+      //       counter: 0,
+      //       href: '#/lol'
+      //     })
+      //   });
+      // });
+
+    }
+
+    return rv;
+  };
+
   $scope.reload = function(){
+    $http.get('/api/navigation').success(function(data){
+      $scope.menu = data;
+    });
+
   //get current user details
     CurrentUser.get({}, function(data){
       $rootScope.user = data;

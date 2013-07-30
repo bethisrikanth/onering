@@ -1,5 +1,6 @@
 require 'controller'
 require 'sinatra/session'
+require 'core/models/navigation'
 
 module App
   class Base < Controller
@@ -50,6 +51,10 @@ module App
             :issuer  =>   (request.env['HTTP_X_SSL_ISSUER'] ? Hash[request.env['HTTP_X_SSL_ISSUER'].to_s.sub(/^\//,'').split('/').collect{|i| i.split('=') }] : nil)
           }
         })
+      end
+
+      get '/navigation/?' do
+        output(Navigation.all.collect{|i| i.to_h }.first)
       end
     end
 
