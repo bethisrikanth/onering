@@ -48,6 +48,12 @@
   </li>
 
   <li>
+    <a rest="/api/devices/{{node.id}}/status/unknown" rest-success="reload()">
+      <i class="icon-circle-blank"> </i> Clear Status
+    </a>
+  </li>
+
+  <li>
     <a rest="/api/devices/{{node.id}}" rest-method="delete" rest-success="reload()">
       <i class="icon-fire"> </i> Destroy Node Data
     </a>
