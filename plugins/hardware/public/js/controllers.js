@@ -2,7 +2,8 @@ function HardwareSitesController($scope, $http){
   $scope.opt = {
     view:        'rear',
     loading:      true,
-    current_unit: null
+    current_unit: null,
+    sites:        {}
   };
 
   $scope.racks = {};
@@ -10,8 +11,14 @@ function HardwareSitesController($scope, $http){
   $scope.reload = function(){
     $scope.opt.loading = true;
 
-    $http.get('/api/devices/list/site').success(function(data){
+    $http.get('/api/hardware/sites').success(function(data){
       $scope.sites = data;
+
+      angular.forEach(data, function(i){
+        $scope.opt.sites[i.id] = {
+          contact_pane: 'facility'
+        }
+      });
     });
 
     $http.get('/api/org/contacts/find/tags/datacenter').success(function(data){
@@ -21,8 +28,8 @@ function HardwareSitesController($scope, $http){
 
   $scope.$watch('sites', function(){
     angular.forEach($scope.sites, function(i){
-      $http.get('/api/hardware/rack/'+i).success(function(data){
-        $scope.racks[i] = data;
+      $http.get('/api/hardware/rack/'+i.id).success(function(data){
+        $scope.racks[i.id] = data;
         $scope.opt.loading = false;
       });
     });

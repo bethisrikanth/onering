@@ -1,12 +1,26 @@
 require 'controller'
 require 'hardware/models/rack'
+require 'assets/models/device'
+require 'organization/models/contact'
 
 module App
   class Base < Controller
     namespace '/api/hardware' do
       namespace '/sites' do
         get '/?' do
-          output(Hardware::Rack.list('site'))
+          sites = Config.get('hardware.sites', Device.list(:site))
+
+          output(sites.collect{|site|
+            {
+              :id => site,
+              :contact => (Contact.where({
+                :site => site
+              }).to_a.first.to_h rescue nil),
+              :summary => {
+
+              }
+            }.compact
+          })
         end
       end
 

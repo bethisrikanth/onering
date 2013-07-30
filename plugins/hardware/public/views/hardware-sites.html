@@ -8,7 +8,7 @@
       <br />
 
       <tabs>
-        <pane ng-repeat="site in sites | orderBy:0" heading="{{ site | uppercase }}">
+        <pane ng-repeat="site in sites | orderBy:0" heading="{{ site.id | uppercase }}">
           <div class="container-fluid widget-pane">
             <div class="row-fluid">
               <div class="span4">
@@ -20,10 +20,51 @@
               </div>
 
               <div class="span4">
-                <div class="widget-title">Contact Information</div>
+                <div class="widget-title">
+                  Contact Information
 
-                <div class="widget-content">
-                  overview
+                  <span class="pull-right">
+                    <span
+                      title="Facility Location"
+                      class="select label label-{{opt.sites[site.id].contact_pane=='facility' &amp;&amp; 'info'}}"
+                      ng-click="opt.sites[site.id].contact_pane='facility'"
+                    >
+                      <i class="icon-map-marker"> </i>
+                    </span>
+
+                    <span
+                      title="Support Information"
+                      class="select label label-{{opt.sites[site.id].contact_pane=='support' &amp;&amp; 'info'}}"
+                      ng-click="opt.sites[site.id].contact_pane='support'"
+                    >
+                      <i class="icon-phone"> </i>
+                    </span>
+                  </span>
+                </div>
+
+                <div class="widget-content" ng-switch on="opt.sites[site.id].contact_pane">
+                  <div ng-switch-when="facility">
+                    <div class="widget-header"><b>Facility Location</b></div>
+                    <br />
+
+                    <address>
+                      <strong>{{ site.contact.name }}<span ng-show="site.contact.vendor_site"> &ndash; {{ site.contact.vendor_site }}</span></strong><br>
+                      {{ site.contact.address | join:', ' }}
+                      (<a href="https://maps.google.com/?q={{ site.contact.address | join:',' }},{{ site.contact.city }},{{ site.contact.state }}" target="_blank">map</a>)<br>
+                      {{ site.contact.city }}, {{ site.contact.state }}&nbsp;&nbsp;{{ site.contact.postal }}<br>
+                      <br>
+                    </address>
+                  </div>
+
+                  <div ng-switch-when="support">
+                    <div class="widget-header"><b>Support Information</b></div>
+                    <br />
+
+                    <div ng-show="site.contact.mail">
+                      <div ng-repeat="(type, value) in site.contact.mail"><i class="icon-envelope"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+                      <div ng-repeat="(type, value) in site.contact.phones"><i class="icon-user"></i> <b>{{ type | titleize }}:</b> {{ value }}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -37,7 +78,7 @@
             </div>
           </div>
 
-          <h2>Racks</h2>
+          <h2>Racks<span ng-show="racks[site.id].length"> &ndash; {{ racks[site.id].length }}</span></h2>
 
           <div ng-hide="opt.loading">
             <div>
@@ -48,9 +89,9 @@
               <br />
             </div>
 
-            <div class="container-fluid widget-pane" ng-hide="racks[site].length == 0">
+            <div class="container-fluid widget-pane" ng-hide="racks[site.id].length == 0">
               <div class="row-fluid">
-                <div class="span3 rack" ng-repeat="rack in racks[site] | orderBy:'name'">
+                <div class="span3 rack" ng-repeat="rack in racks[site.id] | orderBy:'name'">
                   <div class="widget-title">
                     {{ rack.name }}
                     <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
@@ -61,7 +102,7 @@
                         <i class="icon-pencil"> </i>
                       </span>
 
-                      <span title="Delete this rack definition" rest="/api/hardware/rack/{{site}}/{{rack.name}}" rest-method="delete" rest-success="reload()">
+                      <span title="Delete this rack definition" rest="/api/hardware/rack/{{site.id}}/{{rack.name}}" rest-method="delete" rest-success="reload()">
                         <i class="icon-remove"> </i>
                       </span>
                     </span>
@@ -72,6 +113,10 @@
                       <tr ng-repeat="u in unit.unit" ng-switch on="$index">
                         <td class="gutter">{{ u }}</td>
                         <td class="info {{ unit.nodes &amp;&amp; 'occupied' || 'empty' }}" ng-switch-when="0" rowspan="{{ unit.height }}">
+                          <div class="name">
+                            {{ unit.make }} {{ unit.model }}
+                          </div>
+
                           <div width="100%" ng-show="unit.nodes">
                             <div
                               ng-show="unit.physical.layout.slots.order[opt.view || 'default']"
@@ -85,12 +130,12 @@
                             >
                               <!-- physical info present, non-empty -->
                               <span class="status" ng-hide="unit.nodes[slot-1].empty">
-                                <label class="label label-{{ unit.nodes[slot-1].status || 'unknown' }}">{{ slot }}</label>
+                                <label class="label label-{{ unit.nodes[slot-1].status || 'unknown' }}">{{ slot || '1' }}</label>
                               </span>
 
                               <!-- physical info present, empty -->
                               <span class="status" ng-show="unit.nodes[slot-1].empty">
-                                <label class="label label-inverse">{{ slot }}</label>
+                                <label class="label label-inverse">{{ slot || '1' }}</label>
                               </span>
 
 
@@ -104,7 +149,7 @@
                             >
                               <!-- physical info absent, non-empty -->
                               <span class="status">
-                                <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '&nbsp;' }}</label>
+                                <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '1' }}</label>
                               </span>
                             </span>
                           </div>
@@ -116,7 +161,7 @@
               </div>
             </div>
 
-            <div class="center" ng-show="racks[site].length == 0">
+            <div class="center" ng-show="racks[site.id].length == 0">
               <h2>No racks defined</h2>
               <br />
               <p>
@@ -140,7 +185,7 @@
                 <div class="control-group">
                   <label class="control-label" for="name">Site</label>
                   <div class="controls">
-                    <input disabled type="text" ng-model="editRack.site"></input>
+                    <input disabled type="text" ng-model="editRack.site.id"></input>
                   </div>
                 </div>
 
@@ -184,7 +229,7 @@
             </div>
 
             <div class="modal-footer">
-              <button rest="/api/hardware/rack/{{ site }}/{{ editRack.name }}" rest-method="post" rest-data="editRack" rest-success="reload(); editRack=null" class="btn btn-primary">Save</button>
+              <button rest="/api/hardware/rack/{{ site.id }}/{{ editRack.name }}" rest-method="post" rest-data="editRack" rest-success="reload(); editRack=null" class="btn btn-primary">Save</button>
               <button class="btn btn-danger" ng-click="editRack=null; close()">Cancel</button>
             </div>
           </div>
@@ -198,7 +243,7 @@
 <!-- rack unit view -->
 <div class="modal" ng-show="opt.current_unit">
   <div class="modal-header">
-    <h3>{{ opt.current_unit.site | uppercase }}: Rack {{ opt.current_unit.rack.name }}, U{{ opt.current_unit.unit.unit | min }}</h3>
+    <h3>{{ opt.current_unit.site.id | uppercase }}: Rack {{ opt.current_unit.rack.name }}, U{{ opt.current_unit.unit.unit | min }}</h3>
   </div>
 
   <div class="modal-body">
@@ -221,7 +266,7 @@
       </thead>
 
       <tbody>
-        <tr ng-repeat="node in opt.current_unit.unit.nodes | orderBy:'properties.slot'" class="{{ node.name == null &amp;&amp; 'error' }}">
+        <tr ng-repeat="node in opt.current_unit.unit.nodes | orderBy:(sortField || 'properties.slot'):sortReverse" class="{{ node.name == null &amp;&amp; 'error' }}">
           <td><b>{{ node.properties.slot || ' ' }}</b></td>
           <td><a ng-show="node.id" target="_blank" href="#/node/{{node.id}}">{{ node.id }}</a></td>
           <td>

@@ -2,6 +2,10 @@ html, body {
   height: 100%;
 }
 
+address{
+  margin-bottom: 0;
+}
+
 .clearfix{
   clear: both;
 }
@@ -319,6 +323,7 @@ div.autocomplete.help{
 }
 
 .rack .unit tr .info{
+  position: relative;
   border-bottom: 1px solid #DDD;
   border-spacing: 0;
   border-collapse: collapse;
@@ -340,6 +345,14 @@ div.autocomplete.help{
   float: left;
 }
 
+.rack .unit tr .info .name{
+  position: absolute;
+  right: 4px;
+  top:   4px;
+  font-size: 10px;
+  color: #999;
+}
+
 .rack .unit tr .info .slot.toprow{
   border-top: 0;
 }
@@ -353,8 +366,9 @@ div.autocomplete.help{
   border-color: #0088cc !important;
 }
 
-.rack .unit:hover{
-  background-color: #d9edf7;
+.rack .unit:hover,
+.rack .unit:hover .info{
+  background-color: #d9edf7 !important;
 }
 
 .rack .gutter{
@@ -379,13 +393,13 @@ div.autocomplete.help{
 
 .rack .status{
   font-size: 12px;
-  margin-bottom: 0;
 }
 
 .rack .status .label{
   display: inline-block;
   text-align: center;
   width: 14px;
+  margin-bottom: 0 !important;
 }
 
 .node header h1{
@@ -642,6 +656,12 @@ th{
   border-bottom: 1px solid #EBEBEB;
   -webkit-border-radius: 5px 5px 0 0;
   border-radius: 5px 5px 0 0;
+}
+
+.widget-pane > .row-fluid > * > .widget-title .select,
+.widget-pane > .row > * > .widget-title .select{
+  min-width: 16px;
+  text-align: center;
 }
 
 .widget-pane > .row-fluid .widget-header,

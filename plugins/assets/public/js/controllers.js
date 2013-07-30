@@ -188,7 +188,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         value: 'redhat'
       },{
         label: 'Debian / Ubuntu',
-        value: 'debian'
+        value: 'ubuntu-test'
       }],
       diskStrategies: [{
         label: 'Mirrored',
