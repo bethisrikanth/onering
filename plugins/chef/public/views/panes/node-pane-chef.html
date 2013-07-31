@@ -1,0 +1,43 @@
+<div class="container-fluid widget-pane">
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="widget-title">
+        Chef
+      </div>
+
+      <div class="widget-content widget-expand">
+        <table class="table table-plain">
+          <tbody>
+            <tr>
+              <th>State</th>
+              <td>
+                <span ng-show="node.properties.chef.enabled" class="label label-success">Enabled</span>
+                <span ng-hide="node.properties.chef.enabled" class="label label-important">Disabled</span>
+              </td>
+            </tr>
+
+            <tr>
+              <th>Version</th>
+              <td>{{ node.properties.chef.version }}</td>
+            </tr>
+
+            <tr>
+              <th>Last Ran</th>
+              <td>{{ node.properties.chef.last_ran_at | timeAgo }}</td>
+            </tr>
+
+            <tr>
+              <th>Run List</th>
+              <td>
+                <div ng-repeat="item in node.properties.chef.run_list">
+                  <span style="min-width: 48px" class="label center">{{ item | section:'-':0:1 }}</span>
+                  {{ item | section:'-':1 }}
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
