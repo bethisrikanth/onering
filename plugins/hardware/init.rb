@@ -57,6 +57,7 @@ module App
 
           json = MultiJson.load(request.env['rack.input'].read)
           json.delete('units')
+          json.delete('site')
           rack.from_json(json, false, true).safe_save
 
           200
