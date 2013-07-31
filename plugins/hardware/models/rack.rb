@@ -9,10 +9,11 @@ module Hardware
 
     timestamps!
 
-    key :name,      String, :required => true
-    key :site,      String
-    key :vendor,    Hash
-    key :height,    Integer, :required => true
+    key :name,        String, :required => true
+    key :description, String
+    key :site,        String
+    key :vendor,      Hash
+    key :height,      Integer, :required => true
 
 
     def units()
