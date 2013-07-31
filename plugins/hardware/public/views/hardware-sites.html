@@ -93,7 +93,7 @@
               <div class="row-fluid">
                 <div class="span3 rack" ng-repeat="rack in racks[site.id] | orderBy:'name'">
                   <div class="widget-title">
-                    {{ rack.name }}<span ng-show="opt.view"> {{ opt.view | uppercase }}</span>
+                    {{ rack.name }}<span ng-show="opt.view"> [{{ opt.view | uppercase }}]</span>
                     <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
 
                     <span class="pull-right">
