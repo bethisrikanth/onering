@@ -7,8 +7,8 @@
       <br />
       <br />
 
-      <tabs>
-        <pane ng-repeat="site in sites | orderBy:0" heading="{{ site.id | uppercase }}">
+      <tabset>
+        <tab ng-repeat="site in sites | orderBy:0" heading="{{ site.id | uppercase }}">
           <div class="container-fluid widget-pane">
             <div class="row-fluid">
               <div class="span4">
@@ -227,8 +227,8 @@
             </div>
           </div>
 
-        </pane>
-      </tabs>
+        </tab>
+      </tabset>
     </div>
   </div>
 </div>

@@ -348,30 +348,35 @@ function AssetManagerController($scope){
 }
 
 
-function AssetDefaultsController($scope, $http, AssetDefault){
-  $scope.sortField = 'id';
+function AssetDefaultsController($scope, $http){
+  $scope.opt = {
+    tab_active: {}
+  };
+
+  $scope.sortField = 'name';
   $scope.sortReverse = false;
 
-  $scope.add = function(){
+  $scope.add = function(group){
     var o = {
       name:    '',
+      group:   group,
       match:   [],
       apply:   {},
       enabled: true
     };
 
-    $scope.defaults.push(o);
+    $scope.node_defaults[group || 'Ungrouped'].push(o);
     $scope.edit(o);
   }
 
-  $scope.remove = function(d){
+  $scope.remove = function(d, group){
     if(d.id){
       $http.delete('/api/devices/defaults/'+d.id).success(function(){
         $scope.reload();
       });
 
     }else{
-      $scope.defaults.splice($scope.defaults.indexOf(d), 1);
+      $scope.node_defaults[group || 'Ungrouped'].splice($scope.node_defaults[group || 'Ungrouped'].indexOf(d), 1);
     }
   }
 
@@ -385,9 +390,32 @@ function AssetDefaultsController($scope, $http, AssetDefault){
     });
   }
 
+  $scope.setActiveTab = function(id){
+    angular.forEach($scope.node_defaults, function(v,k){
+      if(k == id){
+        $scope.opt.tab_active[k] = true;
+      }else{
+        $scope.opt.tab_active[k] = false;
+      }
+    })
+  }
+
+  $scope.$watch('opt', function(i){
+    console.log($scope.opt)
+  });
+
   $scope.reload = function(){
-    AssetDefault.query(function(data){
-      $scope.defaults = data;
+    $http.get('/api/devices/defaults/groups').success(function(data){
+      $scope.node_groups = data;
+    });
+
+    $http.get('/api/devices/defaults/list').success(function(data){
+      $scope.node_defaults = data;
+
+      if($scope.opt.tab_active.length == 0){
+        $scope.opt.tab_active[data[0].group] = true;
+      }
+
       $scope.current = null;
     });
   }

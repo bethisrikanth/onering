@@ -15,12 +15,25 @@ module App
           output(Automation::Job.find_by_name('assets-sync').request())
         end
 
+        get '/groups' do
+          output(NodeDefault.list('group')+['Ungrouped'])
+        end
+
         get '/list' do
-          output(NodeDefault.all.to_a.collect{|i|
+          defaults = NodeDefault.all.to_a.collect{|i|
             i = i.to_h
             i['apply'] = i['apply'].coalesce(nil,nil,'.')
             i
-          })
+          }
+
+          defaults = defaults.group_by{|i| i['group'] }
+
+          unless defaults[nil].nil?
+            defaults['Ungrouped'] = defaults[nil]
+            defaults.delete(nil)
+          end
+
+          output(defaults)
         end
 
         get '/:id' do

@@ -9,6 +9,7 @@ class NodeDefault < App::Model::Base
   timestamps!
 
   key :name,    String, :unique => true
+  key :group,   String
   key :match,   Array
   key :apply,   Hash
   key :force,   Boolean, :default => false

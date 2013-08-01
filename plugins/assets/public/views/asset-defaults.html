@@ -3,60 +3,67 @@
 <div class="container" ng-controller="AssetDefaultsController">
   <div class="row">
     <div class="span12">
-      <button class="btn" ng-click="add()"><i class="icon-plus"></i>&nbsp;Add Rule</button>
-      <button class="btn" rest="/api/devices/defaults/sync"><i class="icon-refresh"></i>&nbsp;Sync All</button>
-      <br />
-      <br />
+      <span class="pull-right">
+        <button class="btn btn-success" rest="/api/devices/defaults/sync"><i class="icon-refresh"></i>&nbsp;Sync All</button>
+      </span>
     </div>
   </div>
 
   <div class="row">
     <div class="span12">
-      <table class="table table-condensed table-hover">
-        <thead>
-          <tr>
-            <th ng-click="sortField='name'; sortReverse=!sortReverse">Rule</th>
-            <th ng-click="sortField='match'; sortReverse=!sortReverse">If the asset matches this...</th>
-            <th ng-click="sortField='match'; sortReverse=!sortReverse">...then set these values on it:</th>
-            <th><abbr title="Controls whether the values applied here will overwrite existing values">Overwrite?</abbr></th>
-            <th><abbr title="Controls whether this rule is enabled or not">Enabled?</abbr></th>
-            <th> </th>
-          </tr>
-        </thead>
+      <tabset>
+        <tab ng-repeat="(group, defaults) in node_defaults" heading="{{ group | titleize }}" active="opt.tab_active[group]" select="setActiveTab(group)">
+          <button class="btn" ng-click="add(group)"><i class="icon-plus"></i>&nbsp;Add Rule</button>
+          <br />
+          <br />
 
-        <tbody>
-          <tr ng-repeat="default in defaults | orderBy:sortField:sortReverse">
-            <td ng-click="edit(default)">
-              {{ default.name }}
-            </td>
+          <table class="table table-condensed table-hover">
+            <thead>
+              <tr>
+                <th ng-click="sortField='name'; sortReverse=!sortReverse">Rule</th>
+                <th ng-click="sortField='match'; sortReverse=!sortReverse">If the asset matches this...</th>
+                <th ng-click="sortField='match'; sortReverse=!sortReverse">...then set these values on it:</th>
+                <th><abbr title="Controls whether the values applied here will overwrite existing values">Overwrite?</abbr></th>
+                <th><abbr title="Controls whether this rule is enabled or not">Enabled?</abbr></th>
+                <th> </th>
+              </tr>
+            </thead>
 
-            <td ng-click="edit(default)">
-              <span ng-repeat="rule in default.match | orderBy:['field','value']">
-                <b>{{ rule.field }}</b> {{ rule.test || '=' }} {{ rule.value }}<br />
-              </span>
-            </td>
-            <td ng-click="edit(default)">
-              <span ng-repeat="(key,value) in default.apply">
-                <b>{{ key }}</b> = {{ value }}<br />
-              </span>
-            </td>
+            <tbody>
+              <tr ng-repeat="default in defaults | orderBy:sortField:sortReverse">
+                <td ng-click="edit(default)">
+                  {{ default.name }}
+                </td>
 
-            <td>
-              <input type="checkbox" ng-model="default.force" ng-change="default.dirty=true"></input>
-            </td>
+                <td ng-click="edit(default)">
+                  <span ng-repeat="rule in default.match | orderBy:['field','value']">
+                    <b>{{ rule.field }}</b> {{ rule.test || '=' }} {{ rule.value }}<br />
+                  </span>
+                </td>
+                <td ng-click="edit(default)">
+                  <span ng-repeat="(key,value) in default.apply">
+                    <b>{{ key }}</b> = {{ value }}<br />
+                  </span>
+                </td>
 
-            <td>
-              <input type="checkbox" ng-model="default.enabled" ng-change="default.dirty=true"></input>
-            </td>
+                <td>
+                  <input type="checkbox" ng-model="default.force" ng-change="default.dirty=true"></input>
+                </td>
 
-            <td>
-              <i class="icon-ok icon-white" ng-hide="default.dirty"> </i>
-              <a ng-click="save(default)" ng-show="default.dirty"><i class="icon-ok"> </i></a>
-              <a ng-click="remove(default)"><i class="icon-remove"> </i></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <td>
+                  <input type="checkbox" ng-model="default.enabled" ng-change="default.dirty=true"></input>
+                </td>
+
+                <td>
+                  <i class="icon-ok icon-white" ng-hide="default.dirty"> </i>
+                  <a ng-click="save(default)" ng-show="default.dirty"><i class="icon-ok"> </i></a>
+                  <a ng-click="remove(default)"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </tab>
+      </tabset>
     </div>
   </div>
 
@@ -70,7 +77,8 @@
 
       <div class="modal-body">
         <fieldset>
-          <input type="text" class="input-large" placeholder="ex. Remove null status" ng-model="current.name">
+          <input type="text" class="input-small" placeholder="Group" typeahead="g for g in node_groups" ng-model="current.group">
+          <input type="text" class="input-large" placeholder="Rule name" ng-model="current.name">
         </fieldset>
 
         <fieldset>

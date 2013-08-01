@@ -101,8 +101,8 @@
   </div>
 
   <div class="modal-body">
-    <tabs>
-      <pane heading="Private Key" ng-show="private_key">
+    <tabset>
+      <tab heading="Private Key" ng-show="private_key">
         <p>
           This is your private key.  Copy the text below into a new file (e.g <i>~/.onering/client.pem</i>) which can be used by client applications, such as the Onering client (<i>gem install onering-client</i>) to authenticate you to the system without a username and password.
         </p>
@@ -116,9 +116,9 @@
         </div>
 
         <pre>{{ private_key }}</pre>
-      </pane>
+      </tab>
 
-      <pane heading="Public Key" ng-show="public_key">
+      <tab heading="Public Key" ng-show="public_key">
         <p>
           This is your public key.  It is used by the Onering server to authenticate your private key.  This can be retrieved at any time and used to verify your private key as genuine.
         </p>
@@ -126,8 +126,8 @@
         <br />
 
         <pre>{{ public_key }}</pre>
-      </pane>
-    </tabs>
+      </tab>
+    </tabset>
   </div>
 
   <div class="modal-footer">
