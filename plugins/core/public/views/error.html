@@ -7,12 +7,17 @@
       <br />
 
       <div class="alert" ng-repeat="error in errors" ng-class="error.alertClass">
-        <b>{{ error.type }}: </b> {{ error.message }}
+        <h3>{{ error.type }}</h3>
+        {{ error.message }}
+
         <div ng-show="error.backtrace">
           <br />
           <br />
           <b>Backtrace:</b><br />
-          <tt style="font-size: smaller;" ng-repeat="line in error.backtrace">  {{ line }}</tt>
+          <div class="backtrace" ng-repeat="line in error.backtrace">
+            <span ng-bind-html-unsafe="line | highlight:'.*\/onering\/[^\:]+'">
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -3,22 +3,17 @@ require 'babel_bridge'
 module App
   module Helpers
     class ElasticsearchUrlqueryParser < BabelBridge::Parser
-      TOP_LEVEL_FIELDS = ['id', 'parent_id', 'name', 'tags', 'aliases', 'status', 'updated_at', 'created_at', 'collected_at']
-      DEFAULT_FIELD_PREFIX='properties'
+      TOP_LEVEL_FIELDS = []
+      DEFAULT_FIELD_PREFIX=''
 
     # process the whole query
       rule :es, many(:pair, :pairer) do
         def to_elasticsearch_query(options={})
           rv = {
-            :filter => {
-              :and => pair.collect{|e|
-                e.to_elasticsearch_query
-              }.flatten
-            }
+            :and => pair.collect{|e|
+              e.to_elasticsearch_query(options)
+            }.flatten
           }
-
-        # return only top-level + named fields
-          rv[:fields] = TOP_LEVEL_FIELDS+[*options[:fields]] if options[:fields]
 
           return rv
         end
@@ -26,15 +21,15 @@ module App
 
     # process pairs of field/[value] parameters
       rule :pair, many(:field, :fieldop_or), :pairer?, :values? do
-        def to_elasticsearch_query()
+        def to_elasticsearch_query(options={})
 
           return ({
             :or => field.collect{|f|
               if values.to_a.empty?
-                f.to_elasticsearch_query(nil)
+                f.to_elasticsearch_query(nil, options)
               else
                 values.to_a.collect{|v|
-                  f.to_elasticsearch_query(v)
+                  f.to_elasticsearch_query(v, options)
                 }
               end
             }.flatten
@@ -44,19 +39,24 @@ module App
 
     # process field name, modifiers, and prefilters
       rule :field, :field_modifier?, :field_name_pre, :field_prefilter?, :field_name_post? do
-        def translate_field(field, prefix)
+        def translate_field(field, options={})
+          options[:prefix] = DEFAULT_FIELD_PREFIX if options[:prefix].nil?
+          options[:fields] = TOP_LEVEL_FIELDS if options[:fields].nil?
+
           case field
           when 'id'
             return "_#{field}"
-          when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$")
+          when Regexp.new("^(#{(options[:fields]-[options[:prefix]]).join('|')})$")
+            return field
+          when Regexp.new("^#{options[:prefix]}\.")
             return field
           else
-            return "#{prefix}.#{field}"
+            return "#{options[:prefix]}.#{field}"
           end
         end
 
-        def to_elasticsearch_query(value=nil)
-          fname_pre = translate_field(field_name_pre.to_s, DEFAULT_FIELD_PREFIX)
+        def to_elasticsearch_query(value=nil, options={})
+          fname_pre = translate_field(field_name_pre.to_s, options)
           fname = fname_pre + field_name_post.to_s
           rv = nil
 
@@ -74,14 +74,14 @@ module App
               end
             end
           else
-            rv = value.to_elasticsearch_query(fname, field_modifier.nil? ? (fname =~ /_(?:at|or)$/i ? :date : nil) : field_modifier.get_coercer)
+            rv = value.to_elasticsearch_query(fname, (field_modifier.nil? ? (fname =~ /_(?:at|or)$/i ? :date : nil) : field_modifier.get_coercer), options)
           end
 
         # # process prefilter
         #   if field_prefilter.nil?
         #     return rv
         #   else
-        #     return field_prefilter.to_elasticsearch_query(fname_pre, field_name_post.to_s.gsub(/^\./,''), rv)
+        #     return field_prefilter.to_elasticsearch_query(fname_pre, field_name_post.to_s.gsub(/^\./,''), rv, options)
         #   end
 
           return rv
@@ -90,7 +90,7 @@ module App
 
 
       rule :field_prefilter, :field_prefilter_start, :field_prefilter_subfield, :field_prefilter_op_eql, :field_prefilter_value, :field_prefilter_end do
-        def to_elasticsearch_query(array_base, first_field_name, field_query)
+        def to_elasticsearch_query(array_base, first_field_name, field_query, options={})
           return field_query if array_base.nil?
 
           field_prefilter_query = field_prefilter_value.to_s
@@ -126,7 +126,7 @@ module App
 
     # process test value and modifiers
       rule :value, :value_modifier_unary?, :value_value? do
-        def to_elasticsearch_query(field, coerce=nil)
+        def to_elasticsearch_query(field, coerce=nil, options={})
           if coerce.nil?
             rv = value_value.to_s.autotype()
           else
@@ -134,7 +134,7 @@ module App
           end
 
           if value_modifier_unary
-            vmu = value_modifier_unary.to_elasticsearch_query(rv)
+            vmu = value_modifier_unary.to_elasticsearch_query(rv, options)
 
           # handle not operator
             if vmu.first.first == :not
@@ -233,7 +233,7 @@ module App
 
     # process value modifier functions
       rule :value_modifier_unary, :value_function_unary, :modifier do
-        def to_elasticsearch_query(value)
+        def to_elasticsearch_query(value, options={})
           case value_function_unary.to_sym
           when :gt, :gte, :lt, :lte
             return Hash[value_function_unary, value]

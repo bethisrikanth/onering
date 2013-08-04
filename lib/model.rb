@@ -1,6 +1,5 @@
 require 'mongo_mapper'
 require 'tire'
-require 'active_record'
 require 'pp'
 
 module App
@@ -155,7 +154,8 @@ module App
     class Elasticsearch
       require 'assets/lib/elasticsearch_urlquery_parser'
 
-      DEFAULT_MAX_RESULTS = 10000
+      DEFAULT_MAX_RESULTS     = 10000
+      DEFAULT_MAX_API_RESULTS = 25
 
       include ::Tire::Model::Callbacks
       include ::Tire::Model::Persistence
@@ -204,7 +204,8 @@ module App
         def to_elasticsearch_query(query, options={})
           @@_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
           rv = @@_parser.parse(query).to_elasticsearch_query({
-            :fields => options[:fields]
+            :prefix => self.field_prefix(),
+            :fields => self._tire_properties
           })
 
 #puts MultiJson.dump(rv)
@@ -217,23 +218,41 @@ module App
         end
 
         def urlquery(query, options={})
-          q = ({
-            :size => DEFAULT_MAX_RESULTS
-          }.merge(self.to_elasticsearch_query(query, options)))
+          raw = options.delete(:raw)
+          load = options.delete(:load)
+          load = true if load.nil?
 
-          collection = Tire.search(self.index_name(), q)
+          options[:fields].collect!{|i|
+            self.resolve_field(i)
+          } unless options[:fields].nil?
 
-          collection.options[:load] = (options[:load].nil? ? true : options[:load])
-          collection.results
+          query = {
+            :size   => DEFAULT_MAX_RESULTS,
+            :filter => self.to_elasticsearch_query(query),
+            :fields => (self._tire_properties - [self.field_prefix()])
+          }.deeper_merge!(options, {
+            :merge_hash_arrays => true
+          })
+
+puts MultiJson.dump(query)
+
+          collection = Tire.search(self.index_name(), query)
+
+          collection.options[:load] = load
+
+          return collection.results unless raw.nil?
+          return collection.results.to_a
         end
 
-        def where(query, options={})
+        def where(query)
+          load = query.delete(:load)
+          load = true if load.nil?
+
           collection = Tire.search(self.index_name(), {
-            :size        => (options[:size] || DEFAULT_MAX_RESULTS),
-            :fields      => options[:fields]
+            :size        => DEFAULT_MAX_RESULTS
           }.compact.merge(query))
 
-          collection.options[:load] = (options[:load].nil? ? true : options[:load])
+          collection.options[:load] = load
           collection.results
         end
 
@@ -245,21 +264,20 @@ module App
           end
 
           results = self.where({
+            :size   => 0,
+            :load   => false,
             :filter => filter,
             :facets => {
-              field => {
+              :counts => {
                 :terms => {
                   :field => field
                 }
               }
             }
-          }.compact, {
-            :size   => 0,
-            :load   => false
-          })
+          }.compact)
 
 
-          facet = results.facets[field]
+          facet = results.facets[:counts]
           return [] if facet.nil?
 
           return facet.get(:terms,[]).collect{|i|
@@ -278,28 +296,58 @@ module App
       #               (defaults to a summary of the whole collection)
       #
         def summarize(group_by, properties=[], query=nil, options={})
+          rv = []
+
           fields = ([group_by]+[*properties]).compact.collect{|field|
             self.resolve_field(field)
-          }
+          }.reverse
 
-          if query.nil?
-            query = self.where({
-              :fields => fields,
-              :query => {
-                :match_all => {}
+        # pop current field off the stack
+          current_field = fields.pop()
+
+        # perform query, only return facets (no documents)
+          results = self.where({
+            :size   => 0,
+            :load   => false,
+            :facets => {
+              :counts => {
+                :facet_filter => (query.nil? ? nil : self.to_elasticsearch_query(query)),
+                :terms => {
+                  :field => current_field
+                }
+              }.compact
+            }
+          })
+
+        # if we got anything...
+          unless results.facets.nil?
+            results.facets.get('counts.terms',[]).each do |facet|
+              rv << {
+                :id       => facet['term'],
+                :field    => self.unresolve_field(current_field),
+                :count    => facet['count'],
+                :children => (fields.empty? ? nil :
+                # we need to go deeper...
+                  self.summarize(fields[0], fields[1..-1], [query, "#{self.unresolve_field(current_field)}/#{facet['term']}"].compact.join('/'))
+                )
+              }.compact
+            end
+
+          # add in empty results as nulls
+            if results.facets.get('counts.missing',0) > 0
+              rv << {
+                :id       => nil,
+                :field    => self.unresolve_field(current_field),
+                :count    => results.facets.get('counts.missing'),
+                :children => (fields.empty? ? nil :
+                # we need to go deeper...
+                  self.summarize(fields[0], fields[1..-1], [query, "#{self.unresolve_field(current_field)}/null"].compact.join('/'))
+                )
               }
-            })
-          else
-            query = self.urlquery(query, {
-              :fields => fields
-            })
+            end
           end
 
-          results = query.collect{|i|
-            i.to_hash
-          }
-
-          results.count_distinct(fields)
+          return rv
         end
 
         def from_h(hash)
@@ -314,20 +362,25 @@ module App
           return '_id' if field == 'id'
           return field if (@_field_prefix_skip || []).include?(field)
           return field if field.to_s.empty? or @_field_prefix.to_s.empty?
+          return field if field =~ Regexp.new("^#{@_field_prefix}\.")
           return @_field_prefix+'.'+field
+        end
+
+        def unresolve_field(field)
+          field.to_s.gsub(Regexp.new("^#{@_field_prefix}\."), '')
         end
 
 
       # dsl configuration options
         def field_prefix(name=nil)
-          return @_field_prefix if name.nil?
+          return @_field_prefix.to_s if name.nil?
           @_field_prefix = name.to_s
           @_field_prefix_skip ||= self.properties.reject{|i| i.to_s == name.to_s }
         end
 
         def field_prefix_skip(list=nil)
           return @_field_prefix_skip if list.nil?
-          @_field_prefix_skip = [*list]
+          @_field_prefix_skip = [*list].map(&:to_s)
         end
 
         def defaults(type=:_default_, &block)

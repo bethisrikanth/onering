@@ -60,7 +60,7 @@ module App
         if params[:only]
           hash = [hash] unless hash.is_a?(Array)
           rv = hash.collect do |h|
-            h = h.to_h if h.respond_to?(:to_h)
+            h = h.to_hash if h.respond_to?(:to_hash)
             _rv = {}
 
           # prepend properties to all :only fields, as this is implied

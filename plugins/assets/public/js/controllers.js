@@ -1,16 +1,26 @@
-function QueryController($scope, $http, $window, $route, $location, $routeParams, Query){
+function QueryController($scope, $http, $window, $route, $location, $routeParams){
   $scope.query = $routeParams.query;
   $scope.time_left = 0;
+  $scope.pagenum = 1;
 
   $scope.reload = function(){
     $scope.loading = true;
 
   //run arbitrary query
     if($scope.query){
-      Query.query({
-        query: $scope.prepareQuery($scope.query, $routeParams.raw),
-        only:  'alert_state,ip,site,model,rack,unit,slot'
-      }, function(data){
+      var p = {
+        query: 'tags/not:disabled/'+$scope.prepareQuery($scope.query, $routeParams.raw),
+        only:  'alert_state,ip,site,model,rack,unit,slot',
+        page:  ($scope.pagenum || 1)
+      }
+
+      if(angular.isDefined($scope.max_results)){
+        p.max = $scope.max_results;
+      }
+
+      $http.get('/api/devices/find/', {
+        params: p
+      }).success(function(data,status,headers){
         if(data.length == 0){
           $scope.noresults = true;
 
@@ -19,7 +29,15 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
 
         }else{
           $scope.results = data;
+        }
 
+        if(headers('X-Onering-Results-Count')){
+          $scope.pages = {
+            results: headers('X-Onering-Results-Count'),
+            per:     headers('X-Onering-Results-Page-Size'),
+            current: headers('X-Onering-Results-Page-Number'),
+            total:   headers('X-Onering-Results-Page-Count')
+          }
         }
 
         $scope.loading = false;
@@ -48,6 +66,22 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.updateTime = function(){
     $scope.time_left -= 1;
   }
+
+  $scope.$watch('pagenum', function(){
+    if($scope.pages){
+      if($scope.pagenum > $scope.pages.total){
+        $scope.pagenum = $scope.pages.total;
+      }
+    }else if($scope.pagenum < 1){
+      $scope.pagenum = 1;
+    }
+
+    $scope.reload();
+  });
+
+  $scope.$watch('max_results', function(){
+    $scope.reload();
+  });
 
   $window.setInterval($scope.updateTime, 1000);
   $scope.reload();
@@ -81,40 +115,6 @@ function OverviewController($scope, $http){
   }
 
   $scope.reload();
-}
-
-function DeviceListController($scope, $http, $timeout, Device, DeviceNote){
-  $scope.sortField = 'name';
-
-  $scope.$watch('saved', function(){
-    if($scope.saved){
-      $timeout(function(){
-        $scope.saved = null;
-      }, 3000);
-    }
-  });
-
-  $scope.edit = function(){
-    $scope.editing = true;
-  }
-
-  $scope.save = function(){
-    $.each($scope.results, function(idx, i){
-      if(i.properties)
-        if(i.properties.rack)
-          if(i.properties.rack.length > 0)
-            Device.save({
-              id: i.id,
-              properties: {
-                rack: i.properties.rack,
-                unit: i.properties.unit
-              }
-            }, function(){
-              $scope.saved = 'Changes saved';
-              $scope.editing = false;
-            });
-    });
-  }
 }
 
 function SiteController($scope, $http, $routeParams, Query, Site, SiteContact){

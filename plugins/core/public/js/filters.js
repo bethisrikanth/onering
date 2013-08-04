@@ -375,6 +375,24 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('fillArrayFilter', function(){
+    return function(upper,lower){
+      var rv = [];
+
+      if(angular.isUndefined(lower)){
+        lower = 0;
+      }
+
+
+      for(var i = lower; i < upper; i++){
+        rv.push(i);
+      }
+
+      return rv;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('replaceFilter', function(){
     return function(str,find,rep){
       if(str instanceof Array){

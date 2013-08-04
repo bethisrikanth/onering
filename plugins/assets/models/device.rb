@@ -10,7 +10,9 @@ class Device < App::Model::Elasticsearch
 
   defaults do
     {
-      :date_detection => false,
+      :date_detection    => false,
+      :index_analyzer    => :standard,
+      :search_analyzer   => :lowercase,
       :dynamic_templates => [{
         :date_detector => {
           :match    => "*_at",

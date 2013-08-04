@@ -83,11 +83,26 @@ module App
         /find/*
       }.each do |r|
         get r do#ne
-          qsq = (params[:q] || params[:query] || '')
-          q = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
-          rv = Device.urlsearch(q).limit(params[:limit] || 1000).to_a
+          qsq       = (params[:q] || params[:query] || '')
+          q         = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
+          fields    = params[:only].split(',') unless params[:only].nil?
+          page_size = (params[:max] || Config.get('global.api.default_max_results', Device::DEFAULT_MAX_API_RESULTS)).to_i
+          page_num  = (params[:page] || 1)
 
-          output(filter_hash(rv, :properties))
+          rv = Device.urlquery(q, {
+            :raw          => true,
+            :size         => page_size,
+            :from         => page_num
+          })
+
+          headers({
+            'X-Onering-Results-Count'       => rv.total.to_s,
+            'X-Onering-Results-Page-Size'   => ([rv.total, page_size].min).to_s,
+            'X-Onering-Results-Page-Number' => page_num.to_s,
+            'X-Onering-Results-Page-Count'  => (rv.total / page_size).ceil.to_s
+          })
+
+          output(filter_hash(rv.to_a, Device.field_prefix))
         end
       end
 

@@ -529,6 +529,16 @@ i.normal{
   background-color: #F2F2F2;
 }
 
+.backtrace{
+  font-family: monospace;
+  font-size: smaller;
+}
+
+.backtrace .ui-match{
+  background: inherit;
+  font-weight: bold;
+}
+
 .sidetab{
   border-left-style: solid;
   border-left-width: 10px;
