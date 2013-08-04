@@ -1,4 +1,7 @@
 require 'mongo_mapper'
+require 'tire'
+require 'active_record'
+require 'pp'
 
 module App
   module Model
@@ -145,6 +148,197 @@ module App
         end
         safe_save
         self
+      end
+    end
+
+
+    class Elasticsearch
+      require 'assets/lib/elasticsearch_urlquery_parser'
+
+      DEFAULT_MAX_RESULTS = 10000
+
+      include ::Tire::Model::Callbacks
+      include ::Tire::Model::Persistence
+
+      define_model_callbacks :create, :update, :validation, :destroy
+
+      alias_method :to_h,             :to_hash
+
+      before_save            :_update_timestamps
+
+      def _update_timestamps
+        if self.respond_to?('updated_at')
+          self.updated_at = Time.now
+        end
+      end
+
+      def from_h(hash)
+        hash.compact.each do |key, values|
+          self.send("#{key}=", values)
+        end
+
+        self
+      end
+
+      def method_missing(name, *args)
+        if name == :_id=
+          false
+        else
+          super
+        end
+      end
+
+      class<<self
+        include_root_in_json = false
+
+        alias_method :_tire_property,   :property
+        alias_method :_tire_properties, :properties
+        alias_method :_tire_all,        :all
+
+        def property(name, options={})
+          _tire_property(name, {
+            :index => :analyzed
+          }.merge(options))
+        end
+
+        def to_elasticsearch_query(query, options={})
+          @@_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
+          rv = @@_parser.parse(query).to_elasticsearch_query({
+            :fields => options[:fields]
+          })
+
+#puts MultiJson.dump(rv)
+
+          rv
+        end
+
+        def get(field, default=nil)
+          return self.to_hash.get(self.resolve_field(field), default)
+        end
+
+        def urlquery(query, options={})
+          q = ({
+            :size => DEFAULT_MAX_RESULTS
+          }.merge(self.to_elasticsearch_query(query, options)))
+
+          collection = Tire.search(self.index_name(), q)
+
+          collection.options[:load] = (options[:load].nil? ? true : options[:load])
+          collection.results
+        end
+
+        def where(query, options={})
+          collection = Tire.search(self.index_name(), {
+            :size        => (options[:size] || DEFAULT_MAX_RESULTS),
+            :fields      => options[:fields]
+          }.compact.merge(query))
+
+          collection.options[:load] = (options[:load].nil? ? true : options[:load])
+          collection.results
+        end
+
+        def list(field, query=nil)
+          field = self.resolve_field(field)
+
+          if not query.nil?
+            filter = self.to_elasticsearch_query(query)
+          end
+
+          results = self.where({
+            :filter => filter,
+            :facets => {
+              field => {
+                :terms => {
+                  :field => field
+                }
+              }
+            }
+          }.compact, {
+            :size   => 0,
+            :load   => false
+          })
+
+
+          facet = results.facets[field]
+          return [] if facet.nil?
+
+          return facet.get(:terms,[]).collect{|i|
+            i.get(:term)
+          }.compact.sort.uniq
+
+        end
+
+      # summarize
+      #   this method provides arbitrary-depth aggregate rollups of a MongoDB
+      #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)
+      #
+      #   group_by:   the top-level field to group by
+      #   properties: additional fields to drill down into
+      #   query:      a query Hash to filter the collection by
+      #               (defaults to a summary of the whole collection)
+      #
+        def summarize(group_by, properties=[], query=nil, options={})
+          fields = ([group_by]+[*properties]).compact.collect{|field|
+            self.resolve_field(field)
+          }
+
+          if query.nil?
+            query = self.where({
+              :fields => fields,
+              :query => {
+                :match_all => {}
+              }
+            })
+          else
+            query = self.urlquery(query, {
+              :fields => fields
+            })
+          end
+
+          results = query.collect{|i|
+            i.to_hash
+          }
+
+          results.count_distinct(fields)
+        end
+
+        def from_h(hash)
+          hash.each do |key, values|
+            self.send("#{key}=", values)
+          end
+
+          self
+        end
+
+        def resolve_field(field)
+          return '_id' if field == 'id'
+          return field if (@_field_prefix_skip || []).include?(field)
+          return field if field.to_s.empty? or @_field_prefix.to_s.empty?
+          return @_field_prefix+'.'+field
+        end
+
+
+      # dsl configuration options
+        def field_prefix(name=nil)
+          return @_field_prefix if name.nil?
+          @_field_prefix = name.to_s
+          @_field_prefix_skip ||= self.properties.reject{|i| i.to_s == name.to_s }
+        end
+
+        def field_prefix_skip(list=nil)
+          return @_field_prefix_skip if list.nil?
+          @_field_prefix_skip = [*list]
+        end
+
+        def defaults(type=:_default_, &block)
+          if block_given?
+            index.create({
+              :mappings => {
+                type => yield
+              }
+            })
+          end
+        end
       end
     end
   end

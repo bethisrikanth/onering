@@ -17,7 +17,7 @@ module Hardware
 
 
     def units()
-      devices = Device.urlsearch("str:site/#{self.site}/str:rack/#{self.name}/virtual/not:true").to_a
+      devices = Device.urlquery("str:site/#{self.site}/str:rack/#{self.name}/virtual/not:true").to_a
       seen = Set.new()
 
       rv = []

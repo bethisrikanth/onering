@@ -1,19 +1,18 @@
 require 'model'
 require 'assets/lib/helpers'
 
-class NodeDefault < App::Model::Base
-  set_collection_name "node_defaults"
+class NodeDefault < App::Model::Elasticsearch
+  index_name "node_defaults"
 
-  before_validation :_compact
 
-  timestamps!
+  property :name,    :type => 'string'
+  property :group,   :type => 'string'
+  property :match,   :default => []
+  property :apply,   :default => {}
+  property :force,   :type => 'boolean', :default => false
+  property :enabled, :type => 'boolean', :default => true
 
-  key :name,    String, :unique => true
-  key :group,   String
-  key :match,   Array
-  key :apply,   Hash
-  key :force,   Boolean, :default => false
-  key :enabled, Boolean, :default => true
+  before_validation  :_compact
 
   def devices(filter=nil)
     query = []
@@ -32,7 +31,7 @@ class NodeDefault < App::Model::Base
       query << (m['test'].nil? ? '' : m['test']+':')+m['value'] if m['value']
     }
 
-    Device.urlsearch(query.join('/'))
+    Device.urlquery(query.join('/'))
   end
 
   class<<self
@@ -40,7 +39,13 @@ class NodeDefault < App::Model::Base
     def defaults_for(device)
       rv = []
 
-      NodeDefault.where(:enabled => true).each do |default|
+      NodeDefault.where({
+        :filter => {
+          :term => {
+            :enabled => true
+          }
+        }
+      }).each do |default|
         if (default.devices("str:id/#{device.id}").first.id rescue nil) == device.id
           rv << default
           next
@@ -52,9 +57,9 @@ class NodeDefault < App::Model::Base
   end
 
 
-  private
-    def _compact
-      self.match = self.match.collect{|m| m.compact }.compact
-      self.apply = self.apply
-    end
+private
+  def _compact
+    self.match = self.match.collect{|m| m.compact }.compact
+    self.apply = self.apply
+  end
 end

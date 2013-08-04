@@ -114,7 +114,7 @@ module App
       }.each do |r|
         get r do#ne
           q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
-          output Device.list(params[:field], urlquerypath_to_mongoquery(q))
+          output Device.list(params[:field], q)
         end
       end
 
@@ -125,9 +125,9 @@ module App
         /summary/by-:field/*/?
       }.each do |r|
         get r do#ne
-          q = urlquerypath_to_mongoquery(params[:where] || params[:q])
+          q = (params[:where] || params[:q])
           rv = Device.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
-          output rv
+          output(rv)
         end
       end
 
