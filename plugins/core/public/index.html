@@ -66,7 +66,7 @@
                 <li class="divider"></li>
 
                 <li ng-repeat="site in sites | orderBy:'-count'">
-                  <a href="#/inf/show/site:{{ site.id || 'null' }}">
+                  <a href="#/search/site:{{ site.id || 'null' }}">
                     {{ (site.id | uppercase) || '(empty)' }}
                     <span class="badge menu-count">{{ site.count }}</span>
                   </a>
@@ -78,7 +78,7 @@
                   <a tabindex="-1"><i class="icon-ok-circle"></i>&nbsp;&nbsp;Status</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li ng-repeat="status in statuses | orderBy:'count':true">
-                      <a href="#/inf/show/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status:null' }}">
+                      <a href="#/search/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status:null' }}">
                         <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
                         <span ng-show="status.id=='online'">Active</span>
                         <span ng-hide="status.id=='online'">{{ (status.id || 'unknown') | titleize }}</span>
@@ -87,7 +87,7 @@
                     </li>
 
                     <li class="divider"></li>
-                    <li><a href="#/inf/show/reserved:true"><i class="icon-bookmark"></i>&nbsp;&nbsp;Reserved Nodes</a></li>
+                    <li><a href="#/search/reserved:true"><i class="icon-bookmark"></i>&nbsp;&nbsp;Reserved Nodes</a></li>
                   </ul>
                 </li>
 <!--
@@ -95,7 +95,7 @@
                   <a tabindex="-1"><i class="icon-wrench"></i>&nbsp;&nbsp;Maintenance</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li ng-repeat="maint in maintenance_statuses | orderBy:'count':true">
-                      <a href="#/inf/show/{{ (maint.id &amp;&amp; 'maintenance_status:'+maint.id) || '^maintenance_status' }}">
+                      <a href="#/search/{{ (maint.id &amp;&amp; 'maintenance_status:'+maint.id) || '^maintenance_status' }}">
                         <i class="icon-{{ maint.id || 'ok' }}"></i>
                         {{ (maint.id &amp;&amp; 'Needs '+maint.id || 'healthy') | titleize }}
                         <span>{{ maint.count }}</span>
@@ -108,10 +108,10 @@
                   <a tabindex="-1"><i class="icon-warning-sign"></i>&nbsp;&nbsp;Hosts Alerting</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li><a href="#/alerts/nagios"><i class="icon-list"></i> All Alerts</a></li>
-                    <li><a href="#/inf/show/monitor:false"><i class="icon-remove"></i> Unmonitored Hosts</a></li>
+                    <li><a href="#/search/monitor:false"><i class="icon-remove"></i> Unmonitored Hosts</a></li>
                     <li class="divider"></li>
                     <li ng-repeat="alert_state in alert_states | orderBy:'count':true">
-                      <a href="#/inf/show/{{ 'alert_state:'+alert_state.id }}">
+                      <a href="#/search/{{ 'alert_state:'+alert_state.id }}">
                         <img ng-src="/img/alerts/{{ alert_state.id }}.png" />
                         {{ (alert_state.id) | titleize }}
                         <span class="badge menu-count">{{ alert_state.count }}</span>
@@ -124,7 +124,7 @@
                   <a tabindex="-1"><i class="icon-tags"></i>&nbsp;&nbsp;Tags</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li ng-repeat="tag in tags">
-                      <a href="#/inf/show/tags:{{ tag }}">
+                      <a href="#/search/tags:{{ tag }}">
                         {{ tag }}
                       </a>
                     </li>
@@ -208,8 +208,13 @@
           </ul>
 
           <form class="navbar-search pull-right" ng-controller="SearchController">
-            <input type="text" ng-model="query" class="search-query" placeholder="Search"
-              ui-keypress="{'enter alt-space': 'goQuery()'}">
+            <input
+              type="text"
+              ng-model="query"
+              class="search-query"
+              placeholder="Search"
+              ui-keypress="{'enter alt-space': 'goQuery()'}"
+              typeahead="f+': ' as f for f in autocomplete | filter:$viewValue | limitTo:25">
             <span ng-click="search_show_help=!search_show_help" class="add-on"><i class="icon-question-sign icon-white"></i></span>
 
             <!-- <i class="help icon-question-sign" ng-click="search_show_help=!search_show_help"></i> -->

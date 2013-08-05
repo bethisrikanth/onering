@@ -276,9 +276,11 @@ div.autocomplete.help{
   right: 0px;
 }
 
-.navbar-search .autocomplete{
-  margin-right: 20px;
+.search-query+.typeahead.dropdown-menu{
+  min-width: 340px;
+  overflow:  hidden;
 }
+
 
 .dropdown-panel li{
   color: #333;

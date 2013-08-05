@@ -14,8 +14,12 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
         page:  ($scope.pagenum || 1)
       }
 
-      if(angular.isDefined($scope.max_results)){
-        p.max = $scope.max_results;
+      if(angular.isDefined($scope.max_results) && $scope.max_results != null){
+        if($scope.max_results < 0){
+          p.max = 1000;
+        }else{
+          p.max = $scope.max_results;
+        }
       }
 
       $http.get('/api/devices/find/', {
@@ -81,6 +85,12 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
 
   $scope.$watch('max_results', function(){
     $scope.reload();
+  });
+
+  $scope.$watch('filter', function(i){
+    if(angular.isDefined(i)){
+      $location.path('/search/'+$scope.query+' '+i);
+    }
   });
 
   $window.setInterval($scope.updateTime, 1000);

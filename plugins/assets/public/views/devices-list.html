@@ -8,6 +8,19 @@
           <div class="alert alert-success" ng-show="saved">{{ saved == true &amp;&amp; 'Saved!' || saved }}</div>
 
           <br />
+<!--           <h5>Search within these results:</h5>
+          <form class="form-search" ng-controller="SearchController">
+            <input
+              type="text"
+              class="input-large search-query"
+              ng-model="query"
+              ui-keypress="{'enter alt-space': 'goQuery()'}"
+              placeholder="Filter results..."
+              typeahead="f+': ' as f for f in autocomplete | filter:$viewValue | limitTo:25">
+          </form> -->
+
+          <br />
+          <br />
         </div>
       </div>
 
@@ -80,7 +93,7 @@
 
       <div class="row" ng-show="pages &amp;&amp; pages.total > 1">
         <div class="span12 center">
-          <span>Showing {{ pages.per }} of {{ pages.results }} results &mdash; <a ng-click="$parent.max_results=1000">Show All</a></span>
+          <span>Showing {{ pages.per }} of {{ pages.results }} results &mdash; <a ng-click="$parent.max_results=-1">Show All</a></span>
 
           <div class="pagination">
             <ul>

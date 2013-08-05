@@ -37,6 +37,10 @@ config(['$routeProvider', function($routeProvider){
     templateUrl: 'views/devices.html',
     controller: QueryController
   }).
+  when('/search/:query', {
+    templateUrl: 'views/devices.html',
+    controller: QueryController
+  }).
   when('/node/find/:query', {
     templateUrl: 'views/devices.html',
     controller: QueryController

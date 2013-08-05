@@ -116,6 +116,10 @@ function SearchController($scope, $http, $location, Query){
   //   $scope.runQuery();
   // });
 
+  $http.get('/api/devices/schema/fields').success(function(data){
+    $scope.autocomplete = data;
+  });
+
   $scope.runQuery = function(query){
     if(query) $scope.query = query;
 
@@ -136,7 +140,7 @@ function SearchController($scope, $http, $location, Query){
     if(query) $scope.query = query;
 
     if($scope.query){
-      $location.path('/inf/show/'+$scope.query);
+      $location.path('/search/'+$scope.query);
     }
   };
 

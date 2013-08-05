@@ -25,9 +25,7 @@ gem "rdiscount", "1.6.8"
 gem "net-ping"
 gem "net-ldap"
 gem "addressable"
-gem "ruby-pam", :git => "git://github.com/portertech/ruby-pam.git"
-#gem "activesupport", ">= 3.2"
-gem "hashlib", ">= 0.0.20"
+gem "hashlib", ">= 0.0.21"
 gem "babel_bridge"
 gem "eventmachine"
 gem "msgpack"
@@ -36,3 +34,11 @@ gem "rainbow"
 gem "statsd-ruby"
 gem "tire"
 gem "activerecord", "~> 3"
+#gem "activesupport", ">= 3.2"
+
+case RUBY_VERSION
+when /^1\.8/
+  gem "rpam"
+else
+  gem "rpam-ruby19"
+end

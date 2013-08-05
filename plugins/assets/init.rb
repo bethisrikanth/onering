@@ -87,12 +87,12 @@ module App
           q         = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           fields    = params[:only].split(',') unless params[:only].nil?
           page_size = (params[:max] || Config.get('global.api.default_max_results', Device::DEFAULT_MAX_API_RESULTS)).to_i
-          page_num  = (params[:page] || 1)
+          page_num  = (params[:page] || 1).to_i
 
           rv = Device.urlquery(q, {
             :raw          => true,
             :size         => page_size,
-            :from         => page_num
+            :from         => (page_size * (page_num-1))
           })
 
           headers({
@@ -103,6 +103,28 @@ module App
           })
 
           output(filter_hash(rv.to_a, Device.field_prefix))
+        end
+      end
+
+    # list all fields from all documents in the index
+      namespace '/schema' do
+        get '/fields' do
+          rv = []
+
+          Tire.index('devices').mapping.each_recurse({
+            :intermediate => true
+          }) do |k,v,p|
+            if v.is_a?(Hash) and v['type'].is_a?(String)
+
+            # HAX: do this to skip notes fields
+              if p[4] != 'notes'
+                rv << p.join('.').gsub(/(?:^device\.|properties\.|\.properties)/,'')
+              end
+            end
+
+          end
+
+          output(rv.sort)
         end
       end
 
@@ -161,7 +183,7 @@ module App
       end
 
       delete '/:id' do
-        Device.destroy(params[:id])
+        Device.delete(params[:id])
         200
       end
 

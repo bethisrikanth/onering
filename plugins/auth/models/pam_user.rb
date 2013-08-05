@@ -1,59 +1,27 @@
-require 'pam'
+require 'rpam'
 require 'auth/models/user'
 
 class PamUser < User
-  CONVERSATION = Proc.new do |messages, data|
-    rv = []
-    data = {} unless data
-
-    messages.each do |message|
-      case message.msg_style
-      when PAM::PAM_PROMPT_ECHO_ON
-        rv << PAM::Response.new(data[:username], 0)
-
-      when PAM::PAM_PROMPT_ECHO_OFF
-        rv << PAM::Response.new(data[:password], 0)
-
-      else
-        rv << PAM::Response.new(nil, 0)
-
-      end
-    end
-
-    rv
-  end
-
   def authenticate!(options={})
     if super
-      service = App::Config.get!('global.authentication.methods.pam.service')
+      service = App::Config.get('global.authentication.methods.pam.service', 'onering')
       options[:username] = id
 
       begin
-        PAM.start(service, id, CONVERSATION, options) do |pam|
-          begin
-            pam.authenticate(0)
-          rescue PAM::PAM_USER_UNKNOWN
-            STDERR.puts "Unknown user #{id}"
-            return false
-
-          rescue PAM::PAM_AUTH_ERR
-            STDERR.puts "Authentication failed for user #{id}"
-            return false
-
-          rescue PAM::PAMError => e
-            STDERR.puts "PAM Authenticate Error: #{e.message}"
-            return false
-
-          end
-
-          begin
-            pam.acct_mgmt(0)
-            pam.open_session do
-              return true
-            end
-          rescue PAM::PAMError => e
-            STDERR.puts "PAM Error: #{e.message}"
-          end
+      # using rpam-ruby19 (https://github.com/canweriotnow/rpam-ruby19)
+        if Rpam.respond_to?(:auth)
+          return Rpam.auth(options[:username], options[:password], {
+            :service => service
+          })
+        else
+      # rpam legacy (http://rpam.rubyforge.org/)
+      #
+      # NOTE: this version does not work on Ruby 1.8 and does not support
+      #       specifying the PAM service name (hardcoded to 'rpam')
+      #       > e.g. /etc/pam.d/rpam
+      #
+          include Rpam
+          return authpam(options[:username], options[:password])
         end
 
         return false

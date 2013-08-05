@@ -234,7 +234,7 @@ module App
             :merge_hash_arrays => true
           })
 
-puts MultiJson.dump(query)
+#puts MultiJson.dump(query)
 
           collection = Tire.search(self.index_name(), query)
 
