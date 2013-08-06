@@ -218,7 +218,7 @@ module App
 
           raise "Property 'provisioning.family' is required" unless script_type
 
-          liquid "provisioning/#{script_type.downcase}/base".to_sym, :locals => {
+          liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
             :device => (device.to_h rescue {}),
             :config => Config.get('provisioning.boot')
           }
