@@ -376,16 +376,24 @@ config(['$provide', function($provide) {
 }]).
 config(['$provide', function($provide) {
   $provide.factory('replaceFilter', function(){
-    return function(str,find,rep){
+    return function(str,find,rep,all){
       if(str instanceof Array){
         for(var i in str){
           if(typeof(str[i]) == 'string'){
-            str[i] = str[i].replace(find, rep);
+            if(all == true){
+              str[i] = str[i].replace(new RegExp(find,'g'), rep);
+            }else{
+              str[i] = str[i].replace(find, rep);
+            }
           }
         }
 
         return str;
       }else if(typeof(str) == 'string'){
+        if(all == true){
+          return str.replace(new RegExp(find,'g'), rep);
+        }
+
         return str.replace(find, rep);
       }else{
         return str;

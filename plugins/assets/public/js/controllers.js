@@ -280,9 +280,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
       });
 
   //  boot profile list
-      $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
+      $http.get('/api/provision/boot/profile/list?severity=ignore').success(function(data){
         $scope.pxeProfiles = data;
       });
+
 
   //  Give me a ping, Vasili.  One ping only please...
       // $http.get('/api/salt/devices/'+$routeParams.id+'/ping?severity=ignore').success(function(){

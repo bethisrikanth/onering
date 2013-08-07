@@ -101,6 +101,10 @@ module App
         end
       end
 
+      get '/boot/profile/list' do
+        rv = Config.get("provisioning.boot.profiles",[])
+        rv.compact.to_json
+      end
 
       get '/:id/boot/profile' do
         device = Device.find(params[:id])
@@ -122,10 +126,7 @@ module App
         device = Device.find(params[:id])
         return 404 unless device
 
-        pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-        response = Net::HTTP.get_response(URI("#{pxed}/profiles/list"))
-        rv = (MultiJson.load(response.body) rescue [])
-
+        rv = Config.get("provisioning.boot.profiles",[])
         rv.compact.to_json
       end
 
@@ -137,47 +138,13 @@ module App
           device = Device.find(params[:id])
           return 404 unless device
 
-          if device.properties['site']
-            pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-            return [500, "Cannot generate boot profile, no PXEd server defined for site #{device.properties['site'].downcase}"] unless pxed
-            uses_default = true
-            macs = get_macs(device)
+          profiles = Config.get("provisioning.boot.profiles",[])
+          return 400 if profiles.select{|i| i['id'] == (params[:profile].to_s.downcase) }.empty?
 
-            rv  = "# ============================================================================= \n"
-            rv += "# pxed server at #{pxed}, site #{device.properties['site'].upcase}\n"
-            rv += "# ============================================================================= \n"
-            rv += "\n\n"
+          device.properties.set('provisioning.boot.profile', params[:profile].downcase)
+          device.safe_save
 
-            macs.each do |mac|
-              rv += "# ----------------------------------------------------------------------------- \n"
-              rv += "# PXE configuration for device #{mac[:interface]} (#{mac[:mac]})\n"
-              rv += "# ----------------------------------------------------------------------------- \n"
-
-              if params[:profile]
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/link/#{params[:profile]}"))
-              else
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}"))
-              end
-
-              if response.code.to_i < 400
-                uses_default = false
-                rv += response.body
-              end
-
-              rv += "\n\n"
-            end
-
-            if uses_default
-              rv += "# Default PXE configuration\n"
-              rv += "#\n"
-              rv += (Net::HTTP.get(URI("#{pxed}/devices/default")) rescue '')
-            end
-
-            content_type 'text/plain'
-            rv
-          else
-            raise "Cannot provision device #{device.id} without specifying a site"
-          end
+          200
         end
       end
 
