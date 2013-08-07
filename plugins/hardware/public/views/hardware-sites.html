@@ -48,8 +48,8 @@
                     <br />
 
                     <address>
-                      <b>{{ site.contact.name }}<span ng-show="site.contact.properties.vendor_site"> &ndash; {{ site.contact.properties.vendor_site }}</span></b><br>
-                      <span ng-show="site.contact.properties.vendor_area"><b>{{ (site.contact.properties.space_type || 'Area') | titleize }} {{ site.contact.properties.vendor_area }}</b></span>
+                      <b>{{ site.contact.name }}<span ng-show="site.contact.properties.vendor.site"> &ndash; {{ site.contact.properties.vendor.site }}</span></b><br>
+                      <span ng-show="site.contact.properties.vendor.area"><b>{{ (site.contact.properties.space_type || 'Area') | titleize }} {{ site.contact.properties.vendor.area }}</b></span>
                       {{ site.contact.address.street | join:', ' }}
                       (<a href="https://maps.google.com/?q={{ site.contact.address.street | join:',' }},{{ site.contact.address.city }},{{ site.contact.address.state }}" target="_blank">map</a>)<br>
                       {{ site.contact.address.city }}, {{ site.contact.address.state }}&nbsp;&nbsp;{{ site.contact.address.postal }}<br>
