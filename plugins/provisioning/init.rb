@@ -138,8 +138,7 @@ module App
           device = Device.find(params[:id])
           return 404 unless device
 
-          profiles = Config.get("provisioning.boot.profiles",[])
-          return 400 if profiles.select{|i| i['id'] == (params[:profile].to_s.downcase) }.empty?
+#          profiles = Config.get("provisioning.boot.profiles",[])
 
           device.properties.set('provisioning.boot.profile', params[:profile].downcase)
           device.safe_save
