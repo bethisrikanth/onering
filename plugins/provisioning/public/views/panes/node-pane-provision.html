@@ -73,7 +73,7 @@
         <div class="widget-header"><b>Change Boot Profile</b></div>
         <div>
           <select style="margin-bottom:0" class="input-medium" ng-model="node.properties.provisioning.boot.profile" ng-options="v.id as (v.name || (v.id | titleize)) for v in pxeProfiles"></select>
-          <button class="btn btn-primary" rest="/api/provision/{{node.id}}/boot/set/{{node.properties.provisioning.boot.profile}}" rest-success="reload()"><i class="icon-ok icon-white"> </i></button>
+          <button class="btn btn-primary" rest="/api/provision/{{node.id}}/boot/set/{{node.properties.provisioning.boot.profile}}" ng-model-onenter rest-success="reload()"><i class="icon-ok icon-white"> </i></button>
         </div>
 
         <button ng-show="node.status=='allocatable'" rest="/api/provision/{{node.id}}/set/action/reboot" rest-success="reload()" class="btn btn-danger" style="width: 100%; margin-top: 2em">
