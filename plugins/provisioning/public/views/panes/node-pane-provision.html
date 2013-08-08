@@ -36,7 +36,7 @@
 
             <tr>
               <th>Platform</th>
-              <td>{{ node.properties.provisioning.family }}</td>
+              <td>{{ node.properties.provisioning.boot.subprofile }}</td>
             </tr>
 
             <tr>
@@ -68,7 +68,7 @@
 
         <div class="center">
           <h3>{{ node.properties.provisioning.boot.profile | replace:'-':' ':true | titleize }}</h3>
-        </div>        
+        </div>
 
         <div class="widget-header"><b>Change Boot Profile</b></div>
         <div>

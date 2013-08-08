@@ -184,11 +184,11 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     provision: {
       formHelp: {},
       families: [{
-        label: 'RedHat / CentOS',
-        value: 'redhat'
+        label: 'CentOS 5.9',
+        value: 'centos-59'
       },{
-        label: 'Debian / Ubuntu',
-        value: 'ubuntu-test'
+        label: 'Ubuntu 12.04',
+        value: 'ubuntu-1204'
       }],
       diskStrategies: [{
         label: 'Mirrored',
