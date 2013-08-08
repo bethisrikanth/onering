@@ -133,6 +133,7 @@ module App
       %w{
         /:id/boot/?
         /:id/boot/set/:profile/?
+        /:id/boot/set/:profile/:subprofile/?
       }.each do |r|
         get r do#ne
           device = Device.find(params[:id])
@@ -140,6 +141,7 @@ module App
 
           if params[:profile]
             device.properties.set('provisioning.boot.profile', params[:profile])
+            device.properties.set('provisioning.boot.subprofile', params[:subprofile]) unless params[:subprofile].nil?
             device.safe_save()
             device.reload()
           end
