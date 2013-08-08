@@ -187,9 +187,9 @@ module App
             device.safe_save
           end
 
-          script_type = device.properties.get('provisioning.family')
-
-          raise "Property 'provisioning.family' is required" unless script_type
+          script_type = device.properties.get('provisioning.boot.subprofile')
+          raise "Property 'provisioning.boot.subprofile' is required" unless script_type.is_a?(String)
+          script_type.gsub!(/[\-]/,'/')
 
           liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
             :device => (device.to_h rescue {}),
