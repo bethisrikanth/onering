@@ -131,7 +131,7 @@ module App
           i['subprofile'] = {} if i['subprofile'].nil?
           i
         }
-        rv.compact.to_json
+        rv.to_json
       end
 
       %w{
