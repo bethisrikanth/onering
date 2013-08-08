@@ -252,6 +252,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         $scope.node = data;
         $scope.opt.lastLoadTime = new Date();
 
+        try{
+          $scope.opt.newPxeProfile = $scope.node.properties.provisioning.boot.profile;
+        }catch(e){ }
+
     //  load parent
         if($scope.node && $scope.node.parent_id){
           $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
@@ -273,10 +277,6 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   //  boot profiles
       $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
         $scope.pxeboot = data;
-
-        if(data[0]){
-          $scope.opt.newPxeProfile = data[0].id;
-        }
       });
 
   //  boot profile list
