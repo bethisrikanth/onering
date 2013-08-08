@@ -138,14 +138,17 @@ module App
           device = Device.find(params[:id])
           return 404 unless device
 
+          if params[:profile]
+            device.properties.set('provisioning.boot.profile', params[:profile])
+            device.safe_save()
+            device.reload()
+          end
 
-           unless params[:profile].nil?
-#          profiles = Config.get("provisioning.boot.profiles",[])
-            device.properties.set('provisioning.boot.profile', params[:profile].downcase)
-            device.safe_save
-           end
-
-          200
+          status, headers, body = call env.merge({
+            'PATH_INFO'    => '/api/ipxe/boot',
+            'QUERY_STRING' => "id=#{device.id}"
+          })
+          [status, headers, body]
         end
       end
 
