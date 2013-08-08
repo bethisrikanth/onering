@@ -127,6 +127,10 @@ module App
         return 404 unless device
 
         rv = Config.get("provisioning.boot.profiles",[])
+        rv = rv.collect{|i|
+          i['subprofile'] = {} if i['subprofile'].nil?
+          i
+        }
         rv.compact.to_json
       end
 
