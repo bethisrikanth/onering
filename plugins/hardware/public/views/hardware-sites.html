@@ -48,10 +48,11 @@
                     <br />
 
                     <address>
-                      <strong>{{ site.contact.name }}<span ng-show="site.contact.vendor_site"> &ndash; {{ site.contact.vendor_site }}</span></strong><br>
-                      {{ site.contact.address | join:', ' }}
-                      (<a href="https://maps.google.com/?q={{ site.contact.address | join:',' }},{{ site.contact.city }},{{ site.contact.state }}" target="_blank">map</a>)<br>
-                      {{ site.contact.city }}, {{ site.contact.state }}&nbsp;&nbsp;{{ site.contact.postal }}<br>
+                      <b>{{ site.contact.name }}<span ng-show="site.contact.properties.vendor.site"> &ndash; {{ site.contact.properties.vendor.site }}</span></b><br />
+                      <span ng-show="site.contact.properties.vendor.area"><b>{{ (site.contact.properties.space_type || 'Area') | titleize }} {{ site.contact.properties.vendor.area }}</b><br /></span>
+                      {{ site.contact.address.street | join:', ' }}
+                      (<a href="https://maps.google.com/?q={{ site.contact.address.street | join:',' }},{{ site.contact.address.city }},{{ site.contact.address.state }}" target="_blank">map</a>)<br />
+                      {{ site.contact.address.city }}, {{ site.contact.address.state }}&nbsp;&nbsp;{{ site.contact.address.postal }}<br>
                       <br>
                     </address>
                   </div>

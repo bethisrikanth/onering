@@ -101,6 +101,10 @@ module App
         end
       end
 
+      get '/boot/profile/list' do
+        rv = Config.get("provisioning.boot.profiles",[])
+        rv.compact.to_json
+      end
 
       get '/:id/boot/profile' do
         device = Device.find(params[:id])
@@ -122,62 +126,31 @@ module App
         device = Device.find(params[:id])
         return 404 unless device
 
-        pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-        response = Net::HTTP.get_response(URI("#{pxed}/profiles/list"))
-        rv = (MultiJson.load(response.body) rescue [])
-
+        rv = Config.get("provisioning.boot.profiles",[])
         rv.compact.to_json
       end
 
       %w{
         /:id/boot/?
         /:id/boot/set/:profile/?
+        /:id/boot/set/:profile/:subprofile/?
       }.each do |r|
         get r do#ne
           device = Device.find(params[:id])
           return 404 unless device
 
-          if device.properties['site']
-            pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-            return [500, "Cannot generate boot profile, no PXEd server defined for site #{device.properties['site'].downcase}"] unless pxed
-            uses_default = true
-            macs = get_macs(device)
-
-            rv  = "# ============================================================================= \n"
-            rv += "# pxed server at #{pxed}, site #{device.properties['site'].upcase}\n"
-            rv += "# ============================================================================= \n"
-            rv += "\n\n"
-
-            macs.each do |mac|
-              rv += "# ----------------------------------------------------------------------------- \n"
-              rv += "# PXE configuration for device #{mac[:interface]} (#{mac[:mac]})\n"
-              rv += "# ----------------------------------------------------------------------------- \n"
-
-              if params[:profile]
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/link/#{params[:profile]}"))
-              else
-                response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}"))
-              end
-
-              if response.code.to_i < 400
-                uses_default = false
-                rv += response.body
-              end
-
-              rv += "\n\n"
-            end
-
-            if uses_default
-              rv += "# Default PXE configuration\n"
-              rv += "#\n"
-              rv += (Net::HTTP.get(URI("#{pxed}/devices/default")) rescue '')
-            end
-
-            content_type 'text/plain'
-            rv
-          else
-            raise "Cannot provision device #{device.id} without specifying a site"
+          if params[:profile]
+            device.properties.set('provisioning.boot.profile', params[:profile])
+            device.properties.set('provisioning.boot.subprofile', params[:subprofile]) unless params[:subprofile].nil?
+            device.safe_save()
+            device.reload()
           end
+
+          status, headers, body = call env.merge({
+            'PATH_INFO'    => '/api/ipxe/boot',
+            'QUERY_STRING' => "id=#{device.id}"
+          })
+          [status, headers, body]
         end
       end
 
@@ -214,11 +187,11 @@ module App
             device.safe_save
           end
 
-          script_type = device.properties.get('provisioning.family')
+          script_type = device.properties.get('provisioning.boot.subprofile')
+          raise "Property 'provisioning.boot.subprofile' is required" unless script_type.is_a?(String)
+          script_type.gsub!(/[\-]/,'/')
 
-          raise "Property 'provisioning.family' is required" unless script_type
-
-          liquid "provisioning/#{script_type.downcase}/base".to_sym, :locals => {
+          liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
             :device => (device.to_h rescue {}),
             :config => Config.get('provisioning.boot')
           }

@@ -86,7 +86,18 @@
 
     <div class="span3">
       <br />
-      <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
+      <div class="btn-group pull-right">
+        <button class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
+        <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a ng-click="interval=5000">Every 5 seconds</a></li>
+          <li><a ng-click="interval=10000">Every 10 seconds</a></li>
+          <li><a ng-click="interval=30000">Every 30 seconds</a></li>
+          <li><a ng-click="interval=60000">Every 60 seconds</a></li>
+        </ul>
+      </div>
       <i class="icon-circle-arrow-right"> </i> <b>First Registered: </b>{{ node.created_at | timeAgo }}<br />
       <i class="icon-time"> </i> <b>Last Inventory: </b>{{ node.collected_at | timeAgo }}<br />
       <i class="icon-refresh"> </i> <b>Page Refreshed: </b>{{ opt.lastLoadTime | timeAgo }}<br />

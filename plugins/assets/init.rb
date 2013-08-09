@@ -404,10 +404,14 @@ module App
         return 404 if not device
         rv = []
         params[:splat].first.split('/').each do |key|
-          rv << (device.properties.get(key) || ' ').to_s
+          rv << device.properties.get(key)
         end
 
-        output(rv)
+        if rv.length == 1
+          output(rv.first)
+        else
+          output(rv)
+        end
       end
 
     # vector operations

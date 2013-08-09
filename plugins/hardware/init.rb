@@ -14,7 +14,7 @@ module App
             {
               :id => site,
               :contact => (Contact.where({
-                :site => site
+                'properties.site' => site
               }).to_a.first.to_h rescue nil),
               :summary => {
 

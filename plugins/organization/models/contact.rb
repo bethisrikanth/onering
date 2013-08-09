@@ -9,5 +9,8 @@ class Contact < App::Model::Base
 
   key :name,            String
   key :tags,            Array
-
+  key :properties,      Hash
+  key :mail,            Hash
+  key :phones,          Hash
+  key :address,         Hash
 end

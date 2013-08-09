@@ -194,11 +194,11 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     provision: {
       formHelp: {},
       families: [{
-        label: 'RedHat / CentOS',
-        value: 'redhat'
+        label: 'CentOS 5.9',
+        value: 'centos-59'
       },{
-        label: 'Debian / Ubuntu',
-        value: 'ubuntu-test'
+        label: 'Ubuntu 12.04',
+        value: 'ubuntu-1204'
       }],
       diskStrategies: [{
         label: 'Mirrored',
@@ -262,6 +262,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         $scope.node = data;
         $scope.opt.lastLoadTime = new Date();
 
+        try{
+          $scope.opt.newPxeProfile = $scope.node.properties.provisioning.boot.profile;
+        }catch(e){ }
+
     //  load parent
         if($scope.node && $scope.node.parent_id){
           $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
@@ -283,16 +287,13 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   //  boot profiles
       $http.get('/api/provision/'+$routeParams.id+'/boot/profile?severity=ignore').success(function(data){
         $scope.pxeboot = data;
-
-        if(data[0]){
-          $scope.opt.newPxeProfile = data[0].id;
-        }
       });
 
   //  boot profile list
-      $http.get('/api/provision/'+$routeParams.id+'/boot/profile/list?severity=ignore').success(function(data){
+      $http.get('/api/provision/boot/profile/list?severity=ignore').success(function(data){
         $scope.pxeProfiles = data;
       });
+
 
   //  Give me a ping, Vasili.  One ping only please...
       // $http.get('/api/salt/devices/'+$routeParams.id+'/ping?severity=ignore').success(function(){
@@ -331,8 +332,19 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     }
   }
 
+  $scope.$watch('interval', function(i){
+    if(angular.isDefined(i)){
+      if(angular.isDefined($scope.opt.interval_id)){
+        $window.clearInterval($scope.opt.interval_id);
+      }
+
+      $scope.opt.interval_id = $window.setInterval($scope.reload, i);
+      $scope.reload();
+    }
+  });
+
   $window.setInterval($scope.tick, 1000);
-  $window.setInterval($scope.reload, 60000);
+  $scope.interval = 60000;
   $scope.reload();
 }
 
