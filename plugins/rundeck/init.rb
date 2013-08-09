@@ -27,7 +27,13 @@ module App
             rv[field] = value
           end
 
-          rv.compact
+          Hash[rv.compact.collect{|k,v|
+            if v.is_a?(Array)
+              [k, v.collect{|i| i.to_s }]
+            else
+              [k, v.to_s]
+            end
+          }]
         })
       end
     end

@@ -322,8 +322,19 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     }
   }
 
+  $scope.$watch('interval', function(i){
+    if(angular.isDefined(i)){
+      if(angular.isDefined($scope.opt.interval_id)){
+        $window.clearInterval($scope.opt.interval_id);
+      }
+
+      $scope.opt.interval_id = $window.setInterval($scope.reload, i);
+      $scope.reload();
+    }
+  });
+
   $window.setInterval($scope.tick, 1000);
-  $window.setInterval($scope.reload, 60000);
+  $scope.interval = 60000;
   $scope.reload();
 }
 
