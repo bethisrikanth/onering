@@ -9,7 +9,7 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     if($scope.query){
       Query.query({
         query: $scope.prepareQuery($scope.query, $routeParams.raw),
-        only:  'alert_state,ip,site,model,rack,unit,slot'
+        only:  'alert_state,ip,site,model,rack,unit,slot,reserved'
       }, function(data){
         if(data.length == 0){
           $scope.noresults = true;

@@ -44,6 +44,7 @@
               <tr>
                 <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
                 <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
+                <th ng-click="sortField='properties.reserved'; sortReverse=!sortReverse" class="center"><abbr title="Reserved"><i class="icon-bookmark-empty"> </i></abbr></th>
                 <th ng-click="sortField='properties.alert_state'; sortReverse=!sortReverse" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
                 <th ng-click="sortField='maintenance_status'; sortReverse=!sortReverse" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
                 <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
@@ -63,6 +64,9 @@
                 <td class="id"><a target="_blank" tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
                 <td class="status center">
                   <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
+                </td>
+                <td class="center text-reserved">
+                  <span ng-show="device.properties.reserved"><i class="icon-bookmark"> </i></span>
                 </td>
                 <td class="alerts center">
                   <img
