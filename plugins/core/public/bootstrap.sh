@@ -1,11 +1,26 @@
 #!/bin/bash
 # onering boostrap.sh - "The worst way! (TM)"
 #
+if [ $# -gt 0 ]; then
+  SOURCE_IP="$1"
+  ONERING_ARGS="-I $SOURCE_IP"
+fi
+
+
 quitcode(){
   echo -e "\033[31m[FATAL] $1\033[0m" 1>&2
   exit ${2:-1}
 }
 
+docurl(){
+  if [ "$SOURCE_IP" == '' ]; then
+    curl -sfL $1 
+  else
+    curl -sfL --interface $SOURCE_IP $1 
+  fi
+}
+
+[ "$SOURCE_IP" == '' ] || echo -e "\033[34mUsing source IP address ${SOURCE_IP}\033[0m"
 
 echo -e '\033[32mInstalling Ruby\033[0m'
 
@@ -21,8 +36,8 @@ gem install facter json onering-client onering-report-plugins --no-ri --no-rdoc 
 
 which onering > /dev/null 2>&1 || quitcode "Cannot find command: onering in $PATH"
 
-ONERING_CLIENT_V=$(gem list onering-client | grep -Po -m1 '[0-9]+\.[0-9]+\.[0-9]+' | sort -nr | head -n1)
-ONERING_PLUGIN_V=$(gem list onering-report-plugins | grep -Po -m1 '[0-9]+\.[0-9]+\.[0-9]+' | sort -nr | head -n1)
+ONERING_CLIENT_V=$(gem list onering-client | grep -Po -m1 '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+ONERING_PLUGIN_V=$(gem list onering-report-plugins | grep -Po -m1 '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
 
 echo -e "\033[34mInstalled onering-client v${ONERING_CLIENT_V}, plugins v${ONERING_PLUGIN_V}\033[0m"
 
@@ -44,12 +59,12 @@ fi
 
 echo -e '\033[32mRetrieving validation certificate\033[0m'
 mkdir -p /etc/onering
-curl -s -f -L 'https://onering.outbrain.com/validation.pem' > /etc/onering/validation.pem
+docurl 'https://onering.outbrain.com/validation.pem' > /etc/onering/validation.pem
 
 echo -e '\033[32mPerforming inventory\033[0m'
 
 for i in 1 2; do
-  onering -q report --save 2> /dev/null
+  onering $ONERING_ARGS -q report --save 2> /dev/null
 done
 
 echo -e "\033[32mDONE!\033[0m"
