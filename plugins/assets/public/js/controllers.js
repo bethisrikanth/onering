@@ -10,7 +10,7 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     if($scope.query){
       var p = {
         query: 'tags/not:disabled/'+$scope.prepareQuery($scope.query, $routeParams.raw),
-        only:  'alert_state,ip,site,model,rack,unit,slot',
+        only:  'alert_state,ip,site,model,rack,unit,slot,reserved',
         page:  ($scope.pagenum || 1)
       }
 
