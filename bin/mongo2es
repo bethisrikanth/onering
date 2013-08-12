@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require 'pp'
+require 'oj'
+require 'multi_json'
+require 'tire'
+
+STDIN.read.lines.each do |line|
+  next if line[0].chr == '#'
+  next if line.strip.chomp.empty?
+
+  line = MultiJson.load(line)
+
+  line['id'] = line['_id']
+  line['_type'] = line['_type'].downcase
+
+  line.delete('_id')
+
+
+  Tire.index 'devices' do
+    store line
+  end
+
+  pp line['id']
+end

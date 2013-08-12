@@ -33,7 +33,10 @@ GEM
     hashr (0.0.22)
     i18n (0.6.4)
     liquid (2.5.1)
-    listen (0.7.3)
+    listen (1.2.3)
+      rb-fsevent (>= 0.9.3)
+      rb-inotify (>= 0.9)
+      rb-kqueue (>= 0.2)
     log4r (1.1.10)
     mime-types (1.23)
     mongo (1.8.5)
@@ -44,10 +47,10 @@ GEM
       activesupport (~> 3.0)
       plucky (~> 0.5.2)
     msgpack (0.5.5)
-    multi_json (1.7.8)
+    multi_json (1.7.9)
     net-http-persistent (2.9)
     net-ldap (0.3.1)
-    net-ping (1.6.1)
+    net-ping (1.6.2)
       ffi (>= 1.0.0)
     oats (0.1.4)
       log4r
@@ -65,12 +68,15 @@ GEM
       rack-test (>= 0.5)
     rainbow (1.1.4)
     rake (10.1.0)
-    rb-inotify (0.8.8)
+    rb-fsevent (0.9.3)
+    rb-inotify (0.9.1)
+      ffi (>= 0.5.0)
+    rb-kqueue (0.2.0)
       ffi (>= 0.5.0)
     rdiscount (1.6.8)
     redis (2.2.2)
-    rerun (0.8.0)
-      listen
+    rerun (0.8.1)
+      listen (>= 1.0.3)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rpam-ruby19 (1.2.1)
@@ -139,7 +145,6 @@ DEPENDENCIES
   racksh
   rainbow
   rake
-  rb-inotify (= 0.8.8)
   rdiscount (= 1.6.8)
   rerun
   rpam-ruby19
