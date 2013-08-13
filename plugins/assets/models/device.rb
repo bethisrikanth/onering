@@ -12,7 +12,6 @@ class Device < App::Model::Elasticsearch
     {
       :date_detection    => false,
       :index_analyzer    => :standard,
-      :search_analyzer   => :lowercase,
       :dynamic_templates => [{
         :date_detector => {
           :match    => "*_at",
@@ -29,6 +28,13 @@ class Device < App::Model::Elasticsearch
                 }
               }
             }
+          }
+        }
+      },{
+        :store_generic => {
+          :match   => "*",
+          :mapping => {
+            :store => "yes"
           }
         }
       }]
@@ -53,6 +59,7 @@ class Device < App::Model::Elasticsearch
   before_save                   :_confine_status
   # before_save                   :_apply_defaults
   # before_save                   :_resolve_references
+  before_save                   :_print_object
 
 
   def parent()
@@ -67,52 +74,6 @@ class Device < App::Model::Elasticsearch
     NodeDefault.defaults_for(self)
   end
 
-  def push(key, value, coerce=:auto)
-    current_value = self.properties.get(key)
-    new_value = value.convert_to(coerce)
-
-  # creation
-    if current_value.nil?
-      self.properties.set(key, [new_value])
-
-  # append to existing array
-    elsif current_value.is_a?(Array)
-    # dont append duplicates
-      if current_value.select{|i| i.to_s == new_value.to_s }.empty?
-        self.properties.set(key, current_value+[new_value])
-      end
-
-  # convert scalar -> vector
-    else
-      self.properties.set(key, ([current_value]+[new_value]))
-    end
-
-    self
-  end
-
-  def pop(key)
-    current_value = self.properties.get(key)
-
-    if current_value.nil?
-      return nil
-
-    elsif current_value.is_a?(Array)
-      rv = current_value.pop()
-
-      if current_value.empty?
-        self.properties.unset(key)
-      else
-        self.properties.set(key, current_value)
-      end
-
-    else
-      rv = current_value
-      self.properties.unset(key)
-    end
-
-    return rv
-  end
-
 private
   def _compact()
     self.properties = self.properties.compact
@@ -123,6 +84,10 @@ private
       errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
       self.status = nil
     end
+  end
+
+  def _print_object()
+    pp self.properties
   end
 
   def _apply_defaults

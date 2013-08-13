@@ -2,6 +2,8 @@ require 'mongo_mapper'
 require 'tire'
 require 'pp'
 
+Tire.configure { logger 'elasticsearch.log' }
+
 module App
   module Model
     module Errors
@@ -173,20 +175,55 @@ module App
       end
 
       def from_h(hash)
-        hash.compact.each do |key, values|
+        hash.each do |key, values|
           self.send("#{key}=", values)
         end
 
         self
       end
 
-      def method_missing(name, *args)
-        if name == :_id=
-          false
-        else
-          super
-        end
+      def get(field, default=nil)
+        return to_hash.get(self.class.resolve_field(field), default)
       end
+
+      def set(field, value)
+        from_h(to_hash.set(self.class.resolve_field(field), value))
+      end
+
+      def unset(field)
+        set(field, nil)
+      end
+
+      def push(field, values, coerce=:auto)
+        values = [*values]
+
+        current = [*get(field)].compact
+        values.each do |v|
+          current.push_uniq(v.convert_to(coerce))
+        end
+
+        set(field, current)
+      end
+
+      def pop(field, empty=nil)
+        current = [*get(field)].compact
+
+        rv = current.pop()
+        current = nil if current.empty?
+
+        set(field, current)
+
+        return empty if rv.nil?
+        return rv
+      end
+
+      # def method_missing(name, *args)
+      #   if name == :_id=
+      #     false
+      #   else
+      #     super
+      #   end
+      # end
 
       class<<self
         include_root_in_json = false
@@ -211,10 +248,6 @@ module App
 #puts MultiJson.dump(rv)
 
           rv
-        end
-
-        def get(field, default=nil)
-          return self.to_hash.get(self.resolve_field(field), default)
         end
 
         def urlquery(query, options={})
@@ -350,14 +383,6 @@ module App
           return rv
         end
 
-        def from_h(hash)
-          hash.each do |key, values|
-            self.send("#{key}=", values)
-          end
-
-          self
-        end
-
         def resolve_field(field)
           return '_id' if field == 'id'
           return field if (@_field_prefix_skip || []).include?(field)
@@ -383,13 +408,9 @@ module App
           @_field_prefix_skip = [*list].map(&:to_s)
         end
 
-        def defaults(type=:_default_, &block)
+        def defaults(type=nil, &block)
           if block_given?
-            index.create({
-              :mappings => {
-                type => yield
-              }
-            })
+            index.put_mapping(self.name.downcase, yield)
           end
         end
       end

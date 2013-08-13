@@ -302,7 +302,7 @@ module App
             end
           end
 
-          child.safe_save
+          child.save
         end
 
         output(device)
@@ -328,7 +328,7 @@ module App
             device = Device.find(id)
             return 404 unless device
             device.from_h(json)
-            device.safe_save
+            device.save()
             device.reload
             output(device)
           else
@@ -353,7 +353,7 @@ module App
           device = Device.find(params[:id])
           return 404 if not device
           device.add_note(request.env['rack.input'].read, @user.id)
-          device.safe_save
+          device.save()
 
           200
         end
@@ -368,7 +368,7 @@ module App
 
               device.properties['notes'].delete(params[:note_id])
               device.properties.delete('notes') if device.properties['notes'].empty?
-              device.safe_save
+              device.save()
             end
           end
 
@@ -384,7 +384,7 @@ module App
 
         device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
 
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -394,7 +394,7 @@ module App
 
         device.properties.delete(params[:key])
 
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -420,7 +420,7 @@ module App
         return 404 if not device
 
         device.push(params[:key], params[:value], params[:coerce])
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -429,7 +429,7 @@ module App
         return 404 if not device
 
         rv = device.pop(params[:key])
-        device.safe_save
+        device.save()
         output(rv)
       end
 
@@ -440,7 +440,7 @@ module App
         tags = params[:splat].first.split(/\W/)
         device = Device.find(params[:id])
         tags.each{|t| device.tags.push_uniq(t) }
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -449,7 +449,7 @@ module App
         tags = params[:splat].first.split(/\W/)
         device = Device.find(params[:id])
         tags.each{|t| device.tags.delete(t) }
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -460,21 +460,13 @@ module App
         device = Device.find(params[:id])
         return 404 if not device
         case params[:status]
-        when 'unknown'
-          if (Device::VALID_STATUS - Device::MANUAL_STATUS - Device::NO_AUTOCLEAR_STATUS).include?(device.status)
-            device.unset(:status)
-            device.reload
-          end
-
-        when 'clear', 'null'
-          device.unset(:status)
-          device.reload
-
+        when 'unknown', 'clear', 'null'
+          device.status = nil
         else
           device.status = params[:status]
         end
 
-        device.safe_save
+        device.save()
         output(device)
       end
 
@@ -484,14 +476,13 @@ module App
         device = Device.find(params[:id])
         return 404 if not device
         if params[:status] == 'healthy'
-          device.unset(:maintenance_status)
-          device.reload
+          device.maintenance_status = nil
         else
           device.maintenance_status = params[:status]
-          device.safe_save
         end
 
-        output device.to_h
+        device.save()
+        output(device.to_hash)
       end
     end
   end

@@ -109,6 +109,7 @@ module App
       get '/:id/boot/profile' do
         device = Device.find(params[:id])
         return 404 unless device
+        return 500 unless device.properties['site']
 
         rv = []
         pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
