@@ -5,14 +5,16 @@ class NodeDefault < App::Model::Elasticsearch
   index_name "node_defaults"
 
 
-  property :name,    :type => 'string'
-  property :group,   :type => 'string'
-  property :match,   :default => []
-  property :apply,   :default => {}
-  property :force,   :type => 'boolean', :default => false
-  property :enabled, :type => 'boolean', :default => true
+  property :name,       :type => 'string'
+  property :group,      :type => 'string'
+  property :match,      :default => []
+  property :apply,      :default => {}
+  property :force,      :type => 'boolean', :default => false
+  property :enabled,    :type => 'boolean', :default => true
+  property :created_at, :type => 'date',    :default => Time.now
+  property :updated_at, :type => 'date',    :default => Time.now
 
-  before_validation  :_compact
+  before_save  :_compact
 
   def devices(filter=nil)
     query = []

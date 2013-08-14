@@ -75,20 +75,20 @@
   <div class="modal-body">
     <ul class="nav nav-list status">
       <li>
-        <a rest="/api/devices/{{parent.node.id}}/maintenance/healthy" rest-success="close()">
+        <a rest="/api/devices/{{parent.node.id}}/maintenance/healthy" rest-success="parent.reload(); close()">
           <span class="name"><i class="icon-ok"></i> Healthy</span>
           <span>All problems fixed, no known issues</span>
         </a>
       </li>
       <li>
-        <a rest="/api/devices/{{parent.node.id}}/maintenance/parts" rest-success="close()">
-          <span class="name"><i class="icon-parts"></i> Needs Parts</span>
+        <a rest="/api/devices/{{parent.node.id}}/maintenance/parts" rest-success="parent.reload(); close()">
+          <span class="name"><i class="icon-cogs"></i> Needs Parts</span>
           <span>Something is physically broken and needs to be replaced</span>
         </a>
       </li>
       <li>
-        <a rest="/api/devices/{{parent.node.id}}/maintenance/service" rest-success="close()">
-          <span class="name"><i class="icon-service"></i> Needs Service</span>
+        <a rest="/api/devices/{{parent.node.id}}/maintenance/service" rest-success="parent.reload(); close()">
+          <span class="name"><i class="icon-wrench"></i> Needs Service</span>
           <span>Requires some form of manual intervention to get the node to a healthy state</span>
         </a>
       </li>

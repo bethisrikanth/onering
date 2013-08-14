@@ -55,11 +55,12 @@ class Device < App::Model::Elasticsearch
 
   field_prefix                  :properties
 
+  before_save                   :_ensure_id
   before_save                   :_compact
   before_save                   :_confine_status
-  # before_save                   :_apply_defaults
-  # before_save                   :_resolve_references
-  before_save                   :_print_object
+  before_save                   :_apply_defaults
+  before_save                   :_resolve_references
+  #before_save                   :_print_object
 
 
   def parent()
@@ -79,7 +80,18 @@ private
     self.properties = self.properties.compact
   end
 
-  def _confine_status
+  def _ensure_id()
+    if self.id.nil?
+      begin
+        require 'securerandom'
+        self.id = SecureRandom.hex(12)
+      rescue LoadError
+        self.id = Array.new(24){rand(16).to_s(16)}.join
+      end
+    end
+  end
+
+  def _confine_status()
     if not VALID_STATUS.include?(self.status)
       errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
       self.status = nil
@@ -111,13 +123,13 @@ private
       apply = Hash[apply.select{|k,v|
         App::Helpers::TOP_LEVEL_FIELDS.include?(k)
       }].merge({
-        self.field_prefix() => Hash[apply.reject{|k,v|
+        Device.field_prefix() => Hash[apply.reject{|k,v|
           App::Helpers::TOP_LEVEL_FIELDS.include?(k)
         }]
       })
 
     # autotype the properties being applied
-      apply.each_recurse! do |k,v,p|
+      apply = apply.each_recurse do |k,v,p|
         if v.is_a?(Array)
           v.collect{|i| (i.autotype() rescue i) }
         else

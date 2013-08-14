@@ -13,7 +13,7 @@ module Automation
           }
 
         # resync defaults
-          NodeDefault.where(:enabled => true).each do |default|
+          NodeDefault.urlquery('bool:enabled/true').each do |default|
             devices = default.devices.to_a
             next unless devices.length > 0
 
@@ -22,10 +22,18 @@ module Automation
             devices.each do |device|
               begin
               # resave the device to apply the defaults to it
-                device.safe_save
+                device.save()
                 rv[:success] += 1
+
+              rescue Interrupt
+                raise abort("Manually interrupted")
+
               rescue Exception => e
                 log("Error resyncing #{device.id}: #{e.class.name} - #{e.message}", :warning)
+                e.backtrace.each do |backtrace|
+                  next unless backtrace =~ /onering/
+                  log("  #{backtrace}", :debug)
+                end
 
                 rv[:errors] << {
                   :id      => device.id,

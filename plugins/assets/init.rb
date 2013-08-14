@@ -67,7 +67,7 @@ module App
                 apply.each{|k,v| o['apply'].set(k.split(/[\_\.]/), v) }
               end
 
-              default.from_json(o, false, true).safe_save
+              default.from_json(o, false, true).save()
             end
 
             200
@@ -329,7 +329,6 @@ module App
             return 404 unless device
             device.from_h(json)
             device.save()
-            device.reload
             output(device)
           else
             job = Automation::Job.find_by_name('assets-update')
@@ -352,8 +351,8 @@ module App
         post route do
           device = Device.find(params[:id])
           return 404 if not device
-          device.add_note(request.env['rack.input'].read, @user.id)
-          device.save()
+          # device.add_note(request.env['rack.input'].read, @user.id)
+          # device.save()
 
           200
         end

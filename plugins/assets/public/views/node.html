@@ -12,7 +12,16 @@
               </span>
 
               <span ng-show="node.properties.reserved" style="width: 100%" class="label label-reserved">
-                <i class="icon-bookmark" title="This node has been reserved"> </i>&nbsp;&nbsp;Reserved
+                <i class="pull-left icon-bookmark" title="This node has been reserved"> </i>&nbsp;&nbsp;Reserved
+              </span>
+
+              <span ng-show="node.maintenance_status != null" style="width: 100%" class="label label-inverse" ng-switch on="node.maintenance_status">
+                <span ng-switch-when="parts" title="This node requires physical, on-site service">
+                  <i class="pull-left icon-cogs"> </i>&nbsp;&nbsp;Parts
+                </span>
+                <span ng-switch-when="service" title="This node requires remote intervention to return to a healthy state">
+                  <i class="pull-left icon-wrench"> </i>&nbsp;&nbsp;Service
+                </span>
               </span>
             </td>
           </tr>

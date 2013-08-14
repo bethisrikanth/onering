@@ -4,22 +4,37 @@ require 'pp'
 require 'oj'
 require 'multi_json'
 require 'tire'
+require 'hashlib'
 
 STDIN.read.lines.each do |line|
   next if line[0].chr == '#'
   next if line.strip.chomp.empty?
 
+  data = {}
   line = MultiJson.load(line)
 
   line['id'] = line['_id']
-  line['_type'] = line['_type'].downcase
+  line['_type'] = line['_type'].underscore
 
   line.delete('_id')
 
-
-  Tire.index 'devices' do
-    store line
+  line.each_recurse(:intermediate => true) do |k,v,p|
+    if k =~ /_at$/
+      data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+    elsif k == '$date'
+      nil
+    elsif k == '$oid'
+      data.set('id', v)
+    else
+      data.set(p, v)
+    end
   end
 
-  pp line['id']
+
+  Tire.index ARGV[0] do
+    create
+    store data
+  end
+
+  pp data['id']
 end

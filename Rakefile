@@ -12,16 +12,22 @@ namespace :db do
   desc "Seeds the db with test/mock data"
   task :seed do
     load "irb.ru"
-    require "db/seed"
     puts "Seeding database..."
-    App::Database::Seed.seed
-  end
-  task :clean do
-    load "irb.ru"
-    require "db/seed"
-    puts "Cleaning DB..."
-    App::Database::Seed.clean
-    puts "done"
+
+    Tire.configure { logger 'elasticsearch.log' }
+
+    models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
+
+    models.each do |index, model|
+      Tire.index(index) do
+        create
+
+        unless model.defaults.nil?
+          puts "Applying defaults for #{index}/#{model.name.underscore}"
+          mapping(model.name.underscore, model.defaults)
+        end
+      end
+    end
   end
 end
 

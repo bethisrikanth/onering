@@ -174,24 +174,80 @@ module App
         end
       end
 
-      def from_h(hash)
-        hash.each do |key, values|
-          self.send("#{key}=", values)
+    # populate the document from a Hash
+      def from_h(hash, merge=true, autotype=false)
+        raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)
+
+        if merge
+        # build list of paths to fully replace
+          unset_keys = Hash[hash.coalesce(nil, nil, '.').select{|k,v|
+            k.include?('@')
+          }].keys.collect{|k|
+            k = k.split('.')
+            i = k.index{|i| i[0].chr == '@' }
+
+            (i ? k.first(i+1).join('.') : nil)
+          }.compact.uniq
+
+          newhash = to_h
+        # delete existing keys that are to be replaced
+        # rename incoming keys to exclude symbols
+          unset_keys.each do |key|
+            newhash.unset(key.delete('@'))
+            hash.rekey(key, key.delete('@'))
+          end
+
+          newhash = newhash.deeper_merge!(hash, {:merge_hash_arrays => true})
+        else
+          newhash = hash
         end
 
-        self
+      # automatically convert fields ending with _at or _on to Time
+        newhash = newhash.each_recurse do |k,v,p|
+          case k
+          when /_(?:at|on)$/i
+            if v == 'now'
+              Time.now
+            else
+              (Time.parse(v) rescue v)
+            end
+          else
+            v
+          end
+        end
+
+        newhash.each do |k,v|
+          self.send("#{k}=", v) rescue nil
+        end
+
+        return self
       end
+
+    # populate the document from a JSON string
+      def from_json(json, merge=true, autotype=false)
+        json = MultiJson.load(json) if json.is_a?(String)
+        json = [json] if json.is_a?(Hash)
+
+        if json
+          json.each do |j|
+            from_h(j, merge, autotype)
+          end
+        end
+
+        return self
+      end
+
 
       def get(field, default=nil)
         return to_hash.get(self.class.resolve_field(field), default)
       end
 
       def set(field, value)
-        from_h(to_hash.set(self.class.resolve_field(field), value))
+        return from_h(to_hash.set(self.class.resolve_field(field), value))
       end
 
       def unset(field)
-        set(field, nil)
+        return set(field, nil)
       end
 
       def push(field, values, coerce=:auto)
@@ -202,7 +258,7 @@ module App
           current.push_uniq(v.convert_to(coerce))
         end
 
-        set(field, current)
+        return set(field, current)
       end
 
       def pop(field, empty=nil)
@@ -286,7 +342,7 @@ module App
           }.compact.merge(query))
 
           collection.options[:load] = load
-          collection.results
+          return collection.results
         end
 
         def list(field, query=nil)
@@ -309,14 +365,12 @@ module App
             }
           }.compact)
 
-
-          facet = results.facets[:counts]
+          facet = results.facets.get(:counts)
           return [] if facet.nil?
 
           return facet.get(:terms,[]).collect{|i|
             i.get(:term)
           }.compact.sort.uniq
-
         end
 
       # summarize
@@ -388,7 +442,7 @@ module App
           return field if (@_field_prefix_skip || []).include?(field)
           return field if field.to_s.empty? or @_field_prefix.to_s.empty?
           return field if field =~ Regexp.new("^#{@_field_prefix}\.")
-          return @_field_prefix+'.'+field
+          return @_field_prefix.to_s+'.'+field.to_s
         end
 
         def unresolve_field(field)
@@ -410,8 +464,20 @@ module App
 
         def defaults(type=nil, &block)
           if block_given?
-            index.put_mapping(self.name.downcase, yield)
+            @defaults = yield
+            index.put_mapping(self.name.downcase, @defaults)
+          else
+            @defaults
           end
+        end
+
+        def inherited(subclass)
+          @@_implementers ||= Set.new()
+          @@_implementers << subclass
+        end
+
+        def implementers
+          @@_implementers
         end
       end
     end
