@@ -33,7 +33,7 @@ class NodeDefault < App::Model::Elasticsearch
       query << (m['test'].nil? ? '' : m['test']+':')+m['value'] if m['value']
     }
 
-    Device.urlquery(query.join('/'))
+    Asset.urlquery(query.join('/'))
   end
 
   class<<self

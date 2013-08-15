@@ -273,13 +273,13 @@ module App
         return rv
       end
 
-      # def method_missing(name, *args)
-      #   if name == :_id=
-      #     false
-      #   else
-      #     super
-      #   end
-      # end
+      def method_missing(name, *args)
+        if name[-1].chr == '='
+          false
+        else
+          super
+        end
+      end
 
       class<<self
         include_root_in_json = false

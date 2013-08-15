@@ -1,11 +1,11 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module Automation
   module Tasks
     module Openvz
       class Sync < Base
         def run(request)
-          hosts = Device.urlsearch('openvz.guests').to_a
+          hosts = Asset.urlsearch('openvz.guests').to_a
 
 
           if not hosts.empty?
@@ -15,7 +15,7 @@ module Automation
               log("Linking guests for #{host.name} (#{host.id})")
 
               host.get('openvz.guests').each do |guest_name|
-                guest = Device.urlsearch("fqdn/#{guest_name}").to_a.select{|i| i.get('virtual').to_s === 'true' }
+                guest = Asset.urlsearch("fqdn/#{guest_name}").to_a.select{|i| i.get('virtual').to_s === 'true' }
 
                 case guest.length
                 when 0

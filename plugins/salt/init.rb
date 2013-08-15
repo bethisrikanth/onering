@@ -1,7 +1,7 @@
 require 'controller'
 require 'salt/lib/salt'
 require 'automation/models/job'
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module App
   class Base < Controller
@@ -10,7 +10,7 @@ module App
     namespace '/api/salt' do
       namespace '/devices' do
         get '/:id/ping' do
-          device = Device.find(params[:id])
+          device = Asset.find(params[:id])
           return 404 unless device
 
           salt = Salt::API.new(Config.get!("automation.saltrest.#{device.properties['site'].downcase}.url"))

@@ -1,6 +1,6 @@
 require 'set'
 require 'model'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'organization/models/contact'
 
 module Hardware
@@ -17,7 +17,7 @@ module Hardware
 
 
     def units()
-      devices = Device.urlquery("str:site/#{self.site}/str:rack/#{self.name}/virtual/not:true").to_a
+      devices = Asset.urlquery("str:site/#{self.site}/str:rack/#{self.name}/virtual/not:true").to_a
       seen = Set.new()
 
       rv = []

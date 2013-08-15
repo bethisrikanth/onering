@@ -1,4 +1,4 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'assets/models/node_default'
 
 module Automation

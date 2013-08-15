@@ -1,6 +1,6 @@
 require 'controller'
 require 'hardware/models/rack'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'organization/models/contact'
 
 module App
@@ -8,7 +8,7 @@ module App
     namespace '/api/hardware' do
       namespace '/sites' do
         get '/?' do
-          sites = Config.get('hardware.sites', Device.list(:site))
+          sites = Config.get('hardware.sites', Asset.list(:site))
 
           output(sites.collect{|site|
             {

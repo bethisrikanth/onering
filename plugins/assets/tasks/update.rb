@@ -1,4 +1,4 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module Automation
   module Tasks
@@ -9,12 +9,12 @@ module Automation
           nodes = []
 
           if opt(:query)
-            nodes += Device.urlsearch(opt(:query)).to_a if opt(:query)
+            nodes += Asset.urlsearch(opt(:query)).to_a if opt(:query)
             log("Updating #{nodes.length} nodes from query: #{opt(:query)}", :info)
 
           elsif opt(:nodes)
             n = opt(:nodes).split(/[\,\;\:\|]/).flatten
-            nodes += Device.find([*n]).to_a
+            nodes += Asset.find([*n]).to_a
 
             log("Updating #{nodes.length} nodes explicitly named by ID", :info) unless nodes.empty?
 
@@ -24,7 +24,7 @@ module Automation
               log("Inserting #{inserts.length} nodes explicitly named by ID", :info)
 
               inserts.each do |id|
-                nodes << Device.new({
+                nodes << Asset.new({
                   :id => id
                 })
               end

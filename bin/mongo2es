@@ -16,6 +16,8 @@ STDIN.read.lines.each do |line|
   line['id'] = line['_id']
   line['_type'] = line['_type'].underscore
 
+  line['_type'] = 'asset' if line['_type'] == 'device'
+
   line.delete('_id')
 
   line.each_recurse(:intermediate => true) do |k,v,p|

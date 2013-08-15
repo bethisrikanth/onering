@@ -1,11 +1,11 @@
 require 'controller'
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module App
   class Base < Controller
     namespace '/api/rundeck' do
       get '/nodes/?*' do
-        nodes = Device.urlsearch("bool:orchestrate/not:false/"+params[:splat].first)
+        nodes = Asset.urlsearch("bool:orchestrate/not:false/"+params[:splat].first)
         return 404 if nodes.empty?
 
         content_type 'text/x-yaml'

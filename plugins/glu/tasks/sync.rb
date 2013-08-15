@@ -1,4 +1,4 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module Automation
   module Tasks
@@ -40,7 +40,7 @@ module Automation
                 host = base['path'].split('/')[6]
                 return nil unless host
 
-                device = Device.urlsearch("name:aliases/#{host}").first
+                device = Asset.urlsearch("name:aliases/#{host}").first
                 hid = (device[:_id] rescue nil)
                 return nil unless hid
 
@@ -112,7 +112,7 @@ module Automation
 
           # save glu data
             glu_agents.each do |name, glu_properties|
-              device = Device.find_by_name(name)
+              device = Asset.find_by_name(name)
 
               if device
                 rv << device.id
@@ -138,11 +138,11 @@ module Automation
             end
 
           # remove glu properties from hosts not appearing in the glu.json
-            glu_missing = (Device.where({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
+            glu_missing = (Asset.where({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
             log("Removing Glu configuration from #{glu_missing.length} nodes") unless glu_missing.empty?
 
             glu_missing.each do |node|
-              node = Device.find_by_name(node)
+              node = Asset.find_by_name(node)
               next unless node
               node.properties[:glu] = nil
               node.safe_save rescue next

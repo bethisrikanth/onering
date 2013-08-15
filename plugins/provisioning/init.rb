@@ -1,6 +1,6 @@
 require 'liquid_patches'
 require 'controller'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'provisioning/models/asset_request'
 require 'uri'
 require 'net/http'
@@ -13,10 +13,10 @@ module App
     end
 
     helpers do
-      def get_macs(device)
+      def get_macs(asset)
         macs = []
 
-        device.properties.get('network.interfaces').each do |iface|
+        asset.properties.get('network.interfaces').each do |iface|
           if ['eth0', 'eth1'].include?(iface['name'])
             macs << {
               :interface => iface['name'],
@@ -94,7 +94,7 @@ module App
               'body'       => note
             } unless note.nil?
 
-            asset.safe_save()
+            asset.save()
 
             200
           end
@@ -107,13 +107,13 @@ module App
       end
 
       get '/:id/boot/profile' do
-        device = Device.find(params[:id])
-        return 404 unless device
-        return 500 unless device.properties['site']
+        asset = Asset.find(params[:id])
+        return 404 unless asset
+        return 500 unless asset.properties['site']
 
         rv = []
-        pxed = Config.get("provisioning.pxed.#{device.properties['site'].downcase}.url")
-        macs = get_macs(device)
+        pxed = Config.get("provisioning.pxed.#{asset.properties['site'].downcase}.url")
+        macs = get_macs(asset)
 
         macs.each do |mac|
           response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/profile"))
@@ -124,8 +124,8 @@ module App
       end
 
       get '/:id/boot/profile/list' do
-        device = Device.find(params[:id])
-        return 404 unless device
+        asset = Asset.find(params[:id])
+        return 404 unless asset
 
         rv = Config.get("provisioning.boot.profiles",[])
         rv.compact.to_json
@@ -137,19 +137,18 @@ module App
         /:id/boot/set/:profile/:subprofile/?
       }.each do |r|
         get r do#ne
-          device = Device.find(params[:id])
-          return 404 unless device
+          asset = Asset.find(params[:id])
+          return 404 unless asset
 
           if params[:profile]
-            device.properties.set('provisioning.boot.profile', params[:profile])
-            device.properties.set('provisioning.boot.subprofile', params[:subprofile]) unless params[:subprofile].nil?
-            device.safe_save()
-            device.reload()
+            asset.properties.set('provisioning.boot.profile', params[:profile])
+            asset.properties.set('provisioning.boot.subprofile', params[:subprofile]) unless params[:subprofile].nil?
+            asset.save()
           end
 
           status, headers, body = call env.merge({
             'PATH_INFO'    => '/api/ipxe/boot',
-            'QUERY_STRING' => "id=#{device.id}"
+            'QUERY_STRING' => "id=#{asset.id}"
           })
           [status, headers, body]
         end
@@ -162,13 +161,13 @@ module App
         get r do#ne
           content_type 'text/plain'
           if params[:id]
-            device = Device.find(params[:id])
+            asset = Asset.find(params[:id])
 
           elsif (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'] || params[:mac])
             iface = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').first.strip.chomp rescue 'eth0')
             mac = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').last rescue param[:mac]).strip.chomp
 
-            device = Device.first({
+            asset = Asset.first({
               '$and' => [
                 {'properties.network.interfaces.name' => iface},
                 {'properties.network.interfaces.mac'  =>
@@ -181,46 +180,46 @@ module App
             }) if mac
           end
 
-          return 404 unless device
+          return 404 unless asset
 
           if params[:status]
-            device.status = params[:status]
-            device.safe_save
+            asset.status = params[:status]
+            asset.save()
           end
 
-          script_type = device.properties.get('provisioning.boot.subprofile')
+          script_type = asset.properties.get('provisioning.boot.subprofile')
           raise "Property 'provisioning.boot.subprofile' is required" unless script_type.is_a?(String)
           script_type.gsub!(/[\-]/,'/')
 
           liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
-            :device => (device.to_h rescue {}),
+            :device => (asset.to_h rescue {}),
             :config => Config.get('provisioning.boot')
           }
         end
       end
 
       get '/:id/set/:key/:value' do
-        device = Device.find(params[:id])
-        return 404 unless device
+        asset = Asset.find(params[:id])
+        return 404 unless asset
 
-        device.properties ||= {}
-        device.properties.set("provisioning.#{params[:key]}", params[:value])
-        device.safe_save
+        asset.properties ||= {}
+        asset.properties.set("provisioning.#{params[:key]}", params[:value])
+        asset.save()
 
-        device.to_json
+        asset.to_json
       end
 
       get '/:id/action' do
-        device = Device.find(params[:id])
-        return 404 unless device
+        asset = Asset.find(params[:id])
+        return 404 unless asset
 
 
-        rv = device.properties.get('provisioning.action')
+        rv = asset.properties.get('provisioning.action')
 
         if params[:clear] == 'true'
-          if device.properties['provisioning']
-            device.properties['provisioning'].delete('action')
-            device.safe_save
+          if asset.properties['provisioning']
+            asset.properties['provisioning'].delete('action')
+            asset.save()
           end
         end
 
@@ -240,7 +239,7 @@ module App
           mask.each_index{|i| network[i] = (mask[i].to_i(2) & netip[i].to_i(2)) }
           network = network.reject{|i| i == 0 }.join('.')
 
-          ips = Device.list('network.interfaces.addresses.ip').to_a
+          ips = Asset.list('network.interfaces.addresses.ip').to_a
           ips.select!{|i| i =~ Regexp.new("^#{network}") }
 
           raise ips.inspect

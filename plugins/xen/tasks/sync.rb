@@ -1,4 +1,4 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module Automation
   module Tasks
@@ -7,14 +7,14 @@ module Automation
         def run(request)
           hosts = {}
 
-          guests = Device.urlsearch('xen.uuid').to_a
+          guests = Asset.urlsearch('xen.uuid').to_a
 
           if not guests.empty?
             log("Linking #{guests.length} Xen guests to their parent hosts")
 
             guests.each do |guest|
               uuid = guest.properties.get('xen.uuid')
-              parent = (hosts[uuid] || Device.urlsearch("xen.guests/#{uuid}").to_a.first)
+              parent = (hosts[uuid] || Asset.urlsearch("xen.guests/#{uuid}").to_a.first)
 
               if parent
               # cache the parent for the duration of this call

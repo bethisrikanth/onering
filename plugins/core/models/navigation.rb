@@ -1,5 +1,5 @@
 require 'model'
-require 'assets/models/device'
+require 'assets/models/asset'
 
 class Navigation < App::Model::Base
   include App::Model::Taggable

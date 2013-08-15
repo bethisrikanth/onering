@@ -1,5 +1,5 @@
 require 'controller'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'automation/models/job'
 
 module App
@@ -15,7 +15,7 @@ module App
         get '/summary/*' do
           job_requests = (
             params[:q].nil? ? Automation::Request.all
-            : Automation::Request.where(Device.to_mongo(params[:q]))
+            : Automation::Request.where(Asset.to_mongo(params[:q]))
           ).collect{|i|
             i.to_h
           }

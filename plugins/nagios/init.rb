@@ -1,5 +1,5 @@
 require 'controller'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'nagios/models/nagios_host'
 require 'open-uri'
 
@@ -23,7 +23,7 @@ module App
 
         rv = []
 
-        devices = Device.find(nagios_hosts.collect{|i| i['_id'] })
+        devices = Asset.find(nagios_hosts.collect{|i| i['_id'] })
 
         nagios_hosts.each do |nagios|
           device_i = devices.find_index{|i| i['_id'] == nagios['_id'] }

@@ -1,5 +1,5 @@
 require 'controller'
-require 'assets/models/device'
+require 'assets/models/asset'
 
 module App
   class Base < Controller
@@ -8,13 +8,13 @@ module App
         content_type 'text/plain'
 
         if params[:id]
-          device = Device.find(params[:id])
+          device = Asset.find(params[:id])
         elsif params[:mac] and not params[:mac].empty?
         # TODO: order by collected_at DESC
-          device = Device.urlsearch("mac|network.interfaces.mac/#{params[:mac]}").to_a.first
+          device = Asset.urlsearch("mac|network.interfaces.mac/#{params[:mac]}").to_a.first
         elsif params[:uuid] and not params[:uuid].empty?
         # TODO: order by collected_at DESC
-          device = Device.urlsearch("uuid/#{params[:uuid]}").to_a.first
+          device = Asset.urlsearch("uuid/#{params[:uuid]}").to_a.first
         end
 
         liquid "ipxe/boot".to_sym, :locals => {

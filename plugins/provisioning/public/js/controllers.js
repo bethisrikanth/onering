@@ -129,7 +129,7 @@ function ProvisioningController($scope, $http, $window, $timeout, Query, Device)
           i.properties.site = i.properties.site.toLowerCase();
         }
 
-        Device.save({
+        Asset.save({
            id: i.id,
           properties: i.properties
         }, function(){

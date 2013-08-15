@@ -2,6 +2,8 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.query = $routeParams.query;
   $scope.time_left = 0;
   $scope.pagenum = 1;
+  $scope.sortField = 'name';
+  $scope.sortReverse = false;
 
   $scope.reload = function(){
     $scope.loading = true;
@@ -11,6 +13,7 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
       var p = {
         query: 'tags/not:disabled/'+$scope.prepareQuery($scope.query, $routeParams.raw),
         only:  'alert_state,ip,site,model,rack,unit,slot,reserved',
+        sort:  ($scope.sortReverse && '-' || '')+($scope.sortField || 'name'),
         page:  ($scope.pagenum || 1)
       }
 
@@ -67,10 +70,6 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     }
   }
 
-  $scope.updateTime = function(){
-    $scope.time_left -= 1;
-  }
-
   $scope.$watch('pagenum', function(){
     if($scope.pages){
       if($scope.pagenum > $scope.pages.total){
@@ -93,7 +92,14 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     }
   });
 
-  $window.setInterval($scope.updateTime, 1000);
+  $scope.$watch('sortField', function(){
+    $scope.reload();
+  }, true);
+
+  $scope.$watch('sortReverse', function(){
+    $scope.reload();
+  }, true);
+
   $scope.reload();
 }
 

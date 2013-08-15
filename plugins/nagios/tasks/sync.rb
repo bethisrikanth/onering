@@ -1,4 +1,4 @@
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'nagios/models/nagios_host'
 
 module Automation
@@ -15,7 +15,7 @@ module Automation
           fail("Data must be a valid JSON document") unless @data.is_a?(Hash)
 
           NagiosHost.delete_all()
-          Device.set({
+          Asset.set({
             'properties.alert_state' => {'$exists' => 1}
           }, {
             'properties.alert_state' => nil
@@ -36,7 +36,7 @@ module Automation
 
           # if this host has alerts
             unless states['alerts'].empty?
-              device = Device.where({
+              device = Asset.where({
                 '$or' => [{
                   'name' => {
                     '$regex' => "^#{host}.*$",

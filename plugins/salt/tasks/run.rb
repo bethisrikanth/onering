@@ -1,5 +1,5 @@
 require 'automation/models/request'
-require 'assets/models/device'
+require 'assets/models/asset'
 require 'salt/lib/helpers'
 require 'salt/lib/salt'
 
@@ -20,8 +20,8 @@ module Automation
           arguments = nil if arguments.empty?
 
           nodes = []
-          nodes += Device.urlsearch(opt(:query)).fields('properties.site').to_a if opt(:query)
-          nodes += Device.fields('properties.site').find([*opt(:nodes)].flatten).to_a if opt(:nodes)
+          nodes += Asset.urlsearch(opt(:query)).fields('properties.site').to_a if opt(:query)
+          nodes += Asset.fields('properties.site').find([*opt(:nodes)].flatten).to_a if opt(:nodes)
 
           if nodes.empty?
             fail("No nodes specified")

@@ -4,7 +4,7 @@ require 'assets/lib/helpers'
 require 'automation/models/job'
 
 
-class Device < App::Model::Elasticsearch
+class Asset < App::Model::Elasticsearch
   VALID_STATUS = %w{online allocatable installing}
   NO_AUTOCLEAR_STATUS = %w{installing}
 
@@ -64,11 +64,11 @@ class Device < App::Model::Elasticsearch
 
 
   def parent()
-    (self.parent_id ? Device.find(self.parent_id) : nil)
+    (self.parent_id ? Asset.find(self.parent_id) : nil)
   end
 
   def children()
-    Device.urlquery("str:parent_id/#{self.id}")
+    Asset.urlquery("str:parent_id/#{self.id}")
   end
 
   def defaults
@@ -123,7 +123,7 @@ private
       apply = Hash[apply.select{|k,v|
         App::Helpers::TOP_LEVEL_FIELDS.include?(k)
       }].merge({
-        Device.field_prefix() => Hash[apply.reject{|k,v|
+        Asset.field_prefix() => Hash[apply.reject{|k,v|
           App::Helpers::TOP_LEVEL_FIELDS.include?(k)
         }]
       })
@@ -189,7 +189,7 @@ end
 
 
 
-# class Device < App::Model::Elasticsearch
+# class Asset < App::Model::Elasticsearch
 #   include App::Model::Taggable
 
 #   #set_collection_name "devices"
@@ -245,11 +245,11 @@ end
 #   end
 
 #   def parent
-#     (parent_id ? Device.find(parent_id) : nil)
+#     (parent_id ? Asset.find(parent_id) : nil)
 #   end
 
 #   def children
-#     Device.where({
+#     Asset.where({
 #       :parent_id => id
 #     }).to_a
 #   end
@@ -279,7 +279,7 @@ end
 #     end
 
 #     def _id_pattern_valid?
-#       errors.add(:id, "Device ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
+#       errors.add(:id, "Asset ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
 #     end
 
 #     def _compact
@@ -294,7 +294,7 @@ end
 #   # urlsearch
 #   # perform a query formatted as a URL partial path component
 #     def urlsearch(urlquery)
-#       self.where(Device.to_mongo(urlquery))
+#       self.where(Asset.to_mongo(urlquery))
 #     end
 
 #     def to_mongo(urlquery)
