@@ -54,6 +54,11 @@ body .modal {
   margin-left: 0;
 }
 
+.row-fluid .span4+.span8+div,
+.row-fluid .span8+.span4+div{
+  margin-left: 0;
+}
+
 .row-fluid .span12{
   margin-left: 0;
 }
@@ -731,6 +736,80 @@ th{
 }
 
 
+.graph{
+  margin-bottom: 20px;
+  position: relative;
+}
 
-.radian .line{
+.graph .radian{
+  display: inline-block;
+}
+
+.graph .legend{
+  list-style-type: none;
+  margin-left: 20px;
+}
+
+.graph.tpl-graphite{
+  background-color: black;
+  border-radius: 8px;
+  color: white;
+}
+
+.graph.tpl-graphite .radian .axis text{
+  fill: white;
+}
+
+.graph.tpl-graphite .radian .axis path,
+.graph.tpl-graphite .radian .axis .tick{
+  stroke: white;
+}
+
+.graph .radian .line{
+}
+
+.graph .radian .axis-label{
+  display: none;
+}
+
+
+.graph.tpl-panel{
+  background-color: #222;
+  border-radius: 4px;
+  color: #A0A0A0;
+}
+
+.graph.tpl-panel .radian .axis text{
+  fill: #A0A0A0;
+}
+
+.graph.tpl-panel .radian .axis path,
+.graph.tpl-panel .radian .axis .tick{
+  stroke: #A0A0A0;
+}
+
+
+
+
+#dashboard{
+  background-color: #55555A;
+}
+
+#dashboard .graph > div{
+  height: 250px !important;
+  padding-bottom: 40px;
+}
+
+#dashboard .graph h1{
+  background-image: -webkit-linear-gradient(top,#222,#111);
+  border-radius: 4px;
+  color: white;
+  padding-left: 1em;
+  padding-right: 1em;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  text-align: left !important;
 }

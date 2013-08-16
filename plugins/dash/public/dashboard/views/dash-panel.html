@@ -1,0 +1,37 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div ng-repeat="pane in dashboard.panes" class="span{{ pane.columns || '6' }} graph tpl-panel" ng-switch on="_display" ng-init="graph_id=pane.name">
+      <div ng-switch-when="visible" ng-controller="GraphController">
+        <h1 ng-show="graph.name" class="center">
+          {{ graph.name }}
+          <span ng-show="opt.loading">[LOADING]</span>
+
+          <span class="pull-right">
+            <span class="badge {{ graph_params.from=='-30minutes' &amp;&amp; 'badge-info' }}" ng-click="setFromTime('-30minutes')">30m</span>
+            <span class="badge {{ graph_params.from=='-2hours' &amp;&amp; 'badge-info' }}" ng-click="setFromTime('-2hours')">2h</span>
+            <span class="badge {{ graph_params.from=='-24hours' &amp;&amp; 'badge-info' }}" ng-click="setFromTime('-24hours')">24h</span>
+            <span class="badge {{ graph_params.from=='-72hours' &amp;&amp; 'badge-info' }}" ng-click="setFromTime('-72hours')">3d</span>
+            <span class="badge {{ graph_params.from=='-1week' &amp;&amp; 'badge-info' }}" ng-click="setFromTime('-1week')">1w</span>
+          </span>
+        </h1>
+
+        <plot stroke-width="{{ graph.options.line_width || '1' }}" style="width: 100%; height: 100%;" range-y="{{ (graph.options.range.upper &amp;&amp; (graph.options.range.lower || '0')+','+(graph.options.range.upper)) }}">
+          <lines ng-repeat="s in graph.data.schema | filter:isVisible" x="[[graph.data.points#time]]" y="[[graph.data.points#values#($index)]]" stroke="[[s.color]]"></lines>
+        </plot>
+
+        <plot-data name="graph" format="json">
+          <metadata name="time" label="Time" format="date" unit="s"></metadata>
+          []
+        </plot-data>
+
+        <ul class="legend" ng-hide="graph.options.hide_legend">
+          <li ng-repeat="s in graph.data.schema" ng-click="s.hide=!s.hide">
+            <i ng-hide="s.hide" class="icon-circle" style="color:{{s.color}}"> </i>
+            <i ng-show="s.hide" class="icon-circle-blank" style="color:{{s.color}}"> </i>
+            {{ s.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

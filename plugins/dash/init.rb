@@ -1,61 +1,50 @@
 require 'controller'
+require 'dash/lib/graphite_graph'
+require 'dash/models/graph'
 
 module App
   class Base < Controller
     namespace '/api/dashboard' do
-
-      get '/test' do
+      get '/:name' do
         output({
-          :title  => "Test Chart of Awesome Power",
-          :series => [{
-            :name  => "entries",
-            :color => "red"
+          :title => "Test Dashboard",
+          :panes => [{
+            :type    => "graph",
+            :name    => "ops.online.api.responsiveness.99th",
+            :options => {
+              :hide_legend => true,
+              :line_width  => 2
+            },
+            :columns => 12
           },{
-            :name => "others"
-          }],
-          :colors => {
-            "f*" => "green",
-            "o*" => "blue",
-            :default => "black"
-          }
+            :type    => "graph",
+            :name    => "ops.online.api.connection_rate",
+            :options => {
+              :hide_legend => true,
+              :line_width  => 2
+            },
+            :columns => 12
+          }]
         })
       end
 
-      get '/test/data' do
-        rv = {}
-        t = Time.now.to_i
-        times = 5.times.collect{|i| t+i }
+      get '/graph/:id' do
+        graph = Dashboard::Graph.find(params[:id])
+        return 404 if graph.nil?
 
-        graphite = [{
-          "target" => "entries",
-          "datapoints" => [
-            [1.0, 0],
-            [2.0, 1],
-            [3.0, 2],
-            [5.0, 3],
-            [6.0, 4]
-          ]
-        },{
-          "target" => "others",
-          "datapoints" => [
-            [16.0, 0],
-            [22.0, 1],
-            [13.0, 2],
-            [15.0, 3],
-            [16.0, 4]
-          ]
-        }]
+        graph.options[:params] ||= {}
+        graph.options[:params][:from] = params[:from]   if params[:from]
+        graph.options[:params][:until] = params[:until] if params[:until]
 
-        graphite.each do |series|
-          series['datapoints'].each do |value, time|
-            time = (times[time]*1000)
-            rv[time] ||= []
-            rv[time] << (rand() * value)
-          end
-        end
+        rv = graph.to_hash()
+        rv[:data] = {
+          :schema => [],
+          :points => []
+        }
 
-        content_type 'text/plain'
-        rv.collect{|k,v| "#{k},#{v.join(',')}" }.join("\n")
+        rv[:data][:points], rv[:data][:schema] = GraphiteGraph.query(rv)
+
+        output(rv)
       end
     end
   end
