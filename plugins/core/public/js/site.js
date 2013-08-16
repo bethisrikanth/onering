@@ -10,5 +10,6 @@ angular.module('app', [
   'automationPlugin',
   'nagiosPlugin',
   'provisioningPlugin',
-  'chefPlugin'
+  'chefPlugin',
+  'dashPlugin'
 ]);
