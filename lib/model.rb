@@ -288,6 +288,17 @@ module App
         alias_method :_tire_properties, :properties
         alias_method :_tire_all,        :all
 
+
+        def configure(options={})
+          return false if options.empty?
+
+          Tire.configure do
+            url(options.get(:url)) if options.get(:url)
+          end
+
+          return true
+        end
+
         def property(name, options={})
           _tire_property(name, {
             :index => :analyzed

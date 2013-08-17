@@ -31,6 +31,9 @@ module App
       App::Config.load(ENV['PROJECT_ROOT'])
       App::Log.setup()
       Database::Base.load_all()
+
+      App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
+
       Queue.setup()
       App::Log.increment("api.process.started")
       super

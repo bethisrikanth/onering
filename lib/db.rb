@@ -20,6 +20,7 @@ module App
 
         def load_all
           Config.get!('database').each do |name, config|
+            next if config.get(:standalone, false)
             load(name, config)
           end
         end
