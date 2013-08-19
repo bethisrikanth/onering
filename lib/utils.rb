@@ -5,7 +5,7 @@ def prequire(glob)
     begin
       raise "Autoloading #{r}..."
       require r
-    rescue Exception => e 
+    rescue Exception => e
       puts e.message
     end
   end

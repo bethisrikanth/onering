@@ -1,12 +1,15 @@
 require 'model'
 
-class Capability < App::Model::Base
-  set_collection_name "capabilities"
+class Capability < App::Model::Elasticsearch
+  index_name "capabilities"
 
-  timestamps!
+  property :users,        :default => []
+  property :groups,       :default => []
+  property :capabilities
+  property :children
+  property :created_at,   :type => 'date',    :default => Time.now
+  property :updated_at,   :type => 'date',    :default => Time.now
 
-  key :users,  Array
-  key :groups, Array
 
   def all_users
     rv = []
@@ -20,13 +23,18 @@ class Capability < App::Model::Base
       rv = []
 
       where({
-        :capabilities.exists => true
-      }).each do |capability|
-        capability[:children] = capability[:capabilities].collect{|c|
-          find(c).to_h.compact
+        :filter => {
+          :exists => {
+            :field => :capabilities
+          }
         }
+      }).each do |capability|
+        capability = capability.to_h
+        capability.set(:children, capability.get(:capabilities,[]).collect{|c|
+          find(c).to_h.compact
+        })
 
-        rv << capability.to_h.compact
+        rv << capability.compact
       end
 
       rv
@@ -39,9 +47,7 @@ class Capability < App::Model::Base
       users += (find(key).all_users rescue [])
 
     # add users named in a group containing this capability
-      users += (where({
-        :capabilities => key
-      }).collect{|i| i.all_users }.flatten)
+      users += (urlquery("capabilities/#{key}").collect{|i| i.all_users }.flatten)
 
       users
     end

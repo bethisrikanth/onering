@@ -164,7 +164,8 @@ module App
 
       define_model_callbacks :create, :update, :validation, :destroy
 
-      alias_method :to_h,             :to_hash
+      #alias_method :to_h,             :to_hash
+      #alias_method :_original_find,   :find
 
       before_save            :_update_timestamps
 
@@ -273,14 +274,6 @@ module App
         return rv
       end
 
-      def method_missing(name, *args)
-        if name[-1].chr == '='
-          false
-        else
-          super
-        end
-      end
-
       class<<self
         include_root_in_json = false
 
@@ -354,6 +347,19 @@ module App
 
           collection.options[:load] = load
           return collection.results
+        end
+
+        def id(ids)
+          rv = self.where({
+            :filter => {
+              :ids => {
+                :values => [*ids]
+              }
+            }
+          })
+
+          return rv if ids.is_a?(Array)
+          return rv.first
         end
 
         def list(field, query=nil)

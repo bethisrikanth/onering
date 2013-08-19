@@ -21,6 +21,7 @@ namespace :db do
     models.each do |index, model|
       Tire.index(index) do
         create
+        puts "Creating index #{index}"
 
         unless model.defaults.nil?
           puts "Applying defaults for #{index}/#{model.name.underscore}"

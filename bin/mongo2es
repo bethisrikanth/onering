@@ -22,7 +22,11 @@ STDIN.read.lines.each do |line|
 
   line.each_recurse(:intermediate => true) do |k,v,p|
     if k =~ /_at$/
-      data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+      if (v['$date'] rescue false)
+        data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+      else
+        data.set(p, v)
+      end
     elsif k == '$date'
       nil
     elsif k == '$oid'

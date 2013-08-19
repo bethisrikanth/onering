@@ -1,17 +1,15 @@
 require 'model'
 
-class Group < App::Model::Base
-  set_collection_name "groups"
+class Group < App::Model::Elasticsearch
+  index_name "groups"
 
-  timestamps!
-
-  key :name,  String
-  key :users, Array
+  property :name,       :type => 'string'
+  property :users,      :default => []
+  property :created_at, :type => 'date',    :default => Time.now
+  property :updated_at, :type => 'date',    :default => Time.now
 
   def capabilities
-    Capability.where({
-      :groups => id
-    }).collect{|c|
+    Capability.urlquery("groups/#{self.id}").collect{|c|
       (c.capabilities ? c.capabilities : c.id)
     }.flatten
   end

@@ -26,9 +26,7 @@ end
 
 module App
   class Base < Controller
-
     def initialize
-      App::Config.load(ENV['PROJECT_ROOT'])
       App::Log.setup()
       Database::Base.load_all()
 

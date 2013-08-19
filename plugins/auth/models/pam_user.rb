@@ -2,6 +2,10 @@ require 'rpam'
 require 'auth/models/user'
 
 class PamUser < User
+  index_name    "users"
+  document_type "pam_user"
+
+
   def authenticate!(options={})
     if super
       service = App::Config.get('global.authentication.methods.pam.service', 'onering')

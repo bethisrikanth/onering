@@ -1,3 +1,4 @@
+require 'rainbow'
 require 'sinatra/base'
 require 'sinatra/namespace'
 require 'sinatra/cross_origin'
@@ -10,6 +11,9 @@ module App
   class Controller < Sinatra::Base
     register Sinatra::Namespace
     register Sinatra::CrossOrigin
+    use Rack::Logger
+
+    App::Config.load(ENV['PROJECT_ROOT'])
 
     configure do
       set :allow_origin, :any

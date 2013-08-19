@@ -1,40 +1,50 @@
 require 'model'
 
-class User < App::Model::Base
-  set_collection_name "users"
+class User < App::Model::Elasticsearch
+  index_name "users"
 
-  timestamps!
+  property :name,         :type => 'string'
+  property :email,        :type => 'string'
+  property :client_keys,  :default => {}
+  property :tokens,       :default => []
+  property :options,      :default => {}
+  property :logged_in_at, :type => 'date'
+  property :created_at,   :type => 'date',    :default => Time.now
+  property :updated_at,   :type => 'date',    :default => Time.now
 
-  key :name,         String
-  key :email,        String
-  key :client_keys,  Hash
-  key :tokens,       Array
-  key :options,      Hash
-  key :logged_in_at, Time
+
+  #field_prefix :options
 
   def groups
-    Group.where({
-      :users => id
-    }).collect{|i| i.id } rescue []
+    Group.urlquery("users/#{self.id}").collect{|i| i.id } rescue []
   end
 
   def capabilities
   # find all capabilites where this user or any of its groups are named
     capabilities = Capability.where({
-      :$or => [{
-        :users => id
-      }, {
-        :groups => {
-          :$in => groups
-        }
-      }]
+      :filter => {
+        :or => [{
+          :term => {
+            :users => self.id
+          }
+        },{
+          :terms => {
+            :groups => self.groups,
+            :execution => :and
+          }
+        }]
+      }
     }).collect{|c|
       (c.capabilities ? c.capabilities : c.id)
     }.flatten
 
   # select only groups whose set of capabilities is fully included in our existing set
     groups = Capability.where({
-      :capabilities.exists => true
+      :filter => {
+        :exists => {
+          :field => :capabilities
+        }
+      }
     }).select{|i|
       (i.capabilities & capabilities).length == i.capabilities.length
     }
@@ -49,18 +59,12 @@ class User < App::Model::Base
     return capabilities
   end
 
-  def to_h
-    rv = super
-    rv[:type] = _type.gsub('User','').downcase
-    rv[:groups] = groups() unless groups().empty?
-    rv[:capabilities] = capabilities() unless capabilities().empty?
-    rv
-  end
-
-  def from_h(h, merge=true, autotype=false)
-    h['_type'] = (h['type'].capitalize+'User') if h['type']
-    super(h, merge, autotype)
-  end
+  # def to_hash
+  #   rv = super
+  #   rv[:groups] = groups() unless groups().empty?
+  #   rv[:capabilities] = capabilities() unless capabilities().empty?
+  #   rv
+  # end
 
   def authenticate!(options={})
     not App::Config.get('global.authentication.prevent')
@@ -91,7 +95,7 @@ class User < App::Model::Base
       token = generate()
 
       if i < 3
-        unique = User.where({ 'tokens.key' => token }).to_a.empty?
+        unique = User.urlquery("tokens.key/#{token}").to_a.empty?
 
         if unique
           if self.tokens.select{|i| i['name'] == name }.empty?
@@ -99,7 +103,7 @@ class User < App::Model::Base
               :name => name,
               :key  => token
             }
-            self.safe_save
+            self.save()
             return token
           else
             return self.tokens.select{|i| i['name'] == name }.first['key']
