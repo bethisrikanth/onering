@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid dash-panel">
   <div class="row-fluid">
     <div ng-repeat="pane in dashboard.panes" class="span{{ pane.columns || '6' }} graph tpl-panel" ng-switch on="_display" ng-init="graph_id=pane.name">
       <div ng-switch-when="visible" ng-controller="GraphController">
