@@ -349,7 +349,7 @@ module App
           return collection.results
         end
 
-        def id(ids)
+        def find_by_id(ids)
           rv = self.where({
             :filter => {
               :ids => {

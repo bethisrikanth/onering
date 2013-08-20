@@ -67,7 +67,7 @@ module App
                 end
               else
               # get user named by CN
-                @user = User.id(cn) rescue nil
+                @user = User.find_by_id(cn) rescue nil
               end
             else
               halt 403, "Invalid client certificate presented"
@@ -89,7 +89,7 @@ module App
             auth = Rack::Auth::Basic::Request.new(request.env)
 
             if auth.provided? and auth.basic? and auth.credentials
-              user = User.id(auth.credentials.first)
+              user = User.find_by_id(auth.credentials.first)
               halt 401 if user.nil?
 
               user = user_authenticate(user, auth.credentials.last)
@@ -118,7 +118,7 @@ module App
           else
             session_start!
             session! unless session?
-            @user = User.id(session[:user]) if session[:user]
+            @user = User.find_by_id(session[:user]) if session[:user]
 
           end
         end
@@ -160,7 +160,7 @@ module App
           json = JSON.load(request.env['rack.input'].read)
 
           if json
-            user = User.id(json['username'])
+            user = User.find_by_id(json['username'])
             halt 401, 'Invalid credentials' unless user
 
             user = user_authenticate(user, json['password'])
@@ -190,7 +190,7 @@ module App
           allowed_to? :get_user, id
 
           return 404 if id.nil?
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
           output(user.to_hash)
         end
@@ -232,7 +232,7 @@ module App
           id = (params[:id] == 'current' ? @user.id : params[:id])
           allowed_to? :get_user, id
 
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
 
           email = (user.email || user.id+'@'+Config.get('global.email.default_domain'))
@@ -250,7 +250,7 @@ module App
       # test for the presence of the given key
         head '/:id/keys/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
 
           halt 200 if user.client_keys.keys.include?(params[:name])
@@ -260,7 +260,7 @@ module App
       # generate a new API token
         get '/:id/tokens/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
 
           content_type 'text/plain'
@@ -270,7 +270,7 @@ module App
 
         delete '/:id/tokens/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
 
           user.tokens.delete_if{|i| i['name'] == params[:name] }
@@ -291,7 +291,7 @@ module App
 
           #allowed_to? :generate_api_key, id
 
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
 
           if not user.client_keys[params[:name]]
@@ -365,7 +365,7 @@ module App
 
           #allowed_to? :remove_api_key, id
 
-          user = User.id(id)
+          user = User.find_by_id(id)
           return 404 unless user
           return 404 unless user.client_keys.keys.include?(params[:name])
 
@@ -418,7 +418,7 @@ module App
         get '/:group/add/:user' do
           allowed_to? :add_to_group, params[:group], params[:user]
           group = Group.find(params[:group])
-          user = User.id(params[:user])
+          user = User.find_by_id(params[:user])
           return 404 unless group and user
 
           unless group.users.include?(user.id)
@@ -433,7 +433,7 @@ module App
         get '/:group/remove/:user' do
           allowed_to? :remove_from_group, params[:group], params[:user]
           group = Group.find(params[:group])
-          user = User.id(params[:user])
+          user = User.find_by_id(params[:user])
           return 404 unless group and user
 
           group.users.delete(user.id) && group.save()
