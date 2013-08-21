@@ -5,6 +5,7 @@ class Capability < App::Model::Elasticsearch
 
   property :users,        :default => []
   property :groups,       :default => []
+  property :description,  :type => 'string'
   property :capabilities
   property :children
   property :created_at,   :type => 'date',    :default => Time.now

@@ -3,6 +3,13 @@ require 'hashlib'
 require 'net/http'
 require 'time'
 
+class Object
+  def if_else(value, if_true, otherwise=nil)
+    return (self == value ? if_true : otherwise)
+  end
+end
+
+
 class TrueClass
   def to_bool
     self
@@ -39,6 +46,19 @@ class String
 
   def to_bool
     !(self.chomp.strip =~ /^(?:true|on|yes|y|1)$/i).nil?
+  end
+
+  def as_date(format=nil)
+    begin
+    # no format, autoparse
+      return Time.parse(self) if format.nil?
+
+    # format given, use DateTime.strptime
+      return DateTime.strptime(self, format)
+
+    rescue ArgumentError
+      return nil
+    end
   end
 
   def convert_to(to=nil)

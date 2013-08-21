@@ -32,7 +32,7 @@ gem "beaneater"
 gem "rainbow"
 gem "statsd-ruby"
 gem "tire"
-gem "activerecord", "~> 3"
+#gem "activerecord", "~> 3"
 #gem "activesupport", ">= 3.2"
 gem "snmp"
 

@@ -21,7 +21,7 @@ module App
 
         get '/list' do
           defaults = NodeDefault.all.to_a.collect{|i|
-            i = i.to_h
+            i = i.to_hash
             i['apply'] = i['apply'].coalesce(nil,nil,'.')
             i
           }
@@ -39,7 +39,7 @@ module App
         get '/:id' do
           default = NodeDefault.find(params[:id])
           return 404 unless default
-          output(default.to_h)
+          output(default.to_hash)
         end
 
         delete '/:id' do
@@ -185,10 +185,10 @@ module App
       get '/:id' do
         asset = Asset.find(params[:id])
         return 404 if not asset
-        d = asset.to_h
+        d = asset.to_hash
 
         d[:children] = asset.children.collect{|i|
-          filter_hash(i.to_h, :properties)
+          filter_hash(i.to_hash, :properties)
         } if params[:children]
 
         output(filter_hash(d, :properties))
@@ -252,7 +252,7 @@ module App
         allowed_to? :get_asset, params[:id]
         device = Asset.find(params[:id])
         return 404 unless device and device.parent_id and device.parent
-        output(filter_hash(device.parent.to_h, :properties))
+        output(filter_hash(device.parent.to_hash, :properties))
       end
 
       get '/:id/children' do
@@ -261,7 +261,7 @@ module App
         return 404 unless device
         output(device.children.collect{|i|
           allowed_to?(:get_asset, i.id) rescue next
-          filter_hash(i.to_h, :properties)
+          filter_hash(i.to_hash, :properties)
         })
       end
 
@@ -272,7 +272,7 @@ module App
         return 404 unless device
 
         output(device.defaults.collect{|i|
-          i.to_h
+          i.to_hash
         })
       end
 
