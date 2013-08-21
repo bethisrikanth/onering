@@ -101,7 +101,9 @@ module Automation
 end
 
 begin
-  Automation::Worker.new.start()
+  EM.run do
+    Automation::Worker.new.start()
+  end
 
 rescue Interrupt
   puts "Shutting down worker at #{Time.now.strftime("%Y-%m-%d %H:%M:%S %z")}"

@@ -38,7 +38,7 @@ module Automation
       end
 
       def log(message, severity=:info)
-        STDOUT.puts("[TASK] #{message}")
+        STDOUT.print("[TASK] #{message}\n")
         STDOUT.flush()
       end
 
