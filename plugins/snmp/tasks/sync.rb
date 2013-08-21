@@ -56,7 +56,7 @@ module Automation
 
                     unless filter.empty?
                       filter.each do |oid, pattern|
-                        value = snmp.get_value(oid)
+                        value = _snmp_get(snmp, oid)
 
                         unless value =~ Regexp.new(pattern)
                           log("Excluding #{address} because filter #{oid} does not match #{pattern}")
@@ -116,7 +116,7 @@ module Automation
                     # do not process paths whose components have a directive in them
                     # THIS WILL QUITE LIKELY BITE ME IN THE ASS SOMEDAY
                       elsif p.select{|i| i.to_s[0].chr == '_' }.empty?
-                        asset.set(p, _snmp_get(snmp, v).to_s.autotype())
+                        asset.set(p, _snmp_get(snmp, v).to_s)
                       end
                     end
 
@@ -129,9 +129,6 @@ module Automation
                   next
                 rescue Exception => e
                   log("Error handling SNMP device #{address}: #{e.class.name} - #{e.message}", :error)
-                  e.backtrace.each do |b|
-                    log("  #{b}", :debug)
-                  end
                   next
                 ensure
                   processed_addresses += 1
@@ -175,7 +172,7 @@ module Automation
 
       private
         def _snmp_get(snmp, field, i=nil)
-          match = Regexp.new('(?<pre>.*)\@\{(?:(?<alias>\w+)::)?(?<expr>.+)\}(?<post>.*)').match(field)
+          match = Regexp.new('(?<pre>[^@]*)(?<oper>\@{1,2})\{(?:(?<alias>\w+)::)?(?<expr>.+)\}(?<post>.*)').match(field)
           return field if match.nil?
 
           pre = (match[:pre] =~ /^\@/ ? _snmp_get(snmp, match[:pre], i) : match[:pre])
@@ -195,12 +192,16 @@ module Automation
           end
 
           begin
-            if snmp.is_a?(::SNMP::Manager)
+            case match[:oper]
+            when '@'
               value = snmp.get_value(oid)
-            elsif snmp.is_a?(Hash)
-              value = snmp.get(oid)
+            when '@@'
+              value = []
+              snmp.walk(oid){|i|
+                value << i.value
+              }
             else
-              raise "snmp argument must be of type SNMP::Manager or Hash"
+              raise "Invalid operator '#{match[:oper]}'"
             end
           rescue Exception => e
             log("Error retrieving SNMP OID #{oid}: #{e.class.name} - #{e.message}", :warning)
