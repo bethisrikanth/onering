@@ -109,7 +109,7 @@ module Automation
                             end
 
                           # set the appropriate field to what we just built
-                            asset.set(p[0..-2], values)
+                            asset.set(p, values)
                           end
                         end
 
