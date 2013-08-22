@@ -60,7 +60,7 @@ class Asset < App::Model::Elasticsearch
   before_save                   :_confine_status
   before_save                   :_apply_defaults
   before_save                   :_resolve_references
-  #before_save                   :_print_object
+  #before_save                   :_update_collected_at
 
 
   def parent()
@@ -96,10 +96,6 @@ private
       errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
       self.status = nil
     end
-  end
-
-  def _print_object()
-    pp self.properties
   end
 
   def _apply_defaults

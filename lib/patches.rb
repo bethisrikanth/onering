@@ -7,6 +7,10 @@ class Object
   def if_else(value, if_true, otherwise=nil)
     return (self == value ? if_true : otherwise)
   end
+
+  def deep_clone()
+    Marshal.load(Marshal.dump(self))
+  end
 end
 
 

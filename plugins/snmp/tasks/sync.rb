@@ -1,42 +1,35 @@
 require 'assets/models/asset'
+require 'snmp/lib/util'
+require 'snmp/models/snmp_host'
 
 module Automation
   module Tasks
     module Snmp
       class Sync < Base
+        include App::Helpers::Snmp::Util
+
         DEFAULT_PING_TIMEOUT = 0.5
         DEFAULT_SNMP_TIMEOUT = 3.5
 
         require 'net/ping'
         require 'snmp'
         require 'digest'
+        require 'socket'
 
         def run(request)
           @config = App::Config.get!('snmp')
 
           @config.get('profiles',[]).each do |name, profile|
-            log("Performing SNMP discovery for profile #{name}")
-            profile = @config.get('options.defaults',{}).deeper_merge!(profile)
+            profile = apply_profile_defaults(@config, profile)
 
-            addresses = []
-
-          # get addresses from a file, one address per line
-            address_list = File.join(@config.get('options.address_lists', File.join(ENV['PROJECT_ROOT'], 'config', 'snmp', 'addresses')), "#{name}.list")
-
-            if File.exists?(address_list)
-              list = File.read(address_list).lines.reject{|i|
-                i = i.strip.chomp
-                true if i.empty?
-                true if i[0].chr == '#'
-                false
-              }.collect{|i|
-                i.strip.chomp
-              }
-
-              log("Found #{list.length} addresses in file #{address_list}")
-              addresses += list
+            unless profile.get('enabled', true)
+              log("Skipping profile #{name} as it was explicitly disabled")
+              next
             end
 
+            log("Performing SNMP sync for profile #{name}")
+
+            addresses = SnmpHost.urlquery("profile/#{name}").collect{|i| i.id }
             processed_addresses = 0
 
           # perform discovery
@@ -47,23 +40,11 @@ module Automation
 
                   if Net::Ping::ICMP.new(address, port, profile.get('protocol.ping_timeout', DEFAULT_PING_TIMEOUT).to_i).ping?
                     snmp = SNMP::Manager.new({
-                      :host    => address,
-                      :port    => port,
-                      :timeout => profile.get('protocol.timeout', DEFAULT_SNMP_TIMEOUT)
+                      :host      => address,
+                      :port      => port,
+                      :timeout   => profile.get('protocol.timeout', DEFAULT_SNMP_TIMEOUT),
+                      :community => profile.get('protocol.community', 'public')
                     })
-
-                    filter = profile.get('filter', {})
-
-                    unless filter.empty?
-                      filter.each do |oid, pattern|
-                        value = _snmp_get(snmp, oid)
-
-                        unless value =~ Regexp.new(pattern)
-                          log("Excluding #{address} because filter #{oid} does not match #{pattern}")
-                          next
-                        end
-                      end
-                    end
 
                     asset = {}
 
@@ -74,12 +55,13 @@ module Automation
 
                         # generate hardware signature from unique components
                           signature = v['_hardwareid'].collect{|i|
-                            _snmp_get(snmp, i)
+                            snmp_get(snmp, i)
                           }.reject{|i|
                             i.nil? || i.strip.chomp.empty?
                           }.compact.join('-')
 
                           raise "Could not determine hardware signature for device #{address}" if signature.to_s.nil_empty.nil?
+
                         # set signature, calculate and set id
                           asset.set('properties.signature', signature)
                           asset.set('id', Digest::SHA256.new.update(signature).hexdigest[0..5])
@@ -89,7 +71,7 @@ module Automation
 
                           unless v['_repeat']['_range'].nil?
                             range = v['_repeat'].delete('_range').collect{|i|
-                              _snmp_get(snmp, i).to_i
+                              snmp_get(snmp, i).to_i
                             }.sort
 
                             values = []
@@ -102,7 +84,7 @@ module Automation
 
                             # retrieve values for each template field
                               v['_repeat'].each_recurse do |kk,vv,pp|
-                                template.set(pp, _snmp_get(snmp, vv, i).to_s.autotype())
+                                template.set(pp, snmp_get(snmp, vv, i).to_s.autotype())
                               end
 
                               values << template
@@ -116,19 +98,35 @@ module Automation
                     # do not process paths whose components have a directive in them
                     # THIS WILL QUITE LIKELY BITE ME IN THE ASS SOMEDAY
                       elsif p.select{|i| i.to_s[0].chr == '_' }.empty?
-                        asset.set(p, _snmp_get(snmp, v).to_s)
+                        asset.set(p, snmp_get(snmp, v).to_s)
                       end
                     end
 
-                    log("Saving asset #{asset.get(:id)} (#{asset.get(:name)})")
-                    Asset.new(asset).save()
 
+                    unless asset.empty?
+                    # set details about this collection mechanism
+                      asset.set('properties.snmp', {
+                        :address   => address,
+                        :protocol  => {
+                          :version => profile.get('protocol.version')
+                        },
+                        :collector => {
+                          :host         => (Socket.gethostname rescue nil),
+                          :profile      => name,
+                          :tags         => profile.get('tags')
+                        }
+                      }.compact)
+
+                      log("Saving asset #{asset.get(:id)} (#{asset.get(:name)})")
+                      Asset.new(asset).save()
+                    end
 
                   end
                 rescue ::SNMP::RequestTimeout
                   next
                 rescue Exception => e
                   log("Error handling SNMP device #{address}: #{e.class.name} - #{e.message}", :error)
+                  pp e.backtrace
                   next
                 ensure
                   processed_addresses += 1
@@ -169,77 +167,6 @@ module Automation
 
           return nil
         end
-
-      private
-        def _snmp_get(snmp, field, i=nil)
-          match = Regexp.new('(?<pre>[^@]*)(?<oper>\@{1,2})\{(?:(?<alias>\w+)::)?(?<expr>.+)\}(?<post>.*)').match(field)
-          return field if match.nil?
-
-          pre = (match[:pre] =~ /^\@/ ? _snmp_get(snmp, match[:pre], i) : match[:pre])
-          expr = match[:expr].strip.split(/\s*\|\s*/)
-          post = (match[:post] =~ /^\@/ ? _snmp_get(snmp, match[:post], i) : match[:post])
-          oid = expr.shift()
-
-        # check and handle iteration operator
-          raise "OID definition '#{oid}' is invalid outside of an iterator" if i.nil? and oid.include?('#')
-          oid.gsub!('#', i.to_s) unless i.nil?
-
-          if not match[:alias].empty?
-            oid_prefix = @config.get("options.mib.aliases.#{match[:alias]}")
-            raise "Unknown MIB alias #{match[:alias]}" if oid_prefix.nil?
-
-            oid = oid_prefix+'.'+oid
-          end
-
-          begin
-            case match[:oper]
-            when '@'
-              value = snmp.get_value(oid)
-            when '@@'
-              value = []
-              snmp.walk(oid){|i|
-                value << i.value
-              }
-            else
-              raise "Invalid operator '#{match[:oper]}'"
-            end
-          rescue Exception => e
-            log("Error retrieving SNMP OID #{oid}: #{e.class.name} - #{e.message}", :warning)
-            return nil
-          end
-
-          return nil if value.to_s == 'noSuchObject'
-
-          expr.each do |e|
-            e = e.split(':')
-            func = e.shift()
-
-            begin
-              e.collect!{|i|
-                case i
-                when /^\/.*\/$/
-                  Regexp.new(i[1..-2])
-                when /^\".*\"/
-                  i.to_s[1..-2]
-                when /(true|false)/i
-                  (i.downcase == 'true' ? true : false)
-                else
-                  i.autotype()
-                end
-              }
-
-              value = value.send(func.to_sym, *e)
-
-            rescue Exception => e
-              log("Error applying function #{func} to #{oid}=#{value}: #{e.class.name} - #{e.message}", :warning)
-              return nil
-            end
-          end
-
-          return value if pre.empty? and post.empty?
-          return pre+value.to_s+post
-        end
-
       end
     end
   end
