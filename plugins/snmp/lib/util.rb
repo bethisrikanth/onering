@@ -72,7 +72,7 @@ module App
               value << i.value
             }
           else
-            return nil
+            return (field[:oid] || field)
           end
 
           return nil if value.to_s == 'noSuchObject'

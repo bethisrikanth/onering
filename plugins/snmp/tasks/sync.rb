@@ -8,7 +8,7 @@ module Automation
       class Sync < Base
         include App::Helpers::Snmp::Util
 
-        DEFAULT_PING_TIMEOUT = 0.5
+        DEFAULT_PING_TIMEOUT = 3.0
         DEFAULT_SNMP_TIMEOUT = 3.5
 
         require 'net/ping'
