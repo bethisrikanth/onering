@@ -5,6 +5,9 @@
     <li ng-show="node.properties.network.interfaces" ng-class="(opt.netTab=='interfaces' &amp;&amp; 'active' || '')">
       <a ng-click="opt.netTab='interfaces'">Interfaces</a>
     </li>
+    <li ng-show="node.properties.network.sockets.listening" ng-class="(opt.netTab=='services' &amp;&amp; 'active' || '')">
+      <a ng-click="opt.netTab='services'">Services</a>
+    </li>
   </ul>
 
   <div>
@@ -50,6 +53,39 @@
             </td>
             <td>{{ slave.switch.name || slave.switch.ip || '&mdash;' }}</td>
             <td>{{ slave.switch.port || slave.switch.port_name || '&mdash;' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div ng-show="opt.netTab=='services'">
+      <label class="checkbox">
+        <input type="checkbox" ng-model="opt.netTabServicesShowCommand">
+        Show Command Line
+      </label>
+
+      <br />
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Port</th>
+            <th>Protocol</th>
+            <th>Bind Addr.</th>
+            <th>User</th>
+            <th ng-show="opt.netTabServicesShowCommand">Command</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="socket in node.properties.network.sockets.listening | filter:hasAddress | filter:{'protocol': 'tcp'} | orderBy:'port'">
+            <td>{{ socket.port }}</td>
+            <td>{{ socket.protocol | uppercase }}</td>
+            <td>{{ socket.address || '&ndash;' }}</td>
+            <td>{{ socket.user }}</td>
+            <td ng-show="opt.netTabServicesShowCommand">
+              <pre>{{ socket.program.command | replace:" -":"\n  -":true  }}</pre>
+            </td>
           </tr>
         </tbody>
       </table>

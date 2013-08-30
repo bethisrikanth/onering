@@ -15,7 +15,7 @@ module App
               :id => site,
               :contact => (Contact.where({
                 'properties.site' => site
-              }).to_a.first.to_h rescue nil),
+              }).to_a.first.to_hash rescue nil),
               :summary => {
 
               }
@@ -28,7 +28,7 @@ module App
         get '/:site/?' do
           output(Hardware::Rack.where({
             :site => params[:site]
-          }).collect{|i| i.to_h }.sort{|a,b| a['name'] <=> b['name'] })
+          }).collect{|i| i.to_hash }.sort{|a,b| a['name'] <=> b['name'] })
         end
 
 
@@ -39,7 +39,7 @@ module App
             },{
               :name => params[:rack]
             }]
-          }).first.to_h)
+          }).first.to_hash)
         end
 
 

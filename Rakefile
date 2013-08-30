@@ -14,7 +14,7 @@ namespace :db do
     load "irb.ru"
     puts "Seeding database..."
 
-    Tire.configure { logger 'elasticsearch.log' }
+    App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
 
     models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
@@ -27,6 +27,14 @@ namespace :db do
           puts "Applying defaults for #{index}/#{model.name.underscore}"
           mapping(model.name.underscore, model.defaults)
         end
+
+        # x = Hash[model.properties.collect{|i|
+        #   [i, nil]
+        # }]
+
+        m = model.new()
+        m.save()
+        m.destroy()
       end
     end
   end

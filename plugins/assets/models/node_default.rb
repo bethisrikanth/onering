@@ -61,7 +61,8 @@ class NodeDefault < App::Model::Elasticsearch
 
 private
   def _compact
-    self.match = self.match.collect{|m| m.compact }.compact
-    self.apply = self.apply
+    unless self.match.nil?
+      self.match = self.match.collect{|m| m.compact }.compact
+    end
   end
 end

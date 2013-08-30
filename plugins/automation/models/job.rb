@@ -19,25 +19,24 @@ module Automation
 
 
 
-  class Job < App::Model::Base
-    set_collection_name "automation_jobs"
+  class Job < App::Model::Elasticsearch
+    index_name "automation_jobs"
 
-    timestamps!
+    property :name,       :type => 'string', :unique => true
+    property :parameters, :default => {}
+    property :tasks,      :default => []
+    property :data,       :type => 'string'
+    property :created_at, :type => 'date',    :default => Time.now
+    property :updated_at, :type => 'date',    :default => Time.now
 
-    key :name,       String, :unique => true
-    key :parameters, Hash
-    key :tasks,      Array
-    key :data
 
     def requests()
-      Request.where({
-        :job_id => self.id
-      })
+      Request.urlquery("job_id/#{self.id}")
     end
 
     def request(options={})
     # generate unique request with specific details
-      request = Request.create({
+      request = Request.new({
         :status     => :unqueued,
         :anonymous  => options[:anonymous],
         :tasks      => (options[:anonymous].nil? ? nil : self.tasks),
@@ -46,11 +45,12 @@ module Automation
         :parameters => (options[:parameters] || {}),
         :user       => options[:user]
       }.compact)
+      request.save()
 
       raise "Unable to generate job request" unless request
 
     # attempt to enqueue job request
-      result = (App::Queue.channel('onering').push({
+      result = (App::Queue.channel(options.get(:queue, 'onering')).push({
         :job_id     => self.id.to_s,
         :request_id => request.id.to_s,
         :anonymous  => options[:anonymous],
@@ -62,9 +62,8 @@ module Automation
       }.compact) rescue false)
 
     # update request with status
-      request.set({
-        :status => (result === false ? :queue_failed : :queued)
-      })
+      request.status = (result === false ? :queue_failed : :queued)
+      request.save()
 
     # return IDs and statuses
       if result
@@ -130,10 +129,10 @@ module Automation
         # get request
           request = Request.find(header['request_id'])
           fail("Cannot find Request ID #{header['request_id']}") unless request
-          request.set({
-            :started_at => Time.now,
-            :status     => :running
-          })
+
+          request.started_at = Time.now
+          request.status     = :running
+          request.save()
 
 
         # get job
@@ -143,7 +142,7 @@ module Automation
               :tasks => header['tasks']
             })
           else
-            job = Job.find(header['job_id'])
+            job = Job.find_by_id(header['job_id'])
             fail("Cannot find Job ID #{header['job_id']}") unless job
           end
 
@@ -259,25 +258,29 @@ module Automation
           return last_task_result
 
         rescue JobAbort => e
-          request.set({
-            :finished_at => Time.now,
-            :status      => :aborted
-          }) if request
+          if request
+            request.finished_at = Time.now
+            request.status      = :aborted
+            request.save()
+          end
 
           raise e
 
         rescue JobRetry => e
-          request.set({
-            :status   => :retrying
-          }) if request
+          if request
+            request.status = :retrying
+            request.save()
+          end
 
           raise e
 
         rescue Exception => e
-          request.set({
-            :finished_at => Time.now,
-            :status      => :failed
-          }) if request
+          if request
+            request.finished_at = Time.now,
+            request.status      = :failed
+            request.save()
+          end
+
 
           raise e
         end

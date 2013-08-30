@@ -54,7 +54,8 @@ module App
       end
 
       get '/navigation/?' do
-        output(Navigation.all.collect{|i| i.to_h }.first)
+        #output(Navigation.all.collect{|i| i.to_h }.first)
+        output({})
       end
     end
 

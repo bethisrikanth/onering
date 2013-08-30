@@ -15,7 +15,7 @@ module App
         get '/summary/*' do
           job_requests = (
             params[:q].nil? ? Automation::Request.all
-            : Automation::Request.where(Asset.to_mongo(params[:q]))
+            : Automation::Request.urlquery(params[:q])
           ).collect{|i|
             i.to_h
           }
@@ -26,17 +26,11 @@ module App
         get '/status/:status' do
           case params[:status].to_sym
           when :pending then
-            job_requests = Automation::Request.where({
-              :started_at => nil
-            })
+            job_requests = Automation::Request.urlquery("started_at/null")
           when :unfinished then
-            job_requests = Automation::Request.where({
-              :finished_at => nil
-            })
+            job_requests = Automation::Request.urlquery("finished_at/null")
           else
-            job_requests = Automation::Request.where({
-              :status => params[:status]
-            })
+            job_requests = Automation::Request.urlquery("status/#{params[:status]}")
           end
 
           output(job_requests.to_a.collect{|i|
@@ -51,9 +45,7 @@ module App
             :time    => Time.now
           }
 
-          job_requests = Automation::Request.where({
-            :started_at => nil
-          })
+          job_requests = Automation::Request.urlquery("started_at/null")
 
           job_requests.each do |jr|
             jr.destroy()
@@ -66,9 +58,7 @@ module App
 
         get '/requeue' do
           rv = []
-          job_requests = Automation::Request.where({
-            :status => :queue_failed
-          })
+          job_requests = Automation::Request.urlquery("status/queue_failed")
 
           job_requests.each do |jr|
             rv << jr.job.request(jr.to_h)
@@ -89,14 +79,14 @@ module App
         end
 
         get '/:id/requeue' do
-          job_request = Automation::Request.find(params[:id])
+          job_request = Automation::Request.find_by_id(params[:id])
           return 404 unless job_request
           rv = job_request.job.request(job_request.to_h)
           job_request.destroy()
         end
 
         get '/:id' do
-          job_request = Automation::Request.find(params[:id])
+          job_request = Automation::Request.find_by_id(params[:id])
           return 404 unless job_request
           output(job_request)
         end

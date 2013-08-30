@@ -190,7 +190,7 @@ module App
             (i ? k.first(i+1).join('.') : nil)
           }.compact.uniq
 
-          newhash = to_h
+          newhash = to_hash
         # delete existing keys that are to be replaced
         # rename incoming keys to exclude symbols
           unset_keys.each do |key|
@@ -294,7 +294,7 @@ module App
 
         def property(name, options={})
           _tire_property(name, {
-            :index => :analyzed
+            :index => :not_analyzed
           }.merge(options))
         end
 

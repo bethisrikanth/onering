@@ -25,7 +25,7 @@ module Hardware
 
       (1..self.height).to_a.reverse.collect do |u|
         nodes = devices.select{|i| [*i.properties.get(:unit, 0)].map(&:to_i).include?(u) }
-        physical = (nodes.reject{|i| i.properties.get(:physical).nil? }.first.to_h || {}).get('properties.physical',{})
+        physical = (nodes.reject{|i| i.properties.get(:physical).nil? }.first.to_hash rescue {}).get('properties.physical',{})
 
         if physical.get('layout.height')
           node_units = ((u - physical.get('layout.height').to_i + 1)..u).to_a
@@ -51,7 +51,7 @@ module Hardware
 
         # create slot objects keyed on slot number
           nodes.each{|i|
-            slots[i.properties.get(:slot, 0)] = i.to_h.reject{|k,v| k == 'properties'}.merge({
+            slots[i.properties.get(:slot, 0)] = i.to_hash.reject{|k,v| k == 'properties'}.merge({
               :empty      => false,
               :properties => Hash[[:slot, :alert_state, :ip].collect{|j|
                 [j, i.properties.get(j)]
@@ -88,7 +88,7 @@ module Hardware
 
     def serializable_hash(options = {})
       contact_id = self.vendor.get('contact_id')
-      contact = Contact.find(contact_id).to_h if contact_id
+      contact = Contact.find(contact_id).to_hash if contact_id
 
       super(options).deep_merge!({
         'units' => self.units(),

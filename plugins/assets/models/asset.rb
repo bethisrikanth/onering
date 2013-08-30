@@ -11,7 +11,11 @@ class Asset < App::Model::Elasticsearch
   defaults do
     {
       :date_detection    => false,
-      :index_analyzer    => :standard,
+      :index_analyzer    => :whitespace,
+      :search_analyzer   => {
+        :tokenizer => :whitespace,
+        :filter    => [:lowercase]
+      },
       :dynamic_templates => [{
         :date_detector => {
           :match    => "*_at",
@@ -34,7 +38,12 @@ class Asset < App::Model::Elasticsearch
         :store_generic => {
           :match   => "*",
           :mapping => {
-            :store => "yes"
+            :store           => "yes",
+            :index_analyzer  => :whitespace,
+            :search_analyzer => {
+              :tokenizer => :whitespace,
+              :filter    => [:lowercase]
+            }
           }
         }
       }]
@@ -77,7 +86,9 @@ class Asset < App::Model::Elasticsearch
 
 private
   def _compact()
-    self.properties = self.properties.compact
+    unless self.properties.nil?
+      self.properties = self.properties.compact
+    end
   end
 
   def _ensure_id()
@@ -147,30 +158,33 @@ private
   end
 
   def _resolve_references
-    properties = self.properties.clone
+    unless self.properties.nil?
+      properties = self.properties.clone
 
-    properties.each_recurse do |k,v,p|
-      if v.is_a?(String)
-      # resolve expressions
-      #
-      # expression syntax examples:
-      #   {{ field_name }}
-      #   {{ field_name:^regular.*expression[0-9]? }}  // optional regex capture
-      #
-        properties.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
-          x = properties.get($1)
-          x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
-          x
-        })
+      self.properties.each_recurse do |k,v,p|
+        if v.is_a?(String)
+        # resolve expressions
+        #
+        # expression syntax examples:
+        #   {{ field_name }}
+        #   {{ field_name:^regular.*expression[0-9]? }}  // optional regex capture
+        #
+          properties.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
+            x = properties.get($1)
+            x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
+            x
+          })
+
+        end
 
         nil
       end
+
+
+      self.from_h({
+        :properties => properties
+      }, false)
     end
-
-
-    self.from_h({
-      :properties => properties
-    }, false)
 
     self
   end

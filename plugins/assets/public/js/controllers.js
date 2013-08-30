@@ -261,6 +261,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     return true;
   }
 
+  $scope.hasAddress = function(i){
+    return (i['address'].length > 0);
+  }
+
   $scope.reload = function(){
     if(!angular.isUndefined($routeParams.id)){
   //  device
