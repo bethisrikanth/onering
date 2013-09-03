@@ -59,22 +59,19 @@ module App
             rv = []
 
             json = MultiJson.load(request.env['rack.input'].read)
-            json = [json] if json.is_a?(Hash)
+            return 400 unless json.is_a?(Hash)
 
-            json.each do |o|
-              if o['apply']
-                apply = o['apply'].clone
-                o['apply'] = {}
-                apply.each{|k,v| o['apply'].set(k.split(/[\_\.]/), v) }
-              end
-
-              default.from_json(o, false, true)
-              default.save()
-
-              rv << NodeDefault.find(default.id)
+            if json['apply']
+              apply = json['apply'].clone
+              json['apply'] = {}
+              apply.each{|k,v| json['apply'].set(k, v) }
             end
 
-            output(rv)
+            default = NodeDefault.new(json)
+            default.save()
+
+
+            output(default.to_hash)
           end
         end
       end

@@ -6,12 +6,20 @@ module Automation
       class Purge < Base
         def run(request)
           requests = Automation::Request.where({
-            :$or => [{
-              :started_at => nil
-            }, {
-              :status => :succeeded
-            }]
-          }).to_a
+            :filter => {
+              :or => [{
+                :missing => {
+                  :field     => :started_at,
+                  :existence => true,
+                  :null_value => false
+                }
+              }, {
+                :term => {
+                  :status => :succeeded
+                }
+              }]
+            }
+          })
 
           log("Purging #{requests.length} request records")
 

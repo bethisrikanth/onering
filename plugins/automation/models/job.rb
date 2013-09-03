@@ -204,10 +204,10 @@ module Automation
               end
 
             # push the result data into the request object
-              request.push(:results => {
+              request.push(:results, {
                 :task   => config['type'],
                 :output => results
-              })
+              }, :none)
 
             # set next input to current result(s)
               last_task_result = results
@@ -250,10 +250,9 @@ module Automation
           end
 
         # we got here! success!
-          request.set({
-            :finished_at => Time.now,
-            :status      => :succeeded
-          })
+          request.finished_at = Time.now
+          request.status      = :succeeded
+          request.save()
 
           return last_task_result
 

@@ -17,7 +17,7 @@ module App
             params[:q].nil? ? Automation::Request.all
             : Automation::Request.urlquery(params[:q])
           ).collect{|i|
-            i.to_h
+            i.to_hash
           }
 
           output(job_requests.count_distinct(params[:splat].first.split('/')))
@@ -33,8 +33,8 @@ module App
             job_requests = Automation::Request.urlquery("status/#{params[:status]}")
           end
 
-          output(job_requests.to_a.collect{|i|
-            i.to_h
+          output(job_requests.collect{|i|
+            i.to_hash
           })
         end
 
@@ -61,7 +61,7 @@ module App
           job_requests = Automation::Request.urlquery("status/queue_failed")
 
           job_requests.each do |jr|
-            rv << jr.job.request(jr.to_h)
+            rv << jr.job.request(jr.to_hash)
             jr.destroy()
           end
 
@@ -81,7 +81,7 @@ module App
         get '/:id/requeue' do
           job_request = Automation::Request.find_by_id(params[:id])
           return 404 unless job_request
-          rv = job_request.job.request(job_request.to_h)
+          rv = job_request.job.request(job_request.to_hash)
           job_request.destroy()
         end
 

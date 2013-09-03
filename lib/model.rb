@@ -256,7 +256,11 @@ module App
 
         current = [*get(field)].compact
         values.each do |v|
-          current.push_uniq(v.convert_to(coerce))
+          if coerce.nil? or coerce == :none
+            current.push_uniq(v)
+          else
+            current.push_uniq(v.convert_to(coerce))
+          end
         end
 
         return set(field, current)
