@@ -203,14 +203,19 @@ class Device < App::Model::Base
 
       properties.each_recurse do |k,v,p|
         if v.is_a?(String)
-          case v
-          when /^@/ then
-            properties.set(p, self.get(v[1..-1]))
-          when /^%\((\w+):(.*)\)$/ then
-            value = properties.get($1)
-            value = (value.match(Regexp.new($2)).captures.first rescue nil) unless value.nil?
-            properties.set(p, value)
-          end
+        # resolve expressions
+        #
+        # expression syntax examples:
+        #   {{ field_name }}
+        #   {{ field_name:^regular.*expression[0-9]? }}
+        #
+          properties.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
+            x = properties.get($1)
+            x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
+            x
+          })
+
+          nil
         end
       end
 
