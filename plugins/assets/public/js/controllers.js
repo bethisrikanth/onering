@@ -176,7 +176,7 @@ function RackController($scope, $http, $routeParams, Rack){
 function NodeController($scope, $http, $location, $routeParams, $window, $position, $dialog){
   $scope.opt = {
     ping:              null,
-    diskTab:           'mounts',
+    diskTab:           'block',
     netTab:            'interfaces',
     graphsFrom:        '-6hours',
     dns_sort:          ['type', 'name'],
