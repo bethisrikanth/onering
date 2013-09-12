@@ -277,3 +277,4 @@ class Device < App::Model::Base
     end
   end
 end
+
