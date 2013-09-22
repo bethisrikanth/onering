@@ -82,7 +82,7 @@
 
         <tbody>
           <tr ng-repeat="socket in node.properties.network.sockets.listening | filter:hasAddress | filter:{'protocol': 'tcp'} | orderBy:'port'">
-            <td><a target="_blank" href="http://{{ node.properties.ip }}:{{ socket.port }}">{{ socket.port }}</a></td>
+            <td><a target="_blank" href="http{{ (socket.port | endsWith:'443') &amp;&amp; 's' }}://{{ node.properties.ip }}:{{ socket.port }}">{{ socket.port }}</a></td>
             <td>{{ socket.protocol | uppercase }}</td>
             <td>{{ socket.address || '&ndash;' }}</td>
             <td>{{ socket.user }}</td>
