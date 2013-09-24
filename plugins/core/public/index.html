@@ -275,6 +275,35 @@
               </ul>
             </div>
           </form>
+
+          <ul class="nav pull-right">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <span ng-show="group_filter.default">
+                  <i class="icon-filter"></i>
+                </span>
+
+                <span ng-hide="group_filter.default">
+                  <img ng-show="group_filter.icon" class="icon" ng-src="{{ group_filter.icon }}">
+                  {{ group_filter.value }}
+                </span>
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="value in group_filters[0].values">
+                  <a ng-click="setGroupFilter(group_filters[0].field, value)">
+                    <img ng-show="value.icon" class="icon" ng-src="{{ value.icon }}">
+                    {{ value.value }}
+                  </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <a ng-click="clearGroupFilter()"><i class="icon-ban-circle"></i>&nbsp;&nbsp;No Filter</a>
+                </li>
+              </ul>
+            </li>
+            <li class="divider-vertical"></li>
+          </ul>
         </div>
       </div>
     </header>

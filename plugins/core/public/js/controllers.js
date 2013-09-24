@@ -45,9 +45,31 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
     return rv;
   };
 
+  $scope.setGroupFilter = function(field, value){
+    value.field = field;
+    value.query = field+'/'+value.value;
+    $rootScope.group_filter = value;
+
+    $scope.reload();
+  }
+
+  $scope.clearGroupFilter = function(){
+    $rootScope.group_filter = {
+      field:   '',
+      value:   '',
+      query:   'id/not:null',
+      default: true
+    };
+    $scope.reload();
+  }
+  
   $scope.reload = function(){
     $http.get('/api/navigation').success(function(data){
       $scope.menu = data;
+    });
+
+    $http.get('/api/navigation/filters').success(function(data){
+      $scope.group_filters = data;
     });
 
   //get current user details
@@ -57,28 +79,32 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
 
   //get site summary
     Summary.query({
-      field: 'site'
+      field: 'site',
+      q:     $rootScope.group_filter.query
     }, function(data){
       $scope.sites = data;
     });
 
   //get status summary
     Summary.query({
-      field: 'status'
+      field: 'status',
+      q:     $rootScope.group_filter.query
     }, function(data){
       $scope.statuses = data;
     });
 
   //get maintenance status summary
     Summary.query({
-      field: 'maintenance_status'
+      field: 'maintenance_status',
+      q:     $rootScope.group_filter.query
     }, function(data){
       $scope.maintenance_statuses = data;
     });
 
   //get alert state summary
     Summary.query({
-      field: 'alert_state'
+      field: 'alert_state',
+      q:     $rootScope.group_filter.query
     }, function(data){
       $scope.alert_states = $.grep(data, function(el){
         return (el.id !== null);
@@ -87,7 +113,8 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
 
   //get tags
     List.query({
-      field: 'tags'
+      field: 'tags',
+      q:     $rootScope.group_filter.query
     }, function(data){
       $scope.tags = [];
 
@@ -105,7 +132,7 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
   }
 
   $window.setInterval($scope.reload, 45000);
-  $scope.reload();
+  $scope.clearGroupFilter();
 }
 
 function SearchController($scope, $http, $location, Query){

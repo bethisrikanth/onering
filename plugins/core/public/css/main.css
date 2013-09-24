@@ -193,6 +193,16 @@ body .modal {
   background-color: #999;
 }
 
+.icon{
+  display:        inline-block;
+  width:          auto;
+  height:         auto;
+  line-height:    normal;
+  vertical-align: middle;
+  margin-top:     0;
+  margin-right:   0.25em;
+}
+
 .icon-parts{
   background-position: -432px 0;
 }
