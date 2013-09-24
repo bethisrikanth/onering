@@ -278,6 +278,18 @@ module App
         return rv
       end
 
+
+      def method_missing(meth, *args, &block)
+        if meth.to_s[-1].chr == '='
+          unless self._tire_properties.include?(meth.to_s[0..-2])
+            return false
+          end
+        end
+
+        super
+      end
+
+
       class<<self
         include_root_in_json = false
 
@@ -352,6 +364,16 @@ module App
           collection.options[:load] = load
           return collection.results
         end
+
+
+        def all(options={})
+          where({
+            :query => {
+              :match_all => {}
+            }
+          }.merge(options))
+        end
+
 
         def find_by_id(ids)
           rv = self.where({

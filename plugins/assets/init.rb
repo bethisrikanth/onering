@@ -70,8 +70,10 @@ module App
             default = NodeDefault.new(json)
             default.save()
 
+            default = NodeDefault.find_by_id(default.id)
 
-            output(default.to_hash)
+
+            output((default || {}).to_hash)
           end
         end
       end

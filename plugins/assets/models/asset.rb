@@ -169,8 +169,8 @@ private
         #   {{ field_name }}
         #   {{ field_name:^regular.*expression[0-9]? }}  // optional regex capture
         #
-          properties.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
-            x = properties.get($1)
+          properties.rset(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
+            x = properties.rget($1)
             x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
             x
           })

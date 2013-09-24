@@ -380,7 +380,7 @@ function AssetManagerController($scope){
 }
 
 
-function AssetDefaultsController($scope, $http){
+function AssetDefaultsController($scope, $http, $timeout){
   $scope.opt = {
     tab_active: {}
   };
@@ -418,7 +418,7 @@ function AssetDefaultsController($scope, $http){
 
   $scope.save = function(d){
     $http.post('/api/devices/defaults', d).success(function(){
-      $scope.reload();
+      $scope.reload()
     });
   }
 

@@ -134,7 +134,7 @@ module App
         get '/list' do
           allowed_to? :list_users
           output(User.all({
-            :_type.ne => Config.get('global.authentication.machine_user_type', 'DeviceUser')
+            :_type => Config.get('global.authentication.machine_user_type', 'DeviceUser')
           }).collect{|i| i.to_hash })
         end
 
