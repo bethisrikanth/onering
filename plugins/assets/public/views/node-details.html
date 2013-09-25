@@ -62,6 +62,10 @@
       <td>{{ node.properties.mbmake }} {{ node.properties.mbmodel }}</td>
     </tr>
 
+    <tr>
+      <th>Client</th>
+      <td><span ng-show="node.properties.onering">v{{ node.properties.onering.version }}</span></td>
+    </tr>
   </tbody>
 </table>
 

@@ -17,6 +17,16 @@ run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootSco
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];
+ 
+//  prepend global filter
+    if($rootScope.group_filter.default != true){
+      var s = $rootScope.group_filter.query.split('/');
+   
+      if(s.length > 0 && s.length % 2 == 0){
+        stack = s;
+      }
+    }
+
     query = query.replace(/\s*(\:|==|<=|>=|<|>|!=|\)|after|before)\s*/g, '$1').split(' ');
 
 //  for each field being queried

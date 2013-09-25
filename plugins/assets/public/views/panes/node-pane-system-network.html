@@ -19,6 +19,7 @@
             <th> </th>
             <th>MAC</th>
             <th>Addresses</th>
+            <th>VLAN</th>
             <th>Switch</th>
             <th>Port</th>
           </tr>
@@ -37,6 +38,7 @@
               <span ng-show="interface.addresses == null || interface.addresses.length == 0">&mdash;</span>
               <div ng-repeat="address in interface.addresses">{{ address.ip }}</div>
             </td>
+            <td>{{ interface.switch.vlan }}<span ng-show="interface.switch.tagged_vlans" title="Tagged"> ({{ interface.switch.tagged_vlans | join:', ' }})</span></td>
             <td>{{ interface.switch.name || interface.switch.ip || '&mdash;' }}</td>
             <td>{{ interface.switch.port || interface.switch.port_name || '&mdash;' }}</td>
           </tr>
@@ -51,6 +53,7 @@
               <span ng-show="slave.addresses == null || slave.addresses.length == 0">&mdash;</span>
               <div ng-repeat="address in slave.addresses">{{ address.ip }}</div>
             </td>
+            <td>{{ slave.switch.vlan }}<span ng-show="slave.switch.tagged_vlans" title="Tagged"> ({{ slave.switch.tagged_vlans | join:', ' }})</span></td>
             <td>{{ slave.switch.name || slave.switch.ip || '&mdash;' }}</td>
             <td>{{ slave.switch.port || slave.switch.port_name || '&mdash;' }}</td>
           </tr>
@@ -79,7 +82,9 @@
 
         <tbody>
           <tr ng-repeat="socket in node.properties.network.sockets.listening | filter:hasAddress | filter:{'protocol': 'tcp'} | orderBy:'port'">
-            <td>{{ socket.port }}</td>
+            <td>
+              <a target="_blank" href="http{{ (socket.port | endsWith:'443') &amp;&amp; 's' }}://{{ node.properties.ip }}:{{ socket.port }}">{{ socket.port }}</a>
+            </td>
             <td>{{ socket.protocol | uppercase }}</td>
             <td>{{ socket.address || '&ndash;' }}</td>
             <td>{{ socket.user }}</td>

@@ -17,7 +17,7 @@
       <td><abbr title="UUID: {{ mount.uuid }}"><tt>{{ mount.device }}</tt></abbr></td>
       <td>{{ mount.total | autosize:2 }}</td>
       <td>
-        <progress style="margin: 0" value="mount.percent_used"></progress>
+        <progress style="margin: 0" percent="mount.percent_used"></progress>
       </td>
       <td>{{ mount.percent_used }}%</td>
     </tr>

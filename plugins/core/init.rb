@@ -57,6 +57,20 @@ module App
         #output(Navigation.all.collect{|i| i.to_h }.first)
         output({})
       end
+
+      get '/navigation/filters' do 
+        rv = Config.get('global.navigation.filters',[])
+
+        output(rv.collect{|i|
+          i['values'] = Asset.list(i['field']).collect{|j|
+            {
+              :value => j,
+              :icon  => i['icons'][i['icons'].keys.select{|k| j =~ Regexp.new(k) }.first]
+            }.compact
+          }
+          i
+        })
+      end
     end
 
   end

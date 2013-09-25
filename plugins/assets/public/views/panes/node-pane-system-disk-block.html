@@ -1,0 +1,31 @@
+<label class="checkbox">
+  <input type="checkbox" ng-model="opt.diskTabDevicesShowRemovable">
+  Show Removable Devices?
+</label>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Device</th>
+      <th>Model</th>
+      <th>Size</th>
+      <th>Blocksize</th>
+      <th><abbr title="Removable Device"><i class="icon-eject"> </i></abbr></th>
+      <th><abbr title="Flags"><i class="icon-flag-alt"> </i></abbr></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="device in node.properties.metrics.disk.block | orderBy:'name'" ng-show="(device.removable &amp;&amp; opt.diskTabDevicesShowRemovable) || !device.removable">
+      <td><tt>{{ device.device || device.name }}</tt></td>
+      <td>{{ device.model }}</td>
+      <td>{{ device.size | autosize:2 }}</td>
+      <td>{{ device.sectorsize.logical | autosize:0 }}<span ng-show="device.sectorsize.logical!=device.sectorsize.physical">({{ device.sectorsize.physical | autosize:0 }} phys.)</span></td>
+      <td><span ng-show="device.removable"><i class="icon-ok"></i></span></td>
+      <td>
+        <span ng-show="device.solidstate" title="This is a solid-state device"><i class="icon-hdd"></i></span>
+        <span ng-show="device.readonly" title="This device is read-only"><i class="icon-lock"></i></span>
+      </td>
+    </tr>
+  </tbody>
+</table>

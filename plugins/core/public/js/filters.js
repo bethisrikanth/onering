@@ -393,6 +393,28 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('startsWithFilter', function(){
+    return function(obj,test,ci){
+      if(angular.isUndefined(obj) || obj === null){
+        return false;
+      }
+
+      return obj.toString().match(new RegExp("^"+test,(ci==true ? "g" : undefined)));
+    };
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('endsWithFilter', function(){
+    return function(obj,test,ci){
+      if(angular.isUndefined(obj) || obj === null){
+        return false;
+      }
+
+      return obj.toString().match(new RegExp(test+"$",(ci==true ? "g" : undefined)));
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('replaceFilter', function(){
     return function(str,find,rep,all){
       if(str instanceof Array){
