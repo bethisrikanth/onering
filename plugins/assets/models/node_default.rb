@@ -5,14 +5,15 @@ class NodeDefault < App::Model::Elasticsearch
   index_name "node_defaults"
 
 
-  property :name,       :type => 'string'
-  property :group,      :type => 'string'
-  property :match,      :default => []
-  property :apply,      :default => {}
-  property :force,      :type => 'boolean', :default => false
-  property :enabled,    :type => 'boolean', :default => true
-  property :created_at, :type => 'date',    :default => Time.now
-  property :updated_at, :type => 'date',    :default => Time.now
+  key :name,       :string
+  key :group,      :string
+  key :match,      :object,    :array => true
+  key :apply,      :object
+  key :force,      :boolean,   :default => false
+  key :enabled,    :boolean,   :default => true
+  key :created_at, :boolean,   :default => Time.now
+  key :updated_at, :date,      :default => Time.now
+
 
   before_save  :_compact
 
@@ -41,7 +42,7 @@ class NodeDefault < App::Model::Elasticsearch
     def defaults_for(device)
       rv = []
 
-      NodeDefault.where({
+      NodeDefault.search({
         :filter => {
           :term => {
             :enabled => true

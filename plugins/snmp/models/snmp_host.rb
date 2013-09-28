@@ -8,11 +8,11 @@ require 'thread'
 class SnmpHost < App::Model::Elasticsearch
   index_name "snmp_hosts"
 
-  property :profile,    :type => 'string'
-  property :properties, :default => {}
-  property :failcount,  :default => 0
-  property :created_at, :type => 'date',    :default => Time.now
-  property :updated_at, :type => 'date',    :default => Time.now
+  key :profile,    :string
+  key :properties, :object
+  key :failcount,  :integer, :default => 0
+  key :created_at, :date,    :default => Time.now
+  key :updated_at, :date,    :default => Time.now
 
 
   field_prefix :properties

@@ -3,7 +3,6 @@ $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 require 'rubygems'
 require 'oj'
-require 'mongo_patches'
 require 'config'
 require 'log'
 require 'db'
@@ -16,6 +15,7 @@ require 'controller'
 require 'eventmachine'
 require 'multi_json'
 require 'liquid_patches'
+require 'pp'
 
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
@@ -28,7 +28,6 @@ module App
   class Base < Controller
     def initialize
       App::Log.setup()
-      Database::Base.load_all()
 
       App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
 

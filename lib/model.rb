@@ -1,8 +1,4 @@
-require 'mongo_mapper'
-require 'tire'
-require 'pp'
-
-Tire.configure { logger 'elasticsearch.log' }
+require 'tensor'
 
 module App
   module Model
@@ -10,165 +6,157 @@ module App
       class ValidationError < Exception; end
     end
 
-    module Utils
+    # module Utils
 
-    # serialize to a Hash
-      def to_h
-        serializable_hash.reject{|k,v|
-          ['_type'].include?(k)
-        }
-      end
+    # # serialize to a Hash
+    #   def to_h
+    #     serializable_hash.reject{|k,v|
+    #       ['_type'].include?(k)
+    #     }
+    #   end
 
-      def to_h!
-        serializable_hash
-      end
+    #   def to_h!
+    #     serializable_hash
+    #   end
 
-    # populate the document from a Hash
-      def from_h(hash, merge=true, autotype=false)
-        raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)
+    # # populate the document from a Hash
+    #   def from_h(hash, merge=true, autotype=false)
+    #     raise "Cannot populate model: expected Hash, got #{hash.class.name}" unless hash.is_a?(Hash)
 
-        if merge
-        # build list of paths to fully replace
-          unset_keys = Hash[hash.coalesce(nil, nil, '.').select{|k,v|
-            k.include?('@')
-          }].keys.collect{|k|
-            k = k.split('.')
-            i = k.index{|i| i[0].chr == '@' }
+    #     if merge
+    #     # build list of paths to fully replace
+    #       unset_keys = Hash[hash.coalesce(nil, nil, '.').select{|k,v|
+    #         k.include?('@')
+    #       }].keys.collect{|k|
+    #         k = k.split('.')
+    #         i = k.index{|i| i[0].chr == '@' }
 
-            (i ? k.first(i+1).join('.') : nil)
-          }.compact.uniq
+    #         (i ? k.first(i+1).join('.') : nil)
+    #       }.compact.uniq
 
-          newhash = to_h
-        # delete existing keys that are to be replaced
-        # rename incoming keys to exclude symbols
-          unset_keys.each do |key|
-            newhash.unset(key.delete('@'))
-            hash.rekey(key, key.delete('@'))
-          end
+    #       newhash = to_h
+    #     # delete existing keys that are to be replaced
+    #     # rename incoming keys to exclude symbols
+    #       unset_keys.each do |key|
+    #         newhash.unset(key.delete('@'))
+    #         hash.rekey(key, key.delete('@'))
+    #       end
 
-          newhash = newhash.deeper_merge!(hash, {:merge_hash_arrays => true})
-        else
-          newhash = hash
-        end
+    #       newhash = newhash.deeper_merge!(hash, {:merge_hash_arrays => true})
+    #     else
+    #       newhash = hash
+    #     end
 
-      # automatically convert fields ending with _at or _on to Time
-        newhash.each_recurse! do |k,v,p|
-          case k
-          when /_(?:at|on)$/i
-            if v == 'now'
-              Time.now
-            else
-              (Time.parse(v) rescue v)
-            end
-          else
-            v
-          end
-        end
+    #   # automatically convert fields ending with _at or _on to Time
+    #     newhash.each_recurse! do |k,v,p|
+    #       case k
+    #       when /_(?:at|on)$/i
+    #         if v == 'now'
+    #           Time.now
+    #         else
+    #           (Time.parse(v) rescue v)
+    #         end
+    #       else
+    #         v
+    #       end
+    #     end
 
-        newhash.each do |k,v|
-          send("#{k}=", v) rescue nil
-        end
+    #     newhash.each do |k,v|
+    #       send("#{k}=", v) rescue nil
+    #     end
 
-        self
-      end
+    #     self
+    #   end
 
-    # populate the document from a JSON string
-      def from_json(json, merge=true, autotype=false)
-        json = JSON.parse(json) if json.is_a?(String)
-        json = [json] if json.is_a?(Hash)
+    # # populate the document from a JSON string
+    #   def from_json(json, merge=true, autotype=false)
+    #     json = JSON.parse(json) if json.is_a?(String)
+    #     json = [json] if json.is_a?(Hash)
 
-        if json
-          json.each do |j|
-            from_h(j, merge, autotype)
-          end
-        end
+    #     if json
+    #       json.each do |j|
+    #         from_h(j, merge, autotype)
+    #       end
+    #     end
 
-        self
-      end
+    #     self
+    #   end
 
-    # save, but throw an error if not valid
-      def safe_save
-        save({
-          :safe => true
-        }) or raise Errors::ValidationError, errors.collect{|k,v| v }.join("; ")
-      end
+    # # save, but throw an error if not valid
+    #   def safe_save
+    #     save({
+    #       :safe => true
+    #     }) or raise Errors::ValidationError, errors.collect{|k,v| v }.join("; ")
+    #   end
 
-    # provide a difference between two documents (useful for audit history)
-      def -(other)
-        diff = (serializable_hash - other.serializable_hash)
-      end
-
-
-      alias_method :to_hash, :to_h
-    end
-
-    class Base
-      include MongoMapper::Document
-      include Utils
-
-      class<<self
-        alias :_mongo_find :find
-        attr_accessor :query_limit
-        attr_accessor :query_offset
-
-        def find(id)
-          q = self._mongo_find(id)
-          q.limit(query_limit) if query_limit
-          q.skip(query_offset) if query_offset
-          q
-        end
-
-        def find_or_create(ids, init={})
-          rv = find(ids)
-
-          if not rv
-            [*ids].each do |id|
-              i = new({'id' => id})
-
-              i.safe_save
-            end
-
-            rv = find(ids)
-          end
-
-          rv
-        end
-
-        def list(field, query=nil)
-          rv = self.collection.distinct(field, query).compact.sort
-          rv = rv[(query_offset.to_i)..(query_offset.to_i + (query_limit || rv.length))]
-          rv
-        end
-      end
-    end
-
-    module Taggable
-      def tag(value)
-        [*value].each do |v|
-          add_to_set({:tags => v})
-        end
-        safe_save
-        self
-      end
-    end
+    # # provide a difference between two documents (useful for audit history)
+    #   def -(other)
+    #     diff = (serializable_hash - other.serializable_hash)
+    #   end
 
 
-    class Elasticsearch
+    #   alias_method :to_hash, :to_h
+    # end
+
+    # class Base
+    #   include MongoMapper::Document
+    #   include Utils
+
+    #   class<<self
+    #     alias :_mongo_find :find
+    #     attr_accessor :query_limit
+    #     attr_accessor :query_offset
+
+    #     def find(id)
+    #       q = self._mongo_find(id)
+    #       q.limit(query_limit) if query_limit
+    #       q.skip(query_offset) if query_offset
+    #       q
+    #     end
+
+    #     def find_or_create(ids, init={})
+    #       rv = find(ids)
+
+    #       if not rv
+    #         [*ids].each do |id|
+    #           i = new({'id' => id})
+
+    #           i.safe_save
+    #         end
+
+    #         rv = find(ids)
+    #       end
+
+    #       rv
+    #     end
+
+    #     def list(field, query=nil)
+    #       rv = self.collection.distinct(field, query).compact.sort
+    #       rv = rv[(query_offset.to_i)..(query_offset.to_i + (query_limit || rv.length))]
+    #       rv
+    #     end
+    #   end
+    # end
+
+    # module Taggable
+    #   def tag(value)
+    #     [*value].each do |v|
+    #       add_to_set({:tags => v})
+    #     end
+    #     safe_save
+    #     self
+    #   end
+    # end
+
+
+    class Elasticsearch < Tensor::Model
       require 'assets/lib/elasticsearch_urlquery_parser'
 
-      DEFAULT_MAX_RESULTS     = 10000
-      DEFAULT_MAX_API_RESULTS = 25
-
-      include ::Tire::Model::Callbacks
-      include ::Tire::Model::Persistence
-
-      define_model_callbacks :create, :update, :validation, :destroy
-
-      #alias_method :to_h,             :to_hash
-      #alias_method :_original_find,   :find
+      DEFAULT_MAX_FACETS     = 100
 
       before_save            :_update_timestamps
 
+    # set updated_at timestamp on save
       def _update_timestamps
         if self.respond_to?('updated_at')
           self.updated_at = Time.now
@@ -217,9 +205,7 @@ module App
           end
         end
 
-        newhash.each do |k,v|
-          self.send("#{k}=", v) rescue nil
-        end
+        self.from_hash(newhash)
 
         return self
       end
@@ -237,7 +223,6 @@ module App
 
         return self
       end
-
 
       def get(field, default=nil)
         return to_hash.get(self.class.resolve_field(field), default)
@@ -278,47 +263,17 @@ module App
         return rv
       end
 
-
-      def method_missing(meth, *args, &block)
-        if meth.to_s[-1].chr == '='
-          unless self._tire_properties.include?(meth.to_s[0..-2])
-            return false
-          end
-        end
-
-        super
-      end
-
-
       class<<self
-        include_root_in_json = false
-
-        alias_method :_tire_property,   :property
-        alias_method :_tire_properties, :properties
-        alias_method :_tire_all,        :all
-
-
         def configure(options={})
-          return false if options.empty?
-
-          Tire.configure do
-            url(options.get(:url)) if options.get(:url)
-          end
-
-          return true
-        end
-
-        def property(name, options={})
-          _tire_property(name, {
-            :index => :not_analyzed
-          }.merge(options))
+          Tensor::ConnectionPool.connect(options)
         end
 
         def to_elasticsearch_query(query, options={})
-          @@_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
-          rv = @@_parser.parse(query).to_elasticsearch_query({
+          @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
+
+          rv = @_parser.parse(query).to_elasticsearch_query({
             :prefix => self.field_prefix(),
-            :fields => self._tire_properties
+            :fields => self.keys.keys()
           })
 
 #puts MultiJson.dump(rv)
@@ -327,65 +282,22 @@ module App
         end
 
         def urlquery(query, options={})
-          raw = options.delete(:raw)
-          load = options.delete(:load)
-          load = true if load.nil?
-
           options[:fields].collect!{|i|
             self.resolve_field(i)
           } unless options[:fields].nil?
 
           query = {
-            :size   => DEFAULT_MAX_RESULTS,
             :filter => self.to_elasticsearch_query(query),
-            :fields => (self._tire_properties - [self.field_prefix()])
+            :fields => (keys.keys.collect{|i| i.to_s } - [self.field_prefix()])
           }.deeper_merge!(options, {
             :merge_hash_arrays => true
           })
 
 #puts MultiJson.dump(query)
 
-          collection = Tire.search(self.index_name(), query)
-
-          collection.options[:load] = load
-
-          return collection.results unless raw.nil?
-          return collection.results.to_a
-        end
-
-        def where(query)
-          load = query.delete(:load)
-          load = true if load.nil?
-
-          collection = Tire.search(self.index_name(), {
-            :size        => DEFAULT_MAX_RESULTS
-          }.compact.merge(query))
-
-          collection.options[:load] = load
-          return collection.results
-        end
-
-
-        def all(options={})
-          where({
-            :query => {
-              :match_all => {}
-            }
-          }.merge(options))
-        end
-
-
-        def find_by_id(ids)
-          rv = self.where({
-            :filter => {
-              :ids => {
-                :values => [*ids]
-              }
-            }
+          return self.search(query, options.select{|k,v|
+            [:raw].include?(k)
           })
-
-          return rv if ids.is_a?(Array)
-          return rv.first
         end
 
         def list(field, query=nil)
@@ -395,9 +307,7 @@ module App
             filter = self.to_elasticsearch_query(query)
           end
 
-          results = self.where({
-            :size   => 0,
-            :load   => false,
+          results = self.search({
             :filter => filter,
             :facets => {
               :counts => {
@@ -406,9 +316,12 @@ module App
                 }
               }
             }
-          }.compact)
+          }.compact, {
+            :limit => 0,
+            :raw   => true
+          })
 
-          facet = results.facets.get(:counts)
+          facet = results.get('facets.counts')
           return [] if facet.nil?
 
           return facet.get(:terms,[]).collect{|i|
@@ -436,22 +349,24 @@ module App
           current_field = fields.pop()
 
         # perform query, only return facets (no documents)
-          results = self.where({
-            :size   => 0,
-            :load   => false,
+          results = self.search({
             :facets => {
               :counts => {
                 :facet_filter => (query.nil? ? nil : self.to_elasticsearch_query(query)),
                 :terms => {
-                  :field => current_field
+                  :field => current_field,
+                  :size  => (options[:limit].nil? ? DEFAULT_MAX_FACETS : options[:limit])
                 }
               }.compact
             }
+          }, {
+            :limit => 0,
+            :raw   => true
           })
 
         # if we got anything...
-          unless results.facets.nil?
-            results.facets.get('counts.terms',[]).each do |facet|
+          unless results.get('facets.counts.terms').nil?
+            results.get('facets.counts.terms', []).each do |facet|
               rv << {
                 :id       => facet['term'],
                 :field    => self.unresolve_field(current_field),
@@ -464,11 +379,11 @@ module App
             end
 
           # add in empty results as nulls
-            if results.facets.get('counts.missing',0) > 0
+            if results.get('facets.counts.missing', 0) > 0
               rv << {
                 :id       => nil,
                 :field    => self.unresolve_field(current_field),
-                :count    => results.facets.get('counts.missing'),
+                :count    => results.get('facets.counts.missing'),
                 :children => (fields.empty? ? nil :
                 # we need to go deeper...
                   self.summarize(fields[0], fields[1..-1], [query, "#{self.unresolve_field(current_field)}/null"].compact.join('/'))
@@ -497,21 +412,12 @@ module App
         def field_prefix(name=nil)
           return @_field_prefix.to_s if name.nil?
           @_field_prefix = name.to_s
-          @_field_prefix_skip ||= self.properties.reject{|i| i.to_s == name.to_s }
+          @_field_prefix_skip ||= self.keys.keys.reject{|i| i.to_s == name.to_s }
         end
 
         def field_prefix_skip(list=nil)
           return @_field_prefix_skip if list.nil?
           @_field_prefix_skip = [*list].map(&:to_s)
-        end
-
-        def defaults(type=nil, &block)
-          if block_given?
-            @defaults = yield
-            index.put_mapping(self.name.downcase, @defaults)
-          else
-            @defaults
-          end
         end
 
         def inherited(subclass)

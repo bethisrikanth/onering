@@ -22,12 +22,12 @@ module Automation
   class Job < App::Model::Elasticsearch
     index_name "automation_jobs"
 
-    property :name,       :type => 'string', :unique => true
-    property :parameters, :default => {}
-    property :tasks,      :default => []
-    property :data,       :type => 'string'
-    property :created_at, :type => 'date',    :default => Time.now
-    property :updated_at, :type => 'date',    :default => Time.now
+    key :name,       :string, :unique => true
+    key :parameters, :object
+    key :tasks,      :object, :array => true
+    key :data,       :string
+    key :created_at, :date,   :default => Time.now
+    key :updated_at, :date,   :default => Time.now
 
 
     def requests()

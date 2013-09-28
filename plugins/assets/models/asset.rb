@@ -8,63 +8,20 @@ class Asset < App::Model::Elasticsearch
   VALID_STATUS = %w{online allocatable installing}
   NO_AUTOCLEAR_STATUS = %w{installing}
 
-  defaults do
-    {
-      :date_detection    => false,
-      :index_analyzer    => :whitespace,
-      :search_analyzer   => {
-        :tokenizer => :whitespace,
-        :filter    => [:lowercase]
-      },
-      :dynamic_templates => [{
-        :date_detector => {
-          :match    => "*_at",
-          :mapping  => {
-            :fields => {
-              "{name}" => {
-                :type   => :date,
-                :index  => :analyzed,
-                :format => %w{
-                  date_hour_minute_second_millis
-                  date_time
-                  date_time_no_millis
-                  yyyy-MM-dd HH:mm:ss ZZZZ
-                }
-              }
-            }
-          }
-        }
-      },{
-        :store_generic => {
-          :match   => "*",
-          :mapping => {
-            :store           => "yes",
-            :index_analyzer  => :whitespace,
-            :search_analyzer => {
-              :tokenizer => :whitespace,
-              :filter    => [:lowercase]
-            }
-          }
-        }
-      }]
-    }
-  end
-
-  property :aliases,            :default => []
-  property :collected_at,       :type => 'date'
-  property :created_at,         :type => 'date', :default => Time.now
-  property :maintenance_status, :type => 'string'
-  property :name,               :type => 'string'
-  property :parent_id,          :type => 'string'
-  property :properties,         :default => {}
-  property :user_properties,    :default => {}
-  property :status,             :type => 'string'
-  property :tags,               :default => []
-  property :updated_at,         :type => 'date', :default => Time.now
+  key :aliases,                 :string,   :array => true
+  key :collected_at,            :date
+  key :created_at,              :date,     :default => Time.now
+  key :maintenance_status,      :string
+  key :name,                    :string
+  key :parent_id,               :string
+  key :properties,              :object,   :default => {}
+  key :status,                  :string
+  key :tags,                    :string,   :array => true
+  key :updated_at,              :date,     :default => Time.now
 
   field_prefix                  :properties
 
-  before_save                   :_ensure_id
+  #before_save                   :_ensure_id
   before_save                   :_compact
   before_save                   :_confine_status
   before_save                   :_apply_defaults
@@ -110,7 +67,7 @@ private
   end
 
   def _apply_defaults
-    device = self.to_hash
+    device = self.to_hash()
     merges = []
     except = %w{
       id

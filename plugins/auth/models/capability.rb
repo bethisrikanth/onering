@@ -3,13 +3,11 @@ require 'model'
 class Capability < App::Model::Elasticsearch
   index_name "capabilities"
 
-  property :users,        :default => []
-  property :groups,       :default => []
-  property :description,  :type => 'string'
-  property :capabilities
-  property :children
-  property :created_at,   :type => 'date',    :default => Time.now
-  property :updated_at,   :type => 'date',    :default => Time.now
+  key :users,        :string,  :array => true
+  key :groups,       :string,  :array => true
+  key :description,  :string
+  key :created_at,   :date,    :default => Time.now
+  key :updated_at,   :date,    :default => Time.now
 
 
   def all_users

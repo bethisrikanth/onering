@@ -5,18 +5,18 @@ module Automation
   class Request < App::Model::Elasticsearch
     index_name "automation_requests"
 
-    property :status,      :type => 'string',  :default => :unknown
-    property :job_id,      :type => 'string'
-    property :parameters,  :default => {}
-    property :tasks,       :default => []
-    property :source,      :type => 'string'
-    property :user,        :type => 'string'
-    property :anonymous,   :type => 'boolean', :default => false
-    property :started_at,  :type => 'date'
-    property :finished_at, :type => 'date'
-    property :results,     :default => []
-    property :created_at,  :type => 'date',    :default => Time.now
-    property :updated_at,  :type => 'date',    :default => Time.now
+    key :status,      :string,  :default => 'unknown'
+    key :job_id,      :string
+    key :parameters,  :object
+    key :tasks,       :object,  :array => true
+    key :source,      :string
+    key :user,        :string
+    key :anonymous,   :boolean, :default => false
+    key :started_at,  :date
+    key :finished_at, :date
+    key :results,     :string,  :array => true
+    key :created_at,  :date,    :default => Time.now
+    key :updated_at,  :date,    :default => Time.now
 
     def job()
       return Job.find_by_id(self.job_id)

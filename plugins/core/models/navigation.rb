@@ -1,12 +1,10 @@
 require 'model'
 require 'assets/models/asset'
 
-class Navigation < App::Model::Base
-  include App::Model::Taggable
+class Navigation < App::Model::Elasticsearch
+  index_name "navigation"
 
-  set_collection_name "navigation"
-
-  key :name,    String
-  key :items,   Array
-  key :user_id, String
+  key :name,    :string
+  key :items,   :string, :array => true
+  key :user_id, :string
 end

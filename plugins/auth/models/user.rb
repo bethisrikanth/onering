@@ -3,17 +3,15 @@ require 'model'
 class User < App::Model::Elasticsearch
   index_name "users"
 
-  property :name,         :type => 'string'
-  property :email,        :type => 'string'
-  property :client_keys,  :default => {}
-  property :tokens,       :default => []
-  property :options,      :default => {}
-  property :logged_in_at, :type => 'date'
-  property :created_at,   :type => 'date',    :default => Time.now
-  property :updated_at,   :type => 'date',    :default => Time.now
+  key :name,         :string
+  key :email,        :string
+  key :client_keys,  :object
+  key :tokens,       :string,  :array => true
+  key :options,      :object
+  key :logged_in_at, :date
+  key :created_at,   :date,    :default => Time.now
+  key :updated_at,   :date,    :default => Time.now
 
-
-  #field_prefix :options
 
   def groups
     Group.urlquery("users/#{self.id}").collect{|i| i.id } rescue []
@@ -21,7 +19,7 @@ class User < App::Model::Elasticsearch
 
   def capabilities
   # find all capabilites where this user or any of its groups are named
-    capabilities = Capability.where({
+    capabilities = Capability.search({
       :filter => {
         :or => [{
           :term => {
@@ -39,7 +37,7 @@ class User < App::Model::Elasticsearch
     }.flatten
 
   # select only groups whose set of capabilities is fully included in our existing set
-    groups = Capability.where({
+    groups = Capability.search({
       :filter => {
         :exists => {
           :field => :capabilities

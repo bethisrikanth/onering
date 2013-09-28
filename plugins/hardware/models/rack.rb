@@ -4,16 +4,16 @@ require 'assets/models/asset'
 require 'organization/models/contact'
 
 module Hardware
-  class Rack < App::Model::Base
-    set_collection_name "hardware_racks"
+  class Rack < App::Model::Elasticsearch
+    index_name "hardware_racks"
 
-    timestamps!
-
-    key :name,        String, :required => true
-    key :description, String
-    key :site,        String
-    key :vendor,      Hash
-    key :height,      Integer, :required => true
+    key :name,        :string, :required => true
+    key :description, :string
+    key :site,        :string
+    key :vendor,      :object
+    key :height,      :integer, :required => true
+    key :created_at,  :date,    :default => Time.now
+    key :updated_at,  :date,    :default => Time.now
 
 
     def units()

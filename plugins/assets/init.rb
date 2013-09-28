@@ -1,5 +1,4 @@
 require 'controller'
-require 'mongo_mapper'
 require 'assets/lib/helpers'
 require 'assets/models/asset'
 require 'assets/models/node_default'
@@ -70,7 +69,7 @@ module App
             default = NodeDefault.new(json)
             default.save()
 
-            default = NodeDefault.find_by_id(default.id)
+            default = NodeDefault.find(default.id)
 
 
             output((default || {}).to_hash)

@@ -1,24 +1,24 @@
 require 'model'
 
-class AssetRequest < App::Model::Base
-  set_collection_name "asset_requests"
+class AssetRequest < App::Model::Elasticsearch
+  index_name "asset_requests"
 
   before_save :_intify_quantities
   before_save :_compact_notes
 
-  timestamps!
+  key :deliver_by,      :date
 
-  key :deliver_by,      Time
-
-  key :user_id,         String
-  key :team,            String
-  key :quantity,        Hash
-  key :service,         String
-  key :notes,           Array
+  key :user_id,         :string
+  key :team,            :string
+  key :quantity,        :object
+  key :service,         :string
+  key :notes,           :object, :array => true
+  key :created_at,      :date,    :default => Time.now
+  key :updated_at,      :date,    :default => Time.now
 
 
   def to_h
-    super.to_h.merge({
+    super.to_hash.merge({
       'total' => total()
     })
   end

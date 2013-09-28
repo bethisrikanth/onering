@@ -1,16 +1,10 @@
 require 'model'
 
-class Contact < App::Model::Base
-  include App::Model::Taggable
-  
-  set_collection_name "contacts"
-  
-  many :contacts
-
-  key :name,            String
-  key :tags,            Array
-  key :properties,      Hash
-  key :mail,            Hash
-  key :phones,          Hash
-  key :address,         Hash
+class Contact < App::Model::Elasticsearch
+  key :name,            :string
+  key :tags,            :string,   :array => true
+  key :properties,      :object
+  key :mail,            :object
+  key :phones,          :object
+  key :address,         :object
 end

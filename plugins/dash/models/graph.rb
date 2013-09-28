@@ -5,12 +5,12 @@ module Dashboard
     index_name "dashboard_graphs"
 
 
-    property :name,       :type => 'string'
-    property :backend,    :type => 'string'
-    property :options,    :default => {}
-    property :series,     :default => []
-    property :tags,       :default => []
-    property :created_at, :type => 'date',    :default => Time.now
-    property :updated_at, :type => 'date',    :default => Time.now
+    key :name,       :string
+    key :backend,    :string
+    key :options,    :object
+    key :series,     :string,  :array => true
+    key :tags,       :string,  :array => true
+    key :created_at, :date,    :default => Time.now
+    key :updated_at, :date,    :default => Time.now
   end
 end

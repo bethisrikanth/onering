@@ -1,10 +1,11 @@
 require 'model'
 
-class NagiosHost < App::Model::Base
-  set_collection_name "nagios"
+class NagiosHost < App::Model::Elasticsearch
+  index_name "nagios"
 
-  timestamps!
 
-  key :name,            String
-  key :alerts,          Array
+  key :name,        :string
+  key :alerts,      :object,  :array => true
+  key :created_at,  :date,    :default => Time.now
+  key :updated_at,  :date,    :default => Time.now
 end

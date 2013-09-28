@@ -35,12 +35,16 @@ end
 class String
   SI_UNITS=%w{b k m g t p e z y}
 
-  def underscore
+  def underscore()
     self.gsub(/::/, '/').
     gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
     gsub(/([a-z\d])([A-Z])/,'\1_\2').
     tr("-", "_").
     downcase
+  end
+
+  def camelize()
+    self.split('_').collect{|i| i.capitalize }.join()
   end
 
   def nil_empty()
@@ -202,9 +206,17 @@ class Array
     return nil if self.empty?
     self
   end
+
+  def to_json
+    MultiJson.dump(self)
+  end
 end
 
-
+class Hash
+  def to_json
+    MultiJson.dump(self)
+  end
+end
 
 
 class TeeIO
