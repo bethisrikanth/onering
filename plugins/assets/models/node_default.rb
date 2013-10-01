@@ -4,7 +4,6 @@ require 'assets/lib/helpers'
 class NodeDefault < App::Model::Elasticsearch
   index_name "node_defaults"
 
-
   key :name,       :string
   key :group,      :string
   key :match,      :object,    :array => true

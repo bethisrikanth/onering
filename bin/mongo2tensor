@@ -15,7 +15,6 @@ STDIN.read.lines.each do |line|
   next if line[0].chr == '#'
   next if line.strip.chomp.empty?
 
-  types[table] ||= Kernel.const_get(table.split('_').collect{|i| i.capitalize }.join())
 
   data = {}
   notes = []
@@ -27,6 +26,9 @@ STDIN.read.lines.each do |line|
   line['_type'] = 'asset' if line['_type'] == 'device'
 
   line.delete('_id')
+
+  type = line['_type'].split('_').collect{|i| i.capitalize }.join()
+  types[type] ||= Kernel.const_get(type)
 
   line.each_recurse(:intermediate => true) do |k,v,p|
     if k =~ /_at$/
@@ -54,7 +56,7 @@ STDIN.read.lines.each do |line|
   end
 
 # create or update the record
-  types[table].create(data)
+  types[type].create(data)
 
   pp data['id']
 end
