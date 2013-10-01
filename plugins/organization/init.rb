@@ -10,7 +10,7 @@ module App
         end
 
         get '/find/:field/:query' do
-          Contact.where({
+          Contact.search({
             params[:field] => Regexp.new(params[:query], Regexp::IGNORECASE)
           }).collect{|i| i.to_h }.to_json rescue 404
         end

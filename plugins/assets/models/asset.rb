@@ -222,7 +222,7 @@ end
 #   end
 
 #   def children
-#     Asset.where({
+#     Asset.search({
 #       :parent_id => id
 #     }).to_a
 #   end
@@ -267,7 +267,7 @@ end
 #   # urlsearch
 #   # perform a query formatted as a URL partial path component
 #     def urlsearch(urlquery)
-#       self.where(Asset.to_mongo(urlquery))
+#       self.search(Asset.to_mongo(urlquery))
 #     end
 
 #     def to_mongo(urlquery)
@@ -304,7 +304,7 @@ end
 #         end
 #       }
 
-#       results = (query.nil? ? self.fields(fields) : self.where(query).fields(fields)).collect{|i|
+#       results = (query.nil? ? self.fields(fields) : self.search(query).fields(fields)).collect{|i|
 #         i.to_h!
 #       }
 

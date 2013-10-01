@@ -36,7 +36,7 @@ module Automation
 
           # if this host has alerts
             unless states['alerts'].empty?
-              device = Asset.where({
+              device = Asset.search({
                 '$or' => [{
                   'name' => {
                     '$regex' => "^#{host}.*$",

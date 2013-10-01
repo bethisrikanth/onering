@@ -152,7 +152,8 @@ module App
     class Elasticsearch < Tensor::Model
       require 'assets/lib/elasticsearch_urlquery_parser'
 
-      DEFAULT_MAX_FACETS     = 100
+      DEFAULT_MAX_FACETS      = 100
+      DEFAULT_MAX_API_RESULTS = 25
 
       before_save            :_update_timestamps
 
@@ -281,52 +282,19 @@ module App
           rv
         end
 
-        def urlquery(query, options={})
-          options[:fields].collect!{|i|
+        def urlquery(query, query_options={}, tensor_options={})
+          query_options[:fields].collect!{|i|
             self.resolve_field(i)
-          } unless options[:fields].nil?
+          } unless query_options[:fields].nil?
 
           query = {
             :filter => self.to_elasticsearch_query(query),
-            :fields => (keys.keys.collect{|i| i.to_s } - [self.field_prefix()])
-          }.deeper_merge!(options, {
+            :fields => (keys.keys.collect{|i| i.to_s })
+          }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
 
-#puts MultiJson.dump(query)
-
-          return self.search(query, options.select{|k,v|
-            [:raw].include?(k)
-          })
-        end
-
-        def list(field, query=nil)
-          field = self.resolve_field(field)
-
-          if not query.nil?
-            filter = self.to_elasticsearch_query(query)
-          end
-
-          results = self.search({
-            :filter => filter,
-            :facets => {
-              :counts => {
-                :terms => {
-                  :field => field
-                }
-              }
-            }
-          }.compact, {
-            :limit => 0,
-            :raw   => true
-          })
-
-          facet = results.get('facets.counts')
-          return [] if facet.nil?
-
-          return facet.get(:terms,[]).collect{|i|
-            i.get(:term)
-          }.compact.sort.uniq
+          return self.search(query, tensor_options)
         end
 
       # summarize
@@ -393,6 +361,22 @@ module App
           end
 
           return rv
+        end
+
+        def list(field, query=nil)
+          field = [*field]
+          summary = summarize(field.first, field[1..-1])
+
+          rv = []
+
+          field.each do |field|
+
+            summary.collect{|i| i[:id] }.each do |value|
+              row = []
+
+              rv << row
+            end
+          end
         end
 
         def resolve_field(field)

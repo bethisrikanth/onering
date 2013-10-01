@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+ENV['PROJECT_ROOT'] = File.dirname(File.dirname(File.expand_path(__FILE__)))
+$: << File.join(ENV['PROJECT_ROOT'], 'lib')
+$: << File.join(ENV['PROJECT_ROOT'], 'plugins')
+
+require 'pp'
+require 'oj'
+require 'multi_json'
+require './lib/app'
+
+types = {}
+table = ARGV[0]
+
+STDIN.read.lines.each do |line|
+  next if line[0].chr == '#'
+  next if line.strip.chomp.empty?
+
+  types[table] ||= Kernel.const_get(table.split('_').collect{|i| i.capitalize }.join())
+
+  data = {}
+  notes = []
+  line = MultiJson.load(line)
+
+  line['id'] = line['_id']
+  line['_type'] = line['_type'].underscore
+
+  line['_type'] = 'asset' if line['_type'] == 'device'
+
+  line.delete('_id')
+
+  line.each_recurse(:intermediate => true) do |k,v,p|
+    if k =~ /_at$/
+      if (v['$date'] rescue false)
+        data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+      else
+        data.set(p, v)
+      end
+    elsif k =~ /[0-9]+/ and p[-2] == 'notes'
+      v['user_id'] = 'onering' if v['user_id'].nil?
+
+      notes << v
+
+    elsif k == '$date'
+      nil
+    elsif k == '$oid'
+      data.set('id', v)
+    else
+      data.set(p, v)
+    end
+  end
+
+  unless notes.empty?
+    data.set('properties.notes', notes)
+  end
+
+# create or update the record
+  types[table].create(data)
+
+  pp data['id']
+end

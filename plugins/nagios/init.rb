@@ -13,7 +13,7 @@ module App
       end
 
       get '/alerts' do
-        nagios_hosts = NagiosHost.where({
+        nagios_hosts = NagiosHost.search({
           'alerts.current_state' => {
             '$regex' => '^(warning|critical)$'
           }

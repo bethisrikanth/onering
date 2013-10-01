@@ -13,7 +13,7 @@ module App
           output(sites.collect{|site|
             {
               :id => site,
-              :contact => (Contact.where({
+              :contact => (Contact.search({
                 'properties.site' => site
               }).to_a.first.to_hash rescue nil),
               :summary => {
@@ -26,14 +26,14 @@ module App
 
       namespace '/rack' do
         get '/:site/?' do
-          output(Hardware::Rack.where({
+          output(Hardware::Rack.search({
             :site => params[:site]
           }).collect{|i| i.to_hash }.sort{|a,b| a['name'] <=> b['name'] })
         end
 
 
         get '/:site/:rack/?' do
-          output(Hardware::Rack.where({
+          output(Hardware::Rack.search({
             '$and' => [{
               :site => params[:site]
             },{
@@ -44,7 +44,7 @@ module App
 
 
         post '/:site/:rack/?' do
-          rack = Hardware::Rack.where({
+          rack = Hardware::Rack.search({
             '$and' => [{
               :site => params[:site]
             },{
@@ -64,7 +64,7 @@ module App
         end
 
         delete '/:site/:rack/?' do
-          rack = Hardware::Rack.where({
+          rack = Hardware::Rack.search({
             '$and' => [{
               :site => params[:site]
             },{

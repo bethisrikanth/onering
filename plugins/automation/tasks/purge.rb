@@ -5,7 +5,7 @@ module Automation
     module Auto
       class Purge < Base
         def run(request)
-          requests = Automation::Request.where({
+          requests = Automation::Request.search({
             :filter => {
               :or => [{
                 :missing => {

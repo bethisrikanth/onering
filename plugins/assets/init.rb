@@ -99,20 +99,31 @@ module App
           } if params[:sort]
 
           rv = Asset.urlquery(q, {
-            :raw          => true,
             :size         => page_size,
             :from         => (page_size * (page_num-1)),
             :sort         => sort
-          }.compact)
-
-          headers({
-            'X-Onering-Results-Count'       => rv.total.to_s,
-            'X-Onering-Results-Page-Size'   => ([rv.total, page_size].min).to_s,
-            'X-Onering-Results-Page-Number' => page_num.to_s,
-            'X-Onering-Results-Page-Count'  => (rv.total / page_size).ceil.to_s
+          }.compact, {
+            :raw => true
           })
 
-          output(filter_hash([*rv].to_a, Asset.field_prefix))
+          total = rv.get('hits.total', 0)
+          if total > 0
+
+            headers({
+              'X-Onering-Results-Count'       => total.to_s,
+              'X-Onering-Results-Page-Size'   => ([total, page_size].min).to_s,
+              'X-Onering-Results-Page-Number' => page_num.to_s,
+              'X-Onering-Results-Page-Count'  => (total / page_size).ceil.to_s
+            })
+            output(filter_hash(rv.get('hits.hits', []).collect{|i|
+              Asset.new(i['fields'].merge({
+                :id   => i['_id'],
+                :type => i['_type']
+              })).to_hash()
+            }, Asset.field_prefix))
+          else
+            output([])
+          end
         end
       end
 
@@ -121,7 +132,7 @@ module App
         get '/fields' do
           rv = []
 
-          Tire.index('assets').mapping.each_recurse({
+          Asset.mappings.get('properties',{}).each_recurse({
             :intermediate => true
           }) do |k,v,p|
             if v.is_a?(Hash) and v['type'].is_a?(String)
@@ -286,7 +297,7 @@ module App
 
       # set operation works on all children
         if action == :set or action == :unset
-          children = Asset.where({
+          children = Asset.search({
             :parent_id => params[:id]
           }).to_a
 

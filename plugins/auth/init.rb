@@ -461,7 +461,7 @@ module App
         }.each do |route|
           get route do
             allowed_to? :list_capabilities, params[:parent]
-            output(Capability.where({
+            output(Capability.search({
               :capabilities.exists => false
             }))
           end

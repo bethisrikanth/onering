@@ -138,7 +138,7 @@ module Automation
             end
 
           # remove glu properties from hosts not appearing in the glu.json
-            glu_missing = (Asset.where({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
+            glu_missing = (Asset.search({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
             log("Removing Glu configuration from #{glu_missing.length} nodes") unless glu_missing.empty?
 
             glu_missing.each do |node|

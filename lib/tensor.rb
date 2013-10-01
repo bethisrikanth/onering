@@ -105,6 +105,7 @@ module Tensor
         begin
           if key =~ /^_(id|type)$/
             key = $1
+            pp key
           end
 
           @attributes[key] = value
@@ -192,6 +193,17 @@ module Tensor
       return @_dirty
     end
 
+    def to_hash()
+      self.attributes.merge({
+        :id   => self.id,
+        :type => self.type
+      })
+    end
+
+    def to_json()
+      MultiJson.dump(to_hash())
+    end
+
     def to_indexed_hash()
       rv = to_hash()
 
@@ -200,7 +212,7 @@ module Tensor
         rv.delete(i)
       end
 
-      rv = rv.each_recurse! do |k,v,p|
+      rv = rv.each_recurse do |k,v,p|
         if v.is_a?(Time)
           v.strftime('%Y-%m-%dT%H:%M:%S%z')
         else
@@ -456,7 +468,7 @@ module Tensor
       #
       def document_type(override=nil)
         if override.nil?
-          @_document_type ||= self.name.underscore
+          @_document_type ||= self.name.underscore.gsub('/','_')
         else
           @_document_type = override
         end
@@ -489,7 +501,7 @@ module Tensor
           })
         end
 
-        return @_mappings
+        return @_mappings[document_type()]
       end
 
       # retrieve/declare explicit settings for this model
@@ -522,7 +534,9 @@ module Tensor
         connection().indices.put_mapping({
           :index => index_name(),
           :type  => document_type(),
-          :body  => mappings()
+          :body  => {
+            document_type() => mappings()
+          }
         })
       end
 
@@ -575,7 +589,9 @@ module Tensor
       end
 
       def _generate_mapping(options={})
-        {
+        (connection().indices.get_mapping({
+          :index => index_name()
+        }) || {}).get(index_name(),{}).deeper_merge!({
           (options[:type] || document_type()) => DEFAULT_MAPPING.deeper_merge({
             'properties' => Hash[keys().collect{|name, definition|
               definition = definition.stringify_keys()
@@ -585,10 +601,8 @@ module Tensor
               }]
             }]
           })
-        }
+        })
       end
     end
-
-    alias_method  :to_hash, :attributes
   end
 end

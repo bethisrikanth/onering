@@ -40,9 +40,9 @@ module App
               assets = AssetRequest.all()
             else
               k,v = params[:splat].first.split('/')
-              assets = AssetRequest.where({
+              assets = AssetRequest.urlquery({
                 k => v
-              })
+              }.join('/'))
             end
 
             return 404 unless assets
