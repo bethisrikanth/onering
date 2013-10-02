@@ -175,14 +175,13 @@ module Tensor
 
         self.id = result['_id']
 
-
       # unless otherwise specified, make another query to retrieve the object we just saved and update our data
         unless options[:reload] === false
           self.from_hash(self.class.find(self.id).to_hash())
         end
       end
 
-      return self
+      return true
     end
 
 
@@ -221,9 +220,10 @@ module Tensor
         rv.delete(i)
       end
 
-      rv.deep_clone.each_recurse do |k,v,p|
+      rv.each_recurse do |k,v,p|
         if k =~ /_at$/
-          rv.rset(p, Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z'))
+          new_value = (Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z') rescue nil)
+          rv.rset(p, new_value) unless new_value.nil?
         end
 
         nil
@@ -429,7 +429,7 @@ module Tensor
     #
     def self.document_type(override=nil)
       if override.nil?
-        @_document_type ||= self.name.underscore.gsub('/','_')
+        @_document_type ||= self.name.gsub('::','.').underscore
       else
         @_document_type = override
       end
@@ -469,8 +469,10 @@ module Tensor
     def self.settings(definition=nil, &block)
       if block_given?
         @_settings ||= yield
+        sync_schema()
       elsif not definition.nil?
         @_settings ||= definition
+        sync_schema()
       end
 
       return @_settings
@@ -479,6 +481,8 @@ module Tensor
 
     # synchronize the automatic and explicit mapping on this model with elasticsearch
     def self.sync_schema(options={})
+      STDERR.puts("Syncing schema for model #{self.name}...")
+
     # create the index if it doesn't exist
       unless connection().indices.exists({
         :index => index_name()
@@ -599,9 +603,14 @@ module Tensor
       if document['_type'].nil?
         klass = self
       else
-        klass = Kernel.const_get(document['_type'].split('/').collect{|i|
-          i.split('_').collect{|i| i.capitalize }.join()
-        }.join('::'))
+        if document['_type'].include?('::')
+          parts = document['_type'].split('::')
+        else
+          parts = document['_type'].split('.').collect{|i| i.split('_').collect{|i| i.capitalize }.join() }
+        end
+
+        base = parts[0..-2].inject(Object){|k,i| k = k.const_get(i) }
+        klass = base.const_get(parts[-1])
       end
 
       klass.new(document['_source'], {

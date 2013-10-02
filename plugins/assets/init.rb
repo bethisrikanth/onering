@@ -11,7 +11,7 @@ module App
     namespace '/api/devices' do
       namespace '/defaults' do
         get '/sync' do
-          output(Automation::Job.find_by_name('assets-sync').request())
+          output(Automation::Job.urlquery('name/assets-sync').first.request())
         end
 
         get '/groups' do
@@ -354,7 +354,7 @@ module App
             device.save()
             output(device)
           else
-            job = Automation::Job.find_by_name('assets-update')
+            job = Automation::Job.urlquery('name/assets-update').first
             return 503 unless job
 
             output(job.request({

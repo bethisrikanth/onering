@@ -19,23 +19,31 @@ namespace :db do
     models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
     models.each do |index, model|
-      Tire.index(index) do
-        create
-        puts "Creating index #{index}"
+      puts "Syncing model #{model.name}..."
+      model.sync_schema()
+    end
+  end
 
-        unless model.defaults.nil?
-          puts "Applying defaults for #{index}/#{model.name.underscore}"
-          mapping(model.name.underscore, model.defaults)
-        end
+  desc "Deletes all indices and recreates them empty.  EXTREMELY DANGEROUS!"
+  task :nuke do
+    load "irb.ru"
+    puts "Nuking database..."
 
-        # x = Hash[model.properties.collect{|i|
-        #   [i, nil]
-        # }]
+    App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
 
-        m = model.new()
-        m.save()
-        m.destroy()
+    models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
+
+    models.each do |index, model|
+      begin
+        puts "Nuking model #{model.name}..."
+        model.connection.indices.delete({
+          :index => model.index_name()
+        })
+      rescue
+        nil
       end
+
+      model.sync_schema()
     end
   end
 end

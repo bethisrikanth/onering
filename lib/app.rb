@@ -1,3 +1,4 @@
+ENV['PROJECT_ROOT'] = File.dirname(File.dirname(File.expand_path(__FILE__)))
 $: << File.join(ENV['PROJECT_ROOT'], 'lib')
 $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
@@ -5,7 +6,6 @@ require 'rubygems'
 require 'oj'
 require 'config'
 require 'log'
-require 'db'
 require 'queue'
 require 'utils'
 require 'patches'

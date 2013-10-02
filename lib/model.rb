@@ -409,8 +409,17 @@ module App
           @@_implementers << subclass
         end
 
-        def implementers
+        def implementers()
           @@_implementers
+        end
+
+        def sync_schemata()
+          models = Hash[implementers.to_a.collect{|i| [i.index_name, i] }]
+
+          models.each do |index, model|
+            puts "Syncing model #{model.name}..."
+            model.sync_schema()
+          end
         end
       end
     end

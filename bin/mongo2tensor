@@ -8,27 +8,31 @@ require 'oj'
 require 'multi_json'
 require './lib/app'
 
-types = {}
-table = ARGV[0]
 
 STDIN.read.lines.each do |line|
   next if line[0].chr == '#'
   next if line.strip.chomp.empty?
-
 
   data = {}
   notes = []
   line = MultiJson.load(line)
 
   line['id'] = line['_id']
-  line['_type'] = line['_type'].underscore
+  #line['_type'] = line['_type'].underscore
 
   line['_type'] = 'asset' if line['_type'] == 'device'
+  line['_type'] = 'automation.job' if line['_type'] =~ /automation[\_\.]job/
 
   line.delete('_id')
 
-  type = line['_type'].split('_').collect{|i| i.capitalize }.join()
-  types[type] ||= Kernel.const_get(type)
+  if line['_type'].include?('::')
+    parts = line['_type'].split('::')
+  else
+    parts = line['_type'].split('.').collect{|i| i.split('_').collect{|i| i.capitalize }.join() }
+  end
+
+  base = parts[0..-2].inject(Object){|klass,i| klass = klass.const_get(i) }
+  type = base.const_get(parts[-1])
 
   line.each_recurse(:intermediate => true) do |k,v,p|
     if k =~ /_at$/
@@ -56,7 +60,5 @@ STDIN.read.lines.each do |line|
   end
 
 # create or update the record
-  types[type].create(data)
-
-  pp data['id']
+  type.create(data)
 end
