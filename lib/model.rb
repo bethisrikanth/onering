@@ -274,7 +274,7 @@ module App
 
           rv = @_parser.parse(query).to_elasticsearch_query({
             :prefix => self.field_prefix(),
-            :fields => self.keys.keys()
+            :fields => self.fields.keys()
           })
 
 #puts MultiJson.dump(rv)
@@ -289,7 +289,7 @@ module App
 
           query = {
             :filter => self.to_elasticsearch_query(query),
-            :fields => (keys.keys.collect{|i| i.to_s })
+            :fields => (self.fields.keys.collect{|i| i.to_s })
           }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
@@ -396,7 +396,7 @@ module App
         def field_prefix(name=nil)
           return @_field_prefix.to_s if name.nil?
           @_field_prefix = name.to_s
-          @_field_prefix_skip ||= self.keys.keys.reject{|i| i.to_s == name.to_s }
+          @_field_prefix_skip ||= self.fields.keys.reject{|i| i.to_s == name.to_s }
         end
 
         def field_prefix_skip(list=nil)

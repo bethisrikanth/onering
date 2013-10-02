@@ -8,16 +8,16 @@ class Asset < App::Model::Elasticsearch
   VALID_STATUS = %w{online allocatable installing}
   NO_AUTOCLEAR_STATUS = %w{installing}
 
-  key :aliases,                 :string,   :array => true
-  key :collected_at,            :date
-  key :created_at,              :date,     :default => Time.now
-  key :maintenance_status,      :string
-  key :name,                    :string
-  key :parent_id,               :string
-  key :properties,              :object,   :default => {}
-  key :status,                  :string
-  key :tags,                    :string,   :array => true
-  key :updated_at,              :date,     :default => Time.now
+  field :aliases,                 :string,   :array => true
+  field :collected_at,            :date
+  field :created_at,              :date,     :default => Time.now
+  field :maintenance_status,      :string
+  field :name,                    :string
+  field :parent_id,               :string
+  field :properties,              :object,   :default => {}
+  field :status,                  :string
+  field :tags,                    :string,   :array => true
+  field :updated_at,              :date,     :default => Time.now
 
   field_prefix                  :properties
 

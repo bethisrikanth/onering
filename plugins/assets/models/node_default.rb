@@ -4,14 +4,14 @@ require 'assets/lib/helpers'
 class NodeDefault < App::Model::Elasticsearch
   index_name "node_defaults"
 
-  key :name,       :string
-  key :group,      :string
-  key :match,      :object,    :array => true
-  key :apply,      :object
-  key :force,      :boolean,   :default => false
-  key :enabled,    :boolean,   :default => true
-  key :created_at, :boolean,   :default => Time.now
-  key :updated_at, :date,      :default => Time.now
+  field :name,       :string
+  field :group,      :string
+  field :match,      :object,    :array => true
+  field :apply,      :object
+  field :force,      :boolean,   :default => false
+  field :enabled,    :boolean,   :default => true
+  field :created_at, :boolean,   :default => Time.now
+  field :updated_at, :date,      :default => Time.now
 
 
   before_save  :_compact

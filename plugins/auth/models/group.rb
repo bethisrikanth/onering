@@ -3,10 +3,10 @@ require 'model'
 class Group < App::Model::Elasticsearch
   index_name "groups"
 
-  key :name,       :string
-  key :users,      :string,  :array => true
-  key :created_at, :date,    :default => Time.now
-  key :updated_at, :date,    :default => Time.now
+  field :name,       :string
+  field :users,      :string,  :array => true
+  field :created_at, :date,    :default => Time.now
+  field :updated_at, :date,    :default => Time.now
 
   def capabilities
     Capability.urlquery("groups/#{self.id}").collect{|c|

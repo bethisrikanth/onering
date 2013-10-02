@@ -7,13 +7,13 @@ module Hardware
   class Rack < App::Model::Elasticsearch
     index_name "hardware_racks"
 
-    key :name,        :string, :required => true
-    key :description, :string
-    key :site,        :string
-    key :vendor,      :object
-    key :height,      :integer, :required => true
-    key :created_at,  :date,    :default => Time.now
-    key :updated_at,  :date,    :default => Time.now
+    field :name,        :string, :required => true
+    field :description, :string
+    field :site,        :string
+    field :vendor,      :object
+    field :height,      :integer, :required => true
+    field :created_at,  :date,    :default => Time.now
+    field :updated_at,  :date,    :default => Time.now
 
 
     def units()

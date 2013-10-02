@@ -123,7 +123,7 @@
                 </td>
 
                 <td>
-                  <input type="text" class="input-large" placeholder="field" ng-model="match.field">
+                  <input type="text" class="input-large" placeholder="field" ng-model="match.field" typeahead="f as f for f in autocomplete | filter:$viewValue | limitTo:25">
                 </td>
 
                 <td>
@@ -181,7 +181,7 @@
 
               <tr ng-show="newApplyKey">
                 <td>
-                  <input type="text" class="input-medium" placeholder="key.name" ng-model="newApplyKey" ng-model-onblur>
+                  <input type="text" class="input-medium" placeholder="key.name" ng-model="newApplyKey" ng-model-onblur typeahead="f as f for f in autocomplete | filter:$viewValue | limitTo:25">
                 </td>
 
                 <td> </td>

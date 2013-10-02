@@ -450,6 +450,10 @@ function AssetDefaultsController($scope, $http, $timeout){
 
       $scope.current = null;
     });
+
+    $http.get('/api/devices/schema/fields').success(function(data){
+      $scope.autocomplete = data;
+    });
   }
 
   $scope.addNewProperty = function(key){

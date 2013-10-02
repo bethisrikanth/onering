@@ -6,18 +6,18 @@ class AssetRequest < App::Model::Elasticsearch
   before_save :_intify_quantities
   before_save :_compact_notes
 
-  key :deliver_by,      :date
+  field :deliver_by,      :date
 
-  key :user_id,         :string
-  key :team,            :string
-  key :quantity,        :object
-  key :service,         :string
-  key :notes,           :object, :array => true
-  key :created_at,      :date,    :default => Time.now
-  key :updated_at,      :date,    :default => Time.now
+  field :user_id,         :string
+  field :team,            :string
+  field :quantity,        :object
+  field :service,         :string
+  field :notes,           :object,  :array => true
+  field :created_at,      :date,    :default => Time.now
+  field :updated_at,      :date,    :default => Time.now
 
 
-  def to_h
+  def to_hash()
     super.to_hash.merge({
       'total' => total()
     })

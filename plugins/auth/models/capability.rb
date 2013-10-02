@@ -3,16 +3,16 @@ require 'model'
 class Capability < App::Model::Elasticsearch
   index_name "capabilities"
 
-  key :users,        :string,  :array => true
-  key :groups,       :string,  :array => true
-  key :description,  :string
-  key :created_at,   :date,    :default => Time.now
-  key :updated_at,   :date,    :default => Time.now
+  field :users,        :string,  :array => true
+  field :groups,       :string,  :array => true
+  field :description,  :string
+  field :created_at,   :date,    :default => Time.now
+  field :updated_at,   :date,    :default => Time.now
 
 
-  def all_users
+  def all_users()
     rv = []
-    rv += users if users
+    rv += users if users()
     rv += groups.collect{|i| Group.find(i).users rescue [] }.flatten if groups
     rv
   end

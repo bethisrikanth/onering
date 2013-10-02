@@ -3,15 +3,14 @@ require 'model'
 class User < App::Model::Elasticsearch
   index_name "users"
 
-
-  key :name,         :string
-  key :email,        :string
-  key :client_keys,  :object
-  key :tokens,       :object,  :array => true
-  key :options,      :object
-  key :logged_in_at, :date
-  key :created_at,   :date,    :default => Time.now
-  key :updated_at,   :date,    :default => Time.now
+  field :name,         :string
+  field :email,        :string
+  field :client_keys,  :object
+  field :tokens,       :object,  :array => true
+  field :options,      :object
+  field :logged_in_at, :date
+  field :created_at,   :date,    :default => Time.now
+  field :updated_at,   :date,    :default => Time.now
 
 
   def groups
@@ -100,7 +99,7 @@ class User < App::Model::Elasticsearch
           if self.tokens.select{|i| i['name'] == name }.empty?
             self.tokens << {
               :name => name,
-              :key  => token
+              :field  => token
             }
             self.save()
             return token

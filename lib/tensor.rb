@@ -59,13 +59,12 @@ module Tensor
     include ::ActiveModel::Model
     extend  ::ActiveModel::Callbacks
 
-    define_model_callbacks :save, :create, :destroy, :update
-
     attr_accessor :id
     attr_accessor :type
     attr_reader   :_metadata
     attr_accessor :attributes
-    attr_accessor :_properties
+
+    define_model_callbacks :save, :create, :destroy, :update
 
     DEFAULT_INTERNAL_LIMIT = 1000
     DEFAULT_RESULTS_LIMIT  = 10000
@@ -195,8 +194,8 @@ module Tensor
       self.class.query(body, options)
     end
 
-    def keys(name=nil)
-      self.class.keys(name)
+    def fields(name=nil)
+      self.class.fields(name)
     end
 
     def dirty?()
@@ -222,17 +221,25 @@ module Tensor
         rv.delete(i)
       end
 
+      rv.deep_clone.each_recurse do |k,v,p|
+        if k =~ /_at$/
+          rv.rset(p, Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z'))
+        end
+
+        nil
+      end
+
       return rv
     end
 
 
-    def method_missing(meth, *args, &block)
-      pp meth
-      pp self._properties
-      raise "FAIL"
+    # def method_missing(meth, *args, &block)
+    #   pp meth
+    #   pp self.class._fields
+    #   raise "FAIL"
 
-      super
-    end
+    #   super
+    # end
 
 
     ################################################################################
@@ -247,42 +254,39 @@ module Tensor
     # +options+::  options for building the field
     # * :array::   boolean, whether to store the field as an array of +type+ values (true) or not (false)
     #
-    def self.key(name, type=:string, options={})
-      _properties ||= {}
-
+    def self.field(name, type=:string, options={})
       name = name.to_sym
-      raise "Duplicate key definition #{name}" if _properties.has_key?(name)
+      @_fields ||= {}
+      raise "Duplicate field definition #{name}" if @_fields.has_key?(name)
 
     # register the key definition
-      _properties[name] = {
+      @_fields[name] = {
         :type => type.to_s.downcase.to_sym
       }.merge(options)
 
-    # # define getter
-    #   define_method(name) do
-    #     if instance_variables.include?(:"@#{name}")
-    #       instance_variable_get(:"@#{name}")
-    #     else
-    #       self.class._normalize_value(nil, keys(name))
-    #     end
-    #   end
+    # define getter
+      define_method(name) do
+        if instance_variables.include?(:"@#{name}")
+          instance_variable_get(:"@#{name}")
+        else
+          self.class._normalize_value(nil, fields(name))
+        end
+      end
 
-    # # define setter
-    #   define_method(:"#{name}=") do |value|
-    #   # normalize the value according to type/default rules for this field
-    #     pp keys()
+    # define setter
+      define_method(:"#{name}=") do |value|
+      # normalize the value according to type/default rules for this field
+        value = self.class._normalize_value(value, fields(name))
 
-    #     value = self.class._normalize_value(value, keys(name))
+        instance_variable_set(:"@#{name}", value)
+        @attributes[name.to_s] = value
 
-    #     instance_variable_set(:"@#{name}", value)
-    #     @attributes[name.to_s] = value
+      # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
+        @_dirty = true unless @_permaclean
 
-    #   # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
-    #     @_dirty = true unless @_permaclean
-
-    #   # return what we just set
-    #     send(name)
-    #   end
+      # return what we just set
+        send(name)
+      end
 
     end
 
@@ -290,10 +294,20 @@ module Tensor
     # get the schema definition for this model
     # +name+:: get the definition a specific field
     #
-    def self.keys(name=nil)
-      pp _properties()
-      raise "LOL"
-      return (name.nil? ? self._properties : self._properties[name])
+    def self.fields(name=nil)
+      return (name.nil? ? @_fields : @_fields[name])
+    end
+
+
+    # inherit all field definitions from the parent class
+    def self.inherit_fields!(*args)
+      f = superclass.fields
+      f.select!{|k,v| args.map(&:to_s).include?(k.to_s) } unless args.empty?
+
+      @_fields ||= {}
+      @_fields.deeper_merge!(f)
+
+      return @_fields
     end
 
 
@@ -600,7 +614,7 @@ module Tensor
         :index => index_name()
       }) || {}).get(index_name(),{}).deeper_merge!({
         (options[:type] || document_type()) => DEFAULT_MAPPING.deeper_merge({
-          'properties' => Hash[keys().collect{|name, definition|
+          'properties' => Hash[fields().collect{|name, definition|
             definition = definition.stringify_keys()
 
             [name.to_s, {
