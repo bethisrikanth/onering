@@ -152,7 +152,7 @@ module App
       # get user types list
         get '/list/types' do
           allowed_to? :list_users
-          output(User.list(:_type).collect{|i| i.gsub('User','').downcase }.compact.reject{|i| i.empty? })
+          output(User.list(:type).collect{|i| i.gsub('User','').downcase }.compact.reject{|i| i.empty? })
         end
 
       # perform session login

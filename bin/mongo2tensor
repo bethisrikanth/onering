@@ -20,16 +20,18 @@ STDIN.read.lines.each do |line|
   line['id'] = line['_id']
   #line['_type'] = line['_type'].underscore
 
+  line['_type'] = line['_type'].underscore
   line['_type'] = 'asset' if line['_type'] == 'device'
-  line['_type'] = 'automation.job' if line['_type'] =~ /automation[\_\.]job/
+  line['_type'] = 'automation.job' if line['_type'] =~ /automation[\_\.]job/i
 
   line.delete('_id')
 
   if line['_type'].include?('::')
     parts = line['_type'].split('::')
   else
-    parts = line['_type'].split('.').collect{|i| i.split('_').collect{|i| i.capitalize }.join() }
+    parts = line['_type'].split(/[\.\/]/).collect{|i| i.split('_').collect{|i| i.capitalize }.join() }
   end
+
 
   base = parts[0..-2].inject(Object){|klass,i| klass = klass.const_get(i) }
   type = base.const_get(parts[-1])
@@ -45,6 +47,9 @@ STDIN.read.lines.each do |line|
       v['user_id'] = 'onering' if v['user_id'].nil?
 
       notes << v
+
+    elsif k == 'slot'
+      data.set(p, v.to_s)
 
     elsif k == '$date'
       nil

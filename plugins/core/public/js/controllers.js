@@ -57,7 +57,7 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
     $rootScope.group_filter = {
       field:   '',
       value:   '',
-      query:   'id/not:null',
+      query:   null,
       default: true
     };
 

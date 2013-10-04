@@ -19,8 +19,8 @@ module App
         end
 
         get '/list' do
-          defaults = NodeDefault.all.to_a.collect{|i|
-            i = i.to_hash
+          defaults = NodeDefault.all.collect{|i|
+            i = i.to_hash()
             i['apply'] = i['apply'].coalesce(nil,nil,'.')
             i
           }
@@ -136,11 +136,7 @@ module App
             :intermediate => true
           }) do |k,v,p|
             if v.is_a?(Hash) and v['type'].is_a?(String)
-
-            # HAX: do this to skip notes fields
-              if p[4] != 'notes'
-                rv << p.join('.').gsub(/(?:^device\.|^asset\.|properties\.|\.properties)/,'')
-              end
+              rv << p.join('.').gsub(/(?:^device\.|^asset\.|properties\.|\.properties)/,'')
             end
 
           end
@@ -374,8 +370,12 @@ module App
         post route do
           device = Asset.find(params[:id])
           return 404 if not device
-          # device.add_note(request.env['rack.input'].read, @user.id)
-          # device.save()
+
+          if device.add_note(request.env['rack.input'].read, @user.id)
+            device.save()
+          else
+            400
+          end
 
           200
         end
@@ -385,10 +385,13 @@ module App
           return 404 if not device
 
           if device.properties and device.properties['notes']
-            if device.properties['notes'][params[:note_id]]
+            params[:note_id] = params[:note_id].to_i
+            note = device.properties['notes'][params[:note_id].to_i]
+
+            unless note.nil?
               allowed_to? :remove_asset_note, device.properties['notes'][params[:note_id]]
 
-              device.properties['notes'].delete(params[:note_id])
+              device.properties['notes'].delete_at(params[:note_id])
               device.properties.delete('notes') if device.properties['notes'].empty?
               device.save()
             end

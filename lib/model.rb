@@ -270,6 +270,8 @@ module App
         end
 
         def to_elasticsearch_query(query, options={})
+          return nil if query == 'null'
+
           @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
 
           rv = @_parser.parse(query).to_elasticsearch_query({
@@ -364,19 +366,35 @@ module App
         end
 
         def list(field, query=nil)
-          field = [*field]
-          summary = summarize(field.first, field[1..-1])
+        #   field = [*field]
 
-          rv = []
+        #   summary = summarize(field.first, field[1..-1], query, {
+        #     :limit => 10000
+        #   })
 
-          field.each do |field|
+        #   rv = []
 
-            summary.collect{|i| i[:id] }.each do |value|
-              row = []
+        #   get_ids = proc do |facets|
+        #     facets.inject([]) do |row, i|
+        #       if i[:children].nil?
+        #         row << i[:id]
+        #       else
+        #         row += ([i[:id]] * i[:children].length).zip(get_ids.call(i[:children]))
+        #       end
+        #     end
+        #   end
 
-              rv << row
-            end
-          end
+        # # get the party started
+        #   rv = get_ids.call(summary)
+
+
+        #   pp rv.collect{|i|
+        #     i = [*i].flatten[0..(field.length-1)]
+        #     i = [i[0], i[1..-1].reverse].flatten
+        #     i
+        #   }
+
+          return []
         end
 
         def resolve_field(field)

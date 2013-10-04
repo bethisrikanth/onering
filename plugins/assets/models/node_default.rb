@@ -10,7 +10,7 @@ class NodeDefault < App::Model::Elasticsearch
   field :apply,      :object
   field :force,      :boolean,   :default => false
   field :enabled,    :boolean,   :default => true
-  field :created_at, :boolean,   :default => Time.now
+  field :created_at, :date,      :default => Time.now
   field :updated_at, :date,      :default => Time.now
 
 

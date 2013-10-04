@@ -106,23 +106,6 @@ module App
         rv.compact.to_json
       end
 
-      get '/:id/boot/profile' do
-        asset = Asset.find(params[:id])
-        return 404 unless asset
-        return 500 unless asset.properties['site']
-
-        rv = []
-        pxed = Config.get("provisioning.pxed.#{asset.properties['site'].downcase}.url")
-        macs = get_macs(asset)
-
-        macs.each do |mac|
-          response = Net::HTTP.get_response(URI("#{pxed}/devices/01-#{mac[:mac].downcase.gsub(':', '-')}/profile"))
-          rv << (MultiJson.load(response.body).merge(mac) rescue nil)
-        end
-
-        rv.compact.to_json
-      end
-
       get '/:id/boot/profile/list' do
         asset = Asset.find(params[:id])
         return 404 unless asset

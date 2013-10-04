@@ -3,17 +3,16 @@ require 'model'
 class Capability < App::Model::Elasticsearch
   index_name "capabilities"
 
+  field :description,  :string
   field :users,        :string,  :array => true
   field :groups,       :string,  :array => true
-  field :description,  :string
-  field :created_at,   :date,    :default => Time.now
-  field :updated_at,   :date,    :default => Time.now
+  field :capabilities, :string,  :array => true
 
 
   def all_users()
     rv = []
-    rv += users if users()
-    rv += groups.collect{|i| Group.find(i).users rescue [] }.flatten if groups
+    rv += self.users() if self.users()
+    rv += self.groups.collect{|i| Group.find(i).users rescue [] }.flatten unless self.groups.empty?
     rv
   end
 
@@ -21,7 +20,7 @@ class Capability < App::Model::Elasticsearch
     def tree(root=nil)
       rv = []
 
-      where({
+      search({
         :filter => {
           :exists => {
             :field => :capabilities

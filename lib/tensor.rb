@@ -163,12 +163,32 @@ module Tensor
     #
     def save(options={})
       run_callbacks :save do
-        result = self.class.connection().index({
-          :index => @_index_name,
-          :type  => @_document_type,
-          :id    => self.id,
-          :body  => self.to_indexed_hash()
-        })
+        attempts = 0
+
+        body = self.to_indexed_hash()
+
+        begin
+          result = self.class.connection().index({
+            :index => @_index_name,
+            :type  => @_document_type,
+            :id    => self.id,
+            :body  => body
+          })
+
+        rescue Elasticsearch::Transport::Transport::Errors::BadRequest => e
+          message = (MultiJson.load(e.message.gsub(/^\[[0-9]+\]\s+/,'')) rescue nil)
+          raise e unless message.is_a?(Hash)
+
+        # handle some error conditions gracefully
+          case message.get('error')
+          when /^MapperParsingException\[failed to parse \[([^\]]+)\]\].*NumberFormatException\[For input string:/
+            STDERR.puts("#{self.id}: Error indexing field #{$1}, truncating...")
+            body.unset($1)
+            retry
+          else
+            raise e
+          end
+        end
 
       # failed save has failed
         return false unless result['ok'] === true
@@ -213,15 +233,51 @@ module Tensor
     end
 
     def to_indexed_hash()
-      rv = to_hash()
+      rv = to_hash().stringify_keys()
 
     # furthermore, always remove id/type from the output
       %w{id _id type _type}.each do |i|
         rv.delete(i)
       end
 
+    # apply explicitly-defined type definitions
+    # --------------------------------------------------------------------------
+      typedefs = {}
+
+    # get typedefs from all fields
+      self.class.fields.each do |k,v|
+        typedefs[k.to_s] = v.get(:typedefs)
+      end
+
+    # remove nils
+      typedefs.reject!{|k,v| v.nil? or v.empty? }
+
+
       rv.each_recurse do |k,v,p|
-        if k =~ /_at$/
+      # apply type definition if one was set
+        unless (typedef = typedefs.get(p)).nil?
+        # normalize
+          typedef = {
+            'type' => typedef
+          } if typedef.is_a?(String)
+
+          if v.is_a?(Array)
+            if typedef['array'] === true
+              new_value = v.collect{|i| i.to_s.convert_to(typedef['type']) }
+            else
+              new_value = nil
+            end
+          elsif not v.is_a?(Hash)
+            new_value = v.to_s.convert_to(typedef['type'])
+          else
+            new_value = nil
+          end
+
+        # update the value
+          rv.rset(p, new_value)
+        end
+
+        if k.to_s =~ /_at$/
           new_value = (Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z') rescue nil)
           rv.rset(p, new_value) unless new_value.nil?
         end
@@ -437,6 +493,7 @@ module Tensor
       @_document_type
     end
 
+
     # get/set the named connection for this model from the connection pool
     # +name+::  the named connection to retrieve (default: nil)
     #
@@ -588,7 +645,8 @@ module Tensor
         when :search
           return nil unless defined?(response['hits']['hits'])
           return response['hits']['hits'].collect{|i|
-            next unless defined?(i['_source'])
+            i['_source'] = i['fields'] if i['_source'].nil? and not i['fields'].nil?
+            next if i['_source'].nil?
             next if i['_id'][0].chr == '_'
 
             _build_instance(i)
@@ -632,6 +690,8 @@ module Tensor
           }]
         })
       })
+
+    # TODO: build type definitions here as well
     end
   end
 end

@@ -14,13 +14,12 @@ class Asset < App::Model::Elasticsearch
   field :maintenance_status,      :string
   field :name,                    :string
   field :parent_id,               :string
-  field :properties,              :object,   :default => {}
+  field :properties,              :object,   :default => {}, :typedefs => App::Config.get("database.options.typedefs.asset.properties")
   field :status,                  :string
   field :tags,                    :string,   :array => true
   field :updated_at,              :date,     :default => Time.now
 
   field_prefix                    :properties
-
 
   settings do
     {
@@ -101,6 +100,24 @@ class Asset < App::Model::Elasticsearch
     NodeDefault.defaults_for(self)
   end
 
+  def add_note(body, user_id)
+    body = Liquid::Template.parse(body).render({
+      :asset => self.to_hash().stringify_keys()
+    }) rescue nil
+    return false if user_id.nil?
+    return false if body.nil?
+
+    notes = self.properties.rget(:notes, [])
+    notes << {
+      :created_at => Time.now.strftime('%Y-%m-%dT%H:%M:%S%z'), #this is a damned cop-out...
+      :user_id    => user_id,
+      :body       => body
+    }
+
+    self.properties.rset(:notes, notes)
+    return true
+  end
+
 private
   def _compact()
     unless self.properties.nil?
@@ -170,7 +187,7 @@ private
       end
     end
 
-    self.from_h(device, false)
+    self.from_h(device, false, false)
     self
   end
 
