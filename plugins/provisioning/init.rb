@@ -46,24 +46,26 @@ module App
             end
 
             return 404 unless assets
-            output(assets.collect{|i| i.to_h })
+            output(assets.collect{|i| i.to_hash() })
           end
         end
 
         get '/list/:field' do
           assets = AssetRequest.list(params[:field])
           return 404 unless assets
-          output(assets.collect{|i| i.to_h })
+          output(assets.collect{|i| i.to_hash() })
         end
 
         get '/:id' do
           asset = AssetRequest.find(params[:id])
           return 404 unless asset
-          output(asset.to_h)
+          output(asset.to_hash())
         end
 
         delete '/:id' do
-          AssetRequest.destroy(params[:id])
+          asset = AssetRequest.find(params[:id])
+          return 404 unless asset
+          asset.destroy()
           200
         end
 
@@ -175,7 +177,7 @@ module App
           script_type.gsub!(/[\-]/,'/')
 
           liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
-            :device => (asset.to_h rescue {}),
+            :device => (asset.to_hash() rescue {}),
             :config => Config.get('provisioning.boot')
           }
         end

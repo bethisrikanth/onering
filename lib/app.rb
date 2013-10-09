@@ -17,6 +17,9 @@ require 'multi_json'
 require 'liquid_patches'
 require 'pp'
 
+# initialize database settings
+App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
+
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
   name = File.basename(p)
@@ -28,9 +31,6 @@ module App
   class Base < Controller
     def initialize
       App::Log.setup()
-
-      App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
-
       Queue.setup()
       App::Log.increment("api.process.started")
       super

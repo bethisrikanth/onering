@@ -26,7 +26,7 @@ function LogoutController($scope, $http, $rootScope, $window){
 }
 
 
-function UserProfileController($scope, $http, $dialog, $timeout, CurrentUser){
+function UserProfileController($scope, $http, $modal, $timeout, CurrentUser){
   $scope.reload = function(delay){
     var _reload = function(){
       CurrentUser.get({}, function(data){
@@ -50,11 +50,11 @@ function UserProfileController($scope, $http, $dialog, $timeout, CurrentUser){
   $scope.showKeyDialog = function(name, data){
     var $parent = $scope;
 
-    var d = $dialog.dialog({
+    var d = $modal.open({
       backdrop:    true,
       keyboard:    true,
       templateUrl: 'showKeyDialog',
-      controller:  function($scope, $dialog){
+      controller:  function($scope, $modal){
         $scope.name = name;
         $scope.private_key = data[0].trim();
         $scope.public_key  = data[1].trim();
@@ -72,7 +72,7 @@ function UserProfileController($scope, $http, $dialog, $timeout, CurrentUser){
 }
 
 
-function UserManagerController($scope, $http, $dialog, User, UserType, UserList, GroupList, CapabilityList){
+function UserManagerController($scope, $http, $modal, User, UserType, UserList, GroupList, CapabilityList){
   $scope.sortField = 'id';
 
 
@@ -104,11 +104,11 @@ function UserManagerController($scope, $http, $dialog, User, UserType, UserList,
   $scope.userDialog = function(user){
     var $parent = $scope;
 
-    var d = $dialog.dialog({
+    var d = $modal.open({
       backdrop:    true,
       keyboard:    true,
       templateUrl: 'userDialog',
-      controller:  function($scope, $dialog, User){
+      controller:  function($scope, $modal, User){
         $scope.user = user;
         $scope.groups = $parent.groups;
         $scope.userTypes = $parent.userTypes;

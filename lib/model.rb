@@ -266,6 +266,23 @@ module App
 
       class<<self
         def configure(options={})
+          options = options.symbolize_keys()
+
+          if options[:log].nil? or options[:log] === false
+            options[:log]    = false
+            options[:logger] = nil
+
+          elsif options[:logger].is_a?(String)
+            case options[:logger].upcase
+            when 'STDOUT'
+              options[:logger] = Logger.new(STDOUT)
+            when 'STDERR'
+              options[:logger] = Logger.new(STDERR)
+            else
+              options[:logger] = Logger.new(options[:logger])
+            end
+          end
+
           Tensor::ConnectionPool.connect(options)
         end
 
@@ -442,7 +459,6 @@ module App
           models = Hash[implementers.to_a.collect{|i| [i.index_name, i] }]
 
           models.each do |index, model|
-            puts "Syncing model #{model.name}..."
             model.sync_schema()
           end
         end

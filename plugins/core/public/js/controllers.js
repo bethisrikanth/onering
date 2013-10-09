@@ -164,6 +164,10 @@ function SearchController($scope, $http, $location, Query){
     $scope.autocomplete = data;
   });
 
+  $scope.selectAutocomplete = function(scope, locals, a, b, c){
+    console.log(scope, locals, a,b,c)
+  }
+
   $scope.runQuery = function(query){
     if(query) $scope.query = query;
 

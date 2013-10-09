@@ -1,8 +1,8 @@
 angular.module('app', [
+  'ngRoute',
   'ui.utils',
   'ui.bootstrap',
   'rest',
-  'radian',
   'corePlugin',
   'authPlugin',
   'assetsPlugin',

@@ -3,7 +3,7 @@ angular.module('corePlugin', [
   'coreDirectives',
   'coreRoutes'
 ]).
-run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootScope, $window, $http, $dialog, $location){
+run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScope, $window, $http, $modal, $location){
   $rootScope.online = true;
 
   $rootScope.go = function(path){
@@ -17,11 +17,11 @@ run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootSco
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];
- 
+
 //  prepend global filter
     if($rootScope.group_filter.default != true){
       var s = $rootScope.group_filter.query.split('/');
-   
+
       if(s.length > 0 && s.length % 2 == 0){
         stack = s;
       }
@@ -155,11 +155,11 @@ run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootSco
       var subcontroller = controller;
     }
 
-    var d = $dialog.dialog({
+    var d = $modal.open({
       backdrop:    true,
       keyboard:    true,
       templateUrl: tpl,
-      controller:  function($scope, $dialog){
+      controller:  function($scope, $modal){
         if(!angular.isUndefined(parent)){
           $scope.parent = parent;
         }
@@ -169,7 +169,7 @@ run(['$rootScope', '$window', '$http', '$dialog', '$location', function($rootSco
         };
 
         if(!angular.isUndefined(subcontroller)){
-          subcontroller($scope, $dialog);
+          subcontroller($scope, $modal);
         }
       }
     })

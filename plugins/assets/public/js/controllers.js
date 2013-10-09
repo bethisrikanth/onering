@@ -189,7 +189,7 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $location, $routeParams, $window, $position, $dialog){
+function NodeController($scope, $http, $location, $routeParams, $window, $position){
   $scope.opt = {
     ping:              null,
     diskTab:           'block',

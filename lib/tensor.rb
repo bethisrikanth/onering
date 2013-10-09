@@ -50,7 +50,7 @@ module Tensor
       end
 
       def connection(name=:default)
-        connect({}, name)
+        @_connections[name] rescue nil
       end
     end
   end
@@ -169,10 +169,11 @@ module Tensor
 
         begin
           result = self.class.connection().index({
-            :index => @_index_name,
-            :type  => @_document_type,
-            :id    => self.id,
-            :body  => body
+            :index   => @_index_name,
+            :type    => @_document_type,
+            :id      => self.id,
+            :body    => body,
+            :refresh => true
           })
 
         rescue Elasticsearch::Transport::Transport::Errors::BadRequest => e
@@ -205,8 +206,12 @@ module Tensor
     end
 
 
-    def delete()
-
+    # destroy the current record, firing the *_destroy callbacks
+    #
+    def destroy(options={})
+      run_callbacks :destroy do
+        self.class.delete(self.id, options)
+      end
     end
 
     def query(body, options={})
@@ -463,6 +468,38 @@ module Tensor
       self.find!(id).update(attributes)
     end
 
+
+    # determine whether a document with the given ID exists in the index
+    # +id+: the id to check
+    #
+    def self.exists?(id)
+      connection().exists({
+        :index   => self.index_name(),
+        :type    => self.document_type(),
+        :id      => id,
+        :refresh => true
+      })
+    end
+
+
+    # delete a record without firing callbacks
+    # +id+: the id to remove
+    #
+    def self.delete(id, options={})
+      if exists?(id)
+        connection().delete(options.merge({
+          :index   => self.index_name(),
+          :type    => self.document_type(),
+          :id      => id,
+          :refresh => true
+        }))
+
+        return true
+      else
+        return false
+      end
+    end
+
     # get/set the index name for this model.
     # +override+:: the index name to set (default: autodetect)
     #
@@ -538,8 +575,6 @@ module Tensor
 
     # synchronize the automatic and explicit mapping on this model with elasticsearch
     def self.sync_schema(options={})
-      STDERR.puts("Syncing schema for model #{self.name}...")
-
     # create the index if it doesn't exist
       unless connection().indices.exists({
         :index => index_name()

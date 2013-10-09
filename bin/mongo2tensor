@@ -65,5 +65,11 @@ STDIN.read.lines.each do |line|
   end
 
 # create or update the record
-  type.create(data)
+  begin
+    type.create(data)
+  rescue Elasticsearch::Transport::Transport::Errors::BadRequest => e
+    pp line['id']
+    pp e
+    next
+  end
 end
