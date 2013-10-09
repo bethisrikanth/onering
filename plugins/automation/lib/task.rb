@@ -60,7 +60,6 @@ module Automation
               if Automation::Tasks::Base.register(f)
                 begin
                   require f
-                  puts "Loaded #{f}..."
                 rescue LoadError => e
                   STDERR.puts("Unable to load task #{f}: #{e.message}".foreground(:red))
                 end

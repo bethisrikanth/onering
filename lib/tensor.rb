@@ -677,21 +677,35 @@ module Tensor
     end
 
     def self._generate_mapping(options={})
-      (connection().indices.get_mapping({
-        :index => index_name()
-      }) || {}).get(index_name(),{}).deeper_merge!({
-        (options[:type] || document_type()) => DEFAULT_MAPPING.deeper_merge({
+        mapping = {
+        (options[:type] || document_type()) => DEFAULT_MAPPING.deep_clone.deeper_merge({
           'properties' => Hash[fields().collect{|name, definition|
             definition = definition.stringify_keys()
 
-            [name.to_s, {
+            es_mapping = {
               'type' => definition['type'].to_s
-            }]
+            }
+
+            if definition['typedefs'].is_a?(Hash)
+              definition['typedefs'].each_recurse do |k,v,p|
+                es_field = ['properties', p[0..-2].collect{|i| [i, 'properties'] }, p[-1]].flatten.join('.')
+                v = {
+                  'type' => v.to_s
+                } unless v.is_a?(Hash)
+
+                es_mapping.set(es_field, v)
+
+                nil
+              end
+            end
+            [name.to_s, es_mapping]
           }]
         })
-      })
+      }
 
-    # TODO: build type definitions here as well
+      (connection().indices.get_mapping({
+        :index => index_name()
+      }) || {}).get(index_name(),{}).deeper_merge!(mapping)
     end
   end
 end

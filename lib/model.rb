@@ -366,43 +366,50 @@ module App
         end
 
         def list(field, query=nil)
-        #   field = [*field]
+          field = [*field]
 
-        #   summary = summarize(field.first, field[1..-1], query, {
-        #     :limit => 10000
-        #   })
+          summary = summarize(field.first, field[1..-1].reverse(), query, {
+            :limit => 10000
+          })
 
-        #   rv = []
+          if field.length == 1
+            return summary.collect{|i| i[:id] }.compact
+          else
+            def get_ids(facets, rollup=nil)
+              rv = []
 
-        #   get_ids = proc do |facets|
-        #     facets.inject([]) do |row, i|
-        #       if i[:children].nil?
-        #         row << i[:id]
-        #       else
-        #         row += ([i[:id]] * i[:children].length).zip(get_ids.call(i[:children]))
-        #       end
-        #     end
-        #   end
+              facets.each do |facet|
 
-        # # get the party started
-        #   rv = get_ids.call(summary)
+                if facet[:children].is_a?(Array)
+                  if rollup.nil?
+                    rv += get_ids(facet[:children], [facet[:id]])
+                  else
+                    rv += get_ids(facet[:children], rollup.product([facet[:id]]))
+                  end
+                else
+                  if rollup.nil?
+                    rv << [facet[:id]]
+                  else
+                    rv << rollup.product([facet[:id]])
+                  end
+                end
+              end
 
+              return rv
+            end
 
-        #   pp rv.collect{|i|
-        #     i = [*i].flatten[0..(field.length-1)]
-        #     i = [i[0], i[1..-1].reverse].flatten
-        #     i
-        #   }
-
-          return []
+            return get_ids(summary).map(&:flatten)
+          end
         end
 
         def resolve_field(field)
-          return '_id' if field == 'id'
+          field = field.to_s
+
+          return 'id' if field == 'id'
           return field if (@_field_prefix_skip || []).include?(field)
           return field if field.to_s.empty? or @_field_prefix.to_s.empty?
           return field if field =~ Regexp.new("^#{@_field_prefix}\.")
-          return @_field_prefix.to_s+'.'+field.to_s
+          return @_field_prefix.to_s+'.'+field
         end
 
         def unresolve_field(field)
@@ -414,7 +421,7 @@ module App
         def field_prefix(name=nil)
           return @_field_prefix.to_s if name.nil?
           @_field_prefix = name.to_s
-          @_field_prefix_skip ||= self.fields.keys.reject{|i| i.to_s == name.to_s }
+          @_field_prefix_skip ||= self.fields.keys.reject{|i| i.to_s == name.to_s }.map(&:to_s)
         end
 
         def field_prefix_skip(list=nil)

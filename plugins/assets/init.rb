@@ -163,12 +163,11 @@ module App
     # /devices/list
     # list field values
       %w{
-        /list/:field/?
-        /list/:field/where/*
+        /list/*/?
+        /list/*
       }.each do |r|
         get r do#ne
-          q = (params[:splat].empty? ? (params[:where].to_s.empty? ? params[:q] : params[:where]) : params[:splat].first)
-          output Asset.list(params[:field], q)
+          output(Asset.list(params[:splat].first.split('/'), params[:q]))
         end
       end
 

@@ -9,10 +9,10 @@ end
 
 
 namespace :db do
-  desc "Seeds the db with test/mock data"
-  task :seed do
+  desc "Syncs the db with the schema defined in the models"
+  task :sync do
     load "irb.ru"
-    puts "Seeding database..."
+    puts "Syncing database..."
 
     App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
 
@@ -42,7 +42,9 @@ namespace :db do
       rescue
         nil
       end
+    end
 
+    models.each do |index, model|
       model.sync_schema()
     end
   end

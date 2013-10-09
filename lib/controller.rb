@@ -95,10 +95,34 @@ module App
       def output(body, status=200, mime='application/json')
         rv = nil
 
+        [:fs, :rs].each do |key|
+          case params[key]
+          when /(TAB)/
+            params[key].gsub!($1, "\t")
+          when /(NL|ENTER|RETURN|NEWLINE|CRLF|LF)/
+            params[key].gsub!($1, "\n")
+          when /(CR)/
+            params[key].gsub!($1, "\r")
+          end
+        end
+
         case params[:format]
         when 'txt'
           mime = 'text/plain'
           rv = format_text(body)
+
+        when 'csv'
+          raise "Cannot generate CSV output for this URL" unless body.is_a?(Array) and body.first.is_a?(Array)
+          mime = 'text/plain'
+          rv = body.collect{|rows|
+            rows.collect{|cols|
+              if params[:fq].nil? or params[:fq].to_bool === true
+                ((cols.nil? || cols.empty?) ? "" : "\"#{cols}\"")
+              else
+                cols
+              end
+            }.join(params[:fs] || ',')
+          }.join(params[:rs] || "\n")
 
         when 'yaml'
           mime = 'text/yaml'
