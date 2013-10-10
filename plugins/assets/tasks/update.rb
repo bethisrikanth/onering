@@ -13,7 +13,7 @@ module Automation
             log("Updating #{nodes.length} nodes from query: #{opt(:query)}", :info)
 
           elsif opt(:nodes)
-            n = opt(:nodes).split(/[\,\;\:\|]/).flatten
+            n = opt(:nodes).flatten
             nodes += Asset.find([*n]).to_a
 
             log("Updating #{nodes.length} nodes explicitly named by ID", :info) unless nodes.empty?
