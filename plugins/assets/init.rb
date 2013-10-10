@@ -408,7 +408,10 @@ module App
 
         device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
 
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
+
         output(device)
       end
 
@@ -418,7 +421,10 @@ module App
 
         device.properties.delete(params[:key])
 
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
+
         output(device)
       end
 
@@ -444,7 +450,9 @@ module App
         return 404 if not device
 
         device.push(params[:key], params[:value], params[:coerce])
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
         output(device)
       end
 
@@ -453,7 +461,9 @@ module App
         return 404 if not device
 
         rv = device.pop(params[:key])
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
         output(rv)
       end
 
@@ -464,7 +474,9 @@ module App
         tags = params[:splat].first.split(/\W/)
         device = Asset.find(params[:id])
         tags.each{|t| device.tags.push_uniq(t) }
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
         output(device)
       end
 
@@ -473,7 +485,9 @@ module App
         tags = params[:splat].first.split(/\W/)
         device = Asset.find(params[:id])
         tags.each{|t| device.tags.delete(t) }
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
         output(device)
       end
 
@@ -490,7 +504,9 @@ module App
           device.status = params[:status]
         end
 
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
         output(device)
       end
 
@@ -505,7 +521,10 @@ module App
           device.maintenance_status = params[:status]
         end
 
-        device.save()
+        device.save({},{
+          :replication => :sync
+        })
+
         output(device.to_hash)
       end
     end

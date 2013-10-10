@@ -8,6 +8,12 @@ class Asset < App::Model::Elasticsearch
   VALID_STATUS = %w{online allocatable installing}
   NO_AUTOCLEAR_STATUS = %w{installing}
 
+  index_options do
+    {
+      :replication => :async
+    }
+  end
+
   field :aliases,                 :string,   :array => true
   field :collected_at,            :date
   field :created_at,              :date,     :default => Time.now
