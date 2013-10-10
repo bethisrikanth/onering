@@ -755,8 +755,6 @@ module Tensor
         })
       }
 
-      pp mapping
-
       (connection().indices.get_mapping({
         :index => index_name()
       }) || {}).get(index_name(),{}).deeper_merge!(mapping)
