@@ -32,7 +32,8 @@ which ruby > /dev/null 2>&1 || quitcode "Cannot find command: ruby"
 which gem > /dev/null 2>&1 || quitcode "Cannot find command: gem"
 
 echo -e '\033[32mInstalling Onering libraries\033[0m'
-gem install facter json onering-client onering-report-plugins --no-ri --no-rdoc > /dev/null 2>&1
+gem install json -v 1.7.7
+gem install facter onering-client onering-report-plugins --no-ri --no-rdoc > /dev/null 2>&1
 
 which onering > /dev/null 2>&1 || quitcode "Cannot find command: onering in $PATH"
 
