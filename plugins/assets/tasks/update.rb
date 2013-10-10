@@ -51,9 +51,8 @@ module Automation
                 fail("Data must be a JSON string or hash, got: #{@data.class.name}")
               end
 
-              node.safe_save()
-              node.reload()
-              rv << node.to_h.get(opt(:field, 'id'))
+              node.save()
+              rv << node.to_hash.get(opt(:field, 'id'))
             rescue Exception => e
               log("Error updating node #{node.id}: #{e.class.name} - #{e.message}", :error)
               e.backtrace.each do |b|
