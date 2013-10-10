@@ -47,7 +47,7 @@ module Automation
                   @data['collected_at'] = Time.now
                 end
 
-                node.from_h(@data)
+                node.update(@data)
               else
                 fail("Data must be a JSON string or hash, got: #{@data.class.name}")
               end
