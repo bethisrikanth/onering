@@ -142,7 +142,7 @@ module Automation
               :tasks => header['tasks']
             })
           else
-            job = Job.find_by_id(header['job_id'])
+            job = Job.find(header['job_id'])
             fail("Cannot find Job ID #{header['job_id']}") unless job
           end
 
