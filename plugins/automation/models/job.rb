@@ -257,30 +257,12 @@ module Automation
           return last_task_result
 
         rescue JobAbort => e
-          if request
-            request.finished_at = Time.now
-            request.status      = :aborted
-            request.save()
-          end
-
           raise e
 
         rescue JobRetry => e
-          if request
-            request.status = :retrying
-            request.save()
-          end
-
           raise e
 
         rescue Exception => e
-          if request
-            request.finished_at = Time.now,
-            request.status      = :failed
-            request.save()
-          end
-
-
           raise e
         end
       end
