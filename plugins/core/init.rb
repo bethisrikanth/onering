@@ -40,9 +40,12 @@ module App
           :status => 'ok',
           :local_root => ENV['PROJECT_ROOT'],
           :environment => settings.environment,
-          :backend_server_hostname => (%x{hostname -f}.strip.chomp rescue nil),
-          :backend_server_port => (request.env['HTTP_X_PROXY_PORT'] || request.env['SERVER_PORT']).to_i,
-          :backend_server_string => request.env['SERVER_SOFTWARE'],
+          :backend => {
+            :hostname => (%x{hostname -f}.strip.chomp rescue nil),
+            :port => (request.env['HTTP_X_PROXY_PORT'] || request.env['SERVER_PORT']).to_i,
+            :identity => request.env['SERVER_SOFTWARE']
+          },
+          :database => App::Model::Elasticsearch.status(),
           :remote_addr => (request.env['HTTP_X_REAL_IP'] || request.env['REMOTE_ADDR']),
           :request_url => request.url,
           :ssl => {
@@ -58,7 +61,7 @@ module App
         output({})
       end
 
-      get '/navigation/filters' do 
+      get '/navigation/filters' do
         rv = Config.get('global.navigation.filters',[])
 
         output(rv.collect{|i|

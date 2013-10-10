@@ -463,6 +463,16 @@ module App
           end
         end
       end
+
+
+      def self.status()
+        rv = {
+          :type => :elasticsearch,
+          :status => (self.connection().info().symbolize_keys() rescue {
+            :ok => false
+          })
+        }
+      end
     end
   end
 end

@@ -37,26 +37,28 @@ STDIN.read.lines.each do |line|
   type = base.const_get(parts[-1])
 
   line.each_recurse(:intermediate => true) do |k,v,p|
-    if k =~ /_at$/
-      if (v['$date'] rescue false)
-        data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+    unless v.respond_to?(:empty?) and v.empty?
+      if k =~ /_at$/
+        if (v['$date'] rescue false)
+          data.set(p, Time.at(v.get('$date') / 1000).strftime('%Y-%m-%dT%H:%M:%S%z'))
+        else
+          data.set(p, v)
+        end
+      elsif k =~ /[0-9]+/ and p[-2] == 'notes'
+        v['user_id'] = 'onering' if v['user_id'].nil?
+
+        notes << v
+
+      elsif k == 'slot'
+        data.set(p, v.to_s)
+
+      elsif k == '$date'
+        nil
+      elsif k == '$oid'
+        data.set('id', v)
       else
         data.set(p, v)
       end
-    elsif k =~ /[0-9]+/ and p[-2] == 'notes'
-      v['user_id'] = 'onering' if v['user_id'].nil?
-
-      notes << v
-
-    elsif k == 'slot'
-      data.set(p, v.to_s)
-
-    elsif k == '$date'
-      nil
-    elsif k == '$oid'
-      data.set('id', v)
-    else
-      data.set(p, v)
     end
   end
 
@@ -66,7 +68,9 @@ STDIN.read.lines.each do |line|
 
 # create or update the record
   begin
-    type.create(data)
+    type.create(data, {
+      :reload => false
+    })
   rescue Elasticsearch::Transport::Transport::Errors::BadRequest => e
     pp line['id']
     pp e

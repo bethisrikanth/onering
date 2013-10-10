@@ -57,7 +57,8 @@ class Asset < App::Model::Elasticsearch
       :search_analyzer   => :lcwhitespace,
       :dynamic_templates => [{
         :date_detector => {
-          :match    => "*_at",
+          :match         => "_at$",
+          :match_pattern => :regex,
           :mapping  => {
             :fields => {
               "{name}" => {
@@ -77,9 +78,7 @@ class Asset < App::Model::Elasticsearch
         :store_generic => {
           :match   => "*",
           :mapping => {
-            :store           => "yes",
-            :index_analyzer  => :whitespace,
-            :search_analyzer => :lcwhitespace
+            :store           => true
           }
         }
       }]
