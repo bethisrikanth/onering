@@ -39,7 +39,13 @@ module Automation
 
             begin
               if @data.is_a?(String)
-                @data = MultiJson.load(@data)
+                begin
+                  @data = MultiJson.load(@data)
+                rescue MultiJson::LoadError => e
+                  log("Error loading JSON: #{e.message}", :warn)
+                  log("Data dump:\n#{@data.inspect}", :debug)
+                  raise e
+                end
               end
 
               if @data.is_a?(Hash)
