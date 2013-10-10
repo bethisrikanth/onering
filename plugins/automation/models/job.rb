@@ -127,12 +127,12 @@ module Automation
           fail("Request is missing a Request ID") unless header['request_id']
 
         # get request
-          request = Request.find(header['request_id'])
-          fail("Cannot find Request ID #{header['request_id']}") unless request
+          # request = Request.find(header['request_id'])
+          # fail("Cannot find Request ID #{header['request_id']}") unless request
 
-          request.started_at = Time.now
-          request.status     = :running
-          request.save()
+          # request.started_at = Time.now
+          # request.status     = :running
+          # request.save()
 
 
         # get job
@@ -147,9 +147,9 @@ module Automation
           end
 
         # merge header data with current job
-          if job.parameters and not request.parameters.empty?
-            header['parameters'] = job.parameters.deep_merge!(request.parameters)
-          end
+          # if job.parameters and not request.parameters.empty?
+          #   header['parameters'] = job.parameters.deep_merge!(request.parameters)
+          # end
 
 
         # initial data is either provided in the request or inherited from the job definition
@@ -204,10 +204,10 @@ module Automation
               end
 
             # push the result data into the request object
-              request.push(:results, {
-                :task   => config['type'],
-                :output => results
-              }, :none)
+              # request.push(:results, {
+              #   :task   => config['type'],
+              #   :output => results
+              # }, :none)
 
             # set next input to current result(s)
               last_task_result = results
@@ -250,9 +250,9 @@ module Automation
           end
 
         # we got here! success!
-          request.finished_at = Time.now
-          request.status      = :succeeded
-          request.save()
+          # request.finished_at = Time.now
+          # request.status      = :succeeded
+          # request.save()
 
           return last_task_result
 
