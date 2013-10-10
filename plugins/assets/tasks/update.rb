@@ -17,6 +17,7 @@ module Automation
             nodes += Asset.find([*n]).to_a
 
             log("Updating #{nodes.length} nodes explicitly named by ID", :info) unless nodes.empty?
+            log("Nodes: #{nodes.collect{|i| i.id }.join(', ')}", :debug) unless nodes.empty?
 
             inserts = (n - nodes.collect{|i| i.id })
 
