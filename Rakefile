@@ -8,6 +8,15 @@ desc "Run API backend integration tests"
 end
 
 
+namespace :launch do
+  desc "Prepares the checked out copy for first run"
+  task :prep do 
+    system("sudo bundle install")
+    system("./bin/regen-assets.sh")
+  end
+end
+
+
 namespace :db do
   desc "Syncs the db with the schema defined in the models"
   task :sync do
