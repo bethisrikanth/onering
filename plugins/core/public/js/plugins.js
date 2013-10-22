@@ -139,13 +139,17 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
   }
 
   $rootScope.ping = function(){
-    $http.get('/api').
+    $http.get('/api', {
+      severity: 'ignore'
+    }).
     success(function(data){
-      $rootScope.online = true;
+      $rootScope.first_ping = true;
+      $rootScope.state = data;
       $rootScope.$broadcast('online');
     }).
     error(function(data){
-      $rootScope.online = false;
+      $rootScope.first_ping = true;
+      $rootScope.state = false;
       $rootScope.$broadcast('offline');
     });
   }
@@ -200,5 +204,7 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
   }
 
 
+  $rootScope.first_ping = false;
+  $rootScope.ping();
   $window.setInterval($rootScope.ping, 15000);
 }]);

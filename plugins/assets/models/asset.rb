@@ -89,7 +89,7 @@ class Asset < App::Model::Elasticsearch
   before_save                   :_compact
   before_save                   :_confine_status
   before_save                   :_apply_defaults
-  #before_save                   :_resolve_references
+  before_save                   :_resolve_references
   #before_save                   :_update_collected_at
 
 

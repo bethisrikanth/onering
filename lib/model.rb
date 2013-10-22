@@ -466,11 +466,18 @@ module App
 
 
       def self.status()
-        rv = {
-          :type => :elasticsearch,
-          :status => (self.connection().info().symbolize_keys() rescue {
-            :ok => false
-          })
+        rv = (self.connection().info().symbolize_keys() rescue {
+          :ok => false
+        })
+
+        rv[:type] = :elasticsearch
+
+        rv
+      end
+
+      def self.cluster_status()
+        rv = self.connection().cluster().health().symbolize_keys() rescue {
+          :status => 'red'
         }
       end
     end

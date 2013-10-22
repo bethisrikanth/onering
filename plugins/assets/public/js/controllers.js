@@ -70,6 +70,21 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     }
   }
 
+  $scope.sort = function(field, rev){
+    if(angular.isUndefined(rev)){
+      if(field != $scope.sortField){
+        $scope.sortReverse = false;
+      }else{
+        $scope.sortReverse = !$scope.sortReverse;
+      }
+    }else{
+      $scope.sortReverse = rev;
+    }
+
+    $scope.sortField = field;
+    $scope.reload();
+  }
+
   $scope.$watch('pagenum', function(){
     if($scope.pages){
       if($scope.pagenum > $scope.pages.total){
@@ -91,14 +106,6 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
       $location.path('/search/'+$scope.query+' '+i);
     }
   });
-
-  $scope.$watch('sortField', function(){
-    $scope.reload();
-  }, true);
-
-  $scope.$watch('sortReverse', function(){
-    $scope.reload();
-  }, true);
 
   $scope.reload();
 }

@@ -187,12 +187,6 @@
             </li>
           </ul>
 
-          <ul class="nav" ng-hide="online">
-            <span class="label label-important">
-              Could not contact the server
-            </span>
-          </ul>
-
           <ul class="nav pull-right">
             <li class="divider-vertical"></li>
             <li ng-show="user" class="dropdown">
@@ -308,6 +302,89 @@
                 </li>
               </ul>
             </li>
+            <li class="divider-vertical"></li>
+          </ul>
+
+          <ul class="nav pull-right" ng-show="first_ping">
+            <li class="divider-vertical"></li>
+
+            <li ng-show="state">
+              <a ng-click="show_state_popup=!show_state_popup">
+                <i class="icon-circle status-{{ state.database.status.cluster.status }}"></i>
+              </a>
+
+              <ul class="dropdown-menu show dropdown-panel" style="width: 400px" ng-show="show_state_popup" ng-click="show_state_popup=false">
+                <li>
+                  <h1>Backend Information</h1>
+                </li>
+                <li class="body">
+                  <table class="table table-condensed table-plain">
+                    <tbody>
+                      <tr>
+                        <th class="caption" colspan="2">Middleware Service</th>
+                      </tr>
+
+                      <tr>
+                        <th>Status</th>
+                        <td>
+                          <span class="label label-green">Green</span>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Hostname</th>
+                        <td>{{ state.backend.hostname }}</td>
+                      </tr>
+
+                      <tr>
+                        <th>Environment</th>
+                        <td>{{ state.environment }}</td>
+                      </tr>
+                    </tbody>
+
+                    <tbody>
+                      <tr>
+                        <th class="caption" colspan="2">Database</th>
+                      </tr>
+
+                      <tr>
+                        <th>Status</th>
+                        <td>
+                          <span class="label label-{{ state.database.status.cluster.status }}">{{ state.database.status.cluster.status | titleize }}</span>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Driver</th>
+                        <td>{{ state.database.status.current_node.type | titleize }}</td>
+                      </tr>
+
+                      <tr>
+                        <th>Node</th>
+                        <td>{{ state.database.status.current_node.name }}</td>
+                      </tr>
+
+                      <tr>
+                        <th>Version</th>
+                        <td>{{ state.database.status.current_node.version.number }}</td>
+                      </tr>
+
+                      <tr>
+                        <th>Cluster</th>
+                        <td>{{ state.database.status.cluster.cluster_name }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </li>
+              </ul>
+            </li>
+
+            <li ng-hide="state">
+              <a ng-click="show_state_popup=!show_state_popup">
+                <i class="icon-circle status-red"></i>
+              </a>
+            </li>
+
             <li class="divider-vertical"></li>
           </ul>
         </div>

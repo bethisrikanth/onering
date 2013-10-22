@@ -153,43 +153,34 @@ body .modal {
   color: #F89406;
 }
 
-.label-fault{
-  background-color: #B94A48;
-}
-
-.label-failed{
-  background-color: #B94A48;
-}
-
-.label-offline{
-  background-color: #B94A48;
-}
-
-.label-maintenance{
-  background-color: #F89406;
-}
-
-
-.label-online{
+.label-online,
+.label-okay,
+.label-green{
   background-color: #468847;
 }
 
-.label-degraded{
+.label-degraded,
+.label-provisioning,
+.label-maintenance,
+.label-warning,
+.label-yellow{
   background-color: #F89406;
+}
+
+.label-fault,
+.label-failed,
+.label-offline,
+.label-critical,
+.label-red,
+.badge-critical{
+  background-color: #B94A48;
 }
 
 .label-reserved{
   background-color: #7C3AAD;
 }
 
-.label-provisioning{
-  background-color: #F89406;
-}
-
-.label-allocatable{
-  background-color: #3A87AD;
-}
-
+.label-allocatable,
 .label-installing{
   background-color: #3A87AD;
 }
@@ -234,6 +225,14 @@ body .modal {
 
 .table tbody+tbody{
   border: 0px;
+}
+
+.table caption,
+.table .caption{
+  font-weight: bold;
+  border-bottom: 1px solid #DDD;
+  padding-top: 1em;
+  text-align: left;
 }
 
 .table-plain th, .table-plain td{
@@ -297,17 +296,30 @@ div.autocomplete.help{
 }
 
 
-.dropdown-panel li{
+.dropdown-panel > li{
   color: #333;
   padding: 2px 8px;
 }
 
-.dropdown-panel li h1{
-  color: #333;
-  font-size: 18px;
-  line-height: 20px;
-  margin: 0 auto;
+.dropdown-panel > li.body{
+  padding: 2px 8px;
+}
+
+.dropdown-panel, .dropdown-panel li{
   padding: 0;
+}
+
+.dropdown-panel li h1{
+  padding: 8px 14px;
+  margin: 0px;
+  margin-bottom: 1em;
+  font-size: 14px;
+  font-weight: bolder;
+  line-height: 18px;
+  background-color: #F7F7F7;
+  border-bottom: 1px solid #EBEBEB;
+  -webkit-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
 }
 
 .dropdown-panel li li > i{
@@ -520,6 +532,26 @@ i.normal{
   width: 128px;
 }
 
+.status-green{
+  color: #468847;
+  text-shadow: 0px 0px 3px rgba(70, 136, 71, 0.5);
+}
+
+.status-yellow{
+  color: #F89406;
+  text-shadow: 0px 0px 3px rgba(248, 148, 6, 0.5);
+}
+
+.status-red{
+  color: #B94A48;
+  text-shadow: 0px 0px 3px rgba(185, 74, 72, 0.5);
+}
+
+.status-unknown{
+  color: #999;
+  text-shadow: 0px 0px 3px rgba(153, 153, 153, 0.5);
+}
+
 .node .tags .label{
   margin-right: 4px;
 }
@@ -567,10 +599,6 @@ i.normal{
 
 .sidetab-critical{
   border-color: #b94a48;
-}
-
-.label-critical, .badge-critical{
-  background-color: #b94a48;
 }
 
 .sidetab-warning{

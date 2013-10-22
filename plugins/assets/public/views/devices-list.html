@@ -29,25 +29,25 @@
           <table class="table table-condensed table-hover">
             <thead>
               <tr>
-                <th ng-click="sortField='id'; sortReverse=!sortReverse">ID</th>
-                <th ng-click="sortField='status'; sortReverse=!sortReverse" class="center"><abbr title="Status">S</abbr></th>
-                <th ng-click="sortField='properties.reserved'; sortReverse=!sortReverse" class="center"><abbr title="Reserved"><i class="icon-bookmark-empty"> </i></abbr></th>
-                <th ng-click="sortField='properties.alert_state'; sortReverse=!sortReverse" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
-                <th ng-click="sortField='maintenance_status'; sortReverse=!sortReverse" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
-                <th ng-click="sortField='name'; sortReverse=!sortReverse">Name</th>
-                <th ng-click="sortField='properties.ip'; sortReverse=!sortReverse">Primary IP</th>
-                <th ng-click="sortField='properties.site'; sortReverse=!sortReverse">Site</th>
-                <th ng-click="sortField='properties.model'; sortReverse=!sortReverse">Model</th>
-                <th ng-click="sortField='properties.rack'; sortReverse=!sortReverse">Rack</th>
-                <th ng-click="sortField='properties.unit'; sortReverse=!sortReverse">Unit</th>
-                <th ng-click="sortField='properties.slot'; sortReverse=!sortReverse">Slot</th>
-                <th ng-click="sortField='collected_at'; sortReverse=!sortReverse">Last Seen</th>
-                <th ng-click="sortField='properties.notes'; sortReverse=!sortReverse" class="center">Notes</th>
+                <th ng-click="sort('id')">ID</th>
+                <th ng-click="sort('status')" class="center"><abbr title="Status">S</abbr></th>
+                <th ng-click="sort('properties.reserved')" class="center"><abbr title="Reserved"><i class="icon-bookmark-empty"> </i></abbr></th>
+                <th ng-click="sort('properties.alert_state')" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
+                <th ng-click="sort('maintenance_status')" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
+                <th ng-click="sort('name')">Name</th>
+                <th ng-click="sort('properties.ip')">Primary IP</th>
+                <th ng-click="sort('properties.site')">Site</th>
+                <th ng-click="sort('properties.model')">Model</th>
+                <th ng-click="sort('properties.rack')">Rack</th>
+                <th ng-click="sort('properties.unit')">Unit</th>
+                <th ng-click="sort('properties.slot')">Slot</th>
+                <th ng-click="sort('collected_at')">Last Seen</th>
+                <th ng-click="sort('properties.notes')" class="center">Notes</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr ng-repeat="device in results | orderBy:sortField:sortReverse">
+              <tr ng-repeat="device in results">
                 <td class="id"><a target="_blank" tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
                 <td class="status center">
                   <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />

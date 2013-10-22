@@ -45,7 +45,12 @@ module App
             :port => (request.env['HTTP_X_PROXY_PORT'] || request.env['SERVER_PORT']).to_i,
             :identity => request.env['SERVER_SOFTWARE']
           },
-          :database => App::Model::Elasticsearch.status(),
+          :database => {
+            :status => {
+              :current_node => App::Model::Elasticsearch.status(),
+              :cluster      => App::Model::Elasticsearch.cluster_status()
+            }
+          },
           :remote_addr => (request.env['HTTP_X_REAL_IP'] || request.env['REMOTE_ADDR']),
           :request_url => request.url,
           :ssl => {
