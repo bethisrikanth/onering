@@ -868,3 +868,13 @@ th{
   border-bottom-right-radius: 0px;
   text-align: left !important;
 }
+
+
+a.disabled{
+  opacity: 0.5;
+  cursor: wait;
+}
+
+a.disabled i{
+  color: #AAA;
+}
