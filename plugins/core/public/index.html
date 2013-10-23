@@ -383,6 +383,42 @@
               <a ng-click="show_state_popup=!show_state_popup">
                 <i class="icon-circle status-red"></i>
               </a>
+
+              <ul class="dropdown-menu show dropdown-panel" style="width: 400px" ng-show="show_state_popup" ng-click="show_state_popup=false">
+                <li>
+                  <h1>Backend Information</h1>
+                </li>
+
+                <li class="body">
+                  <table class="table table-condensed table-plain">
+                    <tbody>
+                      <tr>
+                        <th class="caption" colspan="2">Middleware Service</th>
+                      </tr>
+
+                      <tr>
+                        <th>Status</th>
+                        <td>
+                          <span class="label label-red">Red</span>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <th>Hostname</th>
+                        <td>{{ location.host() }}{{ location.port() == 80 &amp;&amp; '' || ':'+location.port() }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div class="alert alert-block alert-error">
+                    <h4>Cannot Connect to Backend</h4>
+                    <p>
+                      <br />
+                      Onering is unable to contact the backend API.  Please ensure that you are connected to the network and that you can access <a href="{{ location.protocol() }}://{{ location.host() }}{{ location.port() == 80 &amp;&amp; '' || ':'+location.port() }}">{{ location.protocol() }}://{{ location.host() }}{{ location.port() == 80 &amp;&amp; '' || ':'+location.port() }}</a>.
+                    </p>
+                  </div>
+                </li>
+              </ul>
             </li>
 
             <li class="divider-vertical"></li>

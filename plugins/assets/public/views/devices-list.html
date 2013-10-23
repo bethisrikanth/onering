@@ -37,7 +37,7 @@
                 <th ng-click="sort('name')">Name</th>
                 <th ng-click="sort('properties.ip')">Primary IP</th>
                 <th ng-click="sort('properties.site')">Site</th>
-                <th ng-click="sort('properties.model')">Model</th>
+                <th ng-click="sort('properties.provisioning.class')">Class</th>
                 <th ng-click="sort('properties.rack')">Rack</th>
                 <th ng-click="sort('properties.unit')">Unit</th>
                 <th ng-click="sort('properties.slot')">Slot</th>
@@ -68,7 +68,7 @@
                 <td>{{ device.name | section:'.':0:1 }}</td>
                 <td>{{ device.properties.ip }}</td>
                 <td>{{ device.properties.site | uppercase }}</td>
-                <td>{{ device.properties.model | section:' ':-1 }}</td>
+                <td>{{ device.properties.provisioning.class || (device.properties.model | section:' ':-1) }}</td>
                 <td>
                   <span>{{ device.properties.rack }}</span>
                 </td>

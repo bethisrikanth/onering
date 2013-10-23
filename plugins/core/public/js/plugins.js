@@ -5,6 +5,7 @@ angular.module('corePlugin', [
 ]).
 run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScope, $window, $http, $modal, $location){
   $rootScope.online = true;
+  $rootScope.location = $location;
 
   $rootScope.go = function(path){
     $location.path(path);
@@ -14,6 +15,7 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
       });
     }catch(e){ ; }
   };
+
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];
@@ -206,5 +208,5 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
 
   $rootScope.first_ping = false;
   $rootScope.ping();
-  $window.setInterval($rootScope.ping, 15000);
+  $window.setInterval($rootScope.ping, 10000);
 }]);
