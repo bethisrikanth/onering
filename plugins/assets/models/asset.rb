@@ -90,7 +90,6 @@ class Asset < App::Model::Elasticsearch
   before_save                   :_confine_status
   before_save                   :_apply_defaults
   before_save                   :_resolve_references
-  #before_save                   :_update_collected_at
 
 
   def parent()
@@ -148,16 +147,15 @@ private
     end
   end
 
-  def _apply_defaults
+  def _apply_defaults()
     device = self.to_hash()
-    merges = []
     except = %w{
       id
       name
       updated_at
       created_at
+      collected_at
     }
-
   # get all defaults that apply to this node
     NodeDefault.defaults_for(self).each do |m|
     # remove fields that cannot/should not be set by a rule
@@ -192,11 +190,11 @@ private
       end
     end
 
-    self.from_h(device, false, false)
+    self.from_hash(device)
     self
   end
 
-  def _resolve_references
+  def _resolve_references()
     unless self.properties.nil?
       properties = self.properties.clone
 
@@ -219,10 +217,9 @@ private
         nil
       end
 
-
-      self.from_h({
+      self.from_hash({
         :properties => properties
-      }, false)
+      })
     end
 
     self

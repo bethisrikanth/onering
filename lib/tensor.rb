@@ -647,7 +647,11 @@ module Tensor
       when :float
         rv = Float(value) rescue default
       when :date
-        rv = Time.parse(value) rescue default
+        if value.is_a?(Time)
+          rv = value
+        else
+          rv = Time.parse(value) rescue default
+        end
       when :boolean
         rv = value if value === true or value === false
         case value.to_s.downcase

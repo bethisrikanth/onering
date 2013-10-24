@@ -10,7 +10,7 @@ end
 
 namespace :launch do
   desc "Prepares the checked out copy for first run"
-  task :prep do 
+  task :prep do
     system("sudo bundle install")
     system("./bin/regen-assets.sh")
   end
@@ -45,6 +45,12 @@ namespace :db do
     models.each do |index, model|
       begin
         puts "Nuking model #{model.name}..."
+
+        model.connection.indices.delete_mapping({
+          :index => model.index_name(),
+          :type  => model.document_type()
+        })
+
         model.connection.indices.delete({
           :index => model.index_name()
         })

@@ -342,10 +342,10 @@ module App
 
           if params[:direct].to_bool === true
             json = MultiJson.load(data) unless json
-            json['collected_at'] = Time.now if json['inventory'] === true
+            json['collected_at'] = Time.now if json.delete('inventory') === true
             device = Asset.find(id)
             return 404 unless device
-            device.from_h(json)
+            device.from_hash(json)
             device.save()
             output(device)
           else

@@ -49,11 +49,44 @@ module Automation
               end
 
               if @data.is_a?(Hash)
-                if @data['inventory'] === true
-                  @data['collected_at'] = Time.now
+              #
+              # handle "replacement merge" operator (@)
+              # wherein fields in the incoming data are prefixed with an "@"
+              # symbol to denote that all existing data under that key should first
+              # be removed before merging the incoming data
+              #
+              # this handles cases like deeply-nested objects in arrays that could
+              # accumulate stale entries
+              #
+                inventory = node.to_hash()
+                unset_keys = Hash[@data.coalesce(nil, nil, '.').select{|k,v|
+                  k.include?('@')
+                }].keys.collect{|k|
+                  k = k.split('.')
+                  i = k.index{|i| i[0].chr == '@' }
+
+                  (i ? k.first(i+1).join('.') : nil)
+                }.compact.uniq
+
+
+              # delete existing keys that are to be replaced
+              # rename incoming keys to exclude symbols
+                unset_keys.each do |key|
+                  inventory.unset(key.delete('@'))
+                  @data.rekey(key, key.delete('@'))
                 end
 
-                node.update(@data)
+                inventory = inventory.deeper_merge!(@data, {
+                  :merge_hash_arrays => true
+                })
+
+                if inventory['inventory'].to_bool === true
+                  inventory.delete('inventory')
+                  inventory['collected_at'] = Time.now
+                end
+
+                node.from_hash(inventory)
+
               else
                 fail("Data must be a JSON string or hash, got: #{@data.class.name}")
               end
