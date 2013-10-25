@@ -15,3 +15,4 @@ setup.sh
 /config/*.yaml
 /config/*/
 /config/*.key
+_site
