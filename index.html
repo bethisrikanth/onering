@@ -1,10 +1,41 @@
+---
+---
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
   <head>
     <title>Onering</title>
+
+    <link rel="stylesheet" href="{{ site.url_prefix }}/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ site.url_prefix }}/css/lib.css">
+    <link rel="stylesheet" href="{{ site.url_prefix }}/css/site.css">
+    <link rel="stylesheet" href="{{ site.url_prefix }}/css/override.css">
   </head>
-  
-  <body>
-  
+
+  <body ng-controller="GlobalController">
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavigationController">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="onering-logo" href="{{ site.url_prefix }}/">&nbsp;</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li ng-repeat="nav in navbar" ng-class="{active: getActive(nav.path), disabled: nav.disabled }"><a href="{{ site.url_prefix }}/#[[ nav.path ]]">[[ nav.title ]]</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container content" ng-view>
+    </div>
+
+    <script src="{{ site.url_prefix }}/js/jquery.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/bootstrap.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/angular.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/angular-route.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/ui-bootstrap-0.6.0.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <script src="{{ site.url_prefix }}/js/controllers.js"></script>
+    <script src="{{ site.url_prefix }}/js/site.js"></script>
   </body>
 </html>
