@@ -7,7 +7,7 @@ angular.module('app', [
   $routeProvider.
   when('/docs', {
     templateUrl: 'views/docs.html',
-    controller:  'PageAboutController'
+    controller:  'PageDocsController'
   }).
   otherwise({
     templateUrl: 'views/index.html',

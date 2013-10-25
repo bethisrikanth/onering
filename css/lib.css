@@ -13,3 +13,7 @@
 .align-justify{
   text-align: justify;
 }
+
+.glyphicon, .fa{
+  margin-right: 4px;
+}

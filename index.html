@@ -12,44 +12,51 @@
   </head>
 
   <body ng-controller="GlobalController">
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavigationController">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="onering-logo" href="{{ site.url_prefix }}/">&nbsp;</a>
-        </div>
-
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li ng-repeat="nav in navbar" ng-class="{active: getActive(nav.path), disabled: nav.disabled }"><a href="{{ site.url_prefix }}/#[[ nav.path ]]">[[ nav.title ]]</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container content" ng-view>
-    </div>
-
-    <div class="footer">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-6">
-            Built by system administrators and developers for all mankind.<br />
-            Onering is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
-
-            <br />
-            <br />
-            <ul class="footer-links">
-              <li><a target="_blank" href="https://github.com/outbrain/onering"><i class="fa fa-github-square"></i> GitHub</a></li>
-              <li><a href="{{ site.url_prefix }}/#/contact"><i class="fa fa-bullhorn"></i> Contact the developers</a></li>
-            </ul>
+    <div id="root">
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavigationController">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="onering-logo" href="{{ site.url_prefix }}/">&nbsp;</a>
           </div>
 
-          <div class="copyright col-lg-offset-2 col-lg-4 align-right">
-            <br />
-            <a class="outbrain-logo" target="_blank" href="http://www.outbrain.com">&nbsp;</a>
-            <br />
-            <br />
-            Copyright &copy; {{ site.copyright }} <a target="_blank" href="http://www.outbrain.com">Outbrain, Inc.</a>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li ng-repeat="nav in navbar" ng-class="{active: getActive(nav.path), disabled: nav.disabled }">
+                <a href="{{ site.url_prefix }}/#[[ nav.path ]]">
+                  <i ng-show="nav.icon" class="[[ nav.iconType || 'glyphicon' ]] [[ nav.iconType || 'glyphicon' ]]-[[ nav.icon ]]"> </i>
+                  [[ nav.title ]]
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container content" ng-view>
+      </div>
+
+      <div class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              Built by system administrators and developers for all mankind.<br />
+              Onering is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+
+              <br />
+              <br />
+              <ul class="footer-links">
+                <li><a target="_blank" href="https://github.com/outbrain/onering"><i class="fa fa-github-square"></i> GitHub</a></li>
+                <li><a href="{{ site.url_prefix }}/#/contact"><i class="fa fa-bullhorn"></i> Contact the developers</a></li>
+              </ul>
+            </div>
+
+            <div class="copyright col-md-offset-2 col-md-4 align-right">
+              <br />
+              <a class="outbrain-logo" target="_blank" href="http://www.outbrain.com">&nbsp;</a>
+              <br />
+              <br />
+              Copyright &copy; {{ site.copyright }} <a target="_blank" href="http://www.outbrain.com">Outbrain, Inc.</a>
+            </div>
           </div>
         </div>
       </div>

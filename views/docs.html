@@ -1,0 +1,15 @@
+---
+---
+<h2 class="content-header">Documentation</h2>
+
+<div class="row">
+  <div class="col-lg-2 well well-sm or-sidebar">
+    <ul class="nav" ng-include="'{{ site.url_prefix }}/views/nav_recursive_list.html'">
+    </ul>
+  </div>
+
+  <div class="col-lg-8 topics">
+    <div class="topic-section" ng-include="'{{ site.url_prefix }}/views/docs_recursive_content.html'">
+    </div>
+  </div>
+</div>

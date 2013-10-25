@@ -1,0 +1,7 @@
+---
+---
+<li ng-repeat="topic in topic.topics">
+  <a ng-click="scrollTo(topic.path || nameToPath(topic.link, topic.prefix))">[[ topic.link ]]</a>
+  <ul class="nav" ng-include="'{{ site.url_prefix }}/views/nav_recursive_list.html'">
+  </ul>
+</li>

@@ -1,5 +1,20 @@
 ---
 ---
+html, body{
+  margin:   0;
+  padding:  0;
+  height:   100%;
+}
+
+body{
+  padding-top: 80px;
+}
+
+#root{
+  min-height: 100%;
+  position:   relative;
+}
+
 .navbar .onering-logo{
   display:          block;
   float:            left;
@@ -20,18 +35,67 @@
 }
 
 .content{
-  margin-top: 80px;
+  padding-bottom: 190px;
+}
+
+.content .content-header{
+  margin-top: 0px;
+  margin-bottom: 32px;
 }
 
 .content p{
   font-size: larger;
 }
 
+.or-sidebar .nav li>a{
+  padding: 4px;
+}
+
+.or-sidebar > .nav > li{
+  margin-bottom: 8px;
+}
+
+.or-sidebar .nav li .nav li{
+  padding-left: 1em;
+}
+
+
+.topics > .topic-section .topic-section{
+  margin-bottom: 1em;
+}
+
+.topics > .topic-section > .topic-body{
+  margin-bottom: 2em;
+}
+
+.topics > .topic-section > .topic-body > .topic-header{
+  font-size: 30px;
+  border-bottom: 1px solid #E7E7E7;
+  margin-bottom: 0.5em;
+}
+
+.topics > .topic-section .topic-section .topic-header{
+  font-size: 24px;
+
+}
+
+.topics > .topic-section > .topic-section .topic-section .topic-header{
+  font-size: 18px;
+}
+
+.topics > .topic-section > .topic-section .topic-section .topic-section .topic-header{
+  font-size: 14px;
+}
+
+
+/* FOOTER ------------------------------------------------------------------- */
 .footer{
   background-color: #F8F8F8;
   border-top: 1px solid #E7E7E7;
-  margin-top: 60px;
   padding:    20px;
+  position:   absolute;
+  bottom:     0px;
+  width:      100%;
 }
 
 .footer .footer-links{
@@ -40,7 +104,7 @@
 
 .footer .footer-links li{
   display: inline-block;
-  margin-right: 1em;
+  margin-right: 1.25em;
 }
 
 .footer .outbrain-logo{

@@ -10,8 +10,7 @@ function NavigationController($scope, $location){
   },{
     title: 'Documentation',
     path:  '/docs',
-    icon:  'book',
-    disabled: true
+    icon:  'book'
   },{
     title: 'Download',
     path:  '/download',
@@ -20,7 +19,7 @@ function NavigationController($scope, $location){
   },{
     title: 'Contact',
     path:  '/contact',
-    icon:  '',
+    icon:  'bullhorn',
     disabled: true
   }];
 
@@ -38,6 +37,47 @@ function PageIndexController($scope){
 
 }
 
-function PageAboutController($scope){
+function PageDocsController($scope, $location, $anchorScroll){
+  $scope.topic = {
+    topics: [{
+      link:  'Getting Started',
+      path:  'gs',
+      topics: [{
+        prefix: 'gs',
+        link:   'Requirements'
+      },{
+        prefix: 'gs',
+        link:   'Installation'
+      },{
+        prefix: 'gs',
+        link:   'Receiving Data',
+        title:  'Receiving Data From Clients'
+      }]
+    },{
+      link: 'Using the Frontend',
+      path: 'fe'
+    }]
+  };
 
+  $scope.scrollTo = function(id) {
+    console.log("JUMP", id)
+    $location.hash(id);
+    $anchorScroll();
+  }
+
+  $scope.hasChildren = function(topic){
+    if(angular.isArray(topic.topics)){
+      return true;
+    }
+
+    return false;
+  }
+
+  $scope.nameToPath = function(name, prefix){
+    if(angular.isDefined(prefix)){
+      name = prefix+'-'+name;
+    }
+
+    return name.toLowerCase().replace(/[ ]+/g, '-');
+  }
 }

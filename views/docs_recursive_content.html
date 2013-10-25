@@ -1,0 +1,11 @@
+---
+---
+<div ng-repeat="topic in topic.topics" class="topic-body">
+  <a name="[[ topic.path || nameToPath(topic.link, topic.prefix) ]]"></a>
+  <div class="topic-header">[[ topic.title || topic.link ]]</div>
+
+  <p ng-include="'{{ site.url_prefix }}/docs/'+(topic.path || nameToPath(topic.link, topic.prefix))+'.html'"></p>
+
+  <div class="topic-section" ng-include="'{{ site.url_prefix }}/views/docs_recursive_content.html'">
+  </div>
+</div>
