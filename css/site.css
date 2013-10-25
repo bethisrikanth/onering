@@ -26,3 +26,31 @@
 .content p{
   font-size: larger;
 }
+
+.footer{
+  background-color: #F8F8F8;
+  border-top: 1px solid #E7E7E7;
+  margin-top: 60px;
+  padding:    20px;
+}
+
+.footer .footer-links{
+  padding: 0px;
+}
+
+.footer .footer-links li{
+  display: inline-block;
+  margin-right: 1em;
+}
+
+.footer .outbrain-logo{
+  display:          inline-block;
+  min-width:        100px;
+  min-height:       19px;
+  background:       transparent url("{{ site.url_prefix }}/img/outbrain-logo-muted.png") no-repeat center center;
+}
+
+.footer .outbrain-logo:hover{
+  text-decoration:  none;
+  background-image: url("{{ site.url_prefix }}/img/outbrain-logo.png");
+}

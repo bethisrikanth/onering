@@ -6,9 +6,9 @@
     <title>Onering</title>
 
     <link rel="stylesheet" href="{{ site.url_prefix }}/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ site.url_prefix }}/css/font-awesome.css">
     <link rel="stylesheet" href="{{ site.url_prefix }}/css/lib.css">
     <link rel="stylesheet" href="{{ site.url_prefix }}/css/site.css">
-    <link rel="stylesheet" href="{{ site.url_prefix }}/css/override.css">
   </head>
 
   <body ng-controller="GlobalController">
@@ -27,6 +27,32 @@
     </nav>
 
     <div class="container content" ng-view>
+    </div>
+
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6">
+            Built by system administrators and developers for all mankind.<br />
+            Onering is licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.
+
+            <br />
+            <br />
+            <ul class="footer-links">
+              <li><a target="_blank" href="https://github.com/outbrain/onering"><i class="fa fa-github-square"></i> GitHub</a></li>
+              <li><a href="{{ site.url_prefix }}/#/contact"><i class="fa fa-bullhorn"></i> Contact the developers</a></li>
+            </ul>
+          </div>
+
+          <div class="copyright col-lg-offset-2 col-lg-4 align-right">
+            <br />
+            <a class="outbrain-logo" target="_blank" href="http://www.outbrain.com">&nbsp;</a>
+            <br />
+            <br />
+            Copyright &copy; {{ site.copyright }} <a target="_blank" href="http://www.outbrain.com">Outbrain, Inc.</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="{{ site.url_prefix }}/js/jquery.min.js"></script>
