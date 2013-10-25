@@ -17,3 +17,12 @@
 .glyphicon, .fa{
   margin-right: 4px;
 }
+
+.animated.spinner{
+  -webkit-animation: rotate360 0.5s infinite linear;
+}
+
+@-webkit-keyframes rotate360 {
+    from {-webkit-transform: rotate(0deg);}
+    to   {-webkit-transform: rotate(359deg);}
+}

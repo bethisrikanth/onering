@@ -1,0 +1,20 @@
+{
+  "topics": [{
+    "link":  "Getting Started",
+    "path":  "gs",
+    "topics": [{
+      "prefix": "gs",
+      "link":   "Requirements"
+    },{
+      "prefix": "gs",
+      "link":   "Installation"
+    },{
+      "prefix": "gs",
+      "link":   "Receiving Data",
+      "title":  "Receiving Data From Clients"
+    }]
+  },{
+    "link": "Using the Frontend",
+    "path": "fe"
+  }]
+}

@@ -1,8 +1,6 @@
 ---
 ---
-<h2 class="content-header">Documentation</h2>
-
-<div class="row">
+<div class="row" ng-show="topic">
   <div class="col-lg-2 well well-sm or-sidebar">
     <ul class="nav" ng-include="'{{ site.url_prefix }}/views/nav_recursive_list.html'">
     </ul>
@@ -12,4 +10,9 @@
     <div class="topic-section" ng-include="'{{ site.url_prefix }}/views/docs_recursive_content.html'">
     </div>
   </div>
+</div>
+
+<div ng-hide="topic" class="container align-center">
+  <img class="animated spinner" src="{{ site.url_prefix }}/img/onering-logo-56.png">
+  <h3>Loading...</h3>
 </div>

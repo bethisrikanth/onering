@@ -1,3 +1,5 @@
+---
+---
 function GlobalController($scope){
 
 }
@@ -37,30 +39,12 @@ function PageIndexController($scope){
 
 }
 
-function PageDocsController($scope, $location, $anchorScroll){
-  $scope.topic = {
-    topics: [{
-      link:  'Getting Started',
-      path:  'gs',
-      topics: [{
-        prefix: 'gs',
-        link:   'Requirements'
-      },{
-        prefix: 'gs',
-        link:   'Installation'
-      },{
-        prefix: 'gs',
-        link:   'Receiving Data',
-        title:  'Receiving Data From Clients'
-      }]
-    },{
-      link: 'Using the Frontend',
-      path: 'fe'
-    }]
-  };
+function PageDocsController($scope, $http, $location, $anchorScroll){
+  $http.get('{{ site.url_prefix }}/api/docs/topics.json').success(function(data){
+    $scope.topic = data;
+  });
 
   $scope.scrollTo = function(id) {
-    console.log("JUMP", id)
     $location.hash(id);
     $anchorScroll();
   }
