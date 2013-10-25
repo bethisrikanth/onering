@@ -17,34 +17,27 @@ namespace :launch do
 end
 
 
-namespace :db do
-  desc "Syncs the db with the schema defined in the models"
-  task :sync do
-    load "irb.ru"
-    puts "Syncing database..."
-
-    App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
-
-    models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
-
-    models.each do |index, model|
-      puts "Syncing model #{model.name}..."
-      model.sync_schema()
-    end
+namespace :server do
+  desc "Starts a local development server"
+  task :start do
+    conf = File.expand_path('config.ru', File.dirname(__FILE__))
+    exec("sudo bundle exec thin -e production -R #{conf} --debug -p 9393 start")
   end
 
+end
+
+namespace :db do
   desc "Deletes all indices and recreates them empty.  EXTREMELY DANGEROUS!"
   task :nuke do
     load "irb.ru"
     puts "Nuking database..."
 
     App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
-
     models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
     models.each do |index, model|
       begin
-        puts "Nuking model #{model.name}..."
+        puts "Deleting model #{model.name}..."
 
         model.connection.indices.delete_mapping({
           :index => model.index_name(),
@@ -58,10 +51,24 @@ namespace :db do
         nil
       end
     end
+  end
+
+  desc "Syncs the db with the schema defined in the models"
+  task :sync do
+    load "irb.ru"
+    puts "Syncing database..."
+
+    App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
+    models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
     models.each do |index, model|
+      puts "Syncing model #{model.name}..."
       model.sync_schema()
     end
+  end
+
+  task :reinitialize => [:nuke, :sync] do
+    puts "Reinitialized database"
   end
 end
 

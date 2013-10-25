@@ -640,6 +640,11 @@ module Tensor
     def self._normalize_type(type, value, field)
       default = field[:default]
 
+    # handle nulls up front
+      if value.nil? or ['', 'null'].include?(value.to_s.strip)
+        return nil
+      end
+
     # normalize value
       case type.to_sym
       when :integer

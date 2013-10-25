@@ -1,44 +1,27 @@
 <div class="widget-title">Disks</div>
 
 <div class="widget-content">
-  <ul class="nav nav-pills">
-    <li ng-show="node.properties.metrics.disk.block" ng-class="(opt.diskTab=='block' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='block'">Devices</a>
-    </li>
-    <li ng-show="node.properties.metrics.disk.mounts" ng-class="(opt.diskTab=='mounts' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='mounts'">Mounts</a>
-    </li>
-    <li ng-show="node.properties.metrics.disk.lvm" ng-class="(opt.diskTab=='lvm' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='lvm'">LVM</a>
-    </li>
-    <li ng-show="node.properties.metrics.zfs" ng-class="(opt.diskTab=='zfs' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='zfs'">ZFS</a>
-    </li>
-    <li ng-show="node.properties.metrics.disk.mdraid" ng-class="(opt.diskTab=='mdraid' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='mdraid'">MDRaid</a>
-    </li>
-    <li ng-show="node.properties.metrics.virident" ng-class="(opt.diskTab=='virident' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='virident'">Virident</a>
-    </li>
-    <li ng-show="node.properties.metrics.disk.physical" ng-class="(opt.diskTab=='physical' &amp;&amp; 'active' || '')">
-      <a ng-click="opt.diskTab='physical'">Physical</a>
-    </li>
-  </ul>
+  <tabset type="'pills'">
+    <tab heading="Devices">
+      <div ng-include="'views/panes/node-pane-system-disk-block.html'"></div>
+    </tab>
 
-  <div>
-    <div ng-show="opt.diskTab=='block'" ng-include="'views/panes/node-pane-system-disk-block.html'">
-    </div>
+    <tab heading="Mounts">
+      <div ng-include="'views/panes/node-pane-system-disk-mounts.html'"></div>
+    </tab>
 
-    <div ng-show="opt.diskTab=='mounts'" ng-include="'views/panes/node-pane-system-disk-mounts.html'">
-    </div>
+    <tab heading="LVM">
+      <div ng-include="'views/panes/node-pane-system-disk-lvm.html'"></div>
+    </tab>
 
-    <div ng-show="opt.diskTab=='lvm'" ng-include="'views/panes/node-pane-system-disk-lvm.html'">
-    </div>
+    <tab heading="ZFS">
+      <div ng-include="'views/panes/node-pane-system-disk-zfs.html'"></div>
+    </tab>
 
-    <div ng-show="opt.diskTab=='virident'" ng-include="'views/panes/node-pane-system-disk-virident.html'">
-    </div>
+    <tab heading="MDRaid"></tab>
 
-    <div ng-show="opt.diskTab=='zfs'" ng-include="'views/panes/node-pane-system-disk-zfs.html'">
-    </div>
-  </div>
+    <tab heading="Virident">
+      <div ng-include="'views/panes/node-pane-system-disk-virident.html'"></div>
+    </tab>
+  </tabset>
 </div>

@@ -415,6 +415,81 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('isDefinedFilter', function(){
+    return function(obj){
+      return angular.isDefined(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isUndefinedFilter', function(){
+    return function(obj){
+      return angular.isUndefined(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isObjectFilter', function(){
+    return function(obj){
+      return angular.isObject(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isArrayFilter', function(){
+    return function(obj){
+      return angular.isArray(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isStringFilter', function(){
+    return function(obj){
+      return angular.isString(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isDateFilter', function(){
+    return function(obj){
+      return angular.isDate(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isNumberFilter', function(){
+    return function(obj){
+      return angular.isNumber(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isFunctionFilter', function(){
+    return function(obj){
+      return angular.isFunction(obj);
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('isEmptyFilter', function(){
+    return function(obj, trace){
+console.log(obj, trace)
+
+      if(angular.isString(obj) && obj.length == 0){
+        return true;
+      }else if(angular.isObject(obj) && obj.length == 0){
+        return true;
+      }else if(angular.isUndefined(obj)){
+        return true;
+      }else if(obj === null){
+        return true;
+      }
+
+      return false;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('replaceFilter', function(){
     return function(str,find,rep,all){
       if(str instanceof Array){
