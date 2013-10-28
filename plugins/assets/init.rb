@@ -507,6 +507,7 @@ module App
         device.save({},{
           :replication => :sync
         })
+
         output(device)
       end
 

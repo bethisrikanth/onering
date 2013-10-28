@@ -670,8 +670,13 @@ module Tensor
         rv = (value.is_a?(Hash) ? (value.empty? ? default : value) : default)
 
       when :string
-        rv = value.to_s
-        rv = default if rv.empty?
+        value = value.to_s.strip.chomp
+
+        if value.empty? or value =~ /null/i
+          rv = default
+        else
+          rv = value.to_s
+        end
       else
         rv = default
       end
