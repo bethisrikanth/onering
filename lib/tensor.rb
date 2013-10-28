@@ -641,8 +641,8 @@ module Tensor
       default = field[:default]
 
     # handle nulls up front
-      if value.nil? or ['', 'null'].include?(value.to_s.strip)
-        return nil
+      if value.nil? or ['', 'null'].include?(value.to_s.downcase.strip)
+        return default
       end
 
     # normalize value
@@ -670,13 +670,8 @@ module Tensor
         rv = (value.is_a?(Hash) ? (value.empty? ? default : value) : default)
 
       when :string
-        value = value.to_s.strip.chomp
+        rv = value.to_s.strip.chomp
 
-        if value.empty? or value =~ /null/i
-          rv = default
-        else
-          rv = value.to_s
-        end
       else
         rv = default
       end
