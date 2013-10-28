@@ -238,11 +238,15 @@ module App
           when :gt, :gte, :lt, :lte
             return Hash[value_function_unary, value]
 
-          when :since
-            return Hash[:gte, value]
+          when :before, :since
+            case value.class.name.to_sym
+            when :String
+              value = Time.parse(value).strftime('%Y-%m-%dT%H:%M:%S%z')
+            when :Time
+              value = value.strftime('%Y-%m-%dT%H:%M:%S%z')
+            end
 
-          when :before
-            return Hash[:lte, value]
+            return Hash[(value_function_unary.to_sym === :before ? :lte : :gte), value]
 
           when :not
             return Hash[:not, value]

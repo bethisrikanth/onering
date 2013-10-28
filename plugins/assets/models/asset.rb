@@ -90,6 +90,7 @@ class Asset < App::Model::Elasticsearch
   before_save                   :_confine_status
   before_save                   :_apply_defaults
   before_save                   :_resolve_references
+  #before_save                   :_print_hash
 
 
   def parent()
@@ -191,6 +192,7 @@ private
     end
 
     self.from_hash(device)
+
     self
   end
 
@@ -223,6 +225,12 @@ private
     end
 
     self
+  end
+
+  def _print_hash()
+    pp self.to_hash().reject{|k,v|
+      [:properties].include?(k.to_sym)
+    }
   end
 end
 
