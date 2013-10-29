@@ -8,11 +8,11 @@ angular.module('app', [
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.
   when('/docs', {
-    templateUrl: '{{ url_prefix }}/views/docs.html',
+    templateUrl: '{{ site.url_prefix }}/views/docs.html',
     controller:  'PageDocsController'
   }).
   otherwise({
-    templateUrl: '{{ url_prefix }}/views/index.html',
+    templateUrl: '{{ site.url_prefix }}/views/index.html',
     controller:  'PageIndexController'
   });
 }])
