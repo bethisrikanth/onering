@@ -1,3 +1,5 @@
+---
+---
 angular.module('app', [
   'ng',
   'ngRoute',
@@ -6,11 +8,11 @@ angular.module('app', [
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.
   when('/docs', {
-    templateUrl: 'views/docs.html',
+    templateUrl: '{{ url_prefix }}/views/docs.html',
     controller:  'PageDocsController'
   }).
   otherwise({
-    templateUrl: 'views/index.html',
+    templateUrl: '{{ url_prefix }}/views/index.html',
     controller:  'PageIndexController'
   });
 }])
