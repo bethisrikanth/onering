@@ -23,18 +23,7 @@ namespace :launch do
 
     system("rm -rf _docs && git clone . _docs")
     system("cd _docs && git checkout gh-pages")
-
-  # rewrite config to prefix URLs with the path used when embedded in Onering
-    doc_config = YAML.load(File.read('./_docs/_config.yml'))
-    doc_config['url_prefix'] = '/docs'
-
-    File.open('./_docs/_config.yml', 'w') do |file|
-      file.write(YAML.dump(doc_config))
-      file.flush()
-      file.close()
-    end
-
-    system("cd _docs; jekyll build -d ../public/docs")
+    system("cd _docs; jekyll build --config _config.yml,_config.embed.yml --destination ../public/docs")
   end
 end
 
