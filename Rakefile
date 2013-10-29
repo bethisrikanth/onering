@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'rainbow'
 require 'cucumber'
 require 'cucumber/rake/task'
 
@@ -11,19 +12,51 @@ end
 namespace :launch do
   desc "Prepares the checked out copy for first run"
   task :prep do
-    system("sudo bundle install")
+    puts "Verifying and/or installing Gem prerequisites...".foreground(:blue)
+    system("sudo bundle check || sudo bundle install")
+
+    puts "Generating static assets...".foreground(:blue)
     system("./bin/regen-assets.sh")
+
+  # generate doc site
+    puts "Generating documentation at /docs...".foreground(:blue)
+
+    system("rm -rf docs && git clone . docs")
+    system("cd docs && git checkout gh-pages")
+
+  # rewrite config to prefix URLs with the path used when embedded in Onering
+    doc_config = YAML.load(File.read('./docs/_config.yml'))
+    doc_config['url_prefix'] = '/docs'
+
+    File.open('./docs/_config.yml', 'w') do |file|
+      file.write(YAML.dump(doc_config))
+      file.flush()
+      file.close()
+    end
+
+    system("cd docs; jekyll build -d ../public/docs")
   end
 end
 
 
 namespace :server do
   desc "Starts a local development server"
-  task :start do
+  task :start => ['launch:prep'] do
     conf = File.expand_path('config.ru', File.dirname(__FILE__))
+
+    puts ""
+    puts "Starting server".foreground(:green)
+    puts ("="*80).foreground(:green)
     exec("sudo bundle exec thin -e production -R #{conf} --debug -p 9393 start")
   end
+end
 
+namespace :worker do
+  desc "Starts a local worker process"
+  task :start do
+    conf = File.expand_path('config.ru', File.dirname(__FILE__))
+    exec("sudo bundle exec ./bin/onering-worker")
+  end
 end
 
 namespace :db do

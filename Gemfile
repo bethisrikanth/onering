@@ -33,6 +33,7 @@ gem "elasticsearch", ">= 0.4.0"
 gem "activemodel", ">= 4.0.0"
 gem "cucumber"
 gem "ipaddress"
+gem "jekyll"
 
 case RUBY_VERSION
 when /^1\.8/
