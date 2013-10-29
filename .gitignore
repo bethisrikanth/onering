@@ -16,4 +16,4 @@ setup.sh
 /config/*/
 /config/*.key
 _site
-docs
+_docs

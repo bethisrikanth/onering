@@ -21,20 +21,20 @@ namespace :launch do
   # generate doc site
     puts "Generating documentation at /docs...".foreground(:blue)
 
-    system("rm -rf docs && git clone . docs")
-    system("cd docs && git checkout gh-pages")
+    system("rm -rf _docs && git clone . _docs")
+    system("cd _docs && git checkout gh-pages")
 
   # rewrite config to prefix URLs with the path used when embedded in Onering
-    doc_config = YAML.load(File.read('./docs/_config.yml'))
+    doc_config = YAML.load(File.read('./_docs/_config.yml'))
     doc_config['url_prefix'] = '/docs'
 
-    File.open('./docs/_config.yml', 'w') do |file|
+    File.open('./_docs/_config.yml', 'w') do |file|
       file.write(YAML.dump(doc_config))
       file.flush()
       file.close()
     end
 
-    system("cd docs; jekyll build -d ../public/docs")
+    system("cd _docs; jekyll build -d ../public/docs")
   end
 end
 
