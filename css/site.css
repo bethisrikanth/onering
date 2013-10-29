@@ -7,7 +7,7 @@ html, body{
 }
 
 body{
-  padding-top: 80px;
+  padding-top: 60px;
 }
 
 #root{
@@ -43,8 +43,13 @@ body{
   margin-bottom: 32px;
 }
 
-.content p{
-  font-size: larger;
+.content .code{
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-size:   13px;
+}
+
+.or-sidebar{
+  margin-top: 42px;
 }
 
 .or-sidebar .nav li>a{
@@ -60,6 +65,13 @@ body{
 }
 
 
+.topic-nav .topic-header{
+  color:          #AAA;
+  font-size:      small;
+  font-weight:    bold;
+  text-transform: uppercase;
+}
+
 .topics > .topic-section .topic-section{
   margin-bottom: 1em;
 }
@@ -68,23 +80,53 @@ body{
   margin-bottom: 2em;
 }
 
-.topics > .topic-section > .topic-body > .topic-header{
+.topics > .topic-section > .topic-body p{
+  font-size: 14px;
+}
+
+.topics > .topic-section > .topic-body > .topic-header,
+.topics .topic-body h1{
   font-size: 30px;
   border-bottom: 1px solid #E7E7E7;
   margin-bottom: 0.5em;
 }
 
-.topics > .topic-section .topic-section .topic-header{
+.topics > .topic-section .topic-section .topic-header,
+.topics .topic-body h2{
   font-size: 24px;
-
+  margin-top:    1.5em;
+  margin-bottom: 0.25em;
 }
 
-.topics > .topic-section > .topic-section .topic-section .topic-header{
+.topics > .topic-section > .topic-section .topic-section .topic-header,
+.topics .topic-body h3{
   font-size: 18px;
+  margin-top:    1em;
+  margin-bottom: 0.25em;
 }
 
-.topics > .topic-section > .topic-section .topic-section .topic-section .topic-header{
-  font-size: 14px;
+.topics > .topic-section > .topic-section .topic-section .topic-section .topic-header,
+.topics .topic-body h4{
+  font-size:     16px;
+  font-weight:   bold;
+  margin-top:    2em;
+  margin-bottom: 0.5em;
+}
+
+.topics > .topic-section > .topic-section .topic-section .topic-section .topic-section .topic-header,
+.topics .topic-body h5{
+  font-size:     14px;
+  font-weight:   bold;
+  margin-top:    2em;
+  margin-bottom: 0.5em;
+}
+
+.topics .topic-header.topic-type-group{
+  font-size:     14px !important;
+  font-weight:   bold;
+  color:         #AAA;
+  border-bottom: 0px !important;
+  text-align:    right;
 }
 
 

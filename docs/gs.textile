@@ -1,0 +1,3 @@
+---
+---
+Onering is a distributed metadata database (or _metabase_, if you're so inclined) designed for cataloging, processing, and presenting data about assets in an organization such as servers, virtual machine instances, switches, and anything else you want to keep track of and search for.

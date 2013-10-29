@@ -1,0 +1,46 @@
+---
+server:
+  'Middleware':
+  - Ruby MRI 1.9.3+
+
+  'Database':
+  - Elasticsearch 0.90.5
+
+  'Operating System':
+  - Any modern Linux variant (Ubuntu, Red Hat/CentOS 5+, Fedora)
+---
+Architecturally, Onering is separated into two distinct areas of concern: the server and the client(s).  The server is responsible for the Onering REST API, the web frontend, and backend data processing and storage.  The client is a Ruby library and general-purpose command line utility that wraps the REST API to provide a clean way to work with Onering's data, as well as a framework for extracting pieces of data about the local system for insertion into Onering.
+
+Let's start with the server.  Here is an overview of some of the core technologies it uses:
+
+<dl class="dl-horizontal">
+{% for item in page.server %}
+  <dt>{{ item[0]}}</dt>
+  <dd>{{ item[1] | join:', ' }}</dd>
+{% endfor %}
+</dl>
+
+
+h4. Installing the Required Software
+
+These are streamlined, relatively-straightforward instructions for getting a _basic_ environment setup that can run Onering.  If you intend to run Onering in production at any kind of scale, you should consult the <a>Advanced Topics</a> section for more details.
+
+<tabset>
+  <tab heading="Ubuntu">
+    <h5>Installing Ruby &amp; Related Libraries</h5>
+    From the Ubuntu repositories:
+    <br />
+    <br />
+    <pre>
+      apt-get install ruby1.9.3
+    </pre>
+
+    <h5>Installing Elasticsearch</h5>
+    Visit http://www.elasticsearch.org/download/ and download the "DEB" package.
+    <br />
+    <br />
+    <pre>
+      dpkg -i elasticsearch-0.90.5.deb
+    </pre>
+  </tab>
+</tabset>

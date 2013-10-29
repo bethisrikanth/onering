@@ -1,7 +1,9 @@
 ---
 ---
-<li ng-repeat="topic in topic.topics">
-  <a ng-click="scrollTo(topic.path || nameToPath(topic.link, topic.prefix))">[[ topic.link ]]</a>
+<li ng-repeat="topic in topic.topics" ng-switch="topic.type">
+  <span ng-switch-when="group" class="topic-header">[[ topic.title || topic.link ]]</span>
+
+  <a ng-switch-default ng-click="scrollTo(topic.path || nameToPath(topic.link, topic.prefix))">[[ topic.link ]]</a>
   <ul class="nav" ng-include="'{{ site.url_prefix }}/views/nav_recursive_list.html'">
   </ul>
 </li>

@@ -1,0 +1,13 @@
+---
+---
+Once you have Ruby and Elasticsearch installed, you can proceed to install Onering.
+
+Checkout the latest copy into <code>/opt/onering</code>.
+
+<br />
+<pre>
+  gem install bundler
+  git clone https://github.com/outbrain/onering.git /opt/onering
+  cd /opt/onering
+  rake launch:prep
+</pre>

@@ -10,8 +10,8 @@
       "link":   "Installation"
     },{
       "prefix": "gs",
-      "link":   "Receiving Data",
-      "title":  "Receiving Data From Clients"
+      "link":   "Client Setup",
+      "title":  "Client Setup & Receiving Data"
     }]
   },{
     "link": "Using the Frontend",

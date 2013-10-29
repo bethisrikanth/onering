@@ -1,11 +1,4 @@
-.lightbox-content{
-  padding:       0px;
-  border-radius: 0px !important;
-  border-width:  0px !important;
-}
-
-.lightbox-content .lightbox-caption{
-  bottom: 0px;
-  left:   0px;
-  right:  0px;
+.panel-body.code{
+  background-color: #FCFCFC;
+  padding:     1em;
 }
