@@ -33,6 +33,10 @@ module App
       def get!(path)
         get(path) or raise ConfigKeyError, "config path '#{path}' not found"
       end
+
+      def set(path, value)
+        @_config.set(path, value)
+      end
     end
   end
 end

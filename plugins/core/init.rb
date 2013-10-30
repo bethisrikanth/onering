@@ -35,11 +35,49 @@ module App
         content_type 'application/json'
       end
 
+      helpers do
+        def get_current_git_head()
+          rv = Config.get('repo', {})
+
+        # if the config is undefined, populate it
+          if rv.empty?
+            IO.popen("cd #{ENV['PROJECT_ROOT']} && git log -1 HEAD").lines.each do |line|
+              case line.strip.chomp
+              when /^commit\s+([0-9a-f]+)$/
+                rv[:commit] = $1
+
+              when /^Author:\s+(.*)/
+                rv[:author] = $1
+
+              when /^Date:\s+(.*)/
+                rv[:date] = $1
+
+              end
+            end
+
+          # determine branch
+            rv[:branch] = (IO.popen("cd #{ENV['PROJECT_ROOT']} && git symbolic-ref -q HEAD").read.strip.chomp.split('/').last rescue nil)
+
+          # get short revision
+            rv[:id] = (IO.popen("cd #{ENV['PROJECT_ROOT']} && git rev-parse --short HEAD").read.strip.chomp rescue nil)
+
+          # normalize the date
+            rv[:date] = Time.parse(rv[:date]) unless rv[:date].nil?
+
+            Config.set('repo', rv)
+          end
+
+          return nil if rv.empty?
+          return rv
+        end
+      end
+
       get '/?' do
         output({
           :status => 'ok',
           :local_root => ENV['PROJECT_ROOT'],
           :environment => settings.environment,
+          :repository => get_current_git_head(),
           :backend => {
             :hostname => (%x{hostname -f}.strip.chomp rescue nil),
             :port => (request.env['HTTP_X_PROXY_PORT'] || request.env['SERVER_PORT']).to_i,

@@ -203,27 +203,26 @@ filter('section', function(){
     return null;
   };
 }).
-filter('truncate', function () {
-  return function(text, length, end){
-    if (isNaN(length))
-      length = 10;
-
-    if (end === undefined)
-      end = "...";
-
-    if (text.length <= length || text.length - end.length <= length){
-      return text;
-    }
-    else {
-      return String(text).substring(0, length-end.length) + end;
-    }
-  };
-}).
 filter('jsonify', function () {
   return function(obj, indent){
     return JSON.stringify(obj, null, (indent || 4));
   };
 }).
+config(['$provide', function($provide) {
+  $provide.factory('truncateFilter', function(){
+    return function(text, length, start){
+      if(angular.isUndefined(start)){
+        start = 0;
+      }
+
+      if(text.length <= length || start > test.length){
+        return text;
+      }else{
+        return String(text).substring(start, length);
+      }
+    }
+  });
+}]).
 config(['$provide', function($provide) {
   $provide.factory('skipFilter', function(){
     return function(array, skip){

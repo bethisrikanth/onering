@@ -313,7 +313,7 @@
                 <i class="icon-circle status-{{ state.database.status.cluster.status }}"></i>
               </a>
 
-              <ul class="dropdown-menu show dropdown-panel" style="width: 400px" ng-show="show_state_popup" ng-click="show_state_popup=false">
+              <ul class="dropdown-menu show dropdown-panel" style="width: 440px" ng-show="show_state_popup" ng-click="show_state_popup=false">
                 <li>
                   <h1>Backend Information</h1>
                 </li>
@@ -339,6 +339,11 @@
                       <tr>
                         <th>Environment</th>
                         <td>{{ state.environment }}</td>
+                      </tr>
+
+                      <tr ng-show="state.repository">
+                        <th>Revision</th>
+                        <td>{{ state.repository.branch }} @ {{ state.repository.id }}</td>
                       </tr>
                     </tbody>
 
