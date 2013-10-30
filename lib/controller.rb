@@ -26,9 +26,29 @@ module App
       headers 'Access-Control-Allow-Headers' => 'origin, x-requested-with, accept'
       @_start = Time.now
 
-    # handle query modifiers
-      App::Model::Base.query_limit = params[:limit].to_i if params[:limit]
-      App::Model::Base.query_offset = params[:offset].to_i if params[:offset]
+    # handle query parameters
+      @queryparams = {}
+
+      @query_page_size = (params[:max] || Config.get('global.api.default_max_results', App::Model::Elasticsearch::DEFAULT_MAX_API_RESULTS)).to_i
+      @query_page_num  = (params[:page] || 1).to_i
+      @query_sort      = params[:sort].split(',').collect{|i|
+        if i[0].chr == '-'
+          { i[1..-1].to_sym => :desc }
+        else
+          { i.to_sym        => :asc}
+        end
+      } if params[:sort]
+
+      if @query_page_size > 0 and
+         @query_page_num  > 0 then
+        @queryparams = {
+          :size         => @query_page_size,
+          :from         => (@query_page_size * (@query_page_num-1)),
+          :sort         => @query_sort
+        }.compact
+      end
+
+
 
       if params[:profile] === '1'
         Profiler__.start_profile
@@ -58,6 +78,15 @@ module App
         end
 
         true
+      end
+
+      def paginate_headers(result_count)
+        headers({
+          'X-Onering-Results-Count'       => result_count.to_s,
+          'X-Onering-Results-Page-Size'   => ([result_count, @query_page_size].min).to_s,
+          'X-Onering-Results-Page-Number' => @query_page_num.to_s,
+          'X-Onering-Results-Page-Count'  => (result_count / @query_page_size).ceil.to_s
+        })
       end
 
       def filter_hash(hash, prefix=nil)

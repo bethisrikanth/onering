@@ -3,12 +3,12 @@ $: << File.join(ENV['PROJECT_ROOT'], 'lib')
 $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 require 'rubygems'
+require 'patches'
 require 'oj'
 require 'config'
 require 'log'
 require 'queue'
 require 'utils'
-require 'patches'
 require 'model'
 require 'msgpack'
 require 'controller'

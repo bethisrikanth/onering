@@ -3,15 +3,144 @@
     <tr>
       <th>&nbsp;</th>
       <th ng-click="sortField='id'; sortReverse=!sortReverse">Device ID</th>
+      <th ng-click="sortField='name'; sortReverse=!sortReverse">Description</th>
       <th ng-click="sortField='created_at'; sortReverse=!sortReverse">Created At</th>
     </tr>
   </thead>
 
   <tbody>
-    <tr ng-repeat="result in devices | orderBy:sortField:sortReverse">
+    <tr ng-repeat="account in devices | orderBy:sortField:sortReverse" ng-click="userDialog(account, 'deviceUserDialog')">
       <td class="center"><input type="checkbox"></input></td>
-      <td class="id"><a>{{ result.id }}</a></td>
-      <td class="created_at">{{ result.created_at | date:'short' }}</td>
+      <td class="id"><a>{{ account.id }}</a></td>
+      <td class="description"><a>{{ account.name }}</a></td>
+      <td class="created_at">{{ account.created_at | date:'short' }}</td>
     </tr>
   </tbody>
 </table>
+
+
+<script type="text/ng-template" id="deviceUserDialog">
+  <div class="modal-header">
+    <h3>Edit Asset Account</h3>
+  </div>
+
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span6">
+        <h1>
+          <span  ng-hide="user.new" style="margin-left: 0.5em;">{{ user.id }}</span>
+          <input ng-show="user.new" type="text" placeholder="username" ng-model="user.id" style="margin-left: 0.5em;"></input>
+        </h1>
+      </div>
+
+      <div class="span6">
+        <table class="table-condensed table-plain pull-right">
+          <tbody>
+            <tr>
+              <th>Created At</th>
+              <td>{{ user.created_at || '&ndash;' }}</td>
+            </tr>
+
+            <tr>
+              <th>Last Updated</th>
+              <td>{{ user.updated_at | timeAgo }}</td>
+            </tr>
+
+            <tr>
+              <th>Last Login</th>
+              <td>{{ user.logged_in_at | timeAgo }}</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="span12" style="margin-top: 1em">
+        <tabset>
+          <tab heading="Details">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label">Description</label>
+                <div class="controls">
+                  <input type="text" ng-model="user.name" placeholder="Description"></input>
+                </div>
+              </div>
+            </form>
+          </tab>
+
+          <tab heading="Groups">
+            <div class="container-fluid" style="margin-top: 6px;">
+              <div class="row-fluid" ng-show="user.new">
+                <div class="span12">
+                  <div class="alert alert-block alert-info">
+                    Please save the user before selecting groups.
+                  </div>
+                </div>
+              </div>
+
+              <div class="row-fluid" ng-hide="user.new">
+                <div class="span4">
+                  <b>Currently In</b>
+                </div>
+
+                <div class="offset1 span4">
+                  <b>Available</b>
+                </div>
+              </div>
+
+              <div class="row-fluid" ng-hide="user.new">
+                <div class="span4">
+                  <div
+                    class="badge badge-info"
+                    ng-repeat="group in user.groups"
+                    style="display: block; margin: 4px;"
+                  >
+                    {{ group }}&nbsp;&nbsp;<span class="pull-right" rest="/api/groups/{{ group }}/remove/{{ user.id }}" rest-success="reload()"><i class="icon-white icon-remove"> </i></span>
+                    <div class="clearfix"> </div>
+                  </div>
+                </div>
+
+                <div class="offset1 span4">
+                  <div
+                    class="badge"
+                    ng-repeat="group in (groups.collect('id') | diff: user.groups)"
+                    style="display: block; margin: 4px;"
+                  >
+                    <span class="pull-left" rest="/api/groups/{{ group }}/add/{{ user.id }}" rest-success="reload()"><i class="icon-white icon-plus"> </i></span>&nbsp;&nbsp;{{ group }}
+                    <div class="clearfix"> </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </tab>
+
+          <tab heading="Keys &amp; Tokens">
+            <div class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label">API Keys</label>
+                <div class="controls">
+                  <div ng-include="'views/user-profile-api-tokens.html'"></div>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">SSL Client Keys</label>
+                <div class="controls">
+                  <div ng-include="'views/user-profile-client-keys.html'"></div>
+                </div>
+              </div>
+            </div>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" rest="/api/users/{{ user.id }}" rest-method="delete" rest-success="close()" rest-confirm="Are you sure you want to delete device account {{ user.id }}?">Delete Account</button>
+    <button class="btn btn-primary" rest="/api/users/{{ user.id }}" rest-data="user" rest-method="post" rest-success="close()">Save</button>
+    <button class="btn" ng-click="close()">Cancel</button>
+  </div>
+</script>

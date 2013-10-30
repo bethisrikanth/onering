@@ -169,7 +169,7 @@ module App
             end
 
         # testing for a null value is a snowflake
-          elsif value_value.to_s == 'null'
+          elsif value_value.to_s.downcase == 'null'
             return ({
               :bool => {
                 :must => {
@@ -251,7 +251,8 @@ module App
           when :not
             return Hash[:not, value]
 
-          else return value
+          else
+            return value
           end
         end
       end

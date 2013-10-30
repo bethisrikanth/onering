@@ -13,7 +13,7 @@ namespace :launch do
   desc "Prepares the checked out copy for first run"
   task :prep do
     puts "Verifying and/or installing Gem prerequisites...".foreground(:blue)
-    system("sudo bundle check || sudo bundle install")
+    system("bundle check || bundle install")
 
     puts "Generating static assets...".foreground(:blue)
     system("./bin/regen-assets.sh")
@@ -28,6 +28,12 @@ namespace :launch do
 end
 
 
+desc "Start an IRB shell with the Onering environment loaded"
+task :shell do
+  exec("bundle exec racksh")
+end
+
+
 namespace :server do
   desc "Starts a local development server"
   task :start => ['launch:prep'] do
@@ -36,7 +42,7 @@ namespace :server do
     puts ""
     puts "Starting server".foreground(:green)
     puts ("="*80).foreground(:green)
-    exec("sudo bundle exec thin -e production -R #{conf} --debug -p 9393 start")
+    exec("bundle exec thin -e production -R #{conf} --debug -p 9393 start")
   end
 end
 
@@ -44,7 +50,7 @@ namespace :worker do
   desc "Starts a local worker process"
   task :start do
     conf = File.expand_path('config.ru', File.dirname(__FILE__))
-    exec("sudo bundle exec ./bin/onering-worker")
+    exec("bundle exec ./bin/onering-worker")
   end
 end
 

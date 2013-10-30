@@ -70,8 +70,13 @@ module Tensor
     DEFAULT_RESULTS_LIMIT  = 10000
     DEFAULT_MAPPING = {
       'properties' => {
+        '_id' => {
+          'index' => 'not_analyzed',
+          'type'  => 'string'
+        },
         '_type' => {
-          'type' => 'string'
+          'index' => 'not_analyzed',
+          'type'  => 'string'
         }
       }
     }

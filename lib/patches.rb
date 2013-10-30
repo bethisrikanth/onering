@@ -13,7 +13,6 @@ class Object
   end
 end
 
-
 class TrueClass
   def to_bool
     self

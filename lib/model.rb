@@ -200,7 +200,8 @@ module App
                 :terms => {
                   :field => current_field,
                   :size  => (options[:limit].nil? ? DEFAULT_MAX_FACETS : options[:limit])
-                }
+                },
+                :global => true
               }.compact
             }
           }, {
@@ -304,12 +305,12 @@ module App
         end
 
         def inherited(subclass)
-          @@_implementers ||= Set.new()
-          @@_implementers << subclass
+          @_implementers ||= Set.new()
+          @_implementers << subclass
         end
 
         def implementers()
-          @@_implementers
+          @_implementers
         end
 
         def sync_schemata()

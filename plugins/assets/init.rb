@@ -88,33 +88,15 @@ module App
           qsq       = (params[:q] || params[:query] || '')
           q         = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           fields    = params[:only].split(',') unless params[:only].nil?
-          page_size = (params[:max] || Config.get('global.api.default_max_results', Asset::DEFAULT_MAX_API_RESULTS)).to_i
-          page_num  = (params[:page] || 1).to_i
-          sort      = params[:sort].split(',').collect{|i|
-            if i[0].chr == '-'
-              { i[1..-1].to_sym => :desc }
-            else
-              { i.to_sym        => :asc}
-            end
-          } if params[:sort]
 
-          rv = Asset.urlquery(q, {
-            :size         => page_size,
-            :from         => (page_size * (page_num-1)),
-            :sort         => sort
-          }.compact, {
+          rv = Asset.urlquery(q, @queryparams, {
             :raw => true
           })
 
           total = rv.get('hits.total', 0)
           if total > 0
+            paginate_headers(total)
 
-            headers({
-              'X-Onering-Results-Count'       => total.to_s,
-              'X-Onering-Results-Page-Size'   => ([total, page_size].min).to_s,
-              'X-Onering-Results-Page-Number' => page_num.to_s,
-              'X-Onering-Results-Page-Count'  => (total / page_size).ceil.to_s
-            })
             output(filter_hash(rv.get('hits.hits', []).collect{|i|
               Asset.new(i['fields'].merge({
                 :id   => i['_id'],
@@ -473,7 +455,8 @@ module App
       get '/:id/tag/*' do
         tags = params[:splat].first.split(/\W/)
         device = Asset.find(params[:id])
-        tags.each{|t| device.tags.push_uniq(t) }
+        device.tags = (device.tags + tags).uniq.sort
+
         device.save({},{
           :replication => :sync
         })
@@ -484,7 +467,8 @@ module App
       get '/:id/untag/*' do
         tags = params[:splat].first.split(/\W/)
         device = Asset.find(params[:id])
-        tags.each{|t| device.tags.delete(t) }
+        device.tags = (device.tags - tags)
+
         device.save({},{
           :replication => :sync
         })

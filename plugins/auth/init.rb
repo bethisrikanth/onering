@@ -133,26 +133,30 @@ module App
       # get user list
         get '/list' do
           allowed_to? :list_users
-          output(User.all({
-            :_type => Config.get('global.authentication.machine_user_type', 'DeviceUser')
-          }).collect{|i| i.to_hash })
+          output(User.implementers.to_a.reject{|i|
+            i == Kernel.const_get(Config.get('global.authentication.machine_user_type', 'DeviceUser'))
+          }.collect{|i|
+            i.all(@queryparams).collect{|j|
+              j.to_hash()
+            }
+          }.flatten)
         end
 
         get '/list/machines' do
           allowed_to? :list_machines
-          output(User.all({
-            :_type => Config.get('global.authentication.machine_user_type', 'DeviceUser')
-          }).collect{|i| {
-            :id         => i.id,
-            :created_at => i.created_at,
-            :updated_at => i.updated_at
-          } })
+          output(Kernel.const_get(Config.get('global.authentication.machine_user_type', 'DeviceUser')).all(@queryparams).collect{|i|
+            {
+              :id         => i.id,
+              :created_at => i.created_at,
+              :updated_at => i.updated_at
+            }
+          })
         end
 
       # get user types list
         get '/list/types' do
           allowed_to? :list_users
-          output(User.list(:type).collect{|i| i.gsub('User','').downcase }.compact.reject{|i| i.empty? })
+          output(User.implementers.to_a.collect{|i| i.name.gsub('User','').downcase }.compact.reject{|i| i.empty? })
         end
 
       # perform session login
@@ -206,13 +210,19 @@ module App
           if json
           # remove certain fields
             json.delete_if{|k,v|
-              k =~ /(?:^_?id$|_at$)/
+              k =~ /(?:^_?id$|_at$|^new$)/
             }
 
-            user = User.find_or_create(id)
-            user.from_json(json).save()
-            user.reload
+            type = (Kernel.const_get((json['type'].gsub(/_user$/,'') + '_user').camelize) rescue nil)
+            raise "Cannot find user type #{json['type']}" if type.nil?
 
+            user = User.find(id)
+            user = type.new({
+              :id => id
+            }) if user.nil?
+
+            user.from_hash(json.symbolize_keys)
+            user.save()
             output(user)
           else
             raise "Invalid JSON submitted"
@@ -222,8 +232,10 @@ module App
       # delete user
         delete '/:id' do
           allowed_to? :delete_user
+          user = User.find(params[:id])
+          return 404 unless user
 
-          User.destroy(params[:id])
+          raise "Delete failed for user #{params[:id]}" unless user.destroy()
           200
         end
 

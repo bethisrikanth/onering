@@ -101,13 +101,13 @@ function UserManagerController($scope, $http, $modal, User, UserType, UserList, 
     $scope.reloadGroups();
   }
 
-  $scope.userDialog = function(user){
+  $scope.userDialog = function(user, tpl){
     var $parent = $scope;
 
     var d = $modal.open({
       backdrop:    true,
       keyboard:    true,
-      templateUrl: 'userDialog',
+      templateUrl: (tpl || 'userDialog'),
       controller:  function($scope, $modal, User){
         $scope.user = user;
         $scope.groups = $parent.groups;
