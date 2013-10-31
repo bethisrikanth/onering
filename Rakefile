@@ -1,12 +1,19 @@
 require 'rubygems'
+require 'onering'
 require 'rainbow'
 require 'cucumber'
 require 'cucumber/rake/task'
+require './lib/app'
 
 Cucumber::Rake::Task.new(:test) do |t|
 desc "Run API backend integration tests"
   t.cucumber_opts = "features plugins/*/features"
 end
+
+Onering::Logger.setup({
+  :destination => 'STDERR',
+  :threshold   => :info
+})
 
 
 namespace :launch do
@@ -51,6 +58,22 @@ namespace :worker do
   task :start do
     conf = File.expand_path('config.ru', File.dirname(__FILE__))
     exec("bundle exec ./bin/onering-worker")
+  end
+
+  require 'resque/tasks'
+
+  namespace :resque do
+    task :start do
+      ENV['QUEUE']      = ['critical', 'high', 'normal', 'bulk'].join(',')
+      ENV['TERM_CHILD'] = '1'
+      ENV['INTERVAL']   = '0.2'
+
+    # load tasks
+      Automation::Tasks::ResqueTask.load_all()
+
+      Onering::Logger.info("Starting Resque worker for queues #{ENV['QUEUE']}...", "WORKER")
+      Rake::Task['worker:resque:work'].invoke
+    end
   end
 end
 

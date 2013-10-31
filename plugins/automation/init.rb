@@ -1,6 +1,7 @@
 require 'controller'
 require 'assets/models/asset'
 require 'automation/models/job'
+require 'automation/lib/resque_task'
 
 module App
   class Base < Controller
@@ -8,6 +9,7 @@ module App
 
     helpers do
       Automation::Tasks::Base.load_all()
+      Automation::Tasks::ResqueTask.load_all()
     end
 
     namespace '/api/automation' do

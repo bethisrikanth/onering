@@ -9,7 +9,38 @@ module Automation
       '/var/lib/onering/api/tasks'
     ]
 
+    module FlowControl
+      def abort(message)
+        raise TaskAbort.new(message)
+      end
+
+      def retry(message)
+        raise TaskRetry.new(message)
+      end
+
+      def fail(message)
+        raise TaskFail.new(message)
+      end
+
+      def error(message, source=nil)
+        log(message, :error, source)
+      end
+
+      def info(message, source=nil)
+        log(message, :info, source)
+      end
+
+      def warn(message, source=nil)
+        log(message, :warn, source)
+      end
+
+      def log(message, severity=:info, source=nil)
+        Onering::Logger.log(severity, message, (source || (self.respond_to?(:to_task_name) && self.to_task_name()) || "Automation::Tasks"))
+      end
+    end
+
     class Base
+      include FlowControl
 
       def initialize(options={})
         @options = (options || {})
@@ -23,23 +54,6 @@ module Automation
         rv = @options.get(key)
         raise "Parameter '#{key}' is required" if rv.nil?
         return rv
-      end
-
-      def abort(message)
-        raise TaskAbort.new(message)
-      end
-
-      def retry(message)
-        raise TaskRetry.new(message)
-      end
-
-      def fail(message)
-        raise TaskFail.new(message)
-      end
-
-      def log(message, severity=:info)
-        STDOUT.print("[TASK] #{message}\n")
-        STDOUT.flush()
       end
 
       def execute(request, datum=nil)

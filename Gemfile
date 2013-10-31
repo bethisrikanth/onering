@@ -14,7 +14,6 @@ gem "rake"
 gem "multi_json"
 gem "oj"
 gem "liquid"
-gem "stasis"
 gem "rdiscount", "1.6.8"
 gem "net-ping"
 gem "net-ldap"
@@ -34,6 +33,8 @@ gem "activemodel", ">= 4.0.0"
 gem "cucumber"
 gem "ipaddress"
 gem "jekyll"
+gem "resque"
+gem "onering-client"
 
 case RUBY_VERSION
 when /^1\.8/
