@@ -19,7 +19,7 @@ function ErrorController($scope, $location){
 }
 
 
-function NavigationController($scope, $rootScope, $http, $route, $window, $routeParams, Summary, List, CurrentUser){
+function NavigationController($scope, $rootScope, $http, $route, $window, $routeParams, $cookies, Summary, List, CurrentUser){
   $scope.menuquery = function(query, template){
     var rv = [];
 
@@ -47,13 +47,18 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
 
   $scope.setGroupFilter = function(field, value){
     value.field = field;
-    value.query = field+'/'+value.value;
-    $rootScope.group_filter = value;
+    value.query = field+'/'+(value.value || value);
 
-    $scope.reload();
+    if(angular.isDefined(value.query)){
+      $rootScope.group_filter = value;
+      $cookies['onering.group_filter_query'] = value.query;
+      console.log("GFC", $cookies['onering.group_filter_query'], value.query)
+
+      $scope.reload();
+    }
   }
 
-  $scope.clearGroupFilter = function(){
+  $scope.clearGroupFilter = function(clear_cookie){
     $rootScope.group_filter = {
       field:   '',
       value:   '',
@@ -61,8 +66,9 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
       default: true
     };
 
-    // TODO: angular 1.2.0+
-    //$cookieStore.put('group_filter_query', $rootScope.group_filter.query);
+    if(angular.isDefined(clear_cookie) && clear_cookie === true){
+      delete $cookies['onering.group_filter_query'];
+    }
 
     $scope.reload();
   }
@@ -75,18 +81,16 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
     $http.get('/api/navigation/filters').success(function(data){
       $scope.group_filters = data;
 
-// TODO: angular 1.2.0+
-//       var sessionFilter =  $cookieStore.get('group_filter_query');
+      var sessionFilter = $cookies['onering.group_filter_query'];
 
-// console.log(sessionFilter);
+      if(sessionFilter != null){
+        var fv = sessionFilter.split('/');
 
-//       if(angular.isDefined(sessionFilter)){
-//         var fv = sessionFilter.split('/');
-
-//         if(fv.length > 1){
-//           $scope.setGroupFilter(f[0], f[1]);
-//         }
-//       }
+        if(fv.length > 1){
+          console.log("LOADING GROUP FILTER FROM COOKIE", sessionFilter);
+          $scope.setGroupFilter(fv[0], fv[1]);
+        }
+      }
     });
 
   //get current user details
