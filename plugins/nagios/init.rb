@@ -7,9 +7,12 @@ module App
   class Base < Controller
     namespace '/api/nagios' do
       post '/sync' do
-        output(Automation::Job.run_task('nagios.sync', {
-          :data => request.env['rack.input'].read
-        }))
+        data = (MultiJson.load(request.env['rack.input'].read) rescue nil)
+        return 400 unless json
+
+        queued = Automation::Tasks::Task.run('nagios/sync', data)
+        return 500 unless queued
+        return 200
       end
 
       get '/alerts' do

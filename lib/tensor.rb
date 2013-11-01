@@ -381,7 +381,6 @@ module Tensor
     def self.search!(body, options={}, es_options={})
       return _wrap_response(:search, connection().search({
         :index => (options[:index] || self.index_name()),
-        :type  => (options[:type] || self.document_type()),
         :body  => ({
           :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
         }).merge(body)

@@ -10,7 +10,9 @@ module App
     namespace '/api/devices' do
       namespace '/defaults' do
         get '/sync' do
-          output(Automation::Job.urlquery('name/assets-sync').first.request())
+          queued = Automation::Tasks::Task.run('assets/sync')
+          return 500 unless queued
+          return 200
         end
 
         get '/groups' do
@@ -313,16 +315,15 @@ module App
       }.each do |route|
         post route do
           data = request.env['rack.input'].read
+          json = MultiJson.load(data)
 
           if params[:id]
             id = params[:id]
           else
-            json = MultiJson.load(data)
             id = json['id']
           end
 
           if params[:direct].to_bool === true
-            json = MultiJson.load(data) unless json
             json['collected_at'] = Time.now if json.delete('inventory') === true
             device = Asset.find(id)
             return 404 unless device
@@ -330,15 +331,9 @@ module App
             device.save()
             output(device)
           else
-            job = Automation::Job.urlquery('name/assets-update').first
-            return 503 unless job
-
-            output(job.request({
-              :data       => data,
-              :parameters => {
-                :nodes => [id]
-              }
-            }))
+            queued = Automation::Tasks::Task.run('assets/update', json)
+            return 500 unless queued
+            return 200
           end
         end
       end

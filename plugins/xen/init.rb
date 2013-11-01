@@ -4,7 +4,9 @@ module App
   class Base < Controller
     namespace '/api/xen' do
       get '/sync' do
-        output(Automation::Job.run_task('xen.sync'))
+        queued = Automation::Tasks::Task.run('xen/sync')
+        return 500 unless queued
+        return 200
       end
     end
   end

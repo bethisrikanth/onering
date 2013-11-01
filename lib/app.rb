@@ -31,7 +31,6 @@ module App
   class Base < Controller
     def initialize
       App::Log.setup()
-      Queue.setup()
       App::Log.increment("api.process.started")
       super
     end

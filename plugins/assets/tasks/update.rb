@@ -17,7 +17,7 @@ module Automation
             end
           end
 
-          warn("Node object 'properties' field is empty, possible error in inventory")
+          warn("Node object 'properties' field is empty, possible error in inventory") if node_object.get(:properties,{}).empty?
 
         #
         # handle "replacement merge" operator (@)

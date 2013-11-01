@@ -4,11 +4,15 @@ module App
   class Base < Controller
     namespace '/api/snmp' do
       get '/sync' do
-        output(Automation::Job.run_task('snmp.sync'))
+        queued = Automation::Tasks::Task.run('snmp/sync')
+        return 500 unless queued
+        return 200
       end
 
       get '/discover' do
-        output(Automation::Job.run_task('snmp.discover'))
+        queued = Automation::Tasks::Task.run('snmp/discover')
+        return 500 unless queued
+        return 200
       end
     end
   end
