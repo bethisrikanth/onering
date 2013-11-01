@@ -98,8 +98,10 @@ module Automation
           Onering::Logger.error(e.message, source)
         end
 
-        e.backtrace.each do |eb|
-          Onering::Logger.debug(eb, source)
+        unless e.nil? or e.backtrace.nil?
+          e.backtrace.each do |eb|
+            Onering::Logger.debug(eb, source)
+          end
         end
       end
     end
