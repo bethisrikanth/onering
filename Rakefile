@@ -59,25 +59,27 @@ namespace :server do
 end
 
 namespace :worker do
-  desc "Starts a local worker process"
-  task :start do
-    conf = File.expand_path('config.ru', File.dirname(__FILE__))
-    exec("bundle exec ./bin/onering-worker")
-  end
-
   require 'resque/tasks'
 
-  namespace :resque do
+  desc "Starts a Resque backend job worker"
+  task :start, :queues do |t, args|
+
+    ENV['QUEUE']      = (args[:queues] || ['critical', 'high', 'normal', 'low'].join(','))
+    ENV['TERM_CHILD'] = '1'
+    ENV['INTERVAL']   = '0.2'
+
+  # load tasks
+    Automation::Tasks::Task.load_all()
+
+    Onering::Logger.info("Starting Resque worker for the following queues: #{ENV['QUEUE']}...", "WORKER")
+    Rake::Task['worker:resque:work'].invoke
+  end
+
+  namespace :legacy do
+    desc "Starts a legacy worker backed by beanstalkd"
     task :start do
-      ENV['QUEUE']      = ['critical', 'high', 'normal', 'low'].join(',')
-      ENV['TERM_CHILD'] = '1'
-      ENV['INTERVAL']   = '0.2'
-
-    # load tasks
-      Automation::Tasks::Task.load_all()
-
-      Onering::Logger.info("Starting Resque worker for queues #{ENV['QUEUE']}...", "WORKER")
-      Rake::Task['worker:resque:work'].invoke
+      conf = File.expand_path('config.ru', File.dirname(__FILE__))
+      exec("bundle exec ./bin/onering-worker")
     end
   end
 end
