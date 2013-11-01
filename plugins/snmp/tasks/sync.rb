@@ -5,8 +5,8 @@ require 'snmp/models/snmp_host'
 module Automation
   module Tasks
     module Snmp
-      class Sync < Base
-        include App::Helpers::Snmp::Util
+      class Sync < Task
+        extend App::Helpers::Snmp::Util
 
         DEFAULT_PING_TIMEOUT = 3.0
         DEFAULT_SNMP_TIMEOUT = 3.5
@@ -16,7 +16,7 @@ module Automation
         require 'digest'
         require 'socket'
 
-        def run(request)
+        def self.perform(request)
           @config = App::Config.get!('snmp')
 
           @config.get('profiles',[]).each do |name, profile|

@@ -2,7 +2,6 @@ require 'controller'
 require 'assets/lib/helpers'
 require 'assets/models/asset'
 require 'assets/models/node_default'
-require 'automation/models/job'
 
 module App
   class Base < Controller

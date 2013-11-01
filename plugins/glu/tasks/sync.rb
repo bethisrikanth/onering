@@ -3,10 +3,9 @@ require 'assets/models/asset'
 module Automation
   module Tasks
     module Glu
-      class Sync < Base
-        def run(request)
-          rv = []
-          config = App::Config.get('glu.config')
+      class Sync < Task
+        def self.perform(*args)
+          config = App::Config.get('glu.config',{})
           fail("Cannot continue without Glu JSON URL") unless config && config['url']
           uri = URI.parse(config['url'])
 
@@ -15,52 +14,55 @@ module Automation
         # Glu Agent in Zookeeper, via the "Zookie" REST API (internal Outbrain tool)
         #
 
-          zk = App::Config.get('zookie.config')
-          zkuri = URI.parse(zk['url'])
-          zk_versions = {}
+          zk = App::Config.get('zookie.config',{})
 
-          log("Retrieving Glu agent presence from Zookeeper via #{zkuri.to_s}")
+          unless zk.empty?
+            zkuri = URI.parse(zk['url'])
+            zk_versions = {}
 
-          Net::HTTP.start(zkuri.host, zkuri.port) do |http|
-            request = Net::HTTP::Get.new(zkuri.to_s)
-            request.basic_auth zk['username'], zk['password'] if zk['username'] && zk['password']
-            response = http.request(request)
+            log("Retrieving Glu agent presence from Zookeeper via #{zkuri.to_s}")
 
-            zk_json = MultiJson.load(response.body)
-            fail("Invalid Zookie response") unless zk_json['children']
+            Net::HTTP.start(zkuri.host, zkuri.port) do |http|
+              request = Net::HTTP::Get.new(zkuri.to_s)
+              request.basic_auth zk['username'], zk['password'] if zk['username'] && zk['password']
+              response = http.request(request)
 
-            def get_leaf(base)
-              if base.is_a?(Hash) and base.has_key?('children') and base['children'].is_a?(Array)
-                return base['children'].collect{|i| get_leaf(i) }.flatten
+              zk_json = MultiJson.load(response.body)
+              fail("Invalid Zookie response") unless zk_json['children']
+
+              def get_leaf(base)
+                if base.is_a?(Hash) and base.has_key?('children') and base['children'].is_a?(Array)
+                  return base['children'].collect{|i| get_leaf(i) }.flatten
+                end
+
+                if base['data']
+                  data = (MultiJson.load(base['data']) rescue base['data'])
+
+                  host = base['path'].split('/')[6]
+                  return nil unless host
+
+                  node = Asset.urlquery("name:aliases/#{host}").first
+                  hid = (node[:_id] rescue nil)
+                  return nil unless hid
+
+                  return {
+                    :id      => hid,
+                    :product => (base['path'].split('/')[4].strip rescue nil),
+                    :version => (data['revision'] rescue nil)
+                  }
+                end
+
+                nil
               end
 
-              if base['data']
-                data = (MultiJson.load(base['data']) rescue base['data'])
+              get_leaf(zk_json).each do |node|
+                if node
+                  id = node.delete(:id)
 
-                host = base['path'].split('/')[6]
-                return nil unless host
-
-                device = Asset.urlsearch("name:aliases/#{host}").first
-                hid = (device[:_id] rescue nil)
-                return nil unless hid
-
-                return {
-                  :id      => hid,
-                  :product => (base['path'].split('/')[4].strip rescue nil),
-                  :version => (data['revision'] rescue nil)
-                }
-              end
-
-              nil
-            end
-
-            get_leaf(zk_json).each do |node|
-              if node
-                id = node.delete(:id)
-
-                if id
-                  zk_versions[id] ||= {}
-                  zk_versions[id][node[:product]] = node[:version]
+                  if id
+                    zk_versions[id] ||= {}
+                    zk_versions[id][node[:product]] = node[:version]
+                  end
                 end
               end
             end
@@ -112,17 +114,27 @@ module Automation
 
           # save glu data
             glu_agents.each do |name, glu_properties|
-              device = Asset.find_by_name(name)
+              node = Asset.urlquery("name/#{name}")
 
-              if device
-                rv << device.id
+              case node.length
+              when 0
+                warn("Skipping #{name}, could not find any nodes with this name")
+                next
+              when 1
+                node = node.first
 
-              # efficient?  no.
-              # this exposes the version as reported to Zookeeper from the Glu Agent
-              # in the device object
-                if zk_versions[device.id]
+              else
+                warn("Skipping #{name}, multiple nodes responded to this name: #{node.collect{|i| i.id }.join(', ')}")
+                next
+              end
+
+            # efficient?  no.
+            # this exposes the version as reported to Zookeeper from the Glu Agent
+            # in the device object
+              if zk_versions
+                if zk_versions[node.id]
                   glu_properties['apps'].each do |i|
-                    zk_versions[device.id].each do |k,v|
+                    zk_versions[node.id].each do |k,v|
                       if i['name'] == k
                         i['zk_version'] = v.to_s
                         i.replace i
@@ -130,22 +142,21 @@ module Automation
                     end
                   end
                 end
-
-                device['properties'] = {} unless device['properties']
-                device['properties']['glu'] = glu_properties
-                device.safe_save
               end
+
+              node.properties.set(:glu, glu_properties)
+              node.save()
             end
 
           # remove glu properties from hosts not appearing in the glu.json
-            glu_missing = (Asset.search({'properties.glu' => {'$exists' => true}}).collect{|i| i.name } - glu_agents.keys)
+            glu_missing = (Asset.urlquery("properties.glu/not:null").collect{|i| i.name } - glu_agents.keys)
             log("Removing Glu configuration from #{glu_missing.length} nodes") unless glu_missing.empty?
 
             glu_missing.each do |node|
-              node = Asset.find_by_name(node)
+              node = Asset.urlquery("name/#{name}")
               next unless node
-              node.properties[:glu] = nil
-              node.safe_save rescue next
+              node.properties.set(:glu, nil)
+              node.save() rescue next
             end
           end
 

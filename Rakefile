@@ -12,7 +12,7 @@ end
 
 Onering::Logger.setup({
   :destination => 'STDERR',
-  :threshold   => :info
+  :threshold   => (ENV['LOGLEVEL'] || 'INFO').downcase.to_sym
 })
 
 
@@ -64,12 +64,12 @@ namespace :worker do
 
   namespace :resque do
     task :start do
-      ENV['QUEUE']      = ['critical', 'high', 'normal', 'bulk'].join(',')
+      ENV['QUEUE']      = ['critical', 'high', 'normal', 'low'].join(',')
       ENV['TERM_CHILD'] = '1'
       ENV['INTERVAL']   = '0.2'
 
     # load tasks
-      Automation::Tasks::ResqueTask.load_all()
+      Automation::Tasks::Task.load_all()
 
       Onering::Logger.info("Starting Resque worker for queues #{ENV['QUEUE']}...", "WORKER")
       Rake::Task['worker:resque:work'].invoke

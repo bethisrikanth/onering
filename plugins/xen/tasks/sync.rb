@@ -3,8 +3,8 @@ require 'assets/models/asset'
 module Automation
   module Tasks
     module Xen
-      class Sync < Base
-        def run(request)
+      class Sync < Task
+        def self.perform(*args)
           hosts = {}
 
           guests = Asset.urlquery('xen.uuid').to_a

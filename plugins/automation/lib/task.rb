@@ -1,98 +1,105 @@
-require 'hashlib'
-require 'rainbow'
+require 'resque'
+require 'resque/errors'
+require 'onering'
+require 'automation/lib/util'
 
 module Automation
   module Tasks
-    TASKPATH = [
-      File.join(File.expand_path(__FILE__), 'tasks'),
-      File.join(ENV['PROJECT_ROOT'], 'plugins', '*', 'tasks'),
-      '/var/lib/onering/api/tasks'
-    ]
+    class JobTermination  < Exception; end
+    class TaskTermination < Exception; end
 
-    module FlowControl
-      def abort(message)
-        raise TaskAbort.new(message)
-      end
+    class JobAbort  < JobTermination; end
+    class JobRetry  < JobTermination; end
+    class JobFail   < JobTermination; end
+    class TaskAbort < TaskTermination; end
+    class TaskRetry < TaskTermination; end
+    class TaskFail  < TaskTermination; end
+    class TaskJump  < TaskTermination; end
 
-      def retry(message)
-        raise TaskRetry.new(message)
-      end
+    class Task
+      extend Util
 
-      def fail(message)
-        raise TaskFail.new(message)
-      end
+      TASKPATH = [
+        File.join(ENV['PROJECT_ROOT'], 'plugins', '*', 'tasks')
+      ]
 
-      def error(message, source=nil)
-        log(message, :error, source)
-      end
-
-      def info(message, source=nil)
-        log(message, :info, source)
-      end
-
-      def warn(message, source=nil)
-        log(message, :warn, source)
-      end
-
-      def log(message, severity=:info, source=nil)
-        Onering::Logger.log(severity, message, (source || (self.respond_to?(:to_task_name) && self.to_task_name()) || "Automation::Tasks"))
-      end
-    end
-
-    class Base
-      include FlowControl
-
-      def initialize(options={})
-        @options = (options || {})
-      end
-
-      def opt(key, default=nil)
-        return @options.get(key, default)
-      end
-
-      def opt!(key, default=nil)
-        rv = @options.get(key)
-        raise "Parameter '#{key}' is required" if rv.nil?
-        return rv
-      end
-
-      def execute(request, datum=nil)
-        @data = datum
-        rv = run(request)
-        return (rv.nil? ? @data : rv)
-      end
-
-    # task stub: implement this to perform the actions for a given task
-      def run(request)
-        raise "Not Implemented"
-      end
-
-      class<<self
-        def load_all()
-          Automation::Tasks::TASKPATH.each do |path|
-            Dir["#{path}/**/*.rb"].each do |f|
-              if Automation::Tasks::Base.register(f)
-                begin
-                  require f
-                rescue LoadError => e
-                  STDERR.puts("Unable to load task #{f}: #{e.message}".foreground(:red))
-                end
-              end
+      def self.load_all()
+        TASKPATH.each do |path|
+          Dir["#{path}/**/*.rb"].each do |f|
+            begin
+              Onering::Logger.debug("Loading Resque task #{f}", "Automation::Tasks::Task")
+              require f
+            rescue LoadError => e
+              Onering::Logger.error("Unable to load task #{f}: #{e.message}", "Automation::Tasks::Task")
+              next
             end
           end
         end
+      end
 
-        def register(path)
-          name = File.basename(path, '.rb').to_sym
-          @_tasks = {} unless @_tasks
-          return false if @_tasks[path]
+      def self.run_task(priority, name, *args)
+        task = as_task(name)
 
-          @_tasks[path] = {
-            :name => name,
-            :path => path
-          }
+        unless task.nil?
+          return Resque.enqueue_to(priority, task, *args)
+        else
+          Onering::Logger.error("Cannot locate task #{name}", "Automation::Tasks::Task")
+        end
 
-          return true
+        return false
+      end
+
+      def self.run(name, *args)
+        run_task(:normal, name, *args)
+      end
+
+      def self.run_critical(name, *args)
+        run_task(:critical, name, *args)
+      end
+
+      def self.run_high(name, *args)
+        run_task(:high, name, *args)
+      end
+
+      def self.run_low(name, *args)
+        run_task(:low, name, *args)
+      end
+
+      def self.as_task(name)
+        (['Automation', 'Tasks'] + name.split(/[\.\/]/).map(&:camelize)).join('::').constantize() rescue nil
+      end
+
+      def self.to_task_name()
+        self.name.split('::')[2..-1].map(&:underscore).join('/')
+      end
+
+      def self.before_perform(*args)
+        Onering::Logger.info("Starting task at #{Time.now.to_s}", to_task_name())
+      end
+
+      def self.after_perform(*args)
+        Onering::Logger.info("Task completed at #{Time.now.to_s}", to_task_name())
+      end
+
+      def self.on_failure(e, *args)
+        error_class = case e.class.name
+        when /^Automation::Tasks::/
+          e.class.name.split('::').last.to_sym
+        else
+          e.class.name
+        end
+
+        source = [to_task_name(), error_class.to_s].join(':')
+
+        case error_class
+        when :TaskAbort, :TaskRetry
+          Onering::Logger.warn(e.message, source)
+        else
+          Onering::Logger.error(e.message, source)
+        end
+
+        e.backtrace.each do |eb|
+          Onering::Logger.debug(eb, source)
         end
       end
     end

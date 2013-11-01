@@ -1,7 +1,6 @@
 require 'model'
 require 'assets/models/node_default'
 require 'assets/lib/helpers'
-require 'automation/models/job'
 
 
 class Asset < App::Model::Elasticsearch

@@ -173,6 +173,10 @@ module App
           return self.search(query, tensor_options)
         end
 
+        def ids(urlquery)
+          document_ids(self.to_elasticsearch_query(urlquery))
+        end
+
       # summarize
       #   this method provides arbitrary-depth aggregate rollups of a MongoDB
       #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)
@@ -339,5 +343,11 @@ module App
         }
       end
     end
+  end
+end
+
+class String
+  def to_elasticsearch_query()
+    App::Model::Elasticsearch.to_elasticsearch_query(self)
   end
 end

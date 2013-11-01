@@ -378,14 +378,14 @@ module Tensor
     # +options+::  options for query execution
     # * :type::    the document type to query for (default: autodetect)
     #
-    def self.search!(body, options={})
+    def self.search!(body, options={}, es_options={})
       return _wrap_response(:search, connection().search({
         :index => (options[:index] || self.index_name()),
         :type  => (options[:type] || self.document_type()),
         :body  => ({
           :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
         }).merge(body)
-      }), options)
+      }.merge(es_options)), options)
     end
 
 
@@ -393,7 +393,7 @@ module Tensor
     # +options+::  options for query execution
     # * :type::    the document type to query for (default: autodetect)
     #
-    def self.search(body, options={})
+    def self.search(body, options={}, es_options={})
       begin
         search!(body, options)
       rescue Elasticsearch::Transport::Transport::Errors::NotFound
@@ -430,6 +430,23 @@ module Tensor
         }), options)
       end
     end
+
+
+    def self.document_ids(query=nil, options={})
+      rv = connection().search({
+        :index => self.index_name(),
+        :fields => ['_id'],
+        :size  => (options[:limit] || 10000),
+        :body => {
+          :filter => (query || {
+            :match_all => {}
+          })
+        }
+      })
+
+      rv.get('hits.hits',[]).collect{|i| i['_id'] }
+    end
+
 
     # find one or more records by ID, return nil if not found
     # +id+::      a string or array of strings of IDs to retrieve
@@ -500,6 +517,26 @@ module Tensor
       else
         return false
       end
+    end
+
+
+    # delete all records in this index
+    #
+    def self.delete_all()
+      connection().delete_by_query({
+        :index   => self.index_name(),
+        :type    => self.document_type(),
+        :body    => {
+          :filter => {
+            :match_all => {}
+          }
+        }
+      })
+
+      return (connection().count({
+        :index   => self.index_name(),
+        :type    => self.document_type()
+      }) == 0)
     end
 
     # get/set the index name for this model.

@@ -5,8 +5,8 @@ require 'snmp/models/snmp_host'
 module Automation
   module Tasks
     module Snmp
-      class Discover < Base
-        include App::Helpers::Snmp::Util
+      class Discover < Task
+        extend App::Helpers::Snmp::Util
 
         DEFAULT_PING_TIMEOUT = 1.0
         DEFAULT_SNMP_TIMEOUT = 3.5
@@ -16,7 +16,7 @@ module Automation
         require 'digest'
         require 'socket'
 
-        def run(request)
+        def self.perform(*args)
           @config = App::Config.get!('snmp')
 
           queue = EM::Queue.new()

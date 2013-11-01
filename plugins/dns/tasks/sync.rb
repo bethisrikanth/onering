@@ -3,8 +3,8 @@ require 'assets/models/asset'
 module Automation
   module Tasks
     module Dns
-      class Sync < Base
-        def run(request)
+      class Sync < Task
+        def self.perform(noop=false)
           axfr = {}
 
           App::Config.get('dns.sync', {}).each do |rule, config|
@@ -18,7 +18,7 @@ module Automation
                     io.close
 
                     if $?.to_i == 0
-                      log("Zone transfer of #{zone} from nameserver #{ns} was successful, scanning records")
+                      recs = 0
 
                       dump.lines.each do |line|
                         next unless line =~ /\s+IN\s+(?:CNAME|A|TXT|SRV|PTR)\s+/
@@ -43,65 +43,70 @@ module Automation
                           :rule        => rule,
                           :description => config['label']
                         }.compact
+
+                        recs += 1
                       end
+
+                      log("Zone transfer of #{zone} from nameserver #{ns} was successful, got #{recs} records")
 
                       throw :nextzone
                     else
-                      log("Unable to transfer zone #{zone} from nameserver #{ns}, moving on...", :warn)
+                      warn("Unable to transfer zone #{zone} from nameserver #{ns}, moving on...")
                       next
                     end
                   end
                 end
               end
             end
-
           end
 
-          log("Retrieved #{axfr.inject(0){|s,i| s+=i[1].length }} records")
+          if axfr.empty?
+            warn("No DNS sync rules configured, nothing to do")
+          else
+            log("Retrieved #{axfr.inject(0){|s,i| s+=i[1].length }} records")
 
-          if opt(:noop)
-            log("No-op flag set, skipping node sync")
-            return nil
-          end
+            if noop
+              log("No-op flag set, skipping node sync")
+              return nil
+            end
 
-          log("Syncing records to nodes")
+            log("Syncing records to nodes")
 
-          records = {}
+            records = {}
 
-          axfr[:a].each do |name, record|
-            records[record[:target]] ||= {
-              :target  => record[:target],
-              :records => []
-            }
+            axfr[:a].each do |name, record|
+              records[record[:target]] ||= {
+                :target  => record[:target],
+                :records => []
+              }
 
-            records[record[:target]][:records] << record
-          end
+              records[record[:target]][:records] << record
+            end
 
-          [:cname, :txt, :srv].each do |type|
-            (axfr[type] || []).each do |name, record|
-              a_record = get_a_record(name, type, axfr)
+            [:cname, :txt, :srv].each do |type|
+              (axfr[type] || []).each do |name, record|
+                a_record = get_a_record(name, type, axfr)
 
-              if not a_record.nil?
-                records[a_record[:target]][:records] << record
+                if not a_record.nil?
+                  records[a_record[:target]][:records] << record
+                end
+              end
+            end
+
+            records.each do |ip, node|
+              next if ip =~ /^127\.0\./
+              nodes = Asset.urlquery("ip|network.ip/^#{ip}$").to_a
+
+              nodes.each do |node|
+                node.properties.set(:dns, node[:records])
+                node.save()
               end
             end
           end
-
-          records.each do |ip, node|
-            next if ip =~ /^127\.0\./
-            devices = Asset.urlsearch("ip|network.ip/^#{ip}$").to_a
-
-            devices.each do |device|
-              device.properties.set(:dns, node[:records])
-              device.safe_save
-            end
-          end
-
-          return nil
         end
 
       private
-        def get_a_record(name, type, records)
+        def self.get_a_record(name, type, records)
           if not records[type][name].nil?
             return get_a_record(records[type][name][:target], type, records)
           end

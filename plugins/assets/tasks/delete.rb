@@ -3,40 +3,38 @@ require 'assets/models/asset'
 module Automation
   module Tasks
     module Assets
-      class Delete < Base
-        def run(request)
-          rv = []
+      class Delete < Task
+        def self.perform(ids, type=:list)
           nodes = []
 
-          if opt(:query)
-            nodes += Asset.urlsearch(opt(:query)).to_a if opt(:query)
-            log("Deleting #{nodes.length} nodes from query: #{opt(:query)}", :info)
+          case type.to_sym
+          when :query
+            [*type].each do |query|
+              nodes += Asset.urlsearch(query)
+            end
 
-          elsif opt(:nodes)
-            n = opt(:nodes).split(/[\,\;\:\|]/)
-            nodes += Asset.find([*n]).to_a
-            log("Deleting #{nodes.length} nodes explicitly named by ID", :info)
+            abort("No nodes matched query #{[*type].join(', ')}") if nodes.empty?
+
+          when :list
+            nodes = Asset.find([*ids])
+            abort("No nodes found") if nodes.empty?
+
+          else
+            fail("Unknown input type #{type}")
           end
 
-          raise abort("No nodes specified") if nodes.empty?
+          info("Deleting #{nodes.length} nodes: #{nodes.length <= 5 ? nodes.collect{|i| i.id }.join(', ') : nodes[0..4].collect{|i| i.id }.join(', ')+'...'}")
 
           nodes.each do |node|
+            id = node.id
+
             begin
-              id = node.id
               node.destroy()
-              rv << id
-
             rescue Exception => e
-              log("Error deleting node #{node.id}: #{e.class.name} - #{e.message}", :error)
-              e.backtrace.each do |b|
-                log("  #{b}", :debug)
-              end
-
+              warn("Error destroying node #{id}: #{e.message}", e.class.name)
               next
             end
           end
-
-          return rv
         end
       end
     end

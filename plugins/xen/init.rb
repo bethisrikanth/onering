@@ -1,5 +1,4 @@
 require 'controller'
-require 'automation/models/job'
 
 module App
   class Base < Controller
