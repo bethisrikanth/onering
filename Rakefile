@@ -46,13 +46,15 @@ end
 
 namespace :server do
   desc "Starts a local development server"
-  task :start => ['launch:prep'] do
+  task :start, :port, :env do |t, args|
+    port = Integer(args[:port] || 9393)
+    env  = (args[:env] || 'development')
+
     conf = File.expand_path('config.ru', File.dirname(__FILE__))
 
-    puts ""
-    puts "Starting server".foreground(:green)
-    puts ("="*80).foreground(:green)
-    exec("bundle exec thin -e production -R #{conf} --debug -p 9393 start")
+    Onering::Logger.info("Starting #{env} server on port #{port}")
+    Onering::Logger.info("="*80)
+    exec("bundle exec thin -e #{env} -R #{conf} --debug -p #{port} start")
   end
 end
 
