@@ -24,7 +24,10 @@ namespace :launch do
 
     puts "Generating static assets...".foreground(:blue)
     system("./bin/regen-assets.sh")
+  end
 
+  desc "Generate a local copy of the Onering documentation"
+  task :docs do 
   # generate doc site
     puts "Generating documentation at /docs...".foreground(:blue)
 
