@@ -12,7 +12,11 @@ module Automation
             node = Asset.new()
           else
             if sync === true
-              node.save()
+              node.save({
+                :reload => false
+              },{
+                :refresh => false
+              })
               return true
             end
           end
@@ -61,7 +65,11 @@ module Automation
           node.from_hash(inventory)
 
         # save
-          if node.save()
+          if node.save({
+            :reload => false
+          },{
+            :refresh => false
+          })
             info("Saved node #{node.id}")
           else
             error("Failed to save #{node.id}")

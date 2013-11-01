@@ -156,7 +156,11 @@ module Automation
               node = Asset.urlquery("name/#{name}")
               next unless node
               node.properties.set(:glu, nil)
-              node.save() rescue next
+              node.save({
+                :reload => false
+              },{
+                :refresh => false
+              }) rescue next
             end
           end
 
