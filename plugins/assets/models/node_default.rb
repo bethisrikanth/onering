@@ -33,12 +33,51 @@ class NodeDefault < App::Model::Elasticsearch
       query << (m['test'].nil? ? '' : m['test']+':')+m['value'] if m['value']
     }
 
-    Asset.urlquery(query.join('/'))
+    Asset.ids(query.join('/'))
+  end
+
+  def asset_matches?(node)
+    self.match.each do |m|
+      m = m.symbolize_keys()
+
+    # get the candidate value, return false if not found
+      value = node.get(m[:field])
+
+    # convert type if necessary
+      if m[:type].nil?
+        value = value.to_s.autotype()
+        m[:value] = m[:value].to_s.autotype()
+      else
+        value = value.to_s.convert_to(m[:type])
+        m[:value] = m[:value].to_s.convert_to(m[:type])
+      end
+
+      case m[:test].to_s
+      when 'lt', 'before'
+        return false if value.nil?
+        return false if not value < m[:value]
+      when 'lte'
+        return false if value.nil?
+        return false if not value <= m[:value]
+      when 'gt'
+        return false if value.nil?
+        return false if not value > m[:value]
+      when 'gte', 'since'
+        return false if value.nil?
+        return false if not value >= m[:value]
+      when 'not'
+        return false if value == m[:value]
+      else
+        return false if not value == m[:value]
+      end
+    end
+
+    return true
   end
 
   class<<self
   # return all defaults that apply to the given device
-    def defaults_for(device)
+    def defaults_for(node)
       rv = []
 
       NodeDefault.search({
@@ -48,7 +87,7 @@ class NodeDefault < App::Model::Elasticsearch
           }
         }
       }).each do |default|
-        if (default.devices("str:id/#{device.id}").first.id rescue nil) == device.id
+        if default.asset_matches?(node)
           rv << default
           next
         end
