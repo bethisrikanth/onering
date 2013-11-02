@@ -17,7 +17,7 @@ module Automation
             info("Resyncing #{nodes.length} nodes with rule: #{default.name}")
 
           # add IDs to a set to ensure they only get synced once
-            ids += nodes.collect{|i| i.id }
+            ids += nodes
           end
 
           if ids.empty?
