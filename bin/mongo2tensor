@@ -8,8 +8,14 @@ require 'oj'
 require 'multi_json'
 require './lib/app'
 
+i = 0
 
 STDIN.read.lines.each do |line|
+  if ARGV[0] and i >= ARGV[0].to_i
+    STDERR.puts("Hit #{ARGV[0]} results, stopping")
+    exit 1
+  end
+
   next if line[0].chr == '#'
   next if line.strip.chomp.empty?
 
@@ -76,4 +82,6 @@ STDIN.read.lines.each do |line|
     pp e
     next
   end
+
+  i += 1
 end

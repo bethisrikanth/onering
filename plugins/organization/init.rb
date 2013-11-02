@@ -10,13 +10,13 @@ module App
         end
 
         get '/find/:field/:query' do
-          Contact.search({
-            params[:field] => Regexp.new(params[:query], Regexp::IGNORECASE)
-          }).collect{|i| i.to_h }.to_json rescue 404
+          output(Contact.urlquery([params[:field], params[:query]].join('/')).collect{|i|
+            i.to_hash()
+          })
         end
 
         get '/:id' do
-          Contact.find(params[:id]).to_json rescue 404
+          output(Contact.find(params[:id]))
         end
       end
     end

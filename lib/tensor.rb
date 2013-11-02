@@ -200,7 +200,11 @@ module Tensor
 
       # unless otherwise specified, make another query to retrieve the object we just saved and update our data
         unless options[:reload] === false
-          self.from_hash(self.class.find(self.id).to_hash())
+          begin
+            self.from_hash(self.class.find(self.id).to_hash())
+          rescue Exception
+            return false
+          end
         end
       end
 
@@ -324,7 +328,13 @@ module Tensor
 
     # register the key definition
       @_fields[name] = {
-        :type => type.to_s.downcase.to_sym
+        :type  => type.to_s.downcase.to_sym,
+        :index => case type.to_s.downcase.to_sym
+        when :boolean
+          :not_analyzed
+        else
+          :analyzed
+        end
       }.merge(options)
 
     # define getter
@@ -630,16 +640,22 @@ module Tensor
     # synchronize the automatic and explicit mapping on this model with elasticsearch
     def self.sync_schema(options={})
     # create the index if it doesn't exist
-      unless connection().indices.exists({
-        :index => index_name()
+      unless connection().indices.exists_alias({
+        :name => index_name()
       })
-        connection().indices.create({
-          :index => index_name(),
-          :body  => {
-            :settings => settings()
-          }
+        alias_index({
+          :index => index_name()
         })
       end
+
+      # straight non-aliased index creation
+      #
+      # connection().indices.create({
+      #   :index => index_name(),
+      #   :body  => {
+      #     :settings => settings()
+      #   }
+      # })
 
     # update mappings
       connection().indices.put_mapping({
@@ -648,6 +664,182 @@ module Tensor
         :body  => {
           document_type() => mappings()
         }
+      })
+    end
+
+   def self.alias_index(options={})
+    # aliased indices
+      options[:index] ||= index_name()
+      index = (options[:new_index] || options[:index]+'-'+(options[:seed] || ((get_indices(options[:index]).last.split('-',2).last.to_i+1) rescue 1)).to_s)
+
+      unless options[:create] === false
+        connection().indices.create({
+          :index => index,
+          :body  => {
+            :settings => settings()
+          }
+        })
+      end
+
+      unless options[:swap] === false
+      # perform an atomic swap ensuring that the new index is the only index
+      # that the alias refers to
+        connection().indices.update_aliases({
+          :body => {
+            :actions => (((connection().indices.get_aliases({
+              :index => options[:index]
+            }).keys rescue []) - [index]).collect{|i|
+              {
+                :remove => {
+                  :index => i,
+                  :alias => options[:index]
+                }
+              }
+            })+[{
+              :add => {
+                :index => index,
+                :alias => options[:index]
+              }
+            }]
+          }
+        })
+      end
+
+      return index
+    end
+
+    def self.get_indices(prefix=nil)
+      connection().indices.stats['indices'].keys.select{|i|
+        i =~ Regexp.new("^#{prefix || index_name()}-[0-9]+")
+      }.sort()
+    end
+
+    def self.get_real_index(index=nil)
+      connection().indices.get_aliases({
+        :index => (index || index_name())
+      }).keys.sort.reverse
+    end
+
+    def self.reindex(index=nil)
+      index ||= index_name()
+
+    # save the current referenced indices
+      indices_to_close = get_real_index(index)
+
+    # create the new "real" index, but don't swap the aliases yet
+      new_index = alias_index({
+        :index => index,
+        :swap  => false
+      })
+
+    # copy all records from the current index to the new index
+      status = copy_index(index, new_index)
+      raise "Index data copy failed, leaving alias #{index_name()}->#{indices_to_close.join(',')} intact" unless status['ok'] === true
+
+    # atomically swap the indicies
+      alias_index({
+        :index     => index,
+        :create    => false,
+        :new_index => new_index
+      })
+
+    # close the old indices
+      unless options[:autoclose] === false
+        indices_to_close.each do |i|
+          connection().indices.close({
+            :index => i
+          })
+        end
+      end
+
+      return new_index
+    end
+
+    def self.copy_index(source_index, dest_index, options={})
+    # default is to copy everything
+      options[:query] ||= {
+        :filter => {
+          :match_all => {}
+        }
+      }
+
+    # ensure source index exists first
+      return false unless connection().indices.exists({
+        :index => source_index
+      })
+
+    # create dest index if it does not exist
+      dest_exists = connection().indices.exists({
+        :index => dest_index
+      })
+
+      if not dest_exists or dest_exists and options[:delete_if_exists] === true
+        if dest_exists
+          connection().indices.delete({
+            :index => dest_index,
+          })
+        end
+
+        connection().indices.create({
+          :index => dest_index,
+          :body  => {
+            :settings => (connection().indices.get_settings({
+              :index => source_index
+            }).first.last['settings'] rescue nil),
+
+            :mappings => (connection().indices.get_mapping({
+              :index => source_index
+            }).first.last rescue nil)
+
+          }.reject{|k,v|
+            v.nil?
+          }
+        })
+      end
+
+    # perform the search
+      scroll = connection().search({
+        :index       => source_index,
+        :scroll      => '5m',
+        :size        => 500,
+        :search_type => :scan,
+        :body        => options[:query]
+      })
+
+      scroll_id = scroll['_scroll_id']
+
+      if scroll_id
+        hits = scroll.get('hits.total',0)
+
+        loop do
+          results = connection().scroll({
+            :scroll    => '5m',
+            :scroll_id => scroll_id
+          })
+
+          break if results.get('hits.hits',[]).empty?
+
+        # update scroll id from latest results
+          scroll_id = results.get('_scroll_id')
+
+          connection().bulk({
+            :refresh => true,
+            :body    => results.get('hits.hits').collect{|data|
+              {
+                :index => {
+                  :_index => dest_index,
+                  :_id    => data['_id'],
+                  :_type  => data['_type'],
+                  :data   => data['_source']
+                }
+              }
+            }
+          })
+        end
+      end
+
+      connection().indices.stats({
+        :index => dest_index
       })
     end
 

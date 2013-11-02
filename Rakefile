@@ -27,7 +27,7 @@ namespace :launch do
   end
 
   desc "Generate a local copy of the Onering documentation"
-  task :docs do 
+  task :docs do
   # generate doc site
     puts "Generating documentation at /docs...".foreground(:blue)
 
@@ -102,9 +102,12 @@ namespace :db do
           :type  => model.document_type()
         })
 
-        model.connection.indices.delete({
-          :index => model.index_name()
-        })
+        model.get_indices().each do |i|
+          puts "-> Removing index #{i}"
+          model.connection.indices.delete({
+            :index => i
+          })
+        end
       rescue
         nil
       end

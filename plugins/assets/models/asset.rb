@@ -62,6 +62,7 @@ class Asset < App::Model::Elasticsearch
             :fields => {
               "{name}" => {
                 :type   => :date,
+                :store  => true,
                 :index  => :analyzed,
                 :format => %w{
                   date_hour_minute_second_millis
@@ -74,10 +75,20 @@ class Asset < App::Model::Elasticsearch
           }
         }
       },{
-        :store_generic => {
-          :match   => "*",
+        :unanalyzable => {
+          :match   => '*',
+          :match_mapping_type => :boolean,
           :mapping => {
-            :store           => true
+            :store => true,
+            :index => :not_analyzed
+          }
+        }
+      },{
+        :store_generic => {
+          :match   => '*',
+          :mapping => {
+            :store  => true,
+            :index  => :analyzed
           }
         }
       }]
