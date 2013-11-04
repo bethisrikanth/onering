@@ -627,10 +627,8 @@ module Tensor
     def self.settings(definition=nil, &block)
       if block_given?
         @_settings ||= yield
-        sync_schema()
       elsif not definition.nil?
         @_settings ||= definition
-        sync_schema()
       end
 
       return @_settings
@@ -968,7 +966,7 @@ module Tensor
 
     def self._generate_mapping(options={})
       mapping = {
-        (options[:type] || document_type()) => DEFAULT_MAPPING.deep_clone.deeper_merge({
+        (options[:type] || document_type()).to_s => DEFAULT_MAPPING.deep_clone.deeper_merge({
           'properties' => Hash[fields().collect{|name, definition|
             definition = definition.stringify_keys()
 
@@ -999,7 +997,7 @@ module Tensor
 
       (connection().indices.get_mapping({
         :index => index_name()
-      }) || {}).get(index_name(),{}).deeper_merge!(mapping)
+      }) || {}).get(get_real_index(),{}).deeper_merge!(mapping)
     end
   end
 end

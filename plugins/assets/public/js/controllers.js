@@ -200,6 +200,9 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   $scope.opt = {
     ping:              null,
     diskTab:           'block',
+    tabs:              {
+      disk: []
+    },
     netTab:            'interfaces',
     graphsFrom:        '-6hours',
     dns_sort:          ['type', 'name'],
@@ -287,6 +290,58 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
         if($scope.node && $scope.node.parent_id){
           $http.get('/api/devices/'+$routeParams.id+'/parent?only=site').success(function(data){
             $scope.node.parent = data[0];
+          });
+        }
+
+    //  populate disk tabs
+
+    //  Block devices
+        $scope.opt.tabs.disk = [];
+
+        if(angular.isDefined($scope.node.properties.metrics.disk.block)){
+          $scope.opt.tabs.disk.push({
+            title:    'Devices',
+            template: 'views/panes/node-pane-system-disk-block.html'
+          });
+        }
+
+    //  Mounts
+        if(angular.isDefined($scope.node.properties.metrics.disk.mounts)){
+          $scope.opt.tabs.disk.push({
+            title:    'Mounts',
+            template: 'views/panes/node-pane-system-disk-mounts.html'
+          });
+        }
+
+    //  LVM
+        if(angular.isDefined($scope.node.properties.metrics.disk.lvm.group)){
+          $scope.opt.tabs.disk.push({
+            title:    'LVM',
+            template: 'views/panes/node-pane-system-disk-lvm.html'
+          });
+        }
+
+    //  ZFS
+        if(angular.isDefined($scope.node.properties.metrics.zfs)){
+          $scope.opt.tabs.disk.push({
+            title:    'ZFS',
+            template: 'views/panes/node-pane-system-disk-zfs.html'
+          });
+        }
+
+    //  MDRAID
+        if(angular.isDefined($scope.node.properties.metrics.disk.mdraid)){
+          $scope.opt.tabs.disk.push({
+            title:    'MDRAID',
+            template: 'views/panes/node-pane-system-disk-mdraid.html'
+          });
+        }
+
+    //  Virident
+        if(angular.isDefined($scope.node.properties.metrics.virident)){
+          $scope.opt.tabs.disk.push({
+            title:    'Virident',
+            template: 'views/panes/node-pane-system-disk-virident.html'
           });
         }
       });

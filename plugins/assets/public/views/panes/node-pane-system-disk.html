@@ -2,26 +2,8 @@
 
 <div class="widget-content">
   <tabset type="'pills'">
-    <tab heading="Devices">
-      <div ng-include="'views/panes/node-pane-system-disk-block.html'"></div>
-    </tab>
-
-    <tab heading="Mounts">
-      <div ng-include="'views/panes/node-pane-system-disk-mounts.html'"></div>
-    </tab>
-
-    <tab heading="LVM">
-      <div ng-include="'views/panes/node-pane-system-disk-lvm.html'"></div>
-    </tab>
-
-    <tab heading="ZFS">
-      <div ng-include="'views/panes/node-pane-system-disk-zfs.html'"></div>
-    </tab>
-
-    <tab heading="MDRaid"></tab>
-
-    <tab heading="Virident">
-      <div ng-include="'views/panes/node-pane-system-disk-virident.html'"></div>
+    <tab ng-repeat="tab in opt.tabs.disk" heading="{{ tab.title }}">
+      <div ng-include="tab.template"></div>
     </tab>
   </tabset>
 </div>

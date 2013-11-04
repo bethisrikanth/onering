@@ -198,7 +198,10 @@ module App
           return 404 if id.nil?
           user = User.find(id)
           return 404 unless user
-          output(user.to_hash)
+          output(user.to_hash().merge({
+            :groups       => user.groups(),
+            :capabilities => user.capabilities()
+          }))
         end
 
       # update user

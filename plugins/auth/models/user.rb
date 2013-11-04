@@ -12,7 +12,6 @@ class User < App::Model::Elasticsearch
   field :created_at,   :date,    :default => Time.now
   field :updated_at,   :date,    :default => Time.now
 
-
   def groups
     Group.urlquery("users/#{self.id}").collect{|i| i.id } rescue []
   end

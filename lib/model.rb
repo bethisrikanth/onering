@@ -173,8 +173,9 @@ module App
           return self.search(query, tensor_options)
         end
 
-        def ids(urlquery)
-          document_ids(self.to_elasticsearch_query(urlquery))
+        def ids(urlquery=nil)
+          urlquery = self.to_elasticsearch_query(urlquery) unless urlquery.nil?
+          document_ids(urlquery)
         end
 
       # summarize
@@ -247,37 +248,44 @@ module App
         def list(field, query=nil)
           field = [*field]
 
-          summary = summarize(field.first, field[1..-1].reverse(), query, {
-            :limit => 10000
-          })
+        # yes, this is an edge case
+        # no, I don't like it.
+          if field.first == 'id'
+            self.ids(query)
 
-          if field.length == 1
-            return summary.collect{|i| i[:id] }.compact
           else
-            def get_ids(facets, rollup=nil)
-              rv = []
+            summary = summarize(field.first, field[1..-1].reverse(), query, {
+              :limit => 10000
+            })
 
-              facets.each do |facet|
+            if field.length == 1
+              return summary.collect{|i| i[:id] }.compact
+            else
+              def get_ids(facets, rollup=nil)
+                rv = []
 
-                if facet[:children].is_a?(Array)
-                  if rollup.nil?
-                    rv += get_ids(facet[:children], [facet[:id]])
+                facets.each do |facet|
+
+                  if facet[:children].is_a?(Array)
+                    if rollup.nil?
+                      rv += get_ids(facet[:children], [facet[:id]])
+                    else
+                      rv += get_ids(facet[:children], rollup.product([facet[:id]]))
+                    end
                   else
-                    rv += get_ids(facet[:children], rollup.product([facet[:id]]))
-                  end
-                else
-                  if rollup.nil?
-                    rv << [facet[:id]]
-                  else
-                    rv << rollup.product([facet[:id]])
+                    if rollup.nil?
+                      rv << [facet[:id]]
+                    else
+                      rv << rollup.product([facet[:id]])
+                    end
                   end
                 end
+
+                return rv
               end
 
-              return rv
+              return get_ids(summary).map(&:flatten)
             end
-
-            return get_ids(summary).map(&:flatten)
           end
         end
 
