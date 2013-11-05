@@ -715,9 +715,13 @@ module Tensor
     end
 
     def self.get_real_index(index=nil)
-      connection().indices.get_aliases({
-        :index => (index || index_name())
-      }).keys.sort.reverse
+      begin
+        connection().indices.get_aliases({
+          :index => (index || index_name())
+        }).keys.sort.reverse
+      rescue Elasticsearch::Transport::Transport::Errors::NotFound
+        return []
+      end
     end
 
     def self.reindex(index=nil)
@@ -997,9 +1001,13 @@ module Tensor
         })
       }
 
-      (connection().indices.get_mapping({
-        :index => index_name()
-      }) rescue {}).get(get_real_index(),{}).deeper_merge!(mapping)
+      begin
+        return connection().indices.get_mapping({
+          :index => index_name()
+        }).get(get_real_index().first,{}).deeper_merge!(mapping)
+      rescue Elasticsearch::Transport::Transport::Errors::NotFound
+        return mapping
+      end
     end
   end
 end
