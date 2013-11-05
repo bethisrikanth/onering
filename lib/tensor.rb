@@ -404,7 +404,7 @@ module Tensor
     #
     def self.search(body, options={}, es_options={})
       begin
-        search!(body, options)
+        search!(body, options, es_options)
       rescue Elasticsearch::Transport::Transport::Errors::NotFound
         return []
       end
@@ -478,7 +478,9 @@ module Tensor
         :query => {
           :match_all => {}
         }
-      }, options)
+      }, options, {
+        :type => document_type()
+      })
     end
 
     # create and immediately save a record

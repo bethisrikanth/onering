@@ -77,7 +77,7 @@ function UserManagerController($scope, $http, $modal, User, UserType, UserList, 
 
 
   $scope.reloadUsers = function(){
-    UserList.query({}, function(data){
+    $http.get('/api/users/list').success(function(data){
       $scope.users = data;
     });
 
