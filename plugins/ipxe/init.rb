@@ -18,7 +18,7 @@ module App
         end
 
         liquid "ipxe/boot".to_sym, :locals => {
-          :device => (device.to_h rescue nil),
+          :device => (device.to_hash() rescue nil),
           :config => Config.get('provisioning.boot')
         }
       end
