@@ -11,10 +11,10 @@ module App
           device = Asset.find(params[:id])
         elsif params[:mac] and not params[:mac].empty?
         # TODO: order by collected_at DESC
-          device = Asset.urlsearch("mac|network.interfaces.mac/#{params[:mac]}").to_a.first
+          device = Asset.urlquery("mac|network.interfaces.mac/#{params[:mac]}").to_a.first
         elsif params[:uuid] and not params[:uuid].empty?
         # TODO: order by collected_at DESC
-          device = Asset.urlsearch("uuid/#{params[:uuid]}").to_a.first
+          device = Asset.urlquery("uuid/#{params[:uuid]}").to_a.first
         end
 
         liquid "ipxe/boot".to_sym, :locals => {
