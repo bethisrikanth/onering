@@ -999,7 +999,7 @@ module Tensor
 
       (connection().indices.get_mapping({
         :index => index_name()
-      }) || {}).get(get_real_index(),{}).deeper_merge!(mapping)
+      }) rescue {}).get(get_real_index(),{}).deeper_merge!(mapping)
     end
   end
 end
