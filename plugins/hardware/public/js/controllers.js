@@ -1,4 +1,6 @@
 function HardwareSitesController($scope, $http){
+  $scope.site = null;
+  $scope.rack = null;
   $scope.opt = {
     view:        'rear',
     loading:      true,
@@ -6,7 +8,6 @@ function HardwareSitesController($scope, $http){
     sites:        {}
   };
 
-  $scope.racks = {};
 
   $scope.reload = function(){
     $scope.opt.loading = true;
@@ -19,6 +20,10 @@ function HardwareSitesController($scope, $http){
           contact_pane: 'facility'
         }
       });
+
+      if($scope.site != null){
+        $scope.loadSite($scope.site);
+      }
     });
 
     $http.get('/api/org/contacts/find/tags/datacenter').success(function(data){
@@ -26,14 +31,31 @@ function HardwareSitesController($scope, $http){
     });
   }
 
-  $scope.$watch('sites', function(){
-    angular.forEach($scope.sites, function(i){
-      $http.get('/api/hardware/rack/'+i.id).success(function(data){
-        $scope.racks[i.id] = data;
-        $scope.opt.loading = false;
-      });
+  $scope.loadSite = function(site){
+    console.log("Loading Site", site)
+
+    $scope.site = site;
+    $scope.rack = $scope.loadRack(site, site.racks[0]);
+    $scope.opt.loading = false;
+  };
+
+  $scope.loadRack = function(site, rack){
+    console.log("Loading Rack", site.id, rack);
+
+    $http.get('/api/hardware/rack/'+site.id+'/'+rack).success(function(data){
+      $scope.rack = data;
     });
-  });
+  }
+
+  $scope.hideEmptyUnits = function(unit){
+    if($scope.opt.hideEmpty === true){
+      if(angular.isUndefined(unit.nodes) || unit.nodes.length == 0){
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   $scope.reload();
 }

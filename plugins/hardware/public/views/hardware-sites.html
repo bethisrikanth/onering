@@ -1,25 +1,17 @@
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span12">
+    <div class="span4">
       <h1>Datacenters</h1>
       <button class="btn btn-success pull-right" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
       <br />
       <br />
 
       <tabset>
-        <tab ng-repeat="site in sites | orderBy:0" heading="{{ site.id | uppercase }}">
+        <tab ng-repeat="site in sites | orderBy:0" heading="{{ site.id | uppercase }}" select="loadSite(site)">
           <div class="container-fluid widget-pane">
             <div class="row-fluid">
-              <div class="span4">
-                <div class="widget-title">Site Overview</div>
-
-                <div class="widget-content">
-                  overview
-                </div>
-              </div>
-
-              <div class="span4">
+              <div class="span12">
                 <div class="widget-title">
                   Contact Information
 
@@ -69,105 +61,21 @@
                 </div>
               </div>
 
-              <div class="span4">
-                <div class="widget-title">Services</div>
+<!--               <div class="span12">
+                <div class="widget-title">Site Overview</div>
 
                 <div class="widget-content">
                   overview
                 </div>
               </div>
-            </div>
-          </div>
 
-          <h2>Racks<span ng-show="racks[site.id].length"> &ndash; {{ racks[site.id].length }}</span></h2>
+              <div class="span12">
+                <div class="widget-title">Services</div>
 
-          <div ng-hide="opt.loading">
-            <div>
-              <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site,vendor:{}}"><i class="icon-plus"> </i> Add Rack</button>
-              <button class="btn" ng-show="opt.view=='front'" ng-click="opt.view='rear'"><i class="icon-chevron-right"> </i> Front View</button>
-              <button class="btn" ng-hide="opt.view=='front'" ng-click="opt.view='front'"><i class="icon-chevron-left"> </i>Rear View</button>
-              <br />
-              <br />
-            </div>
-
-            <div class="container-fluid widget-pane" ng-hide="racks[site.id].length == 0">
-              <div class="row-fluid">
-                <div class="span3 rack" ng-repeat="rack in racks[site.id] | orderBy:'name'">
-                  <div class="widget-title">
-                    {{ rack.name }}<span ng-show="opt.view"> [{{ opt.view | uppercase }}]</span>
-                    <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
-
-                    <span class="pull-right">
-                      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                      <span class="select label label-info" title="Edit this rack" ng-click="editRack=rack">
-                        <i class="icon-pencil"> </i>
-                      </span>
-
-                      <span class="select label label-important" title="Delete this rack definition" rest="/api/hardware/rack/{{site.id}}/{{rack.name}}" rest-method="delete" rest-success="reload()">
-                        <i class="icon-remove"> </i>
-                      </span>
-                    </span>
-                  </div>
-
-                  <table style="width:100%">
-                    <tbody ng-repeat="unit in rack.units" class="unit" ng-click="opt.current_unit={site:site,rack:rack,unit:unit}">
-                      <tr ng-repeat="u in unit.unit" ng-switch on="$index">
-                        <td class="gutter">{{ u }}</td>
-                        <td class="info {{ unit.nodes &amp;&amp; 'occupied' || 'empty' }}" ng-switch-when="0" rowspan="{{ unit.height }}">
-                          <div class="name">
-                            {{ unit.make }} {{ unit.model }}
-                          </div>
-
-                          <div width="100%" ng-show="unit.nodes">
-                            <div
-                              ng-show="unit.physical.layout.slots.order[opt.view || 'default']"
-                              class="
-                                slot
-                                {{ ((($index+1) % (unit.physical.layout.slots.count / unit.physical.layout.slots.rows)) == 0) &amp;&amp; 'endcap' }}
-                                {{ ($index < unit.physical.layout.slots.columns) &amp;&amp; 'toprow' }}
-                              "
-                              style="width: {{ 95.0 / unit.physical.layout.slots.columns }}%"
-                              ng-repeat="slot in unit.physical.layout.slots.order[opt.view || 'default']"
-                            >
-                              <!-- physical info present, non-empty -->
-                              <span class="status" ng-hide="unit.nodes[slot-1].empty">
-                                <label class="label label-{{ unit.nodes[slot-1].status || 'unknown' }}">{{ slot || '1' }}</label>
-                              </span>
-
-                              <!-- physical info present, empty -->
-                              <span class="status" ng-show="unit.nodes[slot-1].empty">
-                                <label class="label label-inverse">{{ slot || '1' }}</label>
-                              </span>
-
-
-                              <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
-                            </div>
-
-                            <span
-                              ng-hide="unit.physical.layout.slots.order[opt.view || 'default']"
-                              style="width: 95%"
-                              ng-repeat="node in unit.nodes"
-                            >
-                              <!-- physical info absent, non-empty -->
-                              <span class="status">
-                                <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '1' }}</label>
-                              </span>
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="widget-content">
+                  overview
                 </div>
-              </div>
-            </div>
-
-            <div class="center" ng-show="racks[site.id].length == 0">
-              <h2>No racks defined</h2>
-              <br />
-              <p>
-                Click the <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site}"><i class="icon-plus"> </i> Add Rack</button> button to create a new rack definition.
-              </p>
+              </div> -->
             </div>
           </div>
 
@@ -230,6 +138,108 @@
 
         </tab>
       </tabset>
+    </div>
+
+    <div class="span6">
+      <h2>{{ site.id | uppercase }} &ndash; {{ site.racks.length }} Racks<span ng-show="site.racks.length"></span></h2>
+
+      <div ng-hide="opt.loading">
+        <div class="pagination">
+          <ul>
+            <li ng-repeat="r in site.racks" ng-class="{ active: (r==rack.name) }" ng-click="loadRack(site, r)">
+              <a>{{ r }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site,vendor:{}}"><i class="icon-plus"> </i> Add Rack</button>
+          <button class="btn" ng-show="opt.view=='front'" ng-click="opt.view='rear'"><i class="icon-chevron-left"> </i> Rear View</button>
+          <button class="btn" ng-hide="opt.view=='front'" ng-click="opt.view='front'"><i class="icon-chevron-right"> </i>Front View</button>
+          <br />
+          <br />
+        </div>
+
+        <div class="container-fluid widget-pane" ng-show="rack">
+          <div class="row-fluid">
+            <div class="span8 rack">
+              <div class="widget-title">
+                {{ rack.name }}<span ng-show="opt.view"> [{{ opt.view | uppercase }}]</span>
+                <span ng-show="rack.description">&ndash; {{ rack.description }}</span>
+
+                <span class="pull-right">
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  <span class="select label label-info" title="Edit this rack" ng-click="editRack=rack">
+                    <i class="icon-pencil"> </i>
+                  </span>
+
+                  <span class="select label label-important" title="Delete this rack definition" rest="/api/hardware/rack/{{site.id}}/{{rack.name}}" rest-method="delete" rest-success="reload()">
+                    <i class="icon-remove"> </i>
+                  </span>
+                </span>
+              </div>
+
+              <table style="width:100%">
+                <tbody ng-repeat="unit in rack.units | filter:hideEmptyUnits" class="unit" ng-click="opt.current_unit={site:site,rack:rack,unit:unit}">
+                  <tr ng-repeat="u in unit.unit" ng-switch on="$index">
+                    <td class="gutter">{{ u }}</td>
+                    <td class="info {{ unit.nodes &amp;&amp; 'occupied' || 'empty' }}" ng-switch-when="0" rowspan="{{ unit.height }}">
+                      <div class="name">
+                        {{ unit.make }} {{ unit.model }}
+                      </div>
+
+                      <div width="100%" ng-show="unit.nodes">
+                        <div
+                          ng-show="unit.physical.layout.slots.order[opt.view || 'default']"
+                          class="
+                            slot
+                            {{ ((($index+1) % (unit.physical.layout.slots.count / unit.physical.layout.slots.rows)) == 0) &amp;&amp; 'endcap' }}
+                            {{ ($index < unit.physical.layout.slots.columns) &amp;&amp; 'toprow' }}
+                          "
+                          style="width: {{ 95.0 / unit.physical.layout.slots.columns }}%"
+                          ng-repeat="slot in unit.physical.layout.slots.order[opt.view || 'default']"
+                        >
+                          <!-- physical info present, non-empty -->
+                          <span class="status" ng-hide="unit.nodes[slot-1].empty">
+                            <label class="label label-{{ unit.nodes[slot-1].status || 'unknown' }}">{{ slot || '1' }}</label>
+                          </span>
+
+                          <!-- physical info present, empty -->
+                          <span class="status" ng-show="unit.nodes[slot-1].empty">
+                            <label class="label label-inverse">{{ slot || '1' }}</label>
+                          </span>
+
+
+                          <br ng-show="(($index+1) % unit.physical.layout.slots.rows) == 0">
+                        </div>
+
+                        <span
+                          ng-hide="unit.physical.layout.slots.order[opt.view || 'default']"
+                          style="width: 95%"
+                          ng-repeat="node in unit.nodes"
+                        >
+                          <!-- physical info absent, non-empty -->
+                          <span class="status">
+                            <label class="label label-{{ node.status || 'unknown' }}">{{ node.properties.slot || '1' }}</label>
+                          </span>
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="center" ng-show="racks.length == 0">
+          <h2>No racks defined</h2>
+          <br />
+          <p>
+            Click the <button class="btn" ng-disabled="editRack" ng-click="editRack={site:site}"><i class="icon-plus"> </i> Add Rack</button> button to create a new rack definition.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

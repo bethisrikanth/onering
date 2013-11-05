@@ -87,10 +87,10 @@ module Hardware
     end
 
     def serializable_hash(options = {})
-      contact_id = self.vendor.get('contact_id')
-      contact = Contact.find(contact_id).to_hash if contact_id
+      contact_id = (self.vendor || {}).get('contact_id')
+      contact = Contact.find(contact_id).to_hash() if contact_id
 
-      super(options).deep_merge!({
+      to_hash().deep_merge!({
         'units' => self.units(),
         'vendor' => {
           'contact' => contact
