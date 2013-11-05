@@ -23,7 +23,12 @@ App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}
 # require plugins
 Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
   name = File.basename(p)
-  require "#{name}/init"
+
+  begin
+    require "#{name}/init"
+  rescue LoadError
+    next
+  end
 end
 
 
