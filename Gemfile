@@ -42,3 +42,4 @@ when /^1\.8/
 else
   gem "rpam-ruby19"
 end
+
