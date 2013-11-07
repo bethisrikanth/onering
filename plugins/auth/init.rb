@@ -302,7 +302,9 @@ module App
 
         # this is also where pre-validated devices go to retrieve their API key
           if @bootstrapUser === true and not id === 'current'
-            DeviceUser.find(id) || DeviceUser.create({
+            machine_klass = Config.get('global.authentication.machine_user_type', 'DeviceUser').constantize()
+
+            machine_klass.find(id) || machine_klass.create({
               :id => id
             })
           end
@@ -313,7 +315,7 @@ module App
           user = User.find(id)
           return 404 unless user
 
-          if not user.client_keys[params[:name]]
+          if not user.get("client_keys.#{params[:name]}")
             keyfile = Config.get!('global.authentication.methods.ssl.ca.key')
             crtfile = Config.get!('global.authentication.methods.ssl.ca.cert')
             client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
@@ -353,11 +355,11 @@ module App
             client_cert.sign(key, OpenSSL::Digest::SHA256.new)
 
           # save this key
-            user.client_keys[params[:name]] = {
+            user.set("client_keys.#{params[:name]}", {
               :name       => params[:name],
               :public_key => client_cert.to_pem,
               :created_at => Time.now
-            }
+            })
 
             user.save()
 
@@ -386,7 +388,7 @@ module App
 
           user = User.find(id)
           return 404 unless user
-          return 404 unless user.client_keys.keys.include?(params[:name])
+          return 404 unless user.get(:client_keys,{}).keys.include?(params[:name])
 
           user.client_keys.delete(params[:name])
           user.save()
