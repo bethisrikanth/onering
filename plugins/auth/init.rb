@@ -302,7 +302,9 @@ module App
 
         # this is also where pre-validated devices go to retrieve their API key
           if @bootstrapUser === true and not id === 'current'
-            DeviceUser.find_or_create(id, {})
+            DeviceUser.find(id) || DeviceUser.create({
+              :id => id
+            })
           end
 
 
@@ -421,8 +423,11 @@ module App
               k =~ /(?:^_?id$|^_?type$|_at$)/
             }
 
-            group = Group.find_or_create(params[:group])
-            group.from_json(json).save()
+            group = (Group.find(params[:group]) || Group.create({
+              :id => params[:group]
+            }))
+
+            group.from_hash(json).save()
             group.reload
 
             output(group)
@@ -506,9 +511,11 @@ module App
             json.delete('_id')
             json.delete('_type')
 
-            capability = Capability.find_or_create(id)
-            capability.from_json(json).save()
+            capability = (Capability.find(id) || Capability.create({
+              :id => id
+            }))
 
+            capability.from_hash(json).save()
             200
           else
             raise "Invalid JSON submitted"

@@ -35,6 +35,7 @@ gem "ipaddress"
 gem "jekyll"
 gem "resque"
 gem "onering-client"
+gem "rubyipmi"
 
 case RUBY_VERSION
 when /^1\.8/

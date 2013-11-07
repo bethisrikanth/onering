@@ -93,32 +93,30 @@ body .modal {
   text-align: center;
 }
 
-.text-online{
+.text-online,
+.text-succeeded,
+.text-green{
   color: #468847;
 }
 
-.text-degraded{
+.text-degraded,
+.text-warning,
+.text-provisioning,
+.text-queued,
+.text-yellow{
   color: #F89406;
 }
 
-.text-reserved{
+.text-reserved,
+.text-purple{
   color: #7C3AAD;
 }
 
-.text-provisioning{
-  color: #F89406;
-}
 
-.text-warning{
-  color: #F89406;
-}
-
-
-.text-allocatable{
-  color: #3A87AD;
-}
-
-.text-installing{
+.text-allocatable,
+.text-installing,
+.text-running,
+.text-blue{
   color: #3A87AD;
 }
 
@@ -126,32 +124,11 @@ body .modal {
   color: #999;
 }
 
-.text-succeeded{
-  color: #468847;
-}
-
-.text-reserved{
-  color: #7C3AAD;
-}
-
-.text-queue_failed{
+.text-queue_failed,
+.text-failed,
+.text-critical,
+.text-red{
   color: #B94A48;
-}
-
-.text-failed{
-  color: #B94A48;
-}
-
-.text-critical{
-  color: #B94A48;
-}
-
-.text-running{
-  color: #3A87AD;
-}
-
-.text-queued{
-  color: #F89406;
 }
 
 .label-online,
@@ -526,11 +503,24 @@ i.normal{
   color: #333;
 }
 
+.nav li{
+  cursor: pointer;
+}
+
+.status li.disabled *{
+  color: #999 !important;
+}
+
 .status .name{
   display: block;
   float: left;
   font-weight: bold;
   width: 128px;
+  vertical-align: middle;
+}
+
+.status .name i{
+  vertical-align: middle;
 }
 
 .status-green{

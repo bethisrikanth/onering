@@ -317,8 +317,28 @@ config(['$provide', function($provide) {
         }
       }
 
-      console.log(rv);
       return rv;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
+  $provide.factory('containsFilter', function(){
+    return function(array,value,strict){
+      if (!(array instanceof Array))
+        return false;
+
+  //  strict type checking (default:true)
+      if(strict === false){
+        for(var i = 0; i < array.length; i++){
+          if(array[i].toString() == value.toString()){
+            return true;
+          }
+        }
+
+        return false;
+      }else{
+        return (array.indexOf(value) > -1);
+      }
     }
   });
 }]).
@@ -472,8 +492,6 @@ config(['$provide', function($provide) {
 config(['$provide', function($provide) {
   $provide.factory('isEmptyFilter', function(){
     return function(obj, trace){
-console.log(obj, trace)
-
       if(angular.isString(obj) && obj.length == 0){
         return true;
       }else if(angular.isObject(obj) && obj.length == 0){

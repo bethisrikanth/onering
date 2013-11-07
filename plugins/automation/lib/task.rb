@@ -66,7 +66,12 @@ module Automation
       end
 
       def self.as_task(name)
-        (['Automation', 'Tasks'] + name.split(/[\.\/]/).map(&:camelize)).join('::').constantize() rescue nil
+        begin
+          return (['Automation', 'Tasks'] + name.split(/[\.\/]/).map(&:camelize)).join('::').constantize()
+        rescue NameError => e
+          Onering::Logger.error("Cannot resolve task name #{name}, #{e.message}", "Automation::Tasks::Task")
+          return nil
+        end
       end
 
       def self.to_task_name()

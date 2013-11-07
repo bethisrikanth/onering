@@ -178,9 +178,7 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
           subcontroller($scope, $modal);
         }
       }
-    })
-
-    d.open();
+    });
   }
 
   $rootScope.validateIpAddress = function(value){

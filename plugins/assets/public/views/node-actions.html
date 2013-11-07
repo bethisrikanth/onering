@@ -3,10 +3,10 @@
 <ul class="nav nav-list well">
   <li class="nav-header">Lifecycle</li>
   <li>
-    <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a></a>
+    <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a>
   </li>
   <li>
-    <a ng-click="panes.firstWith('id', 'provision').active=true"><i class="icon-repeat"></i> Redeploy Node</a></a>
+    <a ng-click="panes.firstWith('id', 'provision').active=true"><i class="icon-repeat"></i> Redeploy Node</a>
   </li>
 
   <li class="nav-header">Flags</li>
@@ -39,6 +39,16 @@
   </li>
 
   <li class="nav-header">Operations</li>
+  <li ng-show="node.properties.ipmi_ip">
+    <a ng-click="openDialog('views/ipmi-node-actions-dialog.html', this)"><i class="icon-off"></i> Run IPMI Command</a>
+  </li>
+
+  <li ng-show="node.properties.network.sockets.listening | pluck:'port' | contains:2600">
+    <a ng-click="openDialog('console',this,ConsoleDialogController)"><i class="icon-terminal"> </i> Open Remote Console</a>
+  </li>
+
+
+  <li class="nav-header">Advanced</li>
   <li rest-show="/api/users/{{node.id}}/keys/system">
     <a rest="/api/users/{{node.id}}/keys/system" rest-method="delete" rest-success="reload()" rest-confirm="Are you sure you want to delete the client key for node {{ node.name || node.id }}?">
       <i class="icon-key"> </i>
@@ -46,6 +56,7 @@
       <span ng-hide="node.status=='installing'">Delete Client Key</span>
     </a>
   </li>
+
 
   <li>
     <a rest="/api/devices/{{node.id}}/status/unknown" rest-success="reload()">
@@ -59,9 +70,6 @@
     </a>
   </li>
 
-  <li>
-    <a ng-click="openDialog('console',this,ConsoleDialogController)"><i class="icon-terminal"> </i> Open Remote Console</a>
-  </li>
 </ul>
 
 

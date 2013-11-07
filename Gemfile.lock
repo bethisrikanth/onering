@@ -123,6 +123,7 @@ GEM
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
     rpam-ruby19 (1.2.1)
+    rubyipmi (0.7.0)
     sinatra (1.4.3)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -183,6 +184,7 @@ DEPENDENCIES
   rerun
   resque
   rpam-ruby19
+  rubyipmi
   sinatra
   sinatra-contrib
   sinatra-cross_origin

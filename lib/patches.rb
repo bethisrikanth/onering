@@ -47,7 +47,7 @@ class String
   end
 
   def nil_empty()
-    return nil if self.empty?
+    return nil if self.strip.empty?
     self
   end
 

@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'onering'
 require 'rainbow'
 require 'cucumber'
 require 'cucumber/rake/task'
@@ -9,12 +8,6 @@ Cucumber::Rake::Task.new(:test) do |t|
 desc "Run API backend integration tests"
   t.cucumber_opts = "features plugins/*/features"
 end
-
-Onering::Logger.setup({
-  :destination => 'STDERR',
-  :threshold   => (ENV['LOGLEVEL'] || 'INFO').downcase.to_sym
-})
-
 
 namespace :launch do
   desc "Prepares the checked out copy for first run"

@@ -12,19 +12,19 @@ module App
     namespace '/api/automation' do
       namespace '/tasks' do
         helpers do
-          def run_task(name, args)
+          def run_task(name, *args)
             task = Automation::Tasks::Task.as_task(name)
             return 404 unless task
 
             case params[:priority].to_s.downcase.to_sym
             when :critical
-              Automation::Tasks::Task.run_critical(name, args)
+              Automation::Tasks::Task.run_critical(name, *args)
             when :high
-              Automation::Tasks::Task.run_high(name, args)
+              Automation::Tasks::Task.run_high(name, *args)
             when :low
-              Automation::Tasks::Task.run_low(name, args)
+              Automation::Tasks::Task.run_low(name, *args)
             else
-              Automation::Tasks::Task.run(name, args)
+              Automation::Tasks::Task.run(name, *args)
             end
 
             return 200
@@ -36,7 +36,7 @@ module App
           /run/:name/*/?
         }.each do |r|
           get r do
-            run_task(params[:name], params[:splat].first)
+            run_task(params[:name], *params[:splat].first.split('/'))
           end
 
           post r do

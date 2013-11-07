@@ -1,0 +1,59 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="close()">&times;</button>
+  <h3>Run IPMI Command</h3>
+</div>
+
+<div class="modal-body" ng-controller="IpmiRunController">
+  <h4>BMC Details</h4>
+  <table class="table table-condensed table-plain">
+    <tr>
+      <th>IP</th>
+      <th>Netmask</th>
+      <th>Gateway</th>
+      <th>Hardware Addr.</th>
+    </tr>
+
+    <tr>
+      <td><a target="_blank" href="https://{{ parent.node.properties.ipmi_ip }}">{{ parent.node.properties.ipmi_ip }}</a></td>
+      <td>{{ parent.node.properties.ipmi_netmask }}</td>
+      <td>{{ parent.node.properties.ipmi_gateway }}</td>
+      <td>{{ parent.node.properties.ipmi_macaddress }}</td>
+    </tr>
+  </table>
+
+  <h4>Power Control</h4>
+
+  <ul class="nav nav-list status">
+    <li>
+      <a rest="/api/automation/tasks/run/ipmi.execute/{{ parent.node.id }}/chassis.identify?priority=critical">
+        <span class="name"><i class="icon-sun"></i> Identify</span>
+        <span>Blink the node's identification LED</span>
+      </a>
+    </li>
+
+    <li>
+      <a rest="/api/automation/tasks/run/ipmi.execute/{{ parent.node.id }}/chassis.power.cycle?priority=critical" rest-confirm="Are you sure you want to reset node {{ parent.node.name || parent.node.id }}?">
+        <span class="name"><i class="icon-repeat"></i> Reset</span>
+        <span>Restart the node by powering it off then back on</span>
+      </a>
+    </li>
+
+    <li ng-class="{disabled: (states.power!=false)}">
+      <a rest="/api/automation/tasks/run/ipmi.execute/{{ parent.node.id }}/chassis.power.on?priority=critical" rest-confirm="Are you sure you want to turn on node {{ parent.node.name || parent.node.id }}?" rest-success="interval=5000" rest-disable="(states.power!=false)">
+        <span class="name"><i class="icon-off text-green"></i> Power On</span>
+        <span>Turn the node on</span>
+      </a>
+    </li>
+
+    <li ng-class="{disabled: (states.power!=true)}">
+      <a rest="/api/automation/tasks/run/ipmi.execute/{{ parent.node.id }}/chassis.power.off?priority=critical" rest-confirm="Are you sure you want to turn off node {{ parent.node.name || parent.node.id }}?  It will not be on after you do this...it will be off. Completely." rest-success="interval=5000" rest-disable="(states.power!=true)">
+        <span class="name"><i class="icon-off text-red"></i> Power Off</span>
+        <span>Completely power off the node</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="modal-footer">
+  <a class="btn" ng-click="close()">Close</a>
+</div>

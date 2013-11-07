@@ -3,8 +3,16 @@ $: << File.join(ENV['PROJECT_ROOT'], 'lib')
 $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 
 require 'rubygems'
-require 'patches'
 require 'oj'
+require 'onering'
+
+Onering::Logger.setup({
+  :destination => 'STDERR',
+  :threshold   => (ENV['LOGLEVEL'] || 'INFO').downcase.to_sym
+})
+
+
+require 'patches'
 require 'config'
 require 'log'
 require 'queue'
