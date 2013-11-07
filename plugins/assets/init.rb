@@ -115,7 +115,7 @@ module App
         get '/fields' do
           rv = []
 
-          Asset.mappings.get('properties',{}).each_recurse({
+          Asset.all_mappings.get('asset.properties',{}).each_recurse({
             :intermediate => true
           }) do |k,v,p|
             if v.is_a?(Hash) and v['type'].is_a?(String)

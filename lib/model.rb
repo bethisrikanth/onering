@@ -165,12 +165,14 @@ module App
 
           query = {
             :filter => self.to_elasticsearch_query(query),
-            :fields => (self.fields.keys.collect{|i| i.to_s })
+            :fields => (self.fields.keys.collect{|i| i.to_s }),
           }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
 
-          return self.search(query, tensor_options)
+          return self.search(query, tensor_options, {
+            :analyzer => :urlquery
+          })
         end
 
         def ids(urlquery=nil)

@@ -608,23 +608,29 @@ module Tensor
 
 
     # retrieve/declare explicit mappings for this model
-    def self.mappings(definition=nil, &block)
-      @_mappings ||= _generate_mapping()
+    def self.mappings(definition=nil, options={}, &block)
+      _mappings = _generate_mapping(options || {})
 
       if block_given?
-        definition = {
+        @_definition ||= {
           document_type() => yield
         }
       end
 
     # merge in an explicit definition if specified
-      if definition.is_a?(Hash)
-        @_mappings.deeper_merge(definition.stringify_keys(), {
+      if @_definition.is_a?(Hash)
+        _mappings.deeper_merge(@_definition.stringify_keys(), {
           :merge_hash_arrays => true
         })
       end
 
-      return @_mappings[document_type()]
+      return _mappings
+    end
+
+    def self.all_mappings()
+      mappings(nil, {
+        :remote => true
+      })
     end
 
     # retrieve/declare explicit settings for this model
@@ -642,12 +648,14 @@ module Tensor
     # synchronize the automatic and explicit mapping on this model with elasticsearch
     def self.sync_schema(options={})
     # create the index if it doesn't exist
-      unless connection().indices.exists_alias({
-        :name => index_name()
-      })
-        alias_index({
-          :index => index_name()
+      unless options[:autoalias] === false
+        unless connection().indices.exists_alias({
+          :name => index_name()
         })
+          alias_index({
+            :index => index_name()
+          })
+        end
       end
 
       # straight non-aliased index creation
@@ -661,11 +669,9 @@ module Tensor
 
     # update mappings
       connection().indices.put_mapping({
-        :index => index_name(),
-        :type  => document_type(),
-        :body  => {
-          document_type() => mappings()
-        }
+        :index => (options[:index] || index_name()),
+        :type  => (options[:type] || document_type()),
+        :body  => mappings(nil, options[:mappings])
       })
     end
 
@@ -678,7 +684,8 @@ module Tensor
         connection().indices.create({
           :index => index,
           :body  => {
-            :settings => settings()
+            :settings => settings(),
+            :mappings => mappings(nil, options[:mappings])
           }
         })
       end
@@ -726,33 +733,44 @@ module Tensor
       end
     end
 
-    def self.reindex(index=nil)
-      index ||= index_name()
+    def self.reindex(options={})
+      options[:index] ||= index_name()
 
     # save the current referenced indices
-      indices_to_close = get_real_index(index)
+      indices_to_cleanup = get_real_index(options[:index])
 
     # create the new "real" index, but don't swap the aliases yet
       new_index = alias_index({
-        :index => index,
-        :swap  => false
+        :index => options[:index],
+        :create => true,
+        :swap   => false,
+        :mappings  => {
+          :no_merge_existing => true
+        }
       })
 
     # copy all records from the current index to the new index
-      status = copy_index(index, new_index)
-      raise "Index data copy failed, leaving alias #{index_name()}->#{indices_to_close.join(',')} intact" unless status['ok'] === true
+      status = copy_index(options[:index], new_index)
+      raise "Index data copy failed, leaving alias #{index_name()}->#{indices_to_cleanup.join(',')} intact" unless status['ok'] === true
 
     # atomically swap the indicies
       alias_index({
-        :index     => index,
+        :index     => options[:index],
         :create    => false,
+        :swap      => true,
         :new_index => new_index
       })
 
-    # close the old indices
-      unless options[:autoclose] === false
-        indices_to_close.each do |i|
+
+    # cleanup the old indices (default: close them)
+      indices_to_cleanup.each do |i|
+        case (options[:cleanup] || :close).to_sym
+        when :close
           connection().indices.close({
+            :index => i
+          })
+        when :delete
+          connection().indices.delete({
             :index => i
           })
         end
@@ -1004,9 +1022,13 @@ module Tensor
       }
 
       begin
-        return connection().indices.get_mapping({
-          :index => index_name()
-        }).get(get_real_index().first,{}).deeper_merge!(mapping)
+        if options[:remote] === true
+          return connection().indices.get_mapping({
+            :index => index_name()
+          }).get(get_real_index().first,{}).deeper_merge!(mapping)
+        else
+          return mapping
+        end
       rescue Elasticsearch::Transport::Transport::Errors::NotFound
         return mapping
       end

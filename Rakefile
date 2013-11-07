@@ -124,6 +124,14 @@ namespace :db do
   task :reinitialize => [:nuke, :sync] do
     puts "Reinitialized database"
   end
+
+  task :reindex, :model, :cleanup do |t, args|
+    klass = args[:model].camelize.constantize()
+    Onering::Logger.info("Reindexing model #{klass.name}...")
+    klass.reindex({
+      :cleanup => args[:cleanup]
+    })
+  end
 end
 
 # utilities for managing static assets

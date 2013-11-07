@@ -30,7 +30,7 @@ class Asset < App::Model::Elasticsearch
     {
       :index => {
         :analysis => {
-          :filter => {
+          :char_filter => {
             :remove_expression_tokens => {
               :type        => :pattern_replace,
               :pattern     => '[\:\[\]\*]+',
@@ -38,10 +38,11 @@ class Asset < App::Model::Elasticsearch
             }
           },
           :analyzer => {
-            :lcwhitespace => {
+            :default => {
               :type        => :custom,
               :tokenizer   => :whitespace,
-              :filter      => [:lowercase, :remove_expression_tokens]
+              :filter      => [:lowercase],
+              :char_filter => [:remove_expression_tokens]
             }
           }
         }
@@ -52,15 +53,13 @@ class Asset < App::Model::Elasticsearch
   mappings do
     {
       :date_detection    => false,
-      :index_analyzer    => :whitespace,
-      :search_analyzer   => :lcwhitespace,
       :dynamic_templates => [{
         :date_detector => {
           :match         => "_at$",
           :match_pattern => :regex,
           :mapping  => {
             :fields => {
-              "{name}" => {
+              '{name}' => {
                 :type   => :date,
                 :store  => true,
                 :index  => :analyzed,
@@ -79,8 +78,12 @@ class Asset < App::Model::Elasticsearch
           :match   => '*',
           :match_mapping_type => :boolean,
           :mapping => {
-            :store => true,
-            :index => :not_analyzed
+            :fields => {
+              '{name}' => {
+                :store => true,
+                :index => :not_analyzed
+              }
+            }
           }
         }
       },{
