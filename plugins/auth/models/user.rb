@@ -5,9 +5,9 @@ class User < App::Model::Elasticsearch
 
   field :name,         :string
   field :email,        :string
-  field :client_keys,  :object
+  field :client_keys,  :object,  :default => {}
   field :tokens,       :object,  :array => true
-  field :options,      :object
+  field :options,      :object,  :default => {}
   field :logged_in_at, :date
   field :created_at,   :date,    :default => Time.now
   field :updated_at,   :date,    :default => Time.now
