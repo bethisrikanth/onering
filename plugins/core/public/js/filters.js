@@ -6,11 +6,12 @@ String.prototype.toTitleCase = function(){
 
 String.prototype.titleize = function(){
   var overrides = {
-    'noc':    'NOC',
-    'centos': 'CentOS',
-    'redhat': 'RedHat',
-    'pam':    'PAM',
-    'ldap':   'LDAP'
+    'noc':      'NOC',
+    'centos':   'CentOS',
+    'redhat':   'RedHat',
+    'pam':      'PAM',
+    'ldap':     'LDAP',
+    'grub4dos': 'GRUB4DOS'
   };
 
   if(overrides.hasOwnProperty(this.toLowerCase()))

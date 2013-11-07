@@ -68,6 +68,7 @@
 
         <div class="center">
           <h3>{{ node.properties.provisioning.boot.profile | replace:'-':' ':true | titleize }}</h3>
+          <h5 ng-show="node.properties.provisioning.boot.subprofile">Subprofile: {{ node.properties.provisioning.boot.subprofile | replace:'-':' ':true | titleize }}</h5>
         </div>
 
         <div class="widget-header"><b>Change Boot Profile</b></div>
