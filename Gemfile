@@ -34,7 +34,7 @@ gem "cucumber"
 gem "ipaddress"
 gem "jekyll"
 gem "resque"
-gem "onering-client"
+gem "onering-client", ">= 0.0.95"
 gem "rubyipmi"
 
 case RUBY_VERSION

@@ -52,23 +52,28 @@ class NodeDefault < App::Model::Elasticsearch
         m[:value] = m[:value].to_s.convert_to(m[:type])
       end
 
-      case m[:test].to_s
-      when 'lt', 'before'
-        return false if value.nil?
-        return false if not value < m[:value]
-      when 'lte'
-        return false if value.nil?
-        return false if not value <= m[:value]
-      when 'gt'
-        return false if value.nil?
-        return false if not value > m[:value]
-      when 'gte', 'since'
-        return false if value.nil?
-        return false if not value >= m[:value]
-      when 'not'
-        return false if value == m[:value]
-      else
-        return false if not value == m[:value]
+      begin
+        case m[:test].to_s
+        when 'lt', 'before'
+          return false if value.nil?
+          return false if not value < m[:value]
+        when 'lte'
+          return false if value.nil?
+          return false if not value <= m[:value]
+        when 'gt'
+          return false if value.nil?
+          return false if not value > m[:value]
+        when 'gte', 'since'
+          return false if value.nil?
+          return false if not value >= m[:value]
+        when 'not'
+          return false if value == m[:value]
+        else
+          return false if not value == m[:value]
+        end
+      rescue Exception => e
+        Onering::Logger.warn("Encountered error applying node default: #{e.class.name} - #{e.message}", "NodeDefault")
+        return false
       end
     end
 

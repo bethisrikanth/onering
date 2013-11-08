@@ -17,7 +17,7 @@ class Asset < App::Model::Elasticsearch
   field :collected_at,            :date
   field :created_at,              :date,     :default => Time.now
   field :maintenance_status,      :string
-  field :name,                    :string
+  field :name,                    :string,   :skip_mapping => true  # skip mapping so the dynamic template will handle this field
   field :parent_id,               :string
   field :properties,              :object,   :default => {}, :typedefs => App::Config.get("database.options.typedefs.asset.properties")
   field :status,                  :string
@@ -61,7 +61,7 @@ class Asset < App::Model::Elasticsearch
             :fields => {
               '{name}' => {
                 :type   => :date,
-                :store  => true,
+                :store  => false,
                 :index  => :analyzed,
                 :format => %w{
                   date_hour_minute_second_millis
@@ -80,18 +80,40 @@ class Asset < App::Model::Elasticsearch
           :mapping => {
             :fields => {
               '{name}' => {
-                :store => true,
+                :store => false,
                 :index => :not_analyzed
               }
             }
           }
         }
       },{
-        :store_generic => {
+        :fields_string => {
           :match   => '*',
+          :match_mapping_type => :string,
           :mapping => {
-            :store  => true,
-            :index  => :analyzed
+            :type => :multi_field,
+            :fields => {
+              '{name}' => {
+                :store => false,
+                :type   => '{dynamic_type}',
+                :index => :not_analyzed
+              },
+              :_analyzed => {
+                :store  => false,
+                :type   => '{dynamic_type}',
+                :index  => :analyzed
+              }
+            }
+          }
+        }
+      },{
+        :fields_default => {
+          :match => '.*',
+          :match_mapping_type => 'integer|long|float|double',
+          :match_pattern => :regex,
+          :mapping => {
+            :store    => :false,
+            :index    => :not_analyzed
           }
         }
       }]

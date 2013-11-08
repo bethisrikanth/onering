@@ -146,14 +146,42 @@ module App
         def to_elasticsearch_query(query, options={})
           return nil if query == 'null'
 
+        #
+        # HACKS: Query pre-processor for searching on multi-fields
+        #
+        # What is this?
+        #  It deconstructs the urlquery string and adds a second field to every field
+        #  being search for.  So for example:
+        #    I search for:   mac/abc123
+        #    This yields:    mac|mac._search/abc123
+        #
+        # Why am I doing this?
+        #   To support multi-fields in ES that store both the analyzed and non-analyzed
+        #   version of a field.  In that case we have a situation where we want to
+        #   query on one part of the field but display another part.
+        #
+        #   Since we're generating queries in a highly generic manner, and because
+        #   not every field will have this multi-field property, the kludgy way around
+        #   it is to just throw both cases into an OR and call it a day
+        #
+        #   I welcome an alternate approach.
+        #
+          query = query.split('/').collect.with_index{|x,i|
+            if i.even?
+              x.split('|').collect{|j|
+                [j, j+'.'+App::Config.get('database.options.querying.multifield_suffix', '_analyzed')]
+              }.flatten.join('|')
+            else
+              x
+            end
+          }.join('/')
+
           @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
 
           rv = @_parser.parse(query).to_elasticsearch_query({
-            :prefix => self.field_prefix(),
-            :fields => self.fields.keys()
+            :prefix   => self.field_prefix(),
+            :fields   => self.fields.keys()
           })
-
-#puts MultiJson.dump(rv)
 
           rv
         end
@@ -170,9 +198,7 @@ module App
             :merge_hash_arrays => true
           })
 
-          return self.search(query, tensor_options, {
-            :analyzer => :urlquery
-          })
+          return self.search(query, tensor_options)
         end
 
         def ids(urlquery=nil)

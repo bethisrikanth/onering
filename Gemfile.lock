@@ -84,7 +84,7 @@ GEM
       log4r
       net-http-persistent
     oj (2.1.4)
-    onering-client (0.0.93)
+    onering-client (0.0.95)
       addressable
       deep_merge
       facter (>= 1.7.2)
@@ -176,7 +176,7 @@ DEPENDENCIES
   net-ping
   oats
   oj
-  onering-client
+  onering-client (>= 0.0.95)
   racksh
   rainbow
   rake

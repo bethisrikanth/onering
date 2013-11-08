@@ -22,7 +22,6 @@ module App
     # process pairs of field/[value] parameters
       rule :pair, many(:field, :fieldop_or), :pairer?, :values? do
         def to_elasticsearch_query(options={})
-
           return ({
             :or => field.collect{|f|
               if values.to_a.empty?
@@ -38,7 +37,9 @@ module App
       end
 
     # process field name, modifiers, and prefilters
-      rule :field, :field_modifier?, :field_name_pre, :field_prefilter?, :field_name_post? do
+    # TODO: reenable when prefilters are implemented in ES
+      #rule :field, :field_modifier?, :field_name_pre, :field_prefilter?, :field_name_post? do
+      rule :field, :field_modifier?, :field_name_pre, :field_name_post? do
         def translate_field(field, options={})
           options[:prefix] = DEFAULT_FIELD_PREFIX if options[:prefix].nil?
           options[:fields] = TOP_LEVEL_FIELDS if options[:fields].nil?
@@ -89,26 +90,30 @@ module App
       end
 
 
-      rule :field_prefilter, :field_prefilter_start, :field_prefilter_subfield, :field_prefilter_op_eql, :field_prefilter_value, :field_prefilter_end do
-        def to_elasticsearch_query(array_base, first_field_name, field_query, options={})
-          return field_query if array_base.nil?
+      # TODO: implement field prefilters for elasticsearch
+      #
+      # leftover from the mongo days:
+      #
+      # rule :field_prefilter, :field_prefilter_start, :field_prefilter_subfield, :field_prefilter_op_eql, :field_prefilter_value, :field_prefilter_end do
+      #   def to_elasticsearch_query(array_base, first_field_name, field_query, options={})
+      #     return field_query if array_base.nil?
 
-          field_prefilter_query = field_prefilter_value.to_s
-          field_prefilter_query.gsub!('.', '\\.')
-          field_prefilter_query.gsub!('*', '.*')
-          field_prefilter_query = {'$regex' => field_prefilter_query, '$options' => 'i'}
+      #     field_prefilter_query = field_prefilter_value.to_s
+      #     field_prefilter_query.gsub!('.', '\\.')
+      #     field_prefilter_query.gsub!('*', '.*')
+      #     field_prefilter_query = {'$regex' => field_prefilter_query, '$options' => 'i'}
 
-        # wrap the incoming field_query with an elemMatch condition that includes the query + the prefilter constraint
-          return {
-            array_base => {
-              '$elemMatch' => {
-                first_field_name              => field_query.values.first,
-                field_prefilter_subfield.to_s => field_prefilter_query
-              }
-            }
-          }
-        end
-      end
+      #   # wrap the incoming field_query with an elemMatch condition that includes the query + the prefilter constraint
+      #     return {
+      #       array_base => {
+      #         '$elemMatch' => {
+      #           first_field_name              => field_query.values.first,
+      #           field_prefilter_subfield.to_s => field_prefilter_query
+      #         }
+      #       }
+      #     }
+      #   end
+      # end
 
 
     # process coercion modifier
@@ -183,7 +188,7 @@ module App
             })
 
           elsif rv.is_a?(String)
-            if rv =~ /[\\[\\*\\?\\{}]]/
+            if rv =~ /[\\[\\*\\?\\{}\^\$]]/
               rv.gsub!('.', '\\.')
               rv.gsub!('*', '.*')
 

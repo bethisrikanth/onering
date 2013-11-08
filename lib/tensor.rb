@@ -9,6 +9,12 @@ rescue LoadError
 end
 
 module Tensor
+  class NullLogger
+    def method_missing(meth, *args, &block)
+      return false
+    end
+  end
+
   class ConnectionPool
     def initialize(options={})
       @_connections = {}
@@ -364,6 +370,22 @@ module Tensor
     end
 
 
+    # get the logger instance for output logging
+    #
+    def self.logger()
+      return @@_logger ||= Tensor::NullLogger.new()
+    end
+
+    # set the logger instance for output logging
+    # +logger+::  an instance of a Ruby Logger to use for output
+    #
+    def self.logger=(logger)
+      @@_logger = logger
+      @@_logger.debug("Logger initialized for Tensor::Model")
+      @@_logger
+    end
+
+
     # get the schema definition for this model
     # +name+:: get the definition a specific field
     #
@@ -389,11 +411,15 @@ module Tensor
     # * :type::    the document type to query for (default: autodetect)
     #
     def self.search!(body, options={}, es_options={})
+      query = ({
+        :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
+      }).merge(body)
+
+logger().debug(MultiJson.dump(query, :pretty => true))
+
       return _wrap_response(:search, connection().search({
         :index => (options[:index] || self.index_name()),
-        :body  => ({
-          :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
-        }).merge(body)
+        :body  => query
       }.merge(es_options)), options)
     end
 
@@ -613,7 +639,7 @@ module Tensor
 
       if block_given?
         @_definition ||= {
-          document_type() => yield
+          (options[:type] || :_default_) => yield
         }
       end
 
@@ -719,6 +745,12 @@ module Tensor
 
     def self.get_indices(prefix=nil)
       connection().indices.stats['indices'].keys.select{|i|
+        i =~ Regexp.new("^#{prefix || index_name()}-[0-9]+")
+      }.sort()
+    end
+
+    def self.get_closed_indices(prefix=nil)
+      connection().cluster.state.get('blocks.indices',{}).keys.select{|i|
         i =~ Regexp.new("^#{prefix || index_name()}-[0-9]+")
       }.sort()
     end
@@ -946,7 +978,7 @@ module Tensor
     # * :raw::     boolean, whether to wrap the response (false) or pass it through untouched (true)
     #
     def self._wrap_response(method, response, options={})
-#pp response
+logger().debug("#{method}: #{response.pretty_inspect}")
 
       if options[:raw] === true
         return response
@@ -992,8 +1024,10 @@ module Tensor
 
     def self._generate_mapping(options={})
       mapping = {
-        (options[:type] || document_type()).to_s => DEFAULT_MAPPING.deep_clone.deeper_merge({
-          'properties' => Hash[fields().collect{|name, definition|
+        (options[:type] || :_default_).to_s => DEFAULT_MAPPING.deep_clone.deeper_merge({
+          'properties' => Hash[fields().reject{|k,v|
+            v.get(:skip_mapping, false)
+          }.collect{|name, definition|
             definition = definition.stringify_keys()
 
             es_mapping = {

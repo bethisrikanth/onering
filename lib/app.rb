@@ -25,6 +25,9 @@ require 'multi_json'
 require 'liquid_patches'
 require 'pp'
 
+# initialize model logging
+Tensor::Model.logger = Onering::Logger.logger()
+
 # initialize database settings
 App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
 

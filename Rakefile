@@ -79,7 +79,7 @@ end
 
 namespace :db do
   desc "Deletes all indices and recreates them empty.  EXTREMELY DANGEROUS!"
-  task :nuke do
+  task :nuke, :model do |t,args|
     load "irb.ru"
     puts "Nuking database..."
 
@@ -87,6 +87,8 @@ namespace :db do
     models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
     models.each do |index, model|
+      next if args[:model] and args[:model].camelize.constantize != model
+
       begin
         puts "Deleting model #{model.name}..."
 
@@ -108,29 +110,73 @@ namespace :db do
   end
 
   desc "Syncs the db with the schema defined in the models"
-  task :sync do
+  task :sync, :model do |t,args|
     load "irb.ru"
     puts "Syncing database..."
 
-    App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
     models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
 
     models.each do |index, model|
+      next if args[:model] and args[:model].camelize.constantize != model
+
       puts "Syncing model #{model.name}..."
       model.sync_schema()
     end
   end
 
+  desc "Destroy and recreate an empty database"
   task :reinitialize => [:nuke, :sync] do
     puts "Reinitialized database"
   end
 
+  desc "Initialize a new index based on the latest generated mapping and move data into it"
   task :reindex, :model, :cleanup do |t, args|
     klass = args[:model].camelize.constantize()
     Onering::Logger.info("Reindexing model #{klass.name}...")
-    klass.reindex({
+
+    new_index = klass.reindex({
       :cleanup => args[:cleanup]
     })
+
+    Onering::Logger.info("New index created: #{new_index}")
+  end
+
+  desc "Remove all closed indices for a given model or across all models"
+  task :prune, :model do |t,args|
+    args.with_defaults({
+      :model => nil
+    })
+
+    models = Hash[App::Model::Elasticsearch.implementers.to_a.collect{|i| [i.index_name, i] }]
+
+    models.each do |index, model|
+      next if args[:model] and args[:model].camelize.constantize != model
+
+      puts "Pruning model #{model.name}..."
+      model.get_closed_indices().each do |i|
+        puts "-> deleting closed index #{i}"
+
+        model.connection().indices.delete({
+          :index => i
+        })
+      end
+
+      (model.get_indices() - model.get_real_index()).each do |i|
+        puts "-> deleting unreferenced index #{i}"
+
+        model.connection().indices.delete({
+          :index => i
+        })
+      end
+    end
+  end
+
+  desc "Duplicates an index"
+  task :backup, :source, :dest do |t, args|
+    if args[:source] and args[:dest]
+      puts "Copying #{args[:source]} to #{args[:dest]}..."
+      Tensor::Model.copy_index(args[:source], args[:dest])
+    end
   end
 end
 
