@@ -415,8 +415,6 @@ module Tensor
         :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
       }).merge(body)
 
-logger().debug(MultiJson.dump(query, :pretty => true))
-
       return _wrap_response(:search, connection().search({
         :index => (options[:index] || self.index_name()),
         :body  => query
@@ -978,7 +976,6 @@ logger().debug(MultiJson.dump(query, :pretty => true))
     # * :raw::     boolean, whether to wrap the response (false) or pass it through untouched (true)
     #
     def self._wrap_response(method, response, options={})
-logger().debug("#{method}: #{response.pretty_inspect}")
 
       if options[:raw] === true
         return response

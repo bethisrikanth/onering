@@ -12,13 +12,14 @@ Onering::Logger.setup({
 })
 
 
+require './lib/config'
+App::Config.load(ENV['PROJECT_ROOT'])
+
+
 require 'patches'
-require 'config'
 require 'log'
-require 'queue'
 require 'utils'
 require 'model'
-require 'msgpack'
 require 'controller'
 require 'eventmachine'
 require 'multi_json'

@@ -1,3 +1,4 @@
+require 'set'
 require 'controller'
 require 'assets/lib/helpers'
 require 'assets/models/asset'
@@ -263,6 +264,63 @@ module App
         })
       end
 
+      get '/:id/decomission' do
+        #allowed_to? :decomission_asset, params[:id]
+        device = Asset.find(params[:id])
+        return 404 unless device
+        rv = {
+          :account_removed  => false,
+          :keys_reset       => [],
+          :tasks_dispatched => []
+        }
+
+      # remove machine account
+        account = User.find(device.id)
+        if account
+          account.destroy()
+          rv[:account_removed] = true
+        end
+
+      # cleanup keys
+        Config.get('assets.decomission.reset_properties', []).each do |property, value|
+          device.set(property, value)
+          rv[:keys_reset] << property
+        end
+
+      # save device
+        device.save()
+
+      # determine the list of cleanup tasks
+        tasks = Set.new()
+
+        Config.get('assets.decomission.tasks', {}).each do |key, match|
+          next if key == 'default'
+          next unless match.is_a?(Hash)
+
+        # only run tasks for matching criteria
+          match.each do |value, list|
+            next unless list.is_a?(Array)
+
+            if [*device.get(key,[])].include?(value)
+              list.each do |i|
+                tasks << i
+              end
+            end
+          end
+        end
+
+        Config.get('assets.decomission.tasks.default', []).each do |task|
+          tasks << task
+        end
+
+      # schedule cleanup tasks
+        tasks.each do |task|
+          Automation::Tasks::Task.run_critical(task, device.id, device.to_hash())
+          rv[:tasks_dispatched] << i
+        end
+
+        output(rv)
+      end
 
     # child management operations
       get '/:id/children/:action/?*/?' do

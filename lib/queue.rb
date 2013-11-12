@@ -1,5 +1,4 @@
 require 'config'
-require 'beaneater'
 require 'eventmachine'
 
 module App

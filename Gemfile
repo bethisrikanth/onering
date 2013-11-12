@@ -1,46 +1,16 @@
 source 'https://rubygems.org'
 
-gem "sinatra"
-gem "sinatra-contrib"
-gem "sinatra-session"
-gem "sinatra-cross_origin"
-gem "rerun"
-gem "deep_merge"
-gem "racksh"
-gem "haml"
-gem "oats"
-gem "thin"
-gem "rake"
-gem "multi_json"
-gem "oj"
-gem "liquid"
-gem "rdiscount", "1.6.8"
+gem "snmp"
 gem "net-ping"
-gem "net-ldap"
 gem "addressable"
-gem "hashlib", ">= 0.0.25"
+gem "ipaddress"
+
+gem "net-ldap"
 gem "babel_bridge"
 gem "eventmachine"
 gem "msgpack"
-gem "beaneater"
-gem "rainbow"
-gem "statsd-ruby"
-#gem "activerecord", "~> 3"
-#gem "activesupport", ">= 3.2"
-gem "snmp"
-gem "elasticsearch", ">= 0.4.0"
-gem "activemodel", ">= 4.0.0"
 gem "cucumber"
-gem "ipaddress"
-gem "jekyll"
-gem "resque"
-gem "onering-client", ">= 0.0.95"
-gem "rubyipmi"
 
-case RUBY_VERSION
-when /^1\.8/
-  gem "rpam"
-else
-  gem "rpam-ruby19"
+Dir[File.join(File.dirname(__FILE__), 'plugins', '*', 'Gemfile')].each do |gemfile|
+  eval(IO.read(gemfile), binding)
 end
-

@@ -17,6 +17,10 @@ User.capability :remove_asset_note do |cap, user, args|
 end
 
 
+User.capability :decomission_asset do |cap, user, args|
+  (( (user.class.ancestors.include?(DeviceUser) rescue false) && user.id == args.first) rescue false) || (Capability.user_can?(user.id, cap))
+end
+
 User.capability :bulk_update_assets
 User.capability :query_assets
 User.capability :remove_asset

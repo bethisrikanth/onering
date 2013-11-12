@@ -1,0 +1,29 @@
+gem "activemodel", ">= 4.0.0"
+gem "deep_merge"
+gem "elasticsearch", ">= 0.4.0"
+gem "haml"
+gem "hashlib", ">= 0.0.25"
+gem "jekyll"
+gem "liquid"
+gem "multi_json"
+gem "oats"
+gem "oj"
+gem "onering-client", ">= 0.0.95"
+gem "racksh"
+gem "rainbow"
+gem "rake"
+gem "rdiscount", "1.6.8"
+gem "resque"
+gem "sinatra"
+gem "sinatra-contrib"
+gem "sinatra-cross_origin"
+gem "sinatra-session"
+gem "statsd-ruby"
+gem "thin"
+
+case RUBY_VERSION
+when /^1\.8/
+  gem "rpam"
+else
+  gem "rpam-ruby19"
+end
