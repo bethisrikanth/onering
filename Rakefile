@@ -61,6 +61,9 @@ namespace :worker do
     ENV['TERM_CHILD'] = '1'
     ENV['INTERVAL']   = '0.2'
 
+  # set resque logger
+    Resque.logger = Onering::Logger.logger
+
   # load tasks
     Automation::Tasks::Task.load_all()
 
