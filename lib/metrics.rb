@@ -1,10 +1,9 @@
 require 'config'
 require 'socket'
-require 'msgpack'
 require 'statsd'
 
 module App
-  class Log
+  class Metrics
     class<<self
       def setup()
         @_prefix = Config.get('global.metrics.prefix', '')

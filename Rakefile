@@ -62,7 +62,11 @@ namespace :worker do
     ENV['INTERVAL']   = '0.2'
 
   # set resque logger
-    Resque.logger = Onering::Logger.logger
+    Resque.logger = Logger.new('/dev/null')
+
+  # setup metrics logging
+    App::Metrics.setup()
+    App::Metrics.increment("worker.process.started")
 
   # load tasks
     Automation::Tasks::Task.load_all()

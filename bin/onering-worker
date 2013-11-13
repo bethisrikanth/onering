@@ -15,7 +15,7 @@ module Automation
   class Worker
     def initialize()
       App::Config.load(ENV['PROJECT_ROOT'])
-      App::Log.setup()
+      App::Metrics.setup()
       App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))
       App::Queue.setup()
       Automation::Tasks::Base.load_all()
@@ -23,7 +23,7 @@ module Automation
 
     def start()
       puts "Worker started at #{Time.now.strftime("%Y-%m-%d %H:%M:%S %z")}, ready to process jobs.".foreground(:green)
-      App::Log.increment("worker.process.started")
+      App::Metrics.increment("worker.process.started")
 
       App::Queue.channel('onering').subscribe do |message|
         header = {}
@@ -45,20 +45,20 @@ module Automation
         # start handling
           puts "Starting job #{job.name rescue 'unknown-'+header['job_id']} (request #{header['request_id']}), added at #{header['created_at'].strftime("%Y-%m-%d %H:%M:%S %z")} (#{"%.6f" % header['age']} seconds ago)...".foreground(:green)
 
-          App::Log.increment("worker.jobs.#{job_name}.started")
-          App::Log.timing("worker.jobs.#{job_name}.queuetime", (header['age'].to_f * 1000.0))
+          App::Metrics.increment("worker.jobs.#{job_name}.started")
+          App::Metrics.timing("worker.jobs.#{job_name}.queuetime", (header['age'].to_f * 1000.0))
 
         # run job
           result = Job.run(header)
 
         rescue JobAbort => e
           STDERR.puts("[Job Aborted] #{e.message}".foreground(:yellow))
-          App::Log.increment("worker.jobs.#{job_name}.aborted")
+          App::Metrics.increment("worker.jobs.#{job_name}.aborted")
           success = false
 
         rescue JobFail => e
           STDERR.puts("[Job Failed] #{e.message}".foreground(:red))
-          App::Log.increment("worker.jobs.#{job_name}.failed")
+          App::Metrics.increment("worker.jobs.#{job_name}.failed")
           success = false
 
         rescue Exception => e
@@ -70,7 +70,7 @@ module Automation
 
           message.release()
 
-          App::Log.increment("worker.jobs.#{job_name}.errors")
+          App::Metrics.increment("worker.jobs.#{job_name}.errors")
           success = false
           message = nil
 
@@ -79,8 +79,8 @@ module Automation
           time_to_complete = (Time.now - start).to_f
           puts "Finished job #{job.name rescue 'unknown-'+header['job_id']} (took #{"%.6f" % time_to_complete} seconds)...".foreground(success ? :green : :red)
 
-          App::Log.increment("worker.jobs.#{job_name}.succeeded")
-          App::Log.timing("worker.jobs.#{job_name}.runtime", (time_to_complete * 1000.0))
+          App::Metrics.increment("worker.jobs.#{job_name}.succeeded")
+          App::Metrics.timing("worker.jobs.#{job_name}.runtime", (time_to_complete * 1000.0))
         end
       end
     end
@@ -94,7 +94,7 @@ begin
 
 rescue Interrupt
   puts "Shutting down worker at #{Time.now.strftime("%Y-%m-%d %H:%M:%S %z")}"
-  App::Log.increment("worker.process.stopped")
+  App::Metrics.increment("worker.process.stopped")
 
 rescue Exception => e
   STDERR.puts("[Worker Error] #{e.class.name}: #{e.message}".foreground(:red))
@@ -103,6 +103,6 @@ rescue Exception => e
   end
   STDERR.puts("Exiting now".foreground(:red))
 
-  App::Log.increment("worker.process.crashes")
+  App::Metrics.increment("worker.process.crashes")
   exit 1
 end

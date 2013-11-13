@@ -17,7 +17,7 @@ App::Config.load(ENV['PROJECT_ROOT'])
 
 
 require 'patches'
-require 'log'
+require 'metrics'
 require 'utils'
 require 'model'
 require 'controller'
@@ -47,8 +47,8 @@ end
 module App
   class Base < Controller
     def initialize
-      App::Log.setup()
-      App::Log.increment("api.process.started")
+      App::Metrics.setup()
+      App::Metrics.increment("api.process.started")
       super
     end
 
@@ -86,13 +86,13 @@ module App
       content_type 'application/json'
       message = (response.body.empty? ? "Invalid or malformed request for resource #{request.path}" : [*response.body].join(','))
 
-      {
+      output({
         :error => {
           :type => "Bad Request",
           :message => message,
           :severity  => params[:severity]
         }
-      }.to_json
+      })
     end
 
     error 401 do

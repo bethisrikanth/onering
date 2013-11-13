@@ -1,6 +1,7 @@
 require 'resque'
 require 'resque/errors'
 require 'onering'
+require 'metrics'
 require 'automation/lib/util'
 
 module Automation
@@ -74,16 +75,27 @@ module Automation
         end
       end
 
-      def self.to_task_name()
-        self.name.split('::')[2..-1].map(&:underscore).join('/')
+      def self.to_task_name(joiner='/')
+        self.name.split('::')[2..-1].map(&:underscore).join(joiner)
       end
 
       def self.before_perform(*args)
-        Onering::Logger.info("Starting task at #{Time.now.to_s}", to_task_name())
+        @_start = Time.now
+        @_task = to_task_name('-')
+        Onering::Logger.info("Starting task at #{@_start.to_s}", to_task_name())
+        App::Metrics.increment("worker.tasks.#{@_task}.started")
+        App::Metrics.increment("worker.tasks.all.started")
       end
 
       def self.after_perform(*args)
-        Onering::Logger.info("Task completed at #{Time.now.to_s}", to_task_name())
+        @_end = Time.now
+        time = (@_end - @_start)
+        Onering::Logger.info("Task completed at #{@_end.to_s} (took: #{"%.6f" % time.to_f} seconds)", to_task_name())
+        App::Metrics.increment("worker.tasks.all.completed")
+        App::Metrics.timing("worker.tasks.all.time", (time.to_f * 1000.0).to_i)
+
+        App::Metrics.increment("worker.tasks.#{@_task}.completed")
+        App::Metrics.timing("worker.tasks.#{@_task}.time", (time.to_f * 1000.0).to_i)
       end
 
       def self.on_failure(e, *args)
@@ -95,12 +107,24 @@ module Automation
         end
 
         source = [to_task_name(), error_class.to_s].join(':')
+        task = to_task_name('-')
 
         case error_class
-        when :TaskAbort, :TaskRetry
+        when :TaskAbort
           Onering::Logger.warn(e.message, source)
+          App::Metrics.increment("worker.tasks.all.aborts")
+          App::Metrics.increment("worker.tasks.#{task}.aborts")
+
+        when :TaskRetry
+          Onering::Logger.warn(e.message, source)
+          App::Metrics.increment("worker.tasks.all.retries")
+          App::Metrics.increment("worker.tasks.#{task}.retries")
+
         else
           Onering::Logger.error(e.message, source)
+          App::Metrics.increment("worker.tasks.all.failures")
+          App::Metrics.increment("worker.tasks.#{task}.failures")
+
         end
 
         unless e.nil? or e.backtrace.nil?
