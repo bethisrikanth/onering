@@ -79,7 +79,7 @@ module Automation
         self.name.split('::')[2..-1].map(&:underscore).join(joiner)
       end
 
-      def self.before_perform(*args)
+      def self.before_perform_aaa_log_metrics(*args)
         @_start = Time.now
         @_task = to_task_name('-')
         Onering::Logger.info("Starting task at #{@_start.to_s}", to_task_name())
@@ -87,7 +87,7 @@ module Automation
         App::Metrics.increment("worker.tasks.all.started")
       end
 
-      def self.after_perform(*args)
+      def self.after_perform_aaa_log_metrics(*args)
         @_end = Time.now
         time = (@_end - @_start)
         Onering::Logger.info("Task completed at #{@_end.to_s} (took: #{"%.6f" % time.to_f} seconds)", to_task_name())

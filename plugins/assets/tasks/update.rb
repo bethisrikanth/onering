@@ -76,7 +76,7 @@ module Automation
           end
         end
 
-        def self.before_perform(*args)
+        def self.before_perform_log(*args)
           node_object = args.first
 
           fail("Malformed node object: expected Hash, got #{node_object.class.name}") unless node_object.is_a?(Hash)
