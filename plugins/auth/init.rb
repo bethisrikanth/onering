@@ -315,7 +315,7 @@ module App
           user = User.find(id)
           return 404 unless user
 
-          if not user.client_keys[params[:name]]
+          if user.client_keys[params[:name]].nil?
             keyfile = Config.get!('global.authentication.methods.ssl.ca.key')
             crtfile = Config.get!('global.authentication.methods.ssl.ca.cert')
             client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"

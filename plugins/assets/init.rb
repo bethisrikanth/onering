@@ -122,7 +122,6 @@ module App
             if v.is_a?(Hash) and v['type'].is_a?(String)
               rv << p.join('.').gsub(/(?:^device\.|^asset\.|properties\.|\.properties)/,'')
             end
-
           end
 
           output(rv.sort)

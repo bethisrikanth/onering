@@ -50,16 +50,14 @@ module App
         end
 
       # automatically convert fields ending with _at or _on to Time
-        newhash = newhash.each_recurse do |k,v,p|
+        newhash = newhash.each_recurse do |k,v,p,o|
           case k
           when /_(?:at|on)$/i
             if v == 'now'
-              Time.now
+              o.rset(p, Time.now)
             else
-              (Time.parse(v) rescue v)
+              o.rset(p, (Time.parse(v) rescue v))
             end
-          else
-            v
           end
         end
 

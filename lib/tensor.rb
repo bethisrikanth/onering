@@ -270,7 +270,7 @@ module Tensor
       typedefs.reject!{|k,v| v.nil? or v.empty? }
 
 
-      rv.each_recurse do |k,v,p|
+      return rv.each_recurse do |k,v,p,o|
       # apply type definition if one was set
         unless (typedef = typedefs.get(p)).nil?
         # normalize
@@ -294,15 +294,11 @@ module Tensor
           rv.rset(p, new_value)
         end
 
-        if k.to_s =~ /_at$/
+        if k =~ /_at$/
           new_value = (Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z') rescue nil)
-          rv.rset(p, new_value) unless new_value.nil?
+          o.rset(p, new_value) unless new_value.nil?
         end
-
-        nil
       end
-
-      return rv
     end
 
 
@@ -1041,8 +1037,6 @@ module Tensor
                   } unless v.is_a?(Hash)
 
                   es_mapping.set(es_field, v)
-
-                  nil
                 end
               end
             end
