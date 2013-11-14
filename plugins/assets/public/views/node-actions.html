@@ -44,7 +44,7 @@
   </li>
 
   <li ng-show="node.properties.network.sockets.listening | pluck:'port' | contains:2600">
-    <a target="_blank" href="http://{{parent.node.properties.ip}}:2600"><i class="icon-terminal"> </i> Open Remote Console</a>
+    <a target="_blank" href="http://{{node.properties.ip}}:2600"><i class="icon-terminal"> </i> Open Remote Console</a>
   </li>
 
 
