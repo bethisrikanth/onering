@@ -6,7 +6,7 @@
     <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a>
   </li>
   <li>
-    <a rest="/api/devices/{{node.id}}/decomission"><i class="icon-trash"></i> Decomission Node</a>
+    <a rest="/api/devices/{{node.id}}/decomission" rest-confirm="Are you sure you want to decomission this node?  This is a DESTRUCTIVE action that will remove data from external systems and execute commands remotely on this machine."><i class="icon-trash"></i> Decomission Node</a>
   </li>
 
   <li class="nav-header">Flags</li>
