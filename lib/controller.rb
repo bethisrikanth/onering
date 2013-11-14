@@ -85,7 +85,7 @@ module App
           'X-Onering-Results-Count'       => result_count.to_s,
           'X-Onering-Results-Page-Size'   => ([result_count, @query_page_size].min).to_s,
           'X-Onering-Results-Page-Number' => @query_page_num.to_s,
-          'X-Onering-Results-Page-Count'  => (result_count / @query_page_size).ceil.to_s
+          'X-Onering-Results-Page-Count'  => (result_count.to_f / @query_page_size.to_f).ceil.to_i.to_s
         })
       end
 

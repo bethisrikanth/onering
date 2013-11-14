@@ -270,7 +270,7 @@ module Tensor
       typedefs.reject!{|k,v| v.nil? or v.empty? }
 
 
-      return rv.each_recurse do |k,v,p,o|
+      return rv.each_recurse do |k,v,p,dhm|
       # apply type definition if one was set
         unless (typedef = typedefs.get(p)).nil?
         # normalize
@@ -291,12 +291,22 @@ module Tensor
           end
 
         # update the value
-          o.rset(p, new_value)
+          dhm.set(p, new_value)
         end
 
         if k =~ /_at$/
-          new_value = (Time.parse(v.to_s).strftime('%Y-%m-%dT%H:%M:%S%z') rescue nil)
-          o.rset(p, new_value) unless new_value.nil?
+          if v.is_a?(String)
+            if v.strip.chomp.downcase == 'now'
+              v = Time.now
+            else
+              v = Time.parse(v)
+            end
+          end
+
+          if v.is_a?(Time)
+            new_value = v.strftime('%Y-%m-%dT%H:%M:%S%z')
+            dhm.set(p, new_value)
+          end
         end
       end
     end

@@ -210,11 +210,11 @@ private
       })
 
     # autotype the properties being applied
-      apply = apply.each_recurse do |k,v,p,o|
+      apply = apply.each_recurse do |k,v,p,dhm|
         if v.is_a?(Array)
-          o.rset(p, v.collect{|i| (i.autotype() rescue i) })
+          dhm.set(p, v.collect{|i| (i.autotype() rescue i) })
         else
-          o.rset(p, v.autotype())
+          dhm.set(p, v.autotype())
         end
       end
 
@@ -234,7 +234,7 @@ private
 
   def _resolve_references()
     unless self.properties.nil?
-      self.properties = self.properties.each_recurse do |k,v,p,o|
+      self.properties = self.properties.each_recurse do |k,v,p,dhm|
         if v.is_a?(String)
         # resolve expressions
         #
@@ -242,7 +242,7 @@ private
         #   {{ field_name }}
         #   {{ field_name:^regular.*expression[0-9]? }}  // optional regex capture
         #
-          o.rset(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
+          dhm.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
             x = self.properties.rget($1)
             x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
             x
