@@ -30,31 +30,6 @@ module Automation
               zk_json = MultiJson.load(response.body)
               fail("Invalid Zookie response") unless zk_json['children']
 
-              def get_leaf(base)
-                if base.is_a?(Hash) and base.has_key?('children') and base['children'].is_a?(Array)
-                  return base['children'].collect{|i| get_leaf(i) }.flatten
-                end
-
-                if base['data']
-                  data = (MultiJson.load(base['data']) rescue base['data'])
-
-                  host = base['path'].split('/')[6]
-                  return nil unless host
-
-                  node = Asset.urlquery("name:aliases/#{host}").first
-                  hid = (node[:_id] rescue nil)
-                  return nil unless hid
-
-                  return {
-                    :id      => hid,
-                    :product => (base['path'].split('/')[4].strip rescue nil),
-                    :version => (data['revision'] rescue nil)
-                  }
-                end
-
-                nil
-              end
-
               get_leaf(zk_json).each do |node|
                 if node
                   id = node.delete(:id)
@@ -165,6 +140,31 @@ module Automation
           end
 
           return nil
+        end
+
+        def self.get_leaf(base)
+          if base.is_a?(Hash) and base.has_key?('children') and base['children'].is_a?(Array)
+            return base['children'].collect{|i| get_leaf(i) }.flatten
+          end
+
+          if base['data']
+            data = (MultiJson.load(base['data']) rescue base['data'])
+
+            host = base['path'].split('/')[6]
+            return nil unless host
+
+            node = Asset.urlquery("name:aliases/#{host}").first
+            hid = (node[:_id] rescue nil)
+            return nil unless hid
+
+            return {
+              :id      => hid,
+              :product => (base['path'].split('/')[4].strip rescue nil),
+              :version => (data['revision'] rescue nil)
+            }
+          end
+
+          nil
         end
       end
     end
