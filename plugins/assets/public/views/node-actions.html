@@ -44,7 +44,7 @@
   </li>
 
   <li ng-show="node.properties.network.sockets.listening | pluck:'port' | contains:2600">
-    <a ng-click="openDialog('console',this,ConsoleDialogController)"><i class="icon-terminal"> </i> Open Remote Console</a>
+    <a target="_blank" href="http://{{parent.node.properties.ip}}:2600"><i class="icon-terminal"> </i> Open Remote Console</a>
   </li>
 
 
@@ -126,33 +126,6 @@
 
   <div class="modal-footer">
     <a class="btn btn-primary">Redeploy</a>
-    <a class="btn" ng-click="close()">Close</a>
-  </div>
-</script>
-
-<script type="text/ng-template" id="console">
-  <div class="modal-header">
-    <button type="button" class="close" ng-click="close()">&times;</button>
-    <h3>Remote Console</h3>
-  </div>
-
-  <div class="modal-body" style="padding:0">
-    <div class="container-fluid" style="padding:0">
-      <div class="row-fluid">
-        <div class="span10" style="padding: 9px 14px">
-          <div class="btn-group">
-            <a class="btn" title="Open the console in a new window" ng-click="close()" target="_blank" href="http://{{parent.node.properties.ip}}:2600"><i class="icon-fullscreen"> </i> Breakout</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="row-fluid">
-        <div style="height: 340px; overflow:hidden" ng-bind-html-unsafe="console(parent.node.properties.ip)"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-footer">
     <a class="btn" ng-click="close()">Close</a>
   </div>
 </script>
