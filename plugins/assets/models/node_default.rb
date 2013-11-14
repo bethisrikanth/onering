@@ -45,10 +45,20 @@ class NodeDefault < App::Model::Elasticsearch
 
     # convert type if necessary
       if m[:type].nil?
-        value = value.to_s.autotype()
+        if value.is_a?(Array)
+          value = value.collect{|i| i.to_s.autotype() }
+        else
+          value = value.to_s.autotype()
+        end
+
         m[:value] = m[:value].to_s.autotype()
       else
-        value = value.to_s.convert_to(m[:type])
+        if value.is_a?(Array)
+          value = value.collect{|i| i.to_s.convert_to(m[:type]) }
+        else
+          value = value.to_s.convert_to(m[:type])
+        end
+
         m[:value] = m[:value].to_s.convert_to(m[:type])
       end
 
@@ -69,7 +79,11 @@ class NodeDefault < App::Model::Elasticsearch
         when 'not'
           return false if value == m[:value]
         else
-          return false if not value == m[:value]
+          if value.is_a?(Array)
+            return false if not value.include?(m[:value])
+          else
+            return false if not value == m[:value]
+          end
         end
       rescue Exception => e
         Onering::Logger.warn("Encountered error applying node default: #{e.class.name} - #{e.message}", "NodeDefault")

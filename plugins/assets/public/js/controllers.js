@@ -449,6 +449,7 @@ function AssetDefaultsController($scope, $http, $timeout){
 
   $scope.sortField = 'name';
   $scope.sortReverse = false;
+  $scope.node_defaults = {};
 
   $scope.add = function(group){
     var o = {
@@ -458,6 +459,10 @@ function AssetDefaultsController($scope, $http, $timeout){
       apply:   {},
       enabled: true
     };
+
+    if(angular.isUndefined($scope.node_defaults[group || 'Ungrouped'])){
+      $scope.node_defaults[group || 'Ungrouped'] = [];
+    }
 
     $scope.node_defaults[group || 'Ungrouped'].push(o);
     $scope.edit(o);
