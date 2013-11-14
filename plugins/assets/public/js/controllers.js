@@ -40,10 +40,10 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
 
         if(headers('X-Onering-Results-Count')){
           $scope.pages = {
-            results: headers('X-Onering-Results-Count'),
-            per:     headers('X-Onering-Results-Page-Size'),
-            current: headers('X-Onering-Results-Page-Number'),
-            total:   headers('X-Onering-Results-Page-Count')
+            results: parseInt(headers('X-Onering-Results-Count')),
+            per:     parseInt(headers('X-Onering-Results-Page-Size')),
+            current: parseInt(headers('X-Onering-Results-Page-Number')),
+            total:   parseInt(headers('X-Onering-Results-Page-Count'))
           }
         }
 

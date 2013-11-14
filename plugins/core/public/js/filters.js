@@ -401,10 +401,13 @@ config(['$provide', function($provide) {
 
       if(angular.isUndefined(lower)){
         lower = 0;
+      }else{
+        lower = parseInt(lower);
       }
 
+      upper = parseInt(upper);
 
-      for(var i = lower; i < upper; i++){
+      for(var i = lower; i < (upper+lower); i++){
         rv.push(i);
       }
 
