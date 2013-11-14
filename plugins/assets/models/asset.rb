@@ -161,7 +161,7 @@ class Asset < App::Model::Elasticsearch
 private
   def _compact()
     unless self.properties.nil?
-      self.properties = self.properties.compact
+      self.properties = self.properties.compact()
     end
   end
 
@@ -192,6 +192,7 @@ private
       created_at
       collected_at
     }
+
   # get all defaults that apply to this node
     NodeDefault.defaults_for(self).each do |m|
     # remove fields that cannot/should not be set by a rule
@@ -246,7 +247,6 @@ private
             x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
             x
           })
-
         end
       end
     end
@@ -260,169 +260,3 @@ private
     }
   end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class Asset < App::Model::Elasticsearch
-#   include App::Model::Taggable
-
-#   #set_collection_name "devices"
-
-#   VALID_STATUS = ['online', 'allocatable', 'reserved', 'installing']
-#   MANUAL_STATUS = ['reserved']
-#   NO_AUTOCLEAR_STATUS = ['provisioning', 'installing']
-
-
-#   before_validation :_compact
-#   before_validation :_mangle_id
-#   before_validation :_confine_status
-#   before_validation :_apply_defaults
-#   before_validation :_resolve_references
-
-#   property :id,                 :type =>'string'
-#   property :parent_id,          :type =>'string'
-#   property :name,               :type =>'string'
-#   property :status,             :type =>'string'
-#   property :maintenance_status, :type => 'string'
-#   property :created_at,         :type => 'date', :default => Time.now
-#   property :updated_at,         :type => 'date', :default => Time.now
-#   property :collected_at,       :type => 'date'
-#   property :tags,               :default => []
-#   property :aliases,            :default => []
-#   property :properties,         :default => {}
-
-
-#   def add_note(body, user_id)
-#     id = Time.now.to_i.to_s
-
-#     if properties
-#       properties['notes'] = {} unless properties['notes']
-#       now = Time.now
-
-#       if properties['notes'][id]
-#         note = properties['notes'][id]
-#       else
-#         note = {
-#           'user_id'    => user_id,
-#           'created_at' => now
-#         }
-#       end
-
-#       note['body'] = body
-#       note['updated_at'] = now
-
-#       properties['notes'][id] = note
-#       return true
-#     end
-
-#     false
-#   end
-
-#   def parent
-#     (parent_id ? Asset.find(parent_id) : nil)
-#   end
-
-#   def children
-#     Asset.search({
-#       :parent_id => id
-#     }).to_a
-#   end
-
-#   def defaults
-#     NodeDefault.defaults_for(self)
-#   end
-
-#   private
-#     def _mangle_id
-#       id = id.strip.downcase if id
-#     end
-
-#     def _confine_status
-#       if self.status_changed?
-#         if not VALID_STATUS.include?(self.status)
-#           errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
-#         end
-
-#       # automatic collection cannot clear a reserved state
-#         if MANUAL_STATUS.include?(self.status_was)
-#           if self.collected_at_changed?
-#             self.status = self.status_was
-#           end
-#         end
-#       end
-#     end
-
-#     def _id_pattern_valid?
-#       errors.add(:id, "Asset ID must be at least 6 hexadecimal characters, is: #{id}") if not id =~ /[0-9a-f]{6,}/
-#     end
-
-#     def _compact
-#       self.properties = self.properties.compact
-#     end
-
-
-
-#   class<<self
-#     include App::Helpers
-
-#   # urlsearch
-#   # perform a query formatted as a URL partial path component
-#     def urlsearch(urlquery)
-#       self.search(Asset.to_mongo(urlquery))
-#     end
-
-#     def to_mongo(urlquery)
-#       return urlquerypath_to_mongoquery(urlquery)
-#     end
-
-#   # list
-#   # list distinct values for a field
-#     def list(field, query=nil)
-#       field = case field
-#       when 'id' then '_' + field
-#       when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
-#       else "properties.#{field}"
-#       end
-
-#       super(field, query)
-#     end
-
-#   # summarize
-#   #   this method provides arbitrary-depth aggregate rollups of a MongoDB
-#   #   collection, using the MongoDB Aggregation Framework (mongodb 2.1+)
-#   #
-#   #   group_by:   the top-level field to group by
-#   #   properties: additional fields to drill down into
-#   #   query:      a query Hash to filter the collection by
-#   #               (defaults to a summary of the whole collection)
-#   #
-#     def summarize(group_by, properties=[], query=nil, options={})
-#       fields = ([group_by]+[*properties]).compact.collect{|field|
-#         case field
-#         when 'id' then '_' + field
-#         when Regexp.new("^(#{TOP_LEVEL_FIELDS.join('|')})$") then field
-#         else "properties.#{field}"
-#         end
-#       }
-
-#       results = (query.nil? ? self.fields(fields) : self.search(query).fields(fields)).collect{|i|
-#         i.to_h!
-#       }
-
-#       results.count_distinct(fields)
-#     end
-#   end
-# end

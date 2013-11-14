@@ -291,7 +291,7 @@ module Tensor
           end
 
         # update the value
-          rv.rset(p, new_value)
+          o.rset(p, new_value)
         end
 
         if k =~ /_at$/

@@ -73,6 +73,7 @@ class NodeDefault < App::Model::Elasticsearch
         end
       rescue Exception => e
         Onering::Logger.warn("Encountered error applying node default: #{e.class.name} - #{e.message}", "NodeDefault")
+        Onering::Logger.debug("Node Default ID #{self.id}, field #{m[:field]}. Node value = #{value}, applying #{m[:value]}", "NodeDefault")
         return false
       end
     end
