@@ -77,7 +77,11 @@ class NodeDefault < App::Model::Elasticsearch
           return false if value.nil?
           return false if not value >= m[:value]
         when 'not'
-          return false if value == m[:value]
+          if value.is_a?(Array)
+            return false if value.include?(m[:value])
+          else
+            return false if value == m[:value]
+          end
         else
           if value.is_a?(Array)
             return false if not value.include?(m[:value])
