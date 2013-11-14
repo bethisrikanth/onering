@@ -149,7 +149,7 @@ class Asset < App::Model::Elasticsearch
 
     notes = self.properties.rget(:notes, [])
     notes << {
-      :created_at => Time.now.strftime('%Y-%m-%dT%H:%M:%S%z'), #this is a damned cop-out...
+      :created_at => Time.now,
       :user_id    => user_id,
       :body       => body
     }
@@ -228,7 +228,6 @@ private
     end
 
     self.from_hash(device)
-
     self
   end
 

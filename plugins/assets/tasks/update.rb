@@ -33,6 +33,7 @@ module Automation
         # accumulate stale entries
         #
           inventory = node.to_hash()
+
           unset_keys = Hash[node_object.coalesce(nil, nil, '.').select{|k,v|
             k.include?('@')
           }].keys.collect{|k|
@@ -42,18 +43,21 @@ module Automation
             (i ? k.first(i+1).join('.') : nil)
           }.compact.uniq
 
-
         # delete existing keys that are to be replaced
         # rename incoming keys to exclude symbols
           unset_keys.each do |key|
             inventory.unset(key.delete('@'))
-            node_object.rekey(key, key.delete('@'))
+
+            value = node_object.get(key)
+            node_object.unset(key)
+            node_object.rset(key.delete('@'), value)
           end
 
         # merge the new into the old
           inventory = inventory.deeper_merge!(node_object, {
             :merge_hash_arrays => true
           })
+
 
         # set collected_at time
           if inventory['inventory'].to_bool === true
@@ -66,7 +70,7 @@ module Automation
 
         # save
           if node.save({
-            :reload => false
+            :reload => true
           },{
             :refresh => false
           })

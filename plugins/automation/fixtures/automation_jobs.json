@@ -1,7 +1,0 @@
-[{
-  "name": "automation-purge",
-  "_type": "Automation::Job",
-  "tasks": [{
-    "type":   "assets.update"
-  }]
-}]

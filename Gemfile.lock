@@ -69,7 +69,7 @@ GEM
     haml (4.0.3)
       tilt
     hashie (2.0.5)
-    hashlib (0.0.33)
+    hashlib (0.0.34)
     httparty (0.11.0)
       multi_json (~> 1.0)
       multi_xml (>= 0.5.2)
@@ -235,7 +235,7 @@ DEPENDENCIES
   elasticsearch (>= 0.4.0)
   eventmachine
   haml
-  hashlib (>= 0.0.33)
+  hashlib (>= 0.0.34)
   ipaddress
   jekyll
   liquid

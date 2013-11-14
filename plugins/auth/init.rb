@@ -21,8 +21,8 @@ module App
     # get session secret from config
     # TODO: should this rotate at all?
       set :session_secret, File.read(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key'))
-      set :session_domain, Config.get('authentication.session.domain')
-      set :session_path,   Config.get('authentication.session.path', '/api')
+      set :session_domain, Config.get('global.authentication.session.domain')
+      set :session_path,   Config.get('global.authentication.session.path', '/api')
     end
 
     helpers do
@@ -42,90 +42,94 @@ module App
 
   # session based authentication
     before do
-      unless anonymous?(request.path)
-        @bootstrapUser = false
+      if Config.get('global.authentication.autologin')
+        @user = User.find(Config.get('global.authentication.autologin'))
+      else
+        unless anonymous?(request.path)
+          @bootstrapUser = false
 
-      # attempt SSL client key auth (if present)
-        if ssl_verified?
-          subject = ssl_hash(:subject)
-          issuer =  ssl_hash(:issuer)
+        # attempt SSL client key auth (if present)
+          if ssl_verified?
+            subject = ssl_hash(:subject)
+            issuer =  ssl_hash(:issuer)
 
-        # subject and issuer are required
-          if subject and issuer
-          # make sure issuer Organization's match
-            #subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
+          # subject and issuer are required
+            if subject and issuer
+            # make sure issuer Organization's match
+              #subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
 
-          # get OU, CN
-            ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
-            cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
+            # get OU, CN
+              ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
+              cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
 
-          # if SSL subject is .../OU=System/CN=Validation
-            if cn
-              if ou == 'System'
-                if cn == 'Validation'
-                  @bootstrapUser = true
+            # if SSL subject is .../OU=System/CN=Validation
+              if cn
+                if ou == 'System'
+                  if cn == 'Validation'
+                    @bootstrapUser = true
+                  else
+                    halt 403, "Invalid system certificate presented"
+                  end
                 else
-                  halt 403, "Invalid system certificate presented"
+                # get user named by CN
+                  @user = User.find(cn) rescue nil
                 end
               else
-              # get user named by CN
-                @user = User.find(cn) rescue nil
+                halt 403, "Invalid client certificate presented"
               end
-            else
-              halt 403, "Invalid client certificate presented"
-            end
 
-          # TODO
-          # ensure the key submitted matches the like-named key for this user
-          # does this mean i have to store the private key and sign this cert to "properly" verify it?
-          #
+            # TODO
+            # ensure the key submitted matches the like-named key for this user
+            # does this mean i have to store the private key and sign this cert to "properly" verify it?
+            #
+            end
           end
-        end
 
-      # if SSL client key was not present...
-        if not @user and not @bootstrapUser
-          mechanism = (request.env['HTTP_X_AUTH_MECHANISM'] || (params[:token].nil? ? nil : 'token')).to_s.downcase
+        # if SSL client key was not present...
+          if not @user and not @bootstrapUser
+            mechanism = (request.env['HTTP_X_AUTH_MECHANISM'] || (params[:token].nil? ? nil : 'token')).to_s.downcase
 
-          case mechanism
-          when 'basic'
-            auth = Rack::Auth::Basic::Request.new(request.env)
+            case mechanism
+            when 'basic'
+              auth = Rack::Auth::Basic::Request.new(request.env)
 
-            if auth.provided? and auth.basic? and auth.credentials
-              user = User.find(auth.credentials.first)
-              halt 401 if user.nil?
+              if auth.provided? and auth.basic? and auth.credentials
+                user = User.find(auth.credentials.first)
+                halt 401 if user.nil?
 
-              user = user_authenticate(user, auth.credentials.last)
-              halt 401 if user.nil?
+                user = user_authenticate(user, auth.credentials.last)
+                halt 401 if user.nil?
 
-              @user = user
-            else
-              response['WWW-Authenticate'] = "Basic realm=\"Onering on #{ENV['SERVER_NAME']}\""
-              halt 401
-            end
+                @user = user
+              else
+                response['WWW-Authenticate'] = "Basic realm=\"Onering on #{ENV['SERVER_NAME']}\""
+                halt 401
+              end
 
-          when 'token'
-            if params[:token] =~ /[0-9a-f]{32,64}/
-              user = User.urlquery("tokens.key/#{params[:token]}").to_a
+            when 'token'
+              if params[:token] =~ /[0-9a-f]{32,64}/
+                user = User.urlquery("tokens.key/#{params[:token]}").to_a
 
-              if user.length == 1
-                @user = user.first
+                if user.length == 1
+                  @user = user.first
+                else
+                  halt 401, "Invalid API token specified"
+                end
               else
                 halt 401, "Invalid API token specified"
               end
+
+
             else
-              halt 401, "Invalid API token specified"
+              session_start!
+              session! unless session?
+              @user = User.find(session[:user]) if session[:user]
+
             end
-
-
-          else
-            session_start!
-            session! unless session?
-            @user = User.find(session[:user]) if session[:user]
-
           end
-        end
 
-        halt 401, "Invalid authentication request" unless @user or @bootstrapUser
+          halt 401, "Invalid authentication request" unless @user or @bootstrapUser
+        end
       end
     end
 

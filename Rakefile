@@ -131,6 +131,34 @@ namespace :db do
     end
   end
 
+
+  desc "Loads the default fixture data from all plugins into the database"
+  task :load, :facet do |t, args|
+    fixtures = Dir[File.join([ENV['PROJECT_ROOT'], "plugins", "*", "fixtures", args[:facet], "*.json"].compact)]
+
+    if not fixtures.empty?
+      Onering::Logger.info("Loading fixtures from #{fixtures.length} files")
+
+      fixtures.each do |fixture|
+        Onering::Logger.debug("Loading file #{fixture}")
+
+        json = MultiJson.load(File.read(fixture))
+
+        if json.is_a?(Array) and json.first.is_a?(Hash)
+          json.each do |i|
+            begin
+              klass = (i.delete('_type') || File.basename(fixture, '.json').sub(/s$/,'')).camelize.constantize()
+              klass.new.from_h(i,true,false).save()
+            rescue
+              Onering::Logger.warn("Error processing #{fixture} @ #{i['id']}")
+              next
+            end
+          end
+        end
+      end
+    end
+  end
+
   desc "Destroy and recreate an empty database"
   task :reinitialize => [:nuke, :sync] do
     puts "Reinitialized database"
