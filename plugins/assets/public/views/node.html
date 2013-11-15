@@ -96,15 +96,18 @@
     <div class="span3">
       <br />
       <div class="btn-group pull-right">
-        <button class="btn btn-success" ng-click="reload()"><i class="icon-refresh icon-white"> </i> Reload</button>
-        <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+        <button class="btn" ng-class="{'btn-danger': reload_suspended, 'btn-success': !reload_suspended}" ng-click="reload(true)"><i class="icon-refresh icon-white"> </i> Reload</button>
+        <button class="btn dropdown-toggle" ng-class="{'btn-danger': reload_suspended, 'btn-success': !reload_suspended}" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a ng-click="interval=5000">Every 5 seconds</a></li>
-          <li><a ng-click="interval=10000">Every 10 seconds</a></li>
-          <li><a ng-click="interval=30000">Every 30 seconds</a></li>
-          <li><a ng-click="interval=60000">Every 60 seconds</a></li>
+          <li ng-hide="reload_suspended"><a ng-click="reload_suspended=true">Suspend Auto-reload</a></li>
+          <li ng-show="reload_suspended"><a ng-click="reload_suspended=false">Resume Auto-reload</a></li>
+          <li class="divider"></li>
+          <li><a ng-click="interval=5000" ng-class="{'bold': (interval==5000)}">Every 5 seconds</a></li>
+          <li><a ng-click="interval=10000" ng-class="{'bold': (interval==10000)}">Every 10 seconds</a></li>
+          <li><a ng-click="interval=30000" ng-class="{'bold': (interval==30000)}">Every 30 seconds</a></li>
+          <li><a ng-click="interval=60000" ng-class="{'bold': (interval==60000)}">Every 60 seconds</a></li>
         </ul>
       </div>
       <i class="icon-circle-arrow-right"> </i> <b>First Registered: </b>{{ node.created_at | timeAgo }}<br />

@@ -46,7 +46,9 @@
           </tbody>
         </table>
 
-        <div ng-show="opt.editProvisioning" ng-include="'views/node-actions-provision-form.html'"></div>
+        <div ng-show="opt.editProvisioning">
+          <div ng-include="'views/node-actions-provision-form.html'"></div>
+        </div>
 
         <div class="pull-right">
           <a target="_blank" class="btn" href="/api/provision/{{node.id}}"><i class="icon-ok icon-list"> </i> View Script</a>

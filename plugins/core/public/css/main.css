@@ -27,6 +27,10 @@ address{
   text-align: center !important;
 }
 
+.bold{
+  font-weight: bold !important;
+}
+
 body .modal {
   width: 774px;
   margin-left: -357px;

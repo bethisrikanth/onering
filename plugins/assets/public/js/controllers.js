@@ -197,6 +197,8 @@ function RackController($scope, $http, $routeParams, Rack){
 }
 
 function NodeController($scope, $http, $location, $routeParams, $window, $position){
+  $scope.reload_suspended = false;
+
   $scope.opt = {
     ping:              null,
     diskTab:           'block',
@@ -206,7 +208,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     netTab:            'interfaces',
     graphsFrom:        '-6hours',
     dns_sort:          ['type', 'name'],
-    editProvisioning:  true,
+    editProvisioning:  false,
     provision: {
       formHelp: {},
       families: [{
@@ -275,7 +277,11 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     return (angular.isDefined(i['address']) && i['address'].length > 0);
   }
 
-  $scope.reload = function(){
+  $scope.reload = function(force){
+    if($scope.reload_suspended == true && !(force === true)){
+      return false;
+    }
+
     if(!angular.isUndefined($routeParams.id)){
   //  device
       $http.get('/api/devices/'+$routeParams.id).success(function(data){
@@ -393,6 +399,10 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
 
     }
   });
+
+  $scope.$watch('opt.editProvisioning', function(value){
+    $scope.reload_suspended = value;
+  })
 
   $scope.tick = function(){
     $scope.opt.currentTime = new Date();
