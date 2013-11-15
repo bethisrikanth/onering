@@ -209,6 +209,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
     graphsFrom:        '-6hours',
     dns_sort:          ['type', 'name'],
     editProvisioning:  false,
+    editPhysical:      false,
     provision: {
       formHelp: {},
       families: [{

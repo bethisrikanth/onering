@@ -29,6 +29,14 @@ class NilClass
   def to_bool
     false
   end
+
+  def autotype(*args)
+    self
+  end
+
+  def coerce(*args)
+    self
+  end
 end
 
 class String

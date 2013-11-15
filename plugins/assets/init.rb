@@ -87,7 +87,7 @@ module App
         /find/*
       }.each do |r|
         get r do#ne
-          qsq       = (params[:q] || params[:query] || '')
+          qsq       = (params[:q] || params[:query]).autotype()
           q         = (!params[:splat] || params[:splat].empty? ? qsq : params[:splat].first.split('/').join('/')+(qsq ? '/'+qsq : ''))
           fields    = params[:only].split(',') unless params[:only].nil?
 
@@ -150,7 +150,7 @@ module App
         /list/*
       }.each do |r|
         get r do#ne
-          output(Asset.list(params[:splat].first.split('/'), params[:q]))
+          output(Asset.list(params[:splat].first.split('/'), params[:q].autotype()))
         end
       end
 
@@ -161,7 +161,7 @@ module App
         /summary/by-:field/*/?
       }.each do |r|
         get r do#ne
-          q = (params[:where] || params[:q])
+          q = (params[:where] || params[:q]).autotype()
           rv = Asset.summarize(params[:field], (params[:splat].first.split('/').reverse rescue []), q)
           output(rv)
         end
