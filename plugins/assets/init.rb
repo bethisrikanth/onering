@@ -532,6 +532,7 @@ module App
       get '/:id/status/:status' do
         device = Asset.find(params[:id])
         return 404 if not device
+
         case params[:status]
         when 'unknown', 'clear', 'null'
           device.status = nil
@@ -539,7 +540,9 @@ module App
           device.status = params[:status]
         end
 
-        device.save({},{
+        device.save({
+          :reload => true
+        },{
           :replication => :sync
         })
 

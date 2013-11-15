@@ -4,8 +4,8 @@ require 'assets/lib/helpers'
 
 
 class Asset < App::Model::Elasticsearch
-  VALID_STATUS = %w{online allocatable installing}
-  NO_AUTOCLEAR_STATUS = %w{installing}
+  VALID_STATUS = %w{online allocatable installing booting}
+  NO_AUTOCLEAR_STATUS = %w{installing booting}
 
   index_options do
     {
