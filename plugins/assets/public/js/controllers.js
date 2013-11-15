@@ -272,7 +272,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   }
 
   $scope.hasAddress = function(i){
-    return (i['address'].length > 0);
+    return (angular.isDefined(i['address']) && i['address'].length > 0);
   }
 
   $scope.reload = function(){
