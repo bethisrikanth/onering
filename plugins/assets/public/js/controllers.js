@@ -4,9 +4,19 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.pagenum = 1;
   $scope.sortField = 'name';
   $scope.sortReverse = false;
+  $scope.reload_suspended = false;
 
-  $scope.reload = function(){
+  $scope.opt = {
+    lastLoadTime: null
+  };
+
+  $scope.reload = function(force){
+    if(($scope.reload_suspended == true && !(force === true)) || $scope.loading == true){
+      return false;
+    }
+
     $scope.loading = true;
+    console.log('Reloading!')
 
   //run arbitrary query
     if($scope.query){
@@ -48,25 +58,9 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
         }
 
         $scope.loading = false;
+        $scope.opt.lastLoadTime = new Date();
         $scope.time_left = 0;
       });
-    }
-  }
-
-  $scope.setAutoReload = function(interval){
-    if(interval){
-      if($scope.autoreload_id) $scope.clearAutoReload();
-      $scope.autoreload_id = $window.setInterval($scope.reload, interval);
-      $scope.time_left = interval;
-      $scope.reload();
-    }
-  }
-
-  $scope.clearAutoReload = function(){
-    if($scope.autoreload_id){
-      $window.clearInterval($scope.autoreload_id);
-      $scope.autoreload_id = null;
-      $scope.time_left = 0;
     }
   }
 
@@ -107,7 +101,19 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
     }
   });
 
-  $scope.reload();
+  $scope.$watch('interval', function(){
+    if(angular.isDefined($scope.interval)){
+      if(angular.isDefined($scope.interval_id)){
+        $window.clearInterval($scope.interval_id);
+      }
+
+      console.log('Setting interval to', $scope.interval)
+      $scope.interval_id = $window.setInterval($scope.reload, $scope.interval);
+      $scope.reload();
+    }
+  });
+
+  $scope.interval = 60000;
 }
 
 function SummaryController($scope, $http, $routeParams, $route){
