@@ -359,11 +359,15 @@ module App
             client_cert.sign(key, OpenSSL::Digest::SHA256.new)
 
           # save this key
-            user.client_keys[params[:name]] = {
+          # TODO: Oh man this is some sad stuff right here...
+          #       Need to refactor Tensor such that fields are actually classes
+          #       instead of some weird type tracking thing
+          #
+            user.client_keys = (user.client_keys[params[:name]] = {
               :name       => params[:name],
               :public_key => client_cert.to_pem,
               :created_at => Time.now
-            }
+            })
 
             user.save()
 

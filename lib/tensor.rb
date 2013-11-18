@@ -358,6 +358,18 @@ module Tensor
         end
       end
 
+    # define element reference
+      define_method(:"#{name}[]") do |key|
+        if instance_variables.include?(:"@#{name}")
+          value = instance_variable_get(:"@#{name}")
+          raise NoMethodError.new("undefined method `[]' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:[])
+
+          value[key]
+        else
+          self.class._normalize_value(nil, fields(name))
+        end
+      end
+
     # define setter
       define_method(:"#{name}=") do |value|
       # normalize the value according to type/default rules for this field
@@ -373,6 +385,36 @@ module Tensor
         send(name)
       end
 
+    # define element assignment
+      define_method(:"#{name}[]=") do |key, kval|
+        if not instance_variables.include?(:"@#{name}")
+          instance_variable_set(:"@#{name}", self.class._normalize_value({}, fields(name)))
+        end
+
+        value = instance_variable_get(:"@#{name}")
+        raise NoMethodError.new("undefined method `[]=' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:[]=)
+        value[key] = kval
+
+      # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
+        @_dirty = true unless @_permaclean
+
+        send(:"#{name}[]", key)
+      end
+
+    # define appender
+      define_method(:"#{name}<<") do |append|
+        if not instance_variables.include?(:"@#{name}")
+          instance_variable_set(:"@#{name}", self.class._normalize_value(nil, fields(name)))
+        end
+
+        value = instance_variable_get(:"@#{name}")
+        raise NoMethodError.new("undefined method `<<' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:<<)
+
+      # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
+        @_dirty = true unless @_permaclean
+
+        value << append
+      end
     end
 
 
