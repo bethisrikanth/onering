@@ -363,7 +363,7 @@ module App
           #       Need to refactor Tensor such that fields are actually classes
           #       instead of some weird type tracking thing
           #
-            user.client_keys = (user.client_keys.stringify_keys.merge({
+            user.client_keys = user.client_keys.stringify_keys.merge({
               params[:name] => {
                 :name       => params[:name],
                 :public_key => client_cert.to_pem,
