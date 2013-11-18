@@ -308,7 +308,7 @@ module App
           if @bootstrapUser === true and not id === 'current'
             machine_klass = Config.get('global.authentication.machine_user_type', 'DeviceUser').constantize()
 
-            machine_klass.find(id) || machine_klass.create({
+            machine_klass.create({
               :id => id
             })
           end
@@ -363,10 +363,12 @@ module App
           #       Need to refactor Tensor such that fields are actually classes
           #       instead of some weird type tracking thing
           #
-            user.client_keys = (user.client_keys[params[:name]] = {
-              :name       => params[:name],
-              :public_key => client_cert.to_pem,
-              :created_at => Time.now
+            user.client_keys = (user.client_keys.stringify_keys.merge({
+              params[:name] => {
+                :name       => params[:name],
+                :public_key => client_cert.to_pem,
+                :created_at => Time.now
+              }
             })
 
             user.save()
