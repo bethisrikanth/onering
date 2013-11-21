@@ -54,6 +54,29 @@ Array.prototype.firstWith = function(key, value){
   return null;
 }
 
+Object.prototype.propertyGet = function(path, defval){
+  if(!angular.isArray(path)){
+    path = path.split('.');
+  }
+
+  var work = this;
+
+
+  for(var i = 0; i < path.length; i++){
+    if(work.hasOwnProperty(path[i])){
+      work = work[path[i]];
+    }else{
+      return defval;
+    }
+  }
+
+  if(angular.isDefined(work) && work != null){
+    return work;
+  }else{
+    return defval;
+  }
+}
+
 Array.prototype.max = function() {
   return Math.max.apply(null, this);
 };
@@ -242,6 +265,20 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('sumFilter', function(){
+    return function(array){
+      if (!(array instanceof Array)) return NaN;
+      rv = 0.0;
+
+      for(var i = 0; i < array.length; i++){
+        rv += parseFloat(array[i]);
+      }
+
+      return rv;
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('joinFilter', function(){
     return function(array, delimiter){
       if (!(array instanceof Array)) return array;
@@ -305,16 +342,14 @@ config(['$provide', function($provide) {
 }]).
 config(['$provide', function($provide) {
   $provide.factory('pluckFilter', function(){
-    return function(array,key){
+    return function(array,key,defval){
       if (!(array instanceof Array)) return array;
 
       rv = []
 
       for(var i = 0; i < array.length; i++){
         if(angular.isObject(array[i])){
-          if(array[i].hasOwnProperty(key)){
-            rv.push(array[i][key]);
-          }
+          rv.push(array[i].propertyGet(key,defval));
         }
       }
 
