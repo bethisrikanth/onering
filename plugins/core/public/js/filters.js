@@ -54,6 +54,7 @@ Array.prototype.firstWith = function(key, value){
   return null;
 }
 
+/*
 Object.prototype.propertyGet = function(path, defval){
   if(!angular.isArray(path)){
     path = path.split('.');
@@ -76,6 +77,7 @@ Object.prototype.propertyGet = function(path, defval){
     return defval;
   }
 }
+*/
 
 Array.prototype.max = function() {
   return Math.max.apply(null, this);
