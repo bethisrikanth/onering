@@ -188,13 +188,12 @@ module App
             })
 
           elsif rv.is_a?(String)
-            if rv =~ /[\\[\\*\\?\\{}\^\$]]/
-              rv.gsub!('.', '\\.')
-              rv.gsub!('*', '.*')
+            if rv =~ /[\[\]\*\?\{\}\^\$\\]/ || rv[0].chr == '~'
+              rv.gsub!(/^~/,'')
 
               return {
                 :regexp => {
-                  field => rv,
+                  field => rv
                 }
               }
             else
