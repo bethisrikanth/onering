@@ -190,6 +190,8 @@ module App
           elsif rv.is_a?(String)
             if rv =~ /[\[\]\*\?\{\}\^\$\\]/ || rv[0].chr == '~'
               rv.gsub!(/^~/,'')
+              rv.gsub!(/^\^/,'')
+              rv.gsub!(/[\$]$/,'')
 
               return {
                 :regexp => {
