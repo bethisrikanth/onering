@@ -5,14 +5,18 @@
 
   <tabset>
     <!-- Sites -->
-    <tab heading="NYDC1">
+    <tab ng-repeat="(site, site_clusters) in clusters" heading="{{ site | uppercase }}">
       <ul class="nav nav-pills">
-        <li class="active"><a>Production</a></li>
-        <li><a>Development</a></li>
-        <li><a>Testing</a></li>
+        <li
+          ng-repeat="(site_cluster, master) in site_clusters"
+          ng-click="getMesosStats(master.id)"
+          ng-class="{'active': (current_cluster.cluster == site_cluster)}"
+        >
+          <a>{{ site_cluster }}</a>
+        </li>
       </ul>
 
-      <div>
+      <div ng-show="current_cluster">
         <table class="table table-condensed table-hover">
           <thead>
             <tr>
@@ -21,16 +25,16 @@
               <th>CPU</th>
               <th>RAM</th>
               <th>Framework</th>
-              <th>Executor</th>
+              <th>State</th>
             </tr>
           </thead>
 
           <tbody>
             <tr>
               <th>TOTAL</th>
-              <th>{{ mock_tasks | pluck:'running' | sum }} / {{ mock_tasks | pluck:'instances' | sum }}</th>
-              <th>-</th>
-              <th>-</th>
+              <th>{{ (current_cluster.frameworks | pluck:'tasks' | flatten).length }}</th>
+              <th>{{ (current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum }}</th>
+              <th>{{ (((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum) * 1024 * 1024) | autosize }}</th>
               <th></th>
               <th></th>
             </tr>
@@ -46,13 +50,13 @@
           </tbody>
 
           <tbody>
-            <tr ng-repeat="task in mock_tasks">
-              <td>{{ task.name }}</td>
-              <td><span ng-class="{'text-red': (task.running < task.instances)}">{{ task.running }}</span> / {{ task.instances }}</td>
-              <td>{{ task.running * task.resources.cpu }}</td>
-              <td>{{ task.running * task.resources.memory }} GB</td>
-              <td>{{ task.framework.name }}/{{ task.framework.executor }}</td>
-              <td>{{ task.framework.details.title }}</td>
+            <tr ng-repeat="task in (current_cluster.frameworks | pluck:'tasks' | flatten)">
+              <td>{{ task.name || task.id }}</td>
+              <td></td>
+              <td>{{ task.resources.cpus }}</td>
+              <td>{{ (task.resources.mem * 1024 * 1024) | autosize }}</td>
+              <td>{{ task.framework_id }}/{{ task.executor_id }}</td>
+              <td>{{ task.state }}</td>
             </tr>
           </tbody>
 
@@ -69,8 +73,8 @@
             <tr>
               <th>AVAILABLE</th>
               <th></th>
-              <th>-</th>
-              <th>-</th>
+              <th>{{ (current_cluster.slaves | pluck:'resources.cpus' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum) }}</th>
+              <th>{{ ((current_cluster.slaves | pluck:'resources.mem' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum)) * 1024 * 1024 | autosize }}</th>
               <th></th>
               <th></th>
             </tr>

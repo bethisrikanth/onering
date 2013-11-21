@@ -1,63 +1,38 @@
-function HarbormasterTasksController($scope){
-  $scope.mock_tasks = [{
-    name: "onering-worker",
-    running:   47,
-    instances: 48,
-    framework: {
-      name: "marathon",
-      executor: "docker",
-      details: {
-        title: "ops/onering-worker:latest"
+function HarbormasterTasksController($scope, $http, $window){
+  $scope.reload = function(){
+    $http.get('/api/harbormaster/mesos/clusters').success(function(data){
+      $scope.clusters = data;
+
+      if(angular.isUndefined($scope.current_cluster)){
+        var sites = Object.keys($scope.clusters);
+
+        if(sites.length > 0 && $scope.clusters[sites[0]]){
+          var clusters = Object.keys($scope.clusters[sites[0]]);
+
+          if(clusters.length > 0 && $scope.clusters[sites[0]][clusters[0]]){
+            var master = $scope.clusters[sites[0]][clusters[0]];
+
+            if(master.id){
+              $scope.getMesosStats(master.id);
+            }
+          }
+        }
+      }else if(angular.isDefined($scope.current_cluster.id)){
+        $scope.getMesosStats($scope.current_cluster.id);
       }
-    },
-    resources: {
-      cpu: 2,
-      memory: 2
+    });
+  }
+
+  $scope.getMesosStats = function(id){
+    if(angular.isDefined(id)){
+      $http.get('/api/devices/'+id+'/mesos').success(function(data){
+        $scope.current_cluster = data;
+        $scope.current_cluster.id = id;
+        console.log($scope.current_cluster)
+      });
     }
-  },{
-    name: "onering-api",
-    running:   22,
-    instances: 24,
-    framework: {
-      name: "marathon",
-      executor: "docker",
-      details: {
-        title: "ops/onering-api:latest"
-      }
-    },
-    resources: {
-      cpu: 2,
-      memory: 2
-    }
-  },{
-    name: "onering-redis",
-    running:   1,
-    instances: 1,
-    framework: {
-      name: "marathon",
-      executor: "docker",
-      details: {
-        title: "base/redis:latest"
-      }
-    },
-    resources: {
-      cpu: 2,
-      memory: 4
-    }
-  },{
-    name: "onering-resque-web",
-    running:   1,
-    instances: 1,
-    framework: {
-      name: "marathon",
-      executor: "docker",
-      details: {
-        title: "ops/onering-resque-web:latest"
-      }
-    },
-    resources: {
-      cpu: 2,
-      memory: 1
-    }
-  }];
+  }
+
+  $scope.reload();
+  $window.setInterval($scope.reload, 10000);
 }

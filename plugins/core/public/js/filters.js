@@ -54,14 +54,13 @@ Array.prototype.firstWith = function(key, value){
   return null;
 }
 
-/*
-Object.prototype.propertyGet = function(path, defval){
+
+var propertyGet = function(obj, path, defval){
   if(!angular.isArray(path)){
     path = path.split('.');
   }
 
-  var work = this;
-
+  var work = obj;
 
   for(var i = 0; i < path.length; i++){
     if(work.hasOwnProperty(path[i])){
@@ -71,13 +70,14 @@ Object.prototype.propertyGet = function(path, defval){
     }
   }
 
+
   if(angular.isDefined(work) && work != null){
     return work;
   }else{
     return defval;
   }
 }
-*/
+
 
 Array.prototype.max = function() {
   return Math.max.apply(null, this);
@@ -343,6 +343,17 @@ config(['$provide', function($provide) {
   });
 }]).
 config(['$provide', function($provide) {
+  $provide.factory('flattenFilter', function(){
+    return function(array){
+      if (!(array instanceof Array)) return array;
+
+      return array.reduce(function(a,b){
+        return a.concat(b);
+      });
+    }
+  });
+}]).
+config(['$provide', function($provide) {
   $provide.factory('pluckFilter', function(){
     return function(array,key,defval){
       if (!(array instanceof Array)) return array;
@@ -351,7 +362,7 @@ config(['$provide', function($provide) {
 
       for(var i = 0; i < array.length; i++){
         if(angular.isObject(array[i])){
-          rv.push(array[i].propertyGet(key,defval));
+          rv.push(propertyGet(array[i], key, defval));
         }
       }
 
