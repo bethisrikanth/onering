@@ -5,7 +5,7 @@ module App
   class Base < Controller
     namespace '/api/rundeck' do
       get '/nodes/?*' do
-        nodes = Asset.urlsearch("bool:orchestrate/not:false/"+params[:splat].first)
+        nodes = Asset.urlquery("bool:orchestrate/not:false/"+params[:splat].first)
         return 404 if nodes.empty?
 
         content_type 'text/x-yaml'

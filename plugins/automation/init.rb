@@ -36,7 +36,12 @@ module App
           /run/:name/*/?
         }.each do |r|
           get r do
-            run_task(params[:name], *params[:splat].first.split('/'))
+            if params[:splat].first.nil?
+              run_task(params[:name])
+            else
+              run_task(params[:name], *params[:splat].first.split('/'))
+            end
+
           end
 
           post r do

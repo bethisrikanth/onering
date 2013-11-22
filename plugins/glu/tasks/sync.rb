@@ -128,14 +128,14 @@ module Automation
             log("Removing Glu configuration from #{glu_missing.length} nodes") unless glu_missing.empty?
 
             glu_missing.each do |node|
-              node = Asset.urlquery("name/#{name}")
-              next unless node
-              node.properties.set(:glu, nil)
-              node.save({
-                :reload => false
-              },{
-                :refresh => false
-              }) rescue next
+              Asset.urlquery("name/#{name}").each do |nodes|
+                node.properties.set(:glu, nil)
+                node.save({
+                  :reload => false
+                },{
+                  :refresh => false
+                }) rescue next
+              end
             end
           end
 
