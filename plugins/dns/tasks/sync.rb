@@ -93,12 +93,12 @@ module Automation
               end
             end
 
-            records.each do |ip, node|
+            records.each do |ip, rec|
               next if ip =~ /^127\.0\./
               nodes = Asset.urlquery("ip|network.ip/^#{ip}$").to_a
 
               nodes.each do |node|
-                node.properties.set(:dns, node[:records])
+                node.properties.set(:dns, rec[:records])
                 node.save()
               end
             end
