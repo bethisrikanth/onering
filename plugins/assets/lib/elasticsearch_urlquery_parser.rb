@@ -165,6 +165,17 @@ module App
                   }
                 }
               end
+            elsif vmu.first.first == :matches
+              rv.gsub!(/^~/,'')
+              rv.gsub!(/^\^/,'')
+              rv.gsub!(/[\$]$/,'')
+
+              return {
+                :regexp => {
+                  field => vmu.first.last
+                }
+              }
+
             else
               return {
                 :range => {
@@ -256,6 +267,9 @@ module App
 
           when :not
             return Hash[:not, value]
+
+          when :matches
+            return Hash[:matches, value]
 
           else
             return value

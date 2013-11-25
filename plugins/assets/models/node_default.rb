@@ -82,6 +82,27 @@ class NodeDefault < App::Model::Elasticsearch
           else
             return false if value == m[:value]
           end
+
+        when 'matches'
+          rv = false
+
+        # perform match on all array elements
+          if value.is_a?(Array)
+            value.each do |v|
+              next if v.is_a?(Array)
+              next if v.is_a?(Hash)
+
+            # break true on first positive match
+              if v =~ Regexp.new(m[:value])
+                rv = true
+                break
+              end
+            end
+          elsif value.to_s =~ Regexp.new(m[:value])
+            rv = true
+          end
+
+          return false if rv === false
         else
           if value.is_a?(Array)
             return false if not value.include?(m[:value])

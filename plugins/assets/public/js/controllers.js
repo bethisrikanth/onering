@@ -1,4 +1,4 @@
-function QueryController($scope, $http, $window, $route, $location, $routeParams){
+function QueryController($scope, $http, $interval, $route, $rootScope, $location, $routeParams){
   $scope.query = $routeParams.query;
   $scope.time_left = 0;
   $scope.pagenum = 1;
@@ -104,12 +104,20 @@ function QueryController($scope, $http, $window, $route, $location, $routeParams
   $scope.$watch('interval', function(){
     if(angular.isDefined($scope.interval)){
       if(angular.isDefined($scope.interval_id)){
-        $window.clearInterval($scope.interval_id);
+        $interval.cancel($scope.interval_id);
       }
 
       console.log('Setting interval to', $scope.interval)
-      $scope.interval_id = $window.setInterval($scope.reload, $scope.interval);
+      $scope.interval_id = $interval($scope.reload, $scope.interval);
       $scope.reload();
+    }
+  });
+
+//cleanup timers
+  $rootScope.$on('$locationChangeStart',function(evt,next,current){
+    if(next != current && angular.isDefined($scope.interval_id)){
+      console.log("Clearing intervals for", current)
+      $interval.cancel($scope.interval_id);
     }
   });
 
@@ -202,7 +210,7 @@ function RackController($scope, $http, $routeParams, Rack){
   });
 }
 
-function NodeController($scope, $http, $location, $routeParams, $window, $position){
+function NodeController($scope, $http, $location, $rootScope, $interval, $routeParams, $position){
   $scope.reload_suspended = false;
 
   $scope.opt = {
@@ -409,11 +417,7 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
 
   $scope.$watch('opt.editProvisioning', function(value){
     $scope.reload_suspended = value;
-  })
-
-  $scope.tick = function(){
-    $scope.opt.currentTime = new Date();
-  }
+  });
 
   $scope.ConsoleDialogController = function($scope){
     $scope.console = function(addr, port){
@@ -424,15 +428,22 @@ function NodeController($scope, $http, $location, $routeParams, $window, $positi
   $scope.$watch('interval', function(i){
     if(angular.isDefined(i)){
       if(angular.isDefined($scope.opt.interval_id)){
-        $window.clearInterval($scope.opt.interval_id);
+        $interval.cancel($scope.opt.interval_id);
       }
 
-      $scope.opt.interval_id = $window.setInterval($scope.reload, i);
+      $scope.opt.interval_id = $interval($scope.reload, i);
       $scope.reload();
     }
   });
 
-  $window.setInterval($scope.tick, 1000);
+//cleanup timers
+  $rootScope.$on('$locationChangeStart',function(evt,next,current){
+    if(next != current && angular.isDefined($scope.interval_id)){
+      console.log("Clearing intervals for", current)
+      $interval.cancel($scope.interval_id);
+    }
+  });
+
   $scope.interval = 60000;
   $scope.reload();
 }
