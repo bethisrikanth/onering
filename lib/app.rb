@@ -37,6 +37,7 @@ Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
   name = File.basename(p)
 
   begin
+    Onering::Logger.debug("Loading plugin #{name}...", "Onering")
     require "#{name}/init"
   rescue LoadError
     next

@@ -21,6 +21,11 @@ function HarbormasterTasksController($scope, $http, $window){
         $scope.getMesosStats($scope.current_cluster.id);
       }
     });
+
+    $http.get('/api/harbormaster/tasks/all').success(function(data){
+      $scope.tasks = data;
+      console.log($scope.tasks)
+    });
   }
 
   $scope.getMesosStats = function(id){

@@ -257,6 +257,20 @@ module Tensor
         rv.delete(i)
       end
 
+    # apply defaults for unset fields
+    # --------------------------------------------------------------------------
+      self.class.fields.each do |k,v|
+        if not v.get(:default).nil? and rv[k.to_s].nil? or (rv[k.to_s].respond_to?(:empty?) and rv[k.to_s].empty?)
+          rv[k.to_s] = self.send(k.to_sym)
+        end
+      end
+
+    # what the hell, do it again...
+    # (keys in default values for object types may not be strings, this ensures
+    # they end up as strings)
+    #
+      rv = rv.stringify_keys()
+
     # apply explicitly-defined type definitions
     # --------------------------------------------------------------------------
       typedefs = {}
@@ -983,35 +997,36 @@ module Tensor
     # normalize value
       case type.to_sym
       when :integer
-        rv = Integer(value) rescue default
+        return Integer(value) rescue default
       when :float
-        rv = Float(value) rescue default
+        return Float(value) rescue default
       when :date
         if value.is_a?(Time)
-          rv = value
+          return value
         else
-          rv = Time.parse(value) rescue default
+          return Time.parse(value) rescue default
         end
       when :boolean
-        rv = value if value === true or value === false
+        return value if value === true or value === false
+
         case value.to_s.downcase
         when /t|on|1|yes|true/
-          rv = true
+          return true
         else
-          rv = (default === true ? true : false)
+          return (default === true ? true : false)
         end
       when :object
         default = {} unless default.is_a?(Hash)
-        rv = (value.is_a?(Hash) ? (value.empty? ? default : value) : default)
+        return (value.is_a?(Hash) ? (value.empty? ? default : value) : default)
 
       when :string
-        rv = value.to_s.strip.chomp
+        return value.to_s.strip.chomp
 
       else
-        rv = default
+        return default
       end
 
-      return rv
+      return default
     end
 
 

@@ -30,33 +30,13 @@
           </thead>
 
           <tbody>
-            <tr>
-              <th>TOTAL</th>
-              <th>{{ (current_cluster.frameworks | pluck:'tasks' | flatten).length }}</th>
-              <th>{{ (current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum }}</th>
-              <th>{{ (((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum) * 1024 * 1024) | autosize }}</th>
-              <th></th>
-              <th></th>
-            </tr>
-
-            <tr>
-              <th> </th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
-            </tr>
-          </tbody>
-
-          <tbody>
-            <tr ng-repeat="task in (current_cluster.frameworks | pluck:'tasks' | flatten)">
+            <tr ng-repeat="task in tasks | filter:{cluster: current_cluster.cluster}">
               <td>{{ task.name || task.id }}</td>
               <td></td>
-              <td>{{ task.resources.cpus }}</td>
-              <td>{{ (task.resources.mem * 1024 * 1024) | autosize }}</td>
-              <td>{{ task.framework_id }}/{{ task.executor_id }}</td>
-              <td>{{ task.state }}</td>
+              <td>{{ task.resources.cpu }}</td>
+              <td>{{ (task.resources.memory * 1024 * 1024) | autosize }}</td>
+              <td>{{ task.task.type | titleize }} / {{ task.task.name }}</td>
+              <td>-</td>
             </tr>
           </tbody>
 

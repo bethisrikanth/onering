@@ -1,5 +1,6 @@
 require 'controller'
 require 'assets/models/asset'
+require 'harbormaster/models/task'
 
 module App
   class Base < Controller
@@ -26,6 +27,68 @@ module App
     end
 
     namespace '/api/harbormaster' do
+      namespace '/tasks' do
+        get '/all/?' do
+          output(Harbormaster::Task.all())
+        end
+
+        get '/find/?' do
+          return 400 if params[:q].nil?
+          output(Harbormaster::Task.urlquery(params[:q]))
+        end
+
+        get '/:id/disable' do
+          task = Harbormaster::Task.find(params[:id])
+          return 404 unless task
+
+          task.enabled = false
+          task.save()
+
+          output(task.to_hash())
+        end
+
+        get '/:id/enable' do
+          task = Harbormaster::Task.find(params[:id])
+          return 404 unless task
+
+          task.enabled = true
+          task.save()
+
+          output(task.to_hash())
+        end
+
+        get '/:id/?' do
+          task = Harbormaster::Task.find(params[:id])
+          return 404 unless task
+          output(task.to_hash())
+        end
+
+        delete '/:id/?' do
+          task = Harbormaster::Task.find(params[:id])
+          return 404 unless task
+          task.destroy()
+          204
+        end
+
+        %w{
+          /?
+          /:id/?
+        }.each do |r|
+          post r do
+            json = MultiJson.load(request.env['rack.input'].read)
+            task = Harbormaster::Task.find(params[:id]) unless params[:id].nil?
+            task = Harbormaster::Task.new() unless task
+
+            task.from_hash(json)
+            task.id = params[:id] unless params[:id].nil?
+
+            task.save()
+
+            output(task.to_hash())
+          end
+        end
+      end
+
       namespace '/mesos' do
         get '/clusters' do
           rv = {}
