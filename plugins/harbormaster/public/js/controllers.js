@@ -24,7 +24,6 @@ function HarbormasterTasksController($scope, $http, $window){
 
     $http.get('/api/harbormaster/tasks/all').success(function(data){
       $scope.tasks = data;
-      console.log($scope.tasks)
     });
   }
 
@@ -33,9 +32,16 @@ function HarbormasterTasksController($scope, $http, $window){
       $http.get('/api/devices/'+id+'/mesos').success(function(data){
         $scope.current_cluster = data;
         $scope.current_cluster.id = id;
-        console.log($scope.current_cluster)
       });
     }
+  }
+
+  $scope.mesosTasksFor = function(marathon_task_id, task_id){
+    if(marathon_task_id.indexOf(task_id) !== -1){
+      return true;
+    }
+
+    return false;
   }
 
   $scope.reload();

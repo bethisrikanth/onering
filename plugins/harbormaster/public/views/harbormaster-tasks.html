@@ -20,6 +20,7 @@
         <table class="table table-condensed table-hover">
           <thead>
             <tr>
+              <th> </th>
               <th>Service Name</th>
               <th>Instances</th>
               <th>CPU</th>
@@ -29,14 +30,26 @@
             </tr>
           </thead>
 
-          <tbody>
-            <tr ng-repeat="task in tasks | filter:{cluster: current_cluster.cluster}">
+          <tbody ng-repeat="task in tasks | filter:{cluster: current_cluster.cluster}" ng-init="marathon_tasks = (current_cluster.frameworks | pluck:'tasks' | flatten | filter:{id:task.id}:mesosTasksFor)">
+            <tr>
+              <th>
+                <span ng-show="marathon_tasks" ng-click="task._show_marathon_tasks=!task._show_marathon_tasks">
+                  <span class="icon-plus" ng-hide="task._show_marathon_tasks"></span>
+                  <span class="icon-minus" ng-show="task._show_marathon_tasks"></span>
+                </span>
+              </th>
               <td>{{ task.name || task.id }}</td>
-              <td></td>
+              <td><span ng-show="marathon_tasks">{{ marathon_tasks.length }} / </span>{{ task.instances }}</td>
               <td>{{ task.resources.cpu }}</td>
               <td>{{ (task.resources.memory * 1024 * 1024) | autosize }}</td>
-              <td>{{ task.task.type | titleize }} / {{ task.task.name }}</td>
+              <td>{{ task.task.type | titleize }}: <code>{{ task.task.name }}</code></td>
               <td>-</td>
+            </tr>
+
+            <tr ng-show="task._show_marathon_tasks" ng-repeat="marathon_task in marathon_tasks">
+              <td>&#9492;&nbsp;&nbsp;</td>
+              <td></td>
+              <td>{{ marathon_task.state }}</td>
             </tr>
           </tbody>
 

@@ -213,6 +213,20 @@ namespace :db do
       Tensor::Model.copy_index(args[:source], args[:dest])
     end
   end
+
+
+  desc "Change the data index the given alias points to"
+  task :ln, :from, :to do |t, args|
+    if args[:from] and args[:to]
+      puts "Linking #{args[:to]} -> #{args[:from]}..."
+      Tensor::Model.alias_index({
+        :index     => args[:to],
+        :create    => false,
+        :swap      => true,
+        :new_index => args[:from]
+      })
+    end
+  end
 end
 
 # utilities for managing static assets
