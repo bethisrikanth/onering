@@ -1,0 +1,33 @@
+<div class="container">
+  <h1>{{ task.name }}</h1>
+
+  <form class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label">Container</label>
+      <div class="controls">
+        <input type="text" ng-model="task.task.name">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">Cluster</label>
+      <div class="controls">
+        <input type="text" ng-model="task.cluster">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">CPU</label>
+      <div class="controls">
+        <input type="text" ng-model="task.resources.cpu">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">Memory</label>
+      <div class="controls">
+        <input type="text" ng-model="task.resources.memory">
+      </div>
+    </div>
+  </form>
+</div>

@@ -47,3 +47,12 @@ function HarbormasterTasksController($scope, $http, $window){
   $scope.reload();
   $window.setInterval($scope.reload, 10000);
 }
+
+
+function HarbormasterTaskEditorController($scope, $http, $routeParams){
+  if(angular.isDefined($routeParams.id)){
+    $http.get('/api/harbormaster/tasks/'+$routeParams.id).success(function(data){
+      $scope.task = data;
+    });
+  }
+}
