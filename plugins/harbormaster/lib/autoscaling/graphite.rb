@@ -92,12 +92,12 @@ module Harbormaster
       # one way or another we need a cval by now
         if not consolidated_value.nil?
         # apply the multiplier
-          consolidated_value = (consolidated_value * config.get(:multiplier))
+          consolidated_value = (consolidated_value * config.get(:multiplier,1).to_f)
 
 
         # round to nearest step value
           if config.get(:step,1) > 1
-            consolidated_value = (consolidated_value / config.get(:step)).round() * config.get(:step)
+            consolidated_value = (consolidated_value / config.get(:step,1).to_i).round() * config.get(:step,1).to_i
           end
 
         # return that shit
