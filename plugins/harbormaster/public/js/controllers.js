@@ -1,8 +1,13 @@
 function HarbormasterTasksController($scope, $http, $window){
+  $scope.opt = {
+    expandedTasks: {}
+  };
+
   $scope.reload = function(){
     $http.get('/api/harbormaster/mesos/clusters').success(function(data){
       $scope.clusters = data;
 
+    //select the first cluster from the first site
       if(angular.isUndefined($scope.current_cluster)){
         var sites = Object.keys($scope.clusters);
 
@@ -45,7 +50,7 @@ function HarbormasterTasksController($scope, $http, $window){
   }
 
   $scope.reload();
-  $window.setInterval($scope.reload, 10000);
+  $window.setInterval($scope.reload, 5000);
 }
 
 

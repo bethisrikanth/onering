@@ -44,15 +44,15 @@
           <tbody ng-repeat="task in tasks | filter:{cluster: current_cluster.cluster}" ng-init="marathon_tasks = (current_cluster.frameworks | pluck:'tasks' | flatten | filter:{id:task.id}:mesosTasksFor)">
             <tr ng-class="{'error': (!task.enabled)}">
               <td>
-                <span ng-show="marathon_tasks" ng-click="task._show_marathon_tasks=!task._show_marathon_tasks">
-                  <span class="icon-plus" ng-hide="task._show_marathon_tasks"></span>
-                  <span class="icon-minus" ng-show="task._show_marathon_tasks"></span>
+                <span ng-show="marathon_tasks" ng-click="opt.expandedTasks[task.id]=!opt.expandedTasks[task.id]">
+                  <span class="icon-plus" ng-hide="opt.expandedTasks[task.id]"></span>
+                  <span class="icon-minus" ng-show="opt.expandedTasks[task.id]"></span>
                 </span>
               </td>
               <td><a href="#/harbormaster/task/{{task.id}}">{{ task.name || task.id }}</a></td>
               <td><span ng-show="marathon_tasks">{{ marathon_tasks.length }} / </span>{{ task.instances }}</td>
-              <td>{{ task.resources.cpu }}</td>
-              <td>{{ (task.resources.memory * 1024 * 1024) | autosize }}</td>
+              <td>{{ task.resources.cpu * task.instances }}</td>
+              <td>{{ (task.resources.memory * 1024 * 1024 * task.instances) | autosize }}</td>
               <td>{{ task.task.type | titleize }}: <code>{{ task.task.name }}</code></td>
               <td>
                 <span ng-show="task.enabled" class="cursor-pointer label label-enabled"
@@ -66,10 +66,32 @@
               </td>
             </tr>
 
-            <tr ng-show="task._show_marathon_tasks" ng-repeat="marathon_task in marathon_tasks" ng-class="{'error': (!task.enabled)}">
+            <tr ng-show="opt.expandedTasks[task.id]" ng-repeat="marathon_task in marathon_tasks" ng-class="{'error': (!task.enabled)}">
+              <td> </td>
               <td>&#9492;&nbsp;&nbsp;</td>
-              <td></td>
-              <td>{{ marathon_task.state }}</td>
+              <td> </td>
+              <td>
+                {{ marathon_task.resources.cpus }}
+                <span ng-show="marathon_task.resources.cpus!=task.resources.cpu" class="text-error">
+                  (should be {{ task.resources.cpu }})
+                </span>
+              </td>
+              <td>
+                {{ (marathon_task.resources.mem * 1024 * 1024) | autosize }}
+                <span ng-show="marathon_task.resources.mem!=task.resources.memory" class="text-error">
+                  (should be {{ (task.resources.memory * 1024 * 1024) | autosize }})
+                </span>
+              </td>
+              <td> </td>
+              <td ng-switch on="marathon_task.state">
+                <span ng-switch-when="TASK_STAGED" class="label label-blue">Staged</span>
+                <span ng-switch-when="TASK_RUNNING" class="label label-green">Running</span>
+                <span ng-switch-when="TASK_FINISHED" class="label label-blue">Finished</span>
+                <span ng-switch-when="TASK_KILLED" class="label label-red">Killed</span>
+                <span ng-switch-when="TASK_FAILED" class="label label-red">Failed</span>
+                <span ng-switch-when="TASK_LOST" class="label label-red">Lost</span>
+                <span ng-switch-default class="label">Unknown</span>
+              </td>
             </tr>
           </tbody>
 
@@ -85,11 +107,23 @@
             </tr>
 
             <tr>
-              <th>AVAILABLE</th>
               <th></th>
-              <th>{{ (current_cluster.slaves | pluck:'resources.cpus' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum) }}</th>
-              <th>{{ ((current_cluster.slaves | pluck:'resources.mem' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum)) * 1024 * 1024 | autosize }}</th>
+              <th>Available / Total</th>
               <th></th>
+              <th>
+                {{
+                  (current_cluster.slaves | pluck:'resources.cpus' | sum) - (
+                    (current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum)
+                }} / {{
+                  (current_cluster.slaves | pluck:'resources.cpus' | sum)
+                }}</th>
+              <th>
+                {{
+                  ((current_cluster.slaves | pluck:'resources.mem' | sum) - (
+                    (current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum)) * 1024 * 1024 | autosize
+                }} / {{
+                  (current_cluster.slaves | pluck:'resources.mem' | sum) * 1024 * 1024 | autosize
+                }}</th>
               <th></th>
               <th></th>
             </tr>
