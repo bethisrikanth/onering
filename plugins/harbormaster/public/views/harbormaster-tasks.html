@@ -42,22 +42,31 @@
           </thead>
 
           <tbody ng-repeat="task in tasks | filter:{cluster: current_cluster.cluster}" ng-init="marathon_tasks = (current_cluster.frameworks | pluck:'tasks' | flatten | filter:{id:task.id}:mesosTasksFor)">
-            <tr>
-              <th>
+            <tr ng-class="{'error': (!task.enabled)}">
+              <td>
                 <span ng-show="marathon_tasks" ng-click="task._show_marathon_tasks=!task._show_marathon_tasks">
                   <span class="icon-plus" ng-hide="task._show_marathon_tasks"></span>
                   <span class="icon-minus" ng-show="task._show_marathon_tasks"></span>
                 </span>
-              </th>
+              </td>
               <td><a href="#/harbormaster/task/{{task.id}}">{{ task.name || task.id }}</a></td>
               <td><span ng-show="marathon_tasks">{{ marathon_tasks.length }} / </span>{{ task.instances }}</td>
               <td>{{ task.resources.cpu }}</td>
               <td>{{ (task.resources.memory * 1024 * 1024) | autosize }}</td>
               <td>{{ task.task.type | titleize }}: <code>{{ task.task.name }}</code></td>
-              <td>-</td>
+              <td>
+                <span ng-show="task.enabled" class="cursor-pointer label label-enabled"
+                  rest="/api/harbormaster/tasks/{{task.id}}/disable"
+                  rest-confirm="Are you want to disable task '{{task.name}}'?"
+                  rest-success="reload()">Enabled</span>
+                <span ng-hide="task.enabled" class="cursor-pointer label label-disabled"
+                  rest="/api/harbormaster/tasks/{{task.id}}/enable"
+                  rest-confirm="Are you want to enable task '{{task.name}}'?"
+                  rest-success="reload()">Disabled</span>
+              </td>
             </tr>
 
-            <tr ng-show="task._show_marathon_tasks" ng-repeat="marathon_task in marathon_tasks">
+            <tr ng-show="task._show_marathon_tasks" ng-repeat="marathon_task in marathon_tasks" ng-class="{'error': (!task.enabled)}">
               <td>&#9492;&nbsp;&nbsp;</td>
               <td></td>
               <td>{{ marathon_task.state }}</td>
@@ -72,6 +81,7 @@
               <th></th>
               <th></th>
               <th></th>
+              <th></th>
             </tr>
 
             <tr>
@@ -79,6 +89,7 @@
               <th></th>
               <th>{{ (current_cluster.slaves | pluck:'resources.cpus' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.cpus' | sum) }}</th>
               <th>{{ ((current_cluster.slaves | pluck:'resources.mem' | sum) - ((current_cluster.frameworks | pluck:'tasks' | flatten) | pluck:'resources.mem' | sum)) * 1024 * 1024 | autosize }}</th>
+              <th></th>
               <th></th>
               <th></th>
             </tr>

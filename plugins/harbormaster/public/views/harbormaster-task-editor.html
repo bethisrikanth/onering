@@ -108,7 +108,7 @@
               <div class="control-group">
                 <label class="control-label">Instances</label>
                 <div class="controls">
-                  <input type="text" ng-model="task.instances" ng-disabled="task.scaling.mode=='dynamic'">
+                  <input type="number" class="input-small" ng-model="task.instances" ng-disabled="task.scaling.mode=='dynamic'">
                 </div>
               </div>
 
@@ -200,7 +200,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row margin-top-2 margin-bottom-2">
     <div class="span12">
       <div class="button-group">
         <button

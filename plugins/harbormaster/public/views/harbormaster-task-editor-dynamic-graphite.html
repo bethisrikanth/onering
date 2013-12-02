@@ -8,32 +8,65 @@
 
   <div class="control-group">
     <label class="control-label">Time Range</label>
-    <div class="controls">
+    <div class="controls span4">
       <input type="text" ng-model="task.scaling.config.from" placeholder="e.g.: -10minutes">
+      <span class="help-block">How far back the query should look, specified as a Graphite-formatted time interval</span>
+    </div>
+
+    <div class="controls span4">
       <input type="text" ng-model="task.scaling.config.to" placeholder="e.g.: -2minutes">
+      <span class="help-block">What time the query should start at, specified as a Graphite-formatted time interval</span>
+    </div>
+  </div>
+
+
+  <div class="widget-header bold margin-bottom-1">Check Configuration</div>
+
+  <div class="control-group">
+    <label class="control-label">Samples</label>
+    <div class="controls">
+      <input type="number" ng-model="task.scaling.config.samples" class="input-medium">
+      <span class="help-inline">Select the {{ task.scaling.config.samples || 'n' }} most recent datapoints from the graph URL</span>
     </div>
   </div>
 
   <div class="control-group">
-    <label class="control-label">Point Samples</label>
+    <label class="control-label">Discard Samples</label>
     <div class="controls">
-      <input type="text" ng-model="task.scaling.config.samples" placeholder="Select n more recent points">
-      <input type="text" ng-model="task.scaling.config.discard_samples" placeholder="Discard n most recent points">
-      <input type="text" ng-model="task.scaling.config.max_missing" placeholder="Maximum number of missing samples before failure">
+      <input type="number" ng-model="task.scaling.config.discard_samples" class="input-medium">
+      <span class="help-inline">Discard the {{ task.scaling.config.samples || 'n' }} most recent datapoints (useful for handling values that change due to graph consolidation)</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Max. Missing Samples</label>
+    <div class="controls">
+      <input type="number" ng-model="task.scaling.config.max_missing" class="input-medium">
+      <span class="help-inline">Maximum number of samples that can be missng or <i>null</i> before the check fails</span>
     </div>
   </div>
 
   <div class="control-group">
     <label class="control-label">Consolidation</label>
     <div class="controls">
-      <select ng-model="task.scaling.config.consolidation" ng-options="v as (v | titleize) for v in opt.scalingConsolidationFunctions"></select>
+      <select ng-model="task.scaling.config.consolidation" ng-options="v as (v | titleize) for v in opt.scalingConsolidationFunctions" class="input-medium"></select>
+      <span class="help-inline">Which mathematical function to apply to the samples to produce a single number</span>
     </div>
   </div>
 
   <div class="control-group">
     <label class="control-label">Multiplier</label>
     <div class="controls">
-      <input type="number" ng-model="task.scaling.config.multiplier">
+      <input type="text" ng-model="task.scaling.config.multiplier" class="input-medium">
+      <span class="help-inline">A multiplier that is applied to the consolidated value to determine the final instance count</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Step</label>
+    <div class="controls">
+      <input type="number" ng-model="task.scaling.config.step" class="input-medium">
+      <span class="help-inline">Round the final instance count to the nearest {{ task.scaling.config.step || 'n' }}</span>
     </div>
   </div>
 </form>

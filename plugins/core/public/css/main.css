@@ -171,7 +171,8 @@ body .modal {
 
 .label-online,
 .label-okay,
-.label-green{
+.label-green,
+.label-enabled{
   background-color: #468847;
 }
 
@@ -187,6 +188,7 @@ body .modal {
 .label-failed,
 .label-offline,
 .label-critical,
+.label-disabled,
 .label-red,
 .badge-critical{
   background-color: #B94A48;
@@ -204,6 +206,10 @@ body .modal {
 
 .label-unknown{
   background-color: #999;
+}
+
+.cursor-pointer{
+  cursor: pointer !important;
 }
 
 .icon{
