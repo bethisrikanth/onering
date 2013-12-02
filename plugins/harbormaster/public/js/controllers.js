@@ -50,13 +50,21 @@ function HarbormasterTasksController($scope, $http, $window){
 
 
 function HarbormasterTaskEditorController($scope, $http, $routeParams){
-  $http.get('/api/harbormaster/mesos/clusters/list').success(function(data){
-    $scope.clusters = data;
-  });
+  $scope.opt = {
+    editTitle: false
+  };
 
-  if(angular.isDefined($routeParams.id)){
-    $http.get('/api/harbormaster/tasks/'+$routeParams.id).success(function(data){
-      $scope.task = data;
+  $scope.reload = function(){
+    $http.get('/api/harbormaster/mesos/clusters/list').success(function(data){
+      $scope.clusters = data;
     });
-  }
+
+    if(angular.isDefined($routeParams.id)){
+      $http.get('/api/harbormaster/tasks/'+$routeParams.id).success(function(data){
+        $scope.task = data;
+      });
+    }
+  };
+
+  $scope.reload();
 }

@@ -875,3 +875,13 @@ a.disabled{
 a.disabled i{
   color: #AAA;
 }
+
+
+#toast-container > div.ng-enter,
+#toast-container > div.ng-leave{
+  transition-duration:         250ms !important;
+  -webkit-transition-duration: 250ms !important;
+  -moz-transition-duration:    250ms !important;
+  -ms-transition-duration:     250ms !important;
+  -o-transition-duration:      250ms !important;
+}

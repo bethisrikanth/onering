@@ -1,9 +1,10 @@
 angular.module('corePlugin', [
   'coreFilters',
   'coreDirectives',
-  'coreRoutes'
+  'coreRoutes',
+  'toaster'
 ]).
-run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScope, $window, $http, $modal, $location){
+run(['$rootScope', '$window', '$http', '$modal', '$location', 'toaster', function($rootScope, $window, $http, $modal, $location, toaster){
   $rootScope.online = true;
   $rootScope.location = $location;
 
@@ -16,6 +17,11 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', function($rootScop
     }catch(e){ ; }
   };
 
+
+  $rootScope.toast = function(severity, title, text, timeout){
+    console.log('SAY', title, text)
+    toaster.pop(severity, title, text, 3000);
+  };
 
   $rootScope.prepareQuery = function(query, raw){
     var stack = [];

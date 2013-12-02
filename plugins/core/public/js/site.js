@@ -13,5 +13,7 @@ angular.module('app', [
   'provisioningPlugin',
   'chefPlugin',
   'harbormasterPlugin',
-  'slider'
+  'slider',
+  'ngAnimate',
+  'toaster'
 ]);

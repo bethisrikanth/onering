@@ -12,7 +12,9 @@
     <script type="text/javascript" src="/js/vendor/angular.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular-route.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular-cookies.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular-animate.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular-ui-utils.min.js"></script>
+    <script type="text/javascript" src="/js/vendor/angular-toaster.js"></script>
     <script type="text/javascript" src="/js/vendor/ui-bootstrap-0.6.0.min.js"></script>
     <script type="text/javascript" src="/js/vendor/ui-bootstrap-tpls-0.6.0.min.js"></script>
     <script type="text/javascript" src="/js/vendor/angular-strap.min.js"></script>
@@ -41,6 +43,7 @@
     <link rel="stylesheet" href="/css/font-awesome.min.css"></link>
     <link rel="stylesheet" href="/css/angular-ui.min.css"></link>
     <link rel="stylesheet" href="/css/radian.css"></link>
+    <link rel="stylesheet" href="/css/toaster.css"></link>
     <link rel="stylesheet" href="/css/main.css"></link>
   </head>
   <body ng-controller="GlobalController">
@@ -435,6 +438,11 @@
       </div>
     </header>
 
-    <section class="content clear-navbar" ng-show="user" ng-view>
+
+    <section class="clear-navbar">
+      <toaster-container class="clear-navbar"></toaster-container>
+      <div class="content" ng-show="user" ng-view></div>
+    </section>
+
   </body>
 </html>
