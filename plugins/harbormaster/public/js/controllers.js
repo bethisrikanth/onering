@@ -51,7 +51,18 @@ function HarbormasterTasksController($scope, $http, $window){
 
 function HarbormasterTaskEditorController($scope, $http, $routeParams){
   $scope.opt = {
-    editTitle: false
+    editTitle: false,
+    dynamicScaling: false,
+    taskTypes: [
+      'docker'
+    ],
+    scalingConsolidationFunctions: [
+      'average',
+      'minimum',
+      'maximum',
+      'sum',
+      'count'
+    ]
   };
 
   $scope.reload = function(){
@@ -63,8 +74,45 @@ function HarbormasterTaskEditorController($scope, $http, $routeParams){
       $http.get('/api/harbormaster/tasks/'+$routeParams.id).success(function(data){
         $scope.task = data;
       });
+    }else{
+      $scope.task = {
+        enabled: true,
+        resources: {
+          cpu: 1,
+          memory: 64
+        },
+        scaling: {
+          mode: 'static'
+        }
+      };
     }
   };
+
+  $scope.$watch('task.scaling.mode', function(i){
+    if(i == 'dynamic'){
+      $scope.opt.dynamicScaling = true;
+    }else{
+      $scope.opt.dynamicScaling = false;
+    }
+  });
+
+  $scope.$watch('opt.dynamicScaling', function(i){
+    if(angular.isDefined($scope.task)){
+      if(angular.isUndefined($scope.task.scaling)){
+        $scope.task.scaling = {};
+      }
+
+      if(angular.isUndefined($scope.task.scaling.config)){
+        $scope.task.scaling.config = {};
+      }
+
+      if(i == true){
+        $scope.task.scaling.mode = 'dynamic';
+      }else{
+        $scope.task.scaling.mode = 'static';
+      }
+    }
+  })
 
   $scope.reload();
 }

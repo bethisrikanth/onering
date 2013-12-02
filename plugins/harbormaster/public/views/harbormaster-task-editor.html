@@ -5,76 +5,239 @@
     <li class="active">{{ task.name }}</li>
   </ul>
 
-  <h1>{{ task.name }}</h1>
+  <h1 ng-hide="task.name | isEmpty">{{ task.name }}</h1>
+  <h1 class="text-unknown" ng-show="task.name | isEmpty">New Application</h1>
   <br />
-  <br />
+  <div class="button-group pull-right" ng-show="task.id">
+    <button
+      type="button"
+      rest="/api/automation/tasks/run/harbormaster.tasks.scale/{{task.id}}"
+      class="btn"
+      rest-success="toast('success', 'Scaled Task', 'Successfully dispatched scaling request for task \''+task.name+'\''); reload()"
+    >
+      <i class="icon-tasks"></i>
+      Scale
+    </button>
 
-  <form class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label">Name</label>
-      <div class="controls">
-        <input type="text" ng-model="task.name">
+    <button
+      ng-show="task.enabled"
+      type="button"
+      rest="/api/harbormaster/tasks/{{task.id}}/disable"
+      class="btn btn-danger"
+      rest-confirm="Are you sure you want to disable this task?  This will destroy any running instances and prevent it from running."
+      rest-success="toast('success', 'Disabled Task', 'Successfully disabled task \''+task.name+'\''); reload()"
+    >
+      <i class="icon-stop icon-white"></i>
+      Disable Task
+    </button>
+
+    <button
+      ng-hide="task.enabled"
+      type="button"
+      rest="/api/harbormaster/tasks/{{task.id}}/enable"
+      class="btn btn-success"
+      rest-confirm="Are you sure you want to enable this task?  This launch the task into the {{task.cluster}} cluster."
+      rest-success="toast('success', 'Enabled Task', 'Successfully enabled task \''+task.name+'\''); reload()"
+    >
+      <i class="icon-play icon-white"></i>
+      Enable Task
+    </button>
+  </div>
+
+
+  <div class="row">
+    <br />
+    <br />
+    <br />
+
+    <div class="span6 container-fluid widget-pane">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="widget-title">Configuration</div>
+
+          <div class="widget-content widget-expand">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label">Name</label>
+                <div class="controls">
+                  <input type="text" ng-model="task.name">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Container</label>
+                <div class="controls">
+                  <select ng-model="task.task.type" ng-options="v as (v | titleize) for v in opt.taskTypes"></select>
+                  <input type="text" ng-model="task.task.name">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Cluster</label>
+                <div class="controls">
+                  <select ng-model="task.cluster" ng-options="c for c in clusters">
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="control-group">
-      <label class="control-label">Container</label>
-      <div class="controls">
-        <input type="text" ng-model="task.task.name">
+    <div class="span6 widget-pane">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="widget-title">Resources</div>
+
+          <div class="widget-content widget-expand">
+            <form class="form-horizontal">
+              <div class="control-group">
+                <label class="control-label">Instances</label>
+                <div class="controls">
+                  <input type="text" ng-model="task.instances" ng-disabled="task.scaling.mode=='dynamic'">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Dynamic Scaling Mode?</label>
+                <div class="controls">
+                  <input type="checkbox" ng-model="opt.dynamicScaling">
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">CPU</label>
+                <div class="controls">
+                  <slider ng-model="task.resources.cpu" min="1" max="16"></slider>
+
+                  <label class="pull-right" style="font-size: 16pt" class="bold">
+                    {{ task.resources.cpu }}
+                    <ng-pluralize
+                      count="task.resources.cpu"
+                      when="{
+                        '1': 'Core',
+                        'other': 'Cores'
+                      }"
+                    >
+                    </ng-pluralize>
+                  </label>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label">Memory</label>
+                <div class="controls">
+                  <slider ng-model="task.resources.memory" values="'64,128,256,512,1024,2048,4096,8192,16536'"></slider>
+                  <label class="pull-right" style="font-size: 16pt" class="bold">{{ (task.resources.memory * 1024 * 1024) | autosize:0 }}</label>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="control-group">
-      <label class="control-label">Cluster</label>
-      <div class="controls">
-        <select ng-model="task.cluster" ng-options="c for c in clusters">
-        </select>
+  <div class="row">
+    <div class="span12 widget-pane" ng-show="task.scaling.mode=='dynamic'">
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="widget-title">
+            Dynamic Scaling
+
+            <span class="pull-right">
+              <span
+                title="About Dynamic Scaling"
+                ng-click="openDialog('hm-help-dynamic-scaling')"
+              >
+                <i class="icon-question-sign"> </i>
+              </span>
+            </span>
+          </div>
+
+          <div class="widget-content widget-expand">
+            <div class="widget-header bold margin-bottom-1">Instance Bounds</div>
+
+            <form class="form-inline">
+              <fieldset>
+                <label>Minimum</label>
+                <input type="number" ng-model="task.scaling.minimum"></input>
+
+                <label>Default</label>
+                <input type="number" ng-model="task.scaling.default"></input>
+
+                <label>Maximum</label>
+                <input type="number" ng-model="task.scaling.maximum"></input>
+              </fieldset>
+            </form>
+
+            <div class="widget-header bold margin-bottom-1">Source Configuration</div>
+
+            <tabset>
+              <tab heading="Graphite" select="task.scaling.config={type:'graphite'}">
+                <div ng-include="'views/harbormaster-task-editor-dynamic-graphite.html'"></div>
+              </tab>
+            </tabset>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="control-group">
-      <label class="control-label">CPU</label>
-      <div class="controls">
-        <label style="font-size: 26pt" class="bold">
-          {{ task.resources.cpu }}
-          <ng-pluralize
-            count="task.resources.cpu"
-            when="{
-              '1': 'Core',
-              'other': 'Cores'
-            }"
-          >
-          </ng-pluralize>
-        </label>
-        <br />
-        <slider ng-model="task.resources.cpu" min="1" max="16">
-        <br />
-        <br />
-        <br />
+  <div class="row">
+    <div class="span12">
+      <div class="button-group">
+        <button
+          ng-show="task.id"
+          type="button"
+          class="btn btn-danger"
+          rest="/api/harbormaster/tasks/{{task.id}}"
+          rest-method="delete"
+          rest-confirm="Are you sure you want to delete task '{{task.name}}'?"
+          rest-success="toast('success','Deleted', 'Successfully removed task \''+task.name+'\''); go('/harbormaster/tasks')"
+        >Delete</button>
+
+        <button
+          ng-hide="task.id"
+          type="button"
+          class="btn btn-danger"
+          rest="/api"
+          rest-confirm="You have not saved this task yet. Are you sure you want to cancel?"
+          rest-success="task=null; go('/harbormaster/tasks')"
+        >Cancel</button>
+
+        <button
+          type="submit"
+          class="btn btn-primary pull-right"
+          rest="/api/harbormaster/tasks/{{task.id}}"
+          rest-method="post"
+          rest-data="task"
+          rest-success="toast('success','Saved', 'Successfully saved task \''+task.name+'\''); (task.id &amp;&amp; reload() || go('/harbormaster/tasks'))"
+        >Save</button>
       </div>
     </div>
-
-    <div class="control-group">
-      <label class="control-label">Memory</label>
-      <div class="controls">
-        <label style="font-size: 26pt" class="bold">{{ (task.resources.memory * 1024 * 1024) | autosize:0 }}</label>
-        <br />
-        <slider ng-model="task.resources.memory" values="'64,128,256,512,1024,2048,4096,8192,16536'">
-        <br />
-        <br />
-        <br />
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button
-        type="submit"
-        class="btn btn-primary"
-        rest="/api/harbormaster/tasks/{{task.id}}"
-        rest-method="post"
-        rest-data="task"
-        rest-success="toast('success','Saved', 'Successfully saved task \''+task.name+'\''); reload()"
-      >Save</button>
-    </div>
-  </form>
+  </div>
 </div>
+
+
+<script type="text/ng-template" id="hm-help-dynamic-scaling">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="close()">&times;</button>
+    <h3>About Dynamic Scaling</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      Dynamic scaling allows you to scale the number of instances of this task based on values derived from an external data source.  For example, you can specify the number of instances to be proportionate to the value of a given metric in Graphite, or from a given search in Onering.
+    </p>
+
+    <p>
+      The scaling checks will run periodically, adjusting the number of instances according to the rules specified below.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn btn-danger" ng-click="close()">Close</a>
+  </div>
+</script>

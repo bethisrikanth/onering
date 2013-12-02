@@ -1,0 +1,39 @@
+<form class="form-horizontal">
+  <div class="control-group">
+    <label class="control-label">Graph URL</label>
+    <div class="controls">
+      <input type="text" ng-model="task.scaling.config.url">
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Time Range</label>
+    <div class="controls">
+      <input type="text" ng-model="task.scaling.config.from" placeholder="e.g.: -10minutes">
+      <input type="text" ng-model="task.scaling.config.to" placeholder="e.g.: -2minutes">
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Point Samples</label>
+    <div class="controls">
+      <input type="text" ng-model="task.scaling.config.samples" placeholder="Select n more recent points">
+      <input type="text" ng-model="task.scaling.config.discard_samples" placeholder="Discard n most recent points">
+      <input type="text" ng-model="task.scaling.config.max_missing" placeholder="Maximum number of missing samples before failure">
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Consolidation</label>
+    <div class="controls">
+      <select ng-model="task.scaling.config.consolidation" ng-options="v as (v | titleize) for v in opt.scalingConsolidationFunctions"></select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Multiplier</label>
+    <div class="controls">
+      <input type="number" ng-model="task.scaling.config.multiplier">
+    </div>
+  </div>
+</form>
