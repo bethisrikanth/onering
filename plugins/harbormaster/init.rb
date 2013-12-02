@@ -90,6 +90,18 @@ module App
       end
 
       namespace '/mesos' do
+        get '/clusters/list' do
+          rv = []
+
+          Asset.urlquery("mesos.masters.pid").each do |asset|
+            asset.get('mesos.masters', []).each do |master|
+              rv << master.get('options.cluster', asset.id)
+            end
+          end
+
+          output(rv)
+        end
+
         get '/clusters' do
           rv = {}
 

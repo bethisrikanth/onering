@@ -12,21 +12,42 @@
     <div class="control-group">
       <label class="control-label">Cluster</label>
       <div class="controls">
-        <input type="text" ng-model="task.cluster">
+        <select ng-model="task.cluster" ng-options="c for c in clusters">
+        </select>
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label">CPU</label>
       <div class="controls">
-        <input type="text" ng-model="task.resources.cpu">
+        <label style="font-size: 26pt" class="bold">
+          {{ task.resources.cpu }}
+          <ng-pluralize
+            count="task.resources.cpu"
+            when="{
+              '1': 'Core',
+              'other': 'Cores'
+            }"
+          >
+          </ng-pluralize>
+        </label>
+        <br />
+        <slider ng-model="task.resources.cpu" min="1" max="16">
+        <br />
+        <br />
+        <br />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label">Memory</label>
       <div class="controls">
-        <input type="text" ng-model="task.resources.memory">
+        <label style="font-size: 26pt" class="bold">{{ (task.resources.memory * 1024 * 1024) | autosize:0 }}</label>
+        <br />
+        <slider ng-model="task.resources.memory" values="'64,128,256,512,1024,2048,4096,8192,16536'">
+        <br />
+        <br />
+        <br />
       </div>
     </div>
   </form>

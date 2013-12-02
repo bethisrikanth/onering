@@ -38,7 +38,7 @@
                   <span class="icon-minus" ng-show="task._show_marathon_tasks"></span>
                 </span>
               </th>
-              <td>{{ task.name || task.id }}</td>
+              <td><a href="#/harbormaster/task/{{task.id}}">{{ task.name || task.id }}</a></td>
               <td><span ng-show="marathon_tasks">{{ marathon_tasks.length }} / </span>{{ task.instances }}</td>
               <td>{{ task.resources.cpu }}</td>
               <td>{{ (task.resources.memory * 1024 * 1024) | autosize }}</td>

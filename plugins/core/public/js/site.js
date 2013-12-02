@@ -12,5 +12,6 @@ angular.module('app', [
   'nagiosPlugin',
   'provisioningPlugin',
   'chefPlugin',
-  'harbormasterPlugin'
+  'harbormasterPlugin',
+  'slider'
 ]);
