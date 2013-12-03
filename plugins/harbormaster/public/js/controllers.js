@@ -121,7 +121,11 @@ function HarbormasterTaskEditorController($scope, $http, $routeParams){
         $scope.task.scaling.mode = 'static';
       }
     }
-  })
+  });
+
+  $scope.scale = function(){
+    $http.get('/api/automation/tasks/run/harbormaster.tasks.scale');
+  }
 
   $scope.reload();
 }

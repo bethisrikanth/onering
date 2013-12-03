@@ -210,7 +210,7 @@
           rest="/api/harbormaster/tasks/{{task.id}}"
           rest-method="delete"
           rest-confirm="Are you sure you want to delete task '{{task.name}}'?"
-          rest-success="toast('success','Deleted', 'Successfully removed task \''+task.name+'\''); go('/harbormaster/tasks')"
+          rest-success="toast('success','Deleted', 'Successfully removed task \''+task.name+'\''); scale(); go('/harbormaster/tasks')"
         >Delete</button>
 
         <button
@@ -228,7 +228,7 @@
           rest="/api/harbormaster/tasks/{{task.id}}"
           rest-method="post"
           rest-data="task"
-          rest-success="toast('success','Saved', 'Successfully saved task \''+task.name+'\''); (task.id &amp;&amp; reload() || go('/harbormaster/tasks'))"
+          rest-success="toast('success','Saved', 'Successfully saved task \''+task.name+'\''); scale(); (task.id &amp;&amp; reload() || go('/harbormaster/tasks'))"
         >Save</button>
       </div>
     </div>
