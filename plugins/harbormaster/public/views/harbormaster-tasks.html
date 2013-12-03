@@ -8,7 +8,9 @@
       Launch Task
     </a>
 
-    <button type="button" class="btn btn-success" rest="/api/automation/tasks/run/harbormaster.tasks.scale">
+    <button type="button" class="btn btn-success"
+      rest="/api/automation/tasks/run/harbormaster.tasks.scale"
+      rest-success="toast('success', 'Scale Successful', 'Successfully dispatched scaling request'); scale()">
       <i class="icon-tasks icon-white"></i>
       Scale All
     </button>

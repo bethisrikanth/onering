@@ -49,6 +49,10 @@ function HarbormasterTasksController($scope, $http, $window){
     return false;
   }
 
+  $scope.scale = function(){
+    $http.get('/api/automation/tasks/run/harbormaster.tasks.scale');
+  }
+
   $scope.reload();
   $window.setInterval($scope.reload, 5000);
 }

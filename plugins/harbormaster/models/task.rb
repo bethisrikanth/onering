@@ -157,20 +157,27 @@ module Harbormaster
       # ------------------------------------------------------------------------
         scale_success = false
 
-        3.times.collect do
+        3.times.each do
+          break if scale_success === true
+
           catch(:retry) do
             response = nil
             url      = nil
 
           # task not found in cluster, start it
             if cluster_app.nil?
-              url = "http://#{marathon_node.get(:fqdn)}:8080/v1/apps/start"
-              response = HTTParty.post(url, {
-                :headers => {
-                  'Content-type' => 'application/json'
-                },
-                :body => MultiJson.dump(body)
-              })
+              if self.enabled === true
+                url = "http://#{marathon_node.get(:fqdn)}:8080/v1/apps/start"
+                response = HTTParty.post(url, {
+                  :headers => {
+                    'Content-type' => 'application/json'
+                  },
+                  :body => MultiJson.dump(body)
+                })
+              else
+                Onering::Logger.debug("Task #{self.id} is disabled and absent from Marathon, skipping...")
+                return true
+              end
 
           # task IS found in cluster
             else
@@ -202,6 +209,8 @@ module Harbormaster
 
             # stop it if we're not enabled
               if self.enabled == false
+                Onering::Logger.debug("Sending stop command to #{marathon_node.get(:fqdn)} for task #{marathon_task_name}")
+
                 url = "http://#{marathon_node.get(:fqdn)}:8080/v1/apps/stop"
                 response = HTTParty.post(url, {
                   :headers => {
@@ -212,6 +221,8 @@ module Harbormaster
 
             # scale it to n instances otherwise
               else
+                Onering::Logger.debug("Sending scale command to #{marathon_node.get(:fqdn)} for task #{marathon_task_name}")
+
                 url = "http://#{marathon_node.get(:fqdn)}:8080/v1/apps/scale"
                 response = HTTParty.post(url, {
                   :headers => {
@@ -224,7 +235,7 @@ module Harbormaster
 
             if response.code < 300
               scale_success = true
-              break
+              next
             end
 
             Onering::Logger.warn("Received response HTTP #{response.code} from #{url}")
