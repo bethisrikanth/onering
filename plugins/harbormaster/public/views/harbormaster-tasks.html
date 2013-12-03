@@ -70,7 +70,7 @@
 
             <tr ng-show="opt.expandedTasks[task.id]" ng-repeat="marathon_task in marathon_tasks" ng-class="{'error': (!task.enabled)}">
               <td> </td>
-              <td>&#9492;&nbsp;&nbsp;</td>
+              <td><code class="text-unknown">{{ marathon_task.id }}</code></td>
               <td> </td>
               <td>
                 {{ marathon_task.resources.cpus }}
@@ -86,7 +86,7 @@
               </td>
               <td> </td>
               <td ng-switch on="marathon_task.state">
-                <span ng-switch-when="TASK_STAGED" class="label label-blue">Staged</span>
+                <span ng-switch-when="TASK_STAGING" class="label label-blue">Staging</span>
                 <span ng-switch-when="TASK_RUNNING" class="label label-green">Running</span>
                 <span ng-switch-when="TASK_FINISHED" class="label label-blue">Finished</span>
                 <span ng-switch-when="TASK_KILLED" class="label label-red">Killed</span>
