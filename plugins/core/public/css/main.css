@@ -200,7 +200,8 @@ body .modal {
 }
 
 .label-allocatable,
-.label-installing{
+.label-installing,
+.label-blue{
   background-color: #3A87AD;
 }
 
