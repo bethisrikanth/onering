@@ -4,9 +4,17 @@ require 'ipmi/lib/asset_extensions'
 module App
   class Base < Controller
     namespace '/api/devices' do
-      get '/:id/ipmi/:command' do
+      get '/:id/ipmi/:command/?*' do
         node = Asset.find(params[:id])
         return 404 unless node
+
+        if params[:splat].first.empty?
+          args = []
+        else
+          args = params[:splat].first.split('/').collect{|i|
+            i.autotype()
+          }
+        end
 
         output({
           :id      => node.id,
@@ -17,7 +25,10 @@ module App
             :mac => node.get(:ipmi_macaddress)
           },
           :command => params[:command],
-          :result  => node.ipmi_command(params[:command])
+          :arguments => args,
+          :result  => node.ipmi_command(params[:command], {
+            :arguments => args
+          })
         })
       end
     end

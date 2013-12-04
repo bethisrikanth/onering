@@ -41,9 +41,19 @@ module Ipmi
 
         klass = ipmi
 
-        command.split('.').each do |part|
+        parts = command.split('.')
+
+        parts.each.with_index do |part,i|
           begin
-            klass = klass.send(part.to_sym)
+            if i == (parts.length - 1)
+              if options[:arguments].nil?
+                klass = klass.send(part.to_sym)
+              else
+                klass = klass.send(part.to_sym, *[*options[:arguments]])
+              end
+            else
+              klass = klass.send(part.to_sym)
+            end
           rescue NoMethodError
             Onering::Logger.error("No such command #{command}")
             return false

@@ -19,7 +19,7 @@ module Automation
         def self.perform(*args)
           @config = App::Config.get!('snmp')
 
-          queue = EM::Queue.new()
+          # queue = EM::Queue.new()
           processed_addresses = Set.new()
 
           @config.get('profiles',[]).each do |name, profile|
@@ -32,39 +32,53 @@ module Automation
 
             log("Discovering profile #{name}")
 
-            profile.get('discovery.addresses',[]).each do |address|
+            discover_addresses = profile.get('discovery.addresses',[])
+
+            if discover_addresses.empty?
+              warn("No addresses configured for discovery in profile #{name}")
+              return false
+            end
+
+            discover_addresses.each do |address|
               next if processed_addresses.include?(address)
 
-              mutex, cv = SnmpHost.discover(address, {
-                :ping => {
-                  :timeout => profile.get('protocol.ping_timeout', DEFAULT_PING_TIMEOUT),
-                  :port    => 161
-                },
-                :snmp => {
-                  :timeout   => profile.get('protocol.timeout', DEFAULT_SNMP_TIMEOUT),
-                  :port      => profile.get('protocol.port', 161),
-                  :community => profile.get('protocol.community', 'public'),
-                  :oids      => profile.get('discovery.oids', [])
-                }
-              }) do |discovered_host|
+              EM.run do
+                debug("EventMachine reactor started")
 
-                catch(:skip) do
-                  profile.get('discovery.filter',{}).each do |oid, pattern|
-                    throw :skip unless discovered_host[:properties].keys.include?(oid)
-                    throw :skip unless discovered_host[:properties][oid] =~ Regexp.new(pattern)
+                mutex, cv = SnmpHost.discover(address, {
+                  :ping => {
+                    :timeout => profile.get('protocol.ping_timeout', DEFAULT_PING_TIMEOUT),
+                    :port    => 161
+                  },
+                  :snmp => {
+                    :timeout   => profile.get('protocol.timeout', DEFAULT_SNMP_TIMEOUT),
+                    :port      => profile.get('protocol.port', 161),
+                    :community => profile.get('protocol.community', 'public'),
+                    :oids      => profile.get('discovery.oids', [])
+                  }
+                }) do |discovered_host|
+                  debug("Host #{discovered_host[:id]} is up and responding to SNMP queries")
+
+                  catch(:skip) do
+                    profile.get('discovery.filter',{}).each do |oid, pattern|
+                      throw :skip unless discovered_host[:properties].keys.include?(oid)
+                      throw :skip unless discovered_host[:properties][oid] =~ Regexp.new(pattern)
+                    end
+
+                    info("Saving host identification #{discovered_host.get(:id)}")
+
+                    SnmpHost.new({
+                      :profile => name
+                    }.merge(discovered_host)).save()
                   end
-
-                  log("Saving host identification #{discovered_host.get(:id)}")
-
-                  SnmpHost.new({
-                    :profile => name
-                  }.merge(discovered_host)).save()
                 end
-              end
 
-            # wait for the signal to continue
-              mutex.synchronize do
-                cv.wait(mutex)
+              # wait for the signal to continue
+                mutex.synchronize do
+                  cv.wait(mutex)
+                end
+
+                EM::stop_event_loop()
               end
             end
 

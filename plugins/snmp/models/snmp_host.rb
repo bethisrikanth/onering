@@ -28,13 +28,17 @@ class SnmpHost < App::Model::Elasticsearch
       cv = ConditionVariable.new()
 
       yielder = proc do |response|
-        yield response if block_given?
+        if block_given?
+          Onering::Logger.debug("Host #{response[:id]} responded to SNMP query")
+          yield response
+        end
       end
 
       addresses = IPAddress.parse(ip_range).to_a
 
       addresses.each do |address|
         address = address.to_s
+
 
         pinger = proc do
         # attempt to ping
