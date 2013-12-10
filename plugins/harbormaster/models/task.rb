@@ -143,14 +143,7 @@ module Harbormaster
           :mem       => self.resources.get(:memory),
           :cpus      => self.resources.get(:cpu),
           :cmd       => self.task.get(:name),
-          :env       => self.resources.get(:environment,{}).merge({
-            "DOCKER_OPTS_RUN_NONET"          => "-n=false",
-            "DOCKER_OPTS_RUN_LXC_NET_TYPE"   => "-lxc-conf=lxc.network.type=veth",
-            "DOCKER_OPTS_RUN_LXC_NET_LINK"   => "-lxc-conf=lxc.network.link=br0",
-            "DOCKER_OPTS_RUN_LXC_NET_FLAGS"  => "-lxc-conf=lxc.network.flags=up",
-            "DOCKER_OPTS_RUN_LXC_NET_NAME"   => "-lxc-conf=lxc.network.name=eth0",
-            "DOCKER_OPTS_RUN_LXC_NET_IP"     => "-lxc-conf=lxc.network.ipv4=0.0.0.0"
-          })
+          :env       => self.resources.get(:environment,{})
         }
 
       # send request (with retries!)
