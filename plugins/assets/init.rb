@@ -102,6 +102,10 @@ module App
           })
         end
 
+        get '/pools/list' do
+          output(RegisteredAddress.list(:pool).sort)
+        end
+
         get '/address/:pool/?' do
           address = RegisteredAddress.next_unclaimed_address(params[:pool], params[:asset], {
             :retries   => params[:retries],
