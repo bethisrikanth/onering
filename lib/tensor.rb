@@ -359,7 +359,7 @@ module Tensor
         when :boolean
           :not_analyzed
         else
-          :analyzed
+          options.get(:index)
         end
       }.merge(options)
 
@@ -585,7 +585,6 @@ module Tensor
     def self.update(id, attributes, options={}, es_options={})
       self.find!(id).update(attributes).save(options, es_options)
     end
-
 
     # determine whether a document with the given ID exists in the index
     # +id+: the id to check
@@ -1091,7 +1090,10 @@ module Tensor
             definition = definition.stringify_keys()
 
             es_mapping = {
-              'type' => definition['type'].to_s
+              'type'  => definition['type'].to_s,
+              'index' => definition['index']
+            }.reject{|k,v|
+              v.nil?
             }
 
             if definition['typedefs'].is_a?(Hash)

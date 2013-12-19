@@ -48,7 +48,9 @@ module App
         }.compact
       end
 
-
+      unless params[:only].nil?
+        @queryparams[:fields] = params[:only].split(/[\,\|]/)
+      end
 
       if params[:profile] === '1'
         Profiler__.start_profile

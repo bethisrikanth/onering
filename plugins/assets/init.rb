@@ -3,6 +3,7 @@ require 'controller'
 require 'assets/lib/helpers'
 require 'assets/models/asset'
 require 'assets/models/node_default'
+require 'assets/models/registered_address'
 
 module App
   class Base < Controller
@@ -76,6 +77,39 @@ module App
 
             output((default || {}).to_hash)
           end
+        end
+      end
+
+
+      namespace '/ipam' do
+        get '/list/*/?' do
+          fields = params[:splat].first.split('/')
+          addresses = RegisteredAddress.list(fields, params[:q])
+
+          output(addresses)
+        end
+
+        get '/all/?' do
+          output(RegisteredAddress.all.collect{|i|
+            i.to_hash()
+          })
+        end
+
+        get '/find/?' do
+          addresses = RegisteredAddress.urlquery(params[:q], @queryparams)
+          output(addresses.collect{|i|
+            i.to_hash()
+          })
+        end
+
+        get '/address/:pool/?' do
+          address = RegisteredAddress.next_unclaimed_address(params[:pool], params[:asset], {
+            :retries   => params[:retries],
+            :selection => params[:selection]
+          })
+
+          halt 404 if address.nil?
+          output(address.to_hash)
         end
       end
 

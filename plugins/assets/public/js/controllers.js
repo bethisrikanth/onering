@@ -22,7 +22,7 @@ function QueryController($scope, $http, $interval, $route, $rootScope, $location
     if($scope.query){
       var p = {
         query: 'tags/not:disabled/'+$scope.prepareQuery($scope.query, $routeParams.raw),
-        only:  'alert_state,ip,site,model,rack,unit,slot,reserved,provisioning.class',
+        only:  'name,status,maintenance_status,collected_at,alert_state,ip,site,model,rack,unit,slot,reserved,provisioning.class',
         sort:  ($scope.sortReverse && '-' || '')+($scope.sortField || 'name'),
         page:  ($scope.pagenum || 1)
       }

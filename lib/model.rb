@@ -185,16 +185,18 @@ module App
         end
 
         def urlquery(query, query_options={}, tensor_options={})
-          query_options[:fields].collect!{|i|
-            self.resolve_field(i)
-          } unless query_options[:fields].nil?
-
           query = {
             :filter => self.to_elasticsearch_query(query),
             :fields => (self.fields.keys.collect{|i| i.to_s }),
           }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
+
+          unless query_options[:fields].nil?
+            query[:fields] = query_options[:fields].collect{|i|
+              self.resolve_field(i)
+            }
+          end
 
           return self.search(query, tensor_options)
         end
