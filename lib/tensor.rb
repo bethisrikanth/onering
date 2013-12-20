@@ -125,7 +125,10 @@ module Tensor
             key = $1
           end
 
-          @attributes[key] = value
+        # don't set an attribute unless this key is the name of a field
+          if self.fields.keys.include?(key.to_sym)
+            @attributes[key] = value
+          end
 
         # hack to temporarily disable "dirty" flagging in attr setter
           @_permaclean = true
@@ -236,6 +239,15 @@ module Tensor
 
     def dirty?()
       return @_dirty
+    end
+
+    def metadata(key=nil, default=nil)
+      rv = (@_metadata || {})
+      key = key.to_s
+      key = '_'+key unless key =~ /^_/
+
+      return rv.get(key, default) unless key.nil?
+      return rv
     end
 
     def to_hash()
@@ -508,6 +520,7 @@ module Tensor
         return _wrap_response(:search, connection().search({
           :index => self.index_name(),
           :body  => {
+            :version => true,
             :size  => (options[:limit] || DEFAULT_INTERNAL_LIMIT),
             :query => {
               :ids => {
@@ -561,6 +574,7 @@ module Tensor
 
     def self.all(options={})
       return self.search({
+        :version => true,
         :query => {
           :match_all => {}
         }

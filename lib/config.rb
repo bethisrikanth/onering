@@ -19,23 +19,71 @@ module App
             confpath = conf.split('/')[2..-1]
             confpath = (confpath[0..-2]+[File.basename(confpath[-1], '.yaml')]).join('.')
 
-            @_config.rset(confpath, data)
+            apply(confpath, data)
           end
         end
 
         @_config
       end
 
+      def apply(path, value)
+        current = @_config.get(path)
+
+      # this is necessary because hashlib seems to be replacing the key entirely
+      # if the value is a hash
+      #
+        if current.is_a?(Hash)
+          @_config.set(path, current.deeper_merge!(value))
+        else
+          @_config.set(path, value)
+        end
+
+        self
+      end
+
+      def register(id, path, data)
+        @_externalconfig ||= {}
+        @_externalconfig[id] = {
+          :path => path,
+          :data => data
+        }
+      end
+
+      def unregister(id)
+        if @_externalconfig.is_a?(Hash)
+          @_externalconfig.delete(id)
+        end
+      end
+
+      def registrations()
+        @_externalconfig
+      end
+
       def get(path, default=nil)
-        @_config.get(path, default)
+        to_hash().get(path, default)
       end
 
       def get!(path)
-        get(path) or raise ConfigKeyError, "config path '#{path}' not found"
+        to_hash().get(path) or raise ConfigKeyError, "config path '#{path}' not found"
       end
 
       def set(path, value)
         @_config.set(path, value)
+      end
+
+      def to_hash()
+        @_externalconfig ||= {}
+
+        rv = @_config
+
+        @_externalconfig.each do |id, config|
+          merge_config = {}
+          merge_config.set(config[:path], config[:data])
+
+          rv = rv.deep_merge(merge_config)
+        end
+
+        return rv
       end
     end
   end
