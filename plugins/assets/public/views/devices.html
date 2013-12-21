@@ -122,15 +122,19 @@
 
                 <div class="pagination">
                   <ul>
-                    <li ng-show="pages.current==1" class="disabled"><a>&laquo;</a></li>
-                    <li ng-hide="pages.current==1" ng-click="$parent.pagenum=($parent.pagenum-1)"><a>&laquo;</a></li>
+                    <li ng-class="{'disabled': (pages.current==1) }">
+                      <a ng-show="pages.current==1">&laquo;</a>
+                      <a ng-hide="pages.current==1" ng-click="$parent.pagenum=($parent.pagenum-1)">&laquo;</a>
+                    </li>
 
-                    <li ng-repeat="p in (pages.total | fillArray:1)" class="{{ p==pages.current &amp;&amp; 'active' || '' }}" ng-click="$parent.$parent.pagenum=p">
+                    <li ng-repeat="p in (pages.total | fillArray:1)" class="{{ p==pages.current &amp;&amp; 'active' || '' }}" ng-click="$parent.pagenum=p">
                       <a>{{ p }}</a>
                     </li>
 
-                    <li ng-show="pages.current==pages.total-1" class="disabled"><a>&raquo;</a></li>
-                    <li ng-hide="pages.current==pages.total-1" ng-click="$parent.pagenum=($parent.pagenum+1)"><a>&raquo;</a></li>
+                    <li ng-class="{'disabled': (pages.current==pages.total-1) }">
+                      <a ng-show="pages.current==pages.total-1">&raquo;</a>
+                      <a ng-hide="pages.current==pages.total-1" ng-click="$parent.pagenum=($parent.pagenum+1)">&raquo;</a>
+                    </li>
                   </ul>
                 </div>
               </div>

@@ -138,10 +138,17 @@ module App
             paginate_headers(total)
 
             output(filter_hash(rv.get('hits.hits', []).collect{|i|
-              Asset.new(i['fields'].merge({
+              data = {
                 :id   => i['_id'],
                 :type => i['_type']
-              })).to_hash()
+              }
+
+              i['fields'].each{|k,v|
+                data.set(k,v)
+              }
+
+              Asset.new(data).to_hash()
+
             }, Asset.field_prefix))
           else
             output([])
