@@ -400,7 +400,7 @@ module App
           return 404 unless user
           return 404 unless user.client_keys.keys.include?(params[:name])
 
-          user.client_keys.delete(params[:name])
+          user.client_keys = user.client_keys.delete(params[:name])
           user.save()
 
           200
@@ -456,7 +456,7 @@ module App
           return 404 unless group and user
 
           unless group.users.include?(user.id)
-            group.users << user.id
+            group.users = (group.users + [user.id]).uniq
             group.save()
           end
 
@@ -470,7 +470,9 @@ module App
           user = User.find(params[:user])
           return 404 unless group and user
 
-          group.users.delete(user.id) && group.save()
+          group.users = (group.users - [user.id])
+          group.save()
+
           output(group)
         end
 
@@ -481,7 +483,8 @@ module App
           capability = Capability.find(params[:capability])
           return 404 unless group and capability
 
-          capability.groups << group.id && capability.save()
+          capability.groups = (capability.groups + [group.id]).uniq
+          capability.save()
           200
         end
       end

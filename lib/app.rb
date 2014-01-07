@@ -25,6 +25,7 @@ require 'eventmachine'
 require 'multi_json'
 require 'liquid_patches'
 require 'pp'
+require 'core/models/configuration'
 
 # initialize model logging
 Tensor::Model.logger = Onering::Logger.logger()
@@ -37,13 +38,16 @@ Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*')].each do |p|
   name = File.basename(p)
 
   begin
-    Onering::Logger.debug("Loading plugin #{name}...", "Onering")
+    Onering::Logger.debug("Loading plugin #{name}", "Onering")
     require "#{name}/init"
   rescue LoadError
     next
   end
 end
 
+# merge configuration data from the database into the data loaded from files
+Onering::Logger.debug("Loading configuration from database", "Onering")
+Configuration.sync_remote_with_local()
 
 module App
   class Base < Controller
@@ -68,6 +72,10 @@ module App
       set     :views, File.join(ENV['PROJECT_ROOT'], 'config', 'templates')
 
       ::Liquid::Template.file_system = ::Liquid::LocalFileSystem.new(settings.views)
+    end
+
+    before do
+      Configuration.sync_remote_with_local()
     end
 
     error do

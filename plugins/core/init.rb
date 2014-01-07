@@ -117,6 +117,96 @@ module App
           i
         })
       end
+
+
+      namespace '/config' do
+        get '/?' do
+          allowed_to? :read_config
+          output(filter_hash(App::Config.to_hash()))
+        end
+
+        post '/?' do
+          allowed_to? :update_config
+          data = MultiJson.load(request.env['rack.input'].read)
+          config = Configuration.create(data)
+          output(config.to_hash())
+        end
+
+        get '/get/*/?' do
+          allowed_to? :read_config
+          path = params[:splat].first.split('/')
+
+          if path.empty?
+            out = App::Config.to_hash()
+          else
+            out = {}
+
+            rv = App::Config.to_hash().get(path)
+            halt 404 if rv.nil?
+
+            if params[:root]
+              out.set(params[:root], rv)
+            else
+              out = rv
+            end
+          end
+
+          output(filter_hash(out))
+        end
+
+        get '/debug/?' do
+          allowed_to? :read_config
+          output(App::Config.registrations())
+        end
+
+        get '/all/?' do
+          allowed_to? :read_config
+
+          output(Configuration.all.collect{|i|
+            i.to_hash()
+          })
+        end
+
+        get '/find/?' do
+          allowed_to? :read_config
+          halt 400 unless params[:q]
+          config = Configuration.urlquery(params[:q], @queryparams)
+
+          output(config.collect{|i|
+            i.to_hash()
+          })
+        end
+
+        get '/:id/?' do
+          allowed_to? :read_config, params[:id]
+          config = Configuration.find(params[:id])
+          halt 404 unless config
+          output(config.to_hash())
+        end
+
+        post '/:id/?' do
+          allowed_to? :update_config, params[:id]
+
+          config = Configuration.find(params[:id])
+          halt 404 unless config
+
+          data = MultiJson.load(request.env['rack.input'].read)
+          config.update(data)
+          config.save()
+
+          output(config.to_hash())
+        end
+
+        delete '/:id/?' do
+          allowed_to? :remove_config, params[:id]
+
+          config = Configuration.find(params[:id])
+          halt 404 unless config
+
+          config.destroy()
+          200
+        end
+      end
     end
 
   end

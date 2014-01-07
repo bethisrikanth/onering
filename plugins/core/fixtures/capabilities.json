@@ -1,0 +1,25 @@
+[{
+  "_id":         "read_config",
+  "_type":       "Capability",
+  "description": "Read any configuration item"
+},{
+  "_id":         "update_config",
+  "_type":       "Capability",
+  "description": "Create or update any configuration item"
+},{
+  "_id":         "remove_config",
+  "_type":       "Capability",
+  "description": "Remove a configuration item"
+},{
+  "_id": "manage_config",
+  "_type": "Capability",
+  "description": "Capabilities for creating, modifying and deleting global system configuration",
+  "capabilities": [
+    "read_config",
+    "update_config",
+    "remove_config"
+  ],
+  "groups": [
+    "admins"
+  ]
+}]
