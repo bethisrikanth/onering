@@ -247,7 +247,7 @@ DEPENDENCIES
   oj
   onering-client (>= 0.0.95)
   racksh
-  rainbow
+  rainbow (<= 1.1.4)
   rake
   rdiscount (= 1.6.8)
   resque
