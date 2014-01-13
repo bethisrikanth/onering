@@ -53,8 +53,6 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
       $rootScope.group_filter = value;
       $cookies['onering.group_filter_query'] = value.query;
       console.log("GFC", $cookies['onering.group_filter_query'], value.query)
-
-      $scope.reload();
     }
   }
 
