@@ -50,15 +50,11 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
     value.query = field+'/'+(value.value || value);
 
     if(angular.isDefined(value.query)){
-      var skip_reload = ($rootScope.group_filter == value)
-
       $rootScope.group_filter = value;
       $cookies['onering.group_filter_query'] = value.query;
       console.log("GFC", $cookies['onering.group_filter_query'], value.query)
 
-      if(skip_reload != true){
-        $scope.reload();
-      }
+      $scope.reload();
     }
   }
 
@@ -91,10 +87,12 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
         var fv = sessionFilter.split('/');
 
         if(fv.length > 1){
-          console.log("LOADING GROUP FILTER FROM COOKIE", sessionFilter, fv);
-          $scope.setGroupFilter(fv[0], {
-            value: fv[1]
-          });
+          if(angular.isUndefined($rootScope.group_filter) || (angular.isObject($rootScope.group_filter) && $rootScope.group_filter.value != fv[1])){
+            console.log("LOADING GROUP FILTER FROM COOKIE", sessionFilter, fv);
+            $scope.setGroupFilter(fv[0], {
+              value: fv[1]
+            });
+          }
         }
       }
     });
