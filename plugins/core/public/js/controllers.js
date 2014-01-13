@@ -87,8 +87,10 @@ function NavigationController($scope, $rootScope, $http, $route, $window, $route
         var fv = sessionFilter.split('/');
 
         if(fv.length > 1){
-          console.log("LOADING GROUP FILTER FROM COOKIE", sessionFilter);
-          $scope.setGroupFilter(fv[0], fv[1]);
+          console.log("LOADING GROUP FILTER FROM COOKIE", sessionFilter, fv);
+          $scope.setGroupFilter(fv[0], {
+            value: fv[1]
+          });
         }
       }
     });
