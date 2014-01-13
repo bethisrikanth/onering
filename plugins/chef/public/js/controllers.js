@@ -46,14 +46,18 @@ function ChefConsoleController($scope, $http, $rootScope, $interval, $location){
       return false;
     }
 
+    var prefilter = 'status/not:allocatable/status/not:installing/status/not:booting';
+
     $scope.loading = true;
 
-    $http.get('/api/devices/summary/by-chef.last_run.state').success(function(data){
+    $http.get('/api/devices/summary/by-chef.last_run.state', {
+      params: prefilter
+    }).success(function(data){
       $scope.states = data;
     })
 
     var p = {
-      q:     'status/not:allocatable/status/not:installing/status/not:booting/chef.last_run.state/'+$scope.selected_state,
+      q:     prefilter+'/chef.last_run.state/'+$scope.selected_state,
       only:  'name,status,maintenance_status,collected_at,alert_state,ip,site,reserved,chef',
       sort:  ($scope.sortReverse && '-' || '')+($scope.sortField || 'name'),
       page:  ($scope.pagenum || 1)
