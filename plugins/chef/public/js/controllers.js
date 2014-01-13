@@ -51,7 +51,9 @@ function ChefConsoleController($scope, $http, $rootScope, $interval, $location){
     $scope.loading = true;
 
     $http.get('/api/devices/summary/by-chef.last_run.state', {
-      params: prefilter
+      params: {
+        q: prefilter
+      }
     }).success(function(data){
       $scope.states = data;
     })
