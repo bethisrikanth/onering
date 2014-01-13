@@ -53,7 +53,7 @@ function ChefConsoleController($scope, $http, $rootScope, $interval, $location){
     })
 
     var p = {
-      q:     'chef.last_run.state/'+$scope.selected_state,
+      q:     'status/not:allocatable/status/not:installing/status/not:booting/chef.last_run.state/'+$scope.selected_state,
       only:  'name,status,maintenance_status,collected_at,alert_state,ip,site,reserved,chef',
       sort:  ($scope.sortReverse && '-' || '')+($scope.sortField || 'name'),
       page:  ($scope.pagenum || 1)
