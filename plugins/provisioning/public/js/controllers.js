@@ -192,7 +192,7 @@ function ProvisioningRequestController($scope, $http, $routeParams){
       $scope.request = {
         quantity: {
           nydc1:  0,
-          chidc1: 0,
+          chidc2: 0,
           ladc1:  0
         }
       };

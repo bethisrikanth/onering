@@ -4,13 +4,13 @@ class AssetRequest < App::Model::Elasticsearch
   index_name "asset_requests"
 
   before_save :_intify_quantities
-  before_save :_compact_notes
+  #before_save :_compact_notes
 
   field :deliver_by,      :date
 
   field :user_id,         :string
   field :team,            :string
-  field :quantity,        :object
+  field :quantity,        :object,  :default => {}
   field :service,         :string
   field :notes,           :object,  :array => true
   field :created_at,      :date,    :default => Time.now

@@ -13,13 +13,13 @@
 
   <div class="row">
     <div class="span12">
-      <table class="table table-condensed">
+      <table class="table table-condensed table-hover">
         <thead>
           <tr>
             <th>Total</th>
-            <th>NY</th>
-            <th>CHI</th>
-            <th>LA</th>
+            <th>NYDC1</th>
+            <th>CHIDC2</th>
+            <th>LADC1</th>
             <th>Role</th>
             <th>Team</th>
             <th>Requested By</th>
@@ -31,9 +31,9 @@
 
         <tbody>
           <tr ng-repeat="request in requests">
-            <td>{{ request.total }}</td>
+            <td><b>{{ request.total }}</b></td>
             <td>{{ request.quantity.nydc1 }}</td>
-            <td>{{ request.quantity.chidc1 }}</td>
+            <td>{{ request.quantity.chidc2 }}</td>
             <td>{{ request.quantity.ladc1 }}</td>
             <td>{{ request.service | uppercase }}</td>
             <td>{{ request.team }}</td>
@@ -43,7 +43,7 @@
               <span ng-show="request.notes.length">{{ request.notes.length }}</span>
             </td>
             <td><a href="#/provisioning/request/{{ request.id }}"><i class="icon-pencil"> </i></a></td>
-            <td><a rest="/api/provision/request/{{ request.id }}" rest-method="delete" rest-success="reload()"><i class="icon-remove"> </i></a></td>
+            <td><a rest="/api/provision/request/{{ request.id }}" rest-method="delete" rest-success="reload()" rest-confirm="Are you sure you want to cancel this request?  It will no longer be part of the next hardware acquisition."><i class="icon-remove"> </i></a></td>
           </tr>
         </tbody>
       </table>

@@ -85,7 +85,6 @@ module App
             json = MultiJson.load(request.env['rack.input'].read)
             json['user_id'] = @user.id
 
-            json.delete('notes')
             note = json.delete('_note')
 
             asset.from_json(json)

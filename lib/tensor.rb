@@ -377,23 +377,14 @@ module Tensor
 
     # define getter
       define_method(name) do
-        if instance_variables.include?(:"@#{name}")
-          instance_variable_get(:"@#{name}")
-        else
-          self.class._normalize_value(nil, fields(name))
-        end
-      end
+        if not instance_variables.include?(:"@#{name}")
+          value = self.class._normalize_value(nil, fields(name))
 
-    # define element reference
-      define_method(:"#{name}[]") do |key|
-        if instance_variables.include?(:"@#{name}")
-          value = instance_variable_get(:"@#{name}")
-          raise NoMethodError.new("undefined method `[]' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:[])
-
-          value[key]
-        else
-          self.class._normalize_value(nil, fields(name))
+          @attributes[name.to_s] = value
+          instance_variable_set(:"@#{name}", value)
         end
+
+        instance_variable_get(:"@#{name}")
       end
 
     # define setter
@@ -409,37 +400,6 @@ module Tensor
 
       # return what we just set
         send(name)
-      end
-
-    # define element assignment
-      define_method(:"#{name}[]=") do |key, kval|
-        if not instance_variables.include?(:"@#{name}")
-          instance_variable_set(:"@#{name}", self.class._normalize_value({}, fields(name)))
-        end
-
-        value = instance_variable_get(:"@#{name}")
-        raise NoMethodError.new("undefined method `[]=' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:[]=)
-        value[key] = kval
-
-      # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
-        @_dirty = true unless @_permaclean
-
-        send(:"#{name}[]", key)
-      end
-
-    # define appender
-      define_method(:"#{name}<<") do |append|
-        if not instance_variables.include?(:"@#{name}")
-          instance_variable_set(:"@#{name}", self.class._normalize_value(nil, fields(name)))
-        end
-
-        value = instance_variable_get(:"@#{name}")
-        raise NoMethodError.new("undefined method `<<' for #{self.to_s}:#{self.class.name}") unless value.respond_to?(:<<)
-
-      # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
-        @_dirty = true unless @_permaclean
-
-        value << append
       end
     end
 

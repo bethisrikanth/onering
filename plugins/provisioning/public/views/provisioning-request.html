@@ -23,7 +23,7 @@
             <label class="control-label">Requester</label>
 
             <div class="controls">
-              <input class="input-medium" type="text" value="{{ user.name || user.id }}" disabled></input>
+              <input class="input-large" type="text" value="{{ user.name || user.id }}" disabled></input>
             </div>
           </div>
 
@@ -72,9 +72,9 @@
           </div>
 
           <div class="control-group">
-            <button ng-show="request.id" type="submit" class="btn btn-danger pull-left" rest="/api/provision/request/{{request.id}}" rest-method="delete" rest-data="request" rest-success="go('/provisioning/request')">Cancel Request</button>
+            <button ng-show="request.id" type="submit" class="btn btn-danger pull-left" rest="/api/provision/request/{{request.id}}" rest-method="delete" rest-data="request" rest-success="go('/provisioning/request')" rest-confirm="Are you sure you want to cancel this request?  It will no longer be part of the next hardware acquisition.">Cancel Request</button>
 
-            <button ng-show="request.id" type="submit" class="btn btn-primary pull-right" rest="/api/provision/request" rest-method="post" rest-data="request" rest-success="go('/provisioning/request')">Submit Request</button>
+            <button ng-show="request.id" type="submit" class="btn btn-primary pull-right" rest="/api/provision/request" rest-method="post" rest-data="request" rest-success="go('/provisioning/request')">Update Request</button>
 
             <button ng-hide="request.id" type="submit" class="btn btn-primary pull-right" rest="/api/provision/request" rest-method="post" rest-data="request" rest-success="reload()">Submit Request</button>
           </div>
@@ -117,11 +117,13 @@
             </thead>
 
             <tbody>
-              <tr ng-repeat="request in requestsMine">
-                <td><abbr title="NY: {{request.quantity.nydc1}}, CHI: {{request.quantity.chidc1}}, LA: {{request.quantity.ladc1}}">{{ request.total }}</abbr></td>
-                <td>{{ request.service | uppercase }}</td>
-                <td>{{ request.team }}</td>
-                <td><a href="#/provisioning/request/{{ request.id }}"><i class="icon-pencil"> </i></a></td>
+              <tr ng-repeat="r in requestsMine" ng-class="{'info': (r.id==request.id)}">
+                <td><abbr title="NY: {{r.quantity.nydc1}}, CHI: {{r.quantity.chidc2}}, LA: {{r.quantity.ladc1}}">{{ r.total }}</abbr></td>
+                <td>{{ r.service | uppercase }}</td>
+                <td>{{ r.team }}</td>
+                <td>
+                  <a ng-hide="r.id==request.id" href="#/provisioning/request/{{ r.id }}"><i class="icon-pencil"> </i></a>
+                </td>
               </tr>
             </tbody>
           </table>
