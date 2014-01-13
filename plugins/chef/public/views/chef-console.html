@@ -1,0 +1,125 @@
+<div class="container-fluid">
+  <div class="row-fluid margin-bottom-2">
+    <div class="span12">
+      <h1>Chef Status</h1>
+
+
+      <div class="btn-group pull-right">
+        <button class="btn" ng-class="{'btn-danger': reload_suspended, 'btn-success': !reload_suspended}" ng-click="reload(true)"><i class="icon-refresh icon-white"> </i> Reload</button>
+        <button class="btn dropdown-toggle" ng-class="{'btn-danger': reload_suspended, 'btn-success': !reload_suspended}" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li ng-hide="reload_suspended"><a ng-click="reload_suspended=true">Suspend Auto-reload</a></li>
+          <li ng-show="reload_suspended"><a ng-click="reload_suspended=false">Resume Auto-reload</a></li>
+          <li class="divider"></li>
+          <li><a ng-click="reload_suspended=false;interval=5000" ng-class="{'bold': (interval==5000)}">Every 5 seconds</a></li>
+          <li><a ng-click="reload_suspended=false;interval=10000" ng-class="{'bold': (interval==10000)}">Every 10 seconds</a></li>
+          <li><a ng-click="reload_suspended=false;interval=30000" ng-class="{'bold': (interval==30000)}">Every 30 seconds</a></li>
+          <li><a ng-click="reload_suspended=false;interval=60000" ng-class="{'bold': (interval==60000)}">Every 60 seconds</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span2">
+      <ul class="nav nav-pills nav-stacked" ng-show="states">
+        <li>
+          <a class="text-succeeded" ng-click="selected_state='succeeded'" ng-class="{'label-succeeded text-inverted': (selected_state=='succeeded')}">
+            <b class="larger">Succeeded</b>
+            <b class="larger pull-right">{{ states | filter:{'id': 'succeeded'} | pluck:'count' | sum }}</b>
+          </a>
+        </li>
+
+        <li>
+          <a class="text-failed" ng-click="selected_state='failed'" ng-class="{'label-failed text-inverted': (selected_state=='failed')}">
+            <b class="larger">Failed</b>
+            <b class="larger pull-right">{{ states | filter:{'id': 'failed'} | pluck:'count' | sum }}</b>
+          </a>
+        </li>
+
+        <li>
+          <a class="text-unknown" ng-click="selected_state='null'" ng-class="{'label-unknown text-inverted': (selected_state=='null')}">
+            <b class="larger">Unknown</b>
+            <b class="larger pull-right">{{ states | filter:{'id': null} | pluck:'count' | sum }}</b>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="span10">
+      <table class="table table-condensed table-hover">
+        <thead>
+          <tr>
+            <th ng-click="sort('id')">ID</th>
+            <th ng-click="sort('status')" class="center"><abbr title="Status">S</abbr></th>
+            <th ng-click="sort('properties.reserved')" class="center"><abbr title="Reserved"><i class="icon-bookmark-empty"> </i></abbr></th>
+            <th ng-click="sort('properties.alert_state')" class="center"><abbr title="Alerts"><i class="icon-warning-sign"></i></abbr></th>
+            <th ng-click="sort('maintenance_status')" class="center"><abbr title="Maintenance Status"><i class="icon-wrench"></i></abbr></th>
+            <th ng-click="sort('name')">Name</th>
+            <th ng-click="sort('properties.ip')">Primary IP</th>
+            <th ng-click="sort('properties.site')">Site</th>
+            <th ng-click="sort('properties.chef.enabled')">Chef Enabled?</th>
+            <th ng-click="sort('properties.chef.last_ran_at')">Last Chef Run</th>
+            <th ng-click="sort('collected_at')">Last Seen</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="device in results">
+            <td class="id"><a target="_blank" tabindex="{{ results.length + $index + 1 }}" href="#/node/{{ device.id }}">{{ device.id }}</a></td>
+            <td class="status center">
+              <img title="{{ (device.status || 'unknown') | titleize }}" ng-src="/img/status/{{ device.status || 'unknown' }}.png" />
+            </td>
+            <td class="center text-reserved">
+              <span ng-show="device.properties.reserved"><i class="icon-bookmark"> </i></span>
+            </td>
+            <td class="alerts center">
+              <img
+                ng-show="device.properties.alert_state"
+                title="{{ device.properties.alert_state | titleize }}"
+                ng-src="/img/alerts/{{ (device.properties.alert_state || 'unknown') }}.png"
+              />
+            </td>
+            <td class="maintenance_status center">
+              <i class="icon-{{ (device.maintenance_status || 'healthy') }}" title="Needs {{ (device.maintenance_status || 'healthy') | titleize }}"></i>
+            </td>
+            <td>{{ device.name | section:'.':0:1 }}</td>
+            <td>{{ device.properties.ip }}</td>
+            <td>{{ device.properties.site | uppercase }}</td>
+            <td>
+              <label ng-show="device.properties.chef.enabled" class="label label-success">Enabled</label>
+              <label ng-hide="device.properties.chef.enabled" class="label label-important">Disabled</label>
+            </td>
+            <td>{{ device.properties.chef.last_ran_at &amp;&amp; (device.properties.chef.last_ran_at | timeAgo) || '-' }}</td>
+            <td>{{ device.collected_at &amp;&amp; (device.collected_at | timeAgo) || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="center" ng-show="pages &amp;&amp; pages.total > 1">
+        <span>Showing {{ pages.per }} of {{ pages.results }} results &mdash; <a ng-click="$parent.max_results=-1">Show All</a></span>
+
+        <div class="pagination">
+          <ul>
+            <li ng-class="{'disabled': (pages.current==1) }">
+              <a ng-show="pages.current==1">&laquo;</a>
+              <a ng-hide="pages.current==1" ng-click="$parent.pagenum=($parent.pagenum-1)">&laquo;</a>
+            </li>
+
+            <li ng-repeat="p in (pages.total | fillArray:1)" class="{{ p==pages.current &amp;&amp; 'active' || '' }}" ng-click="$parent.pagenum=p">
+              <a>{{ p }}</a>
+            </li>
+
+            <li ng-class="{'disabled': (pages.current==pages.total-1) }">
+              <a ng-show="pages.current==pages.total-1">&raquo;</a>
+              <a ng-hide="pages.current==pages.total-1" ng-click="$parent.pagenum=($parent.pagenum+1)">&raquo;</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

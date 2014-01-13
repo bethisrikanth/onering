@@ -16,7 +16,6 @@ function QueryController($scope, $http, $interval, $route, $rootScope, $location
     }
 
     $scope.loading = true;
-    console.log('Reloading!')
 
   //run arbitrary query
     if($scope.query){
@@ -121,7 +120,7 @@ function QueryController($scope, $http, $interval, $route, $rootScope, $location
     }
   });
 
-  $scope.interval = 60000;
+  $scope.interval = ($location.search().interval || 60000);
 }
 
 function SummaryController($scope, $http, $routeParams, $route){
@@ -444,7 +443,7 @@ function NodeController($scope, $http, $location, $rootScope, $interval, $routeP
     }
   });
 
-  $scope.interval = 60000;
+  $scope.interval = ($location.search().interval || 60000);
   $scope.reload();
 }
 

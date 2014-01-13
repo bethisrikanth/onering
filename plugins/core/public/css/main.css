@@ -31,6 +31,14 @@ address{
   font-weight: bold !important;
 }
 
+.smaller{
+  font-size: smaller !important;
+}
+
+.larger{
+  font-size: larger !important;
+}
+
 
 .margin-top-1{
   margin-top: 1em !important;
@@ -133,7 +141,7 @@ body .modal {
 .text-online,
 .text-succeeded,
 .text-green{
-  color: #468847;
+  color: #468847 !important;
 }
 
 .text-degraded,
@@ -141,13 +149,13 @@ body .modal {
 .text-provisioning,
 .text-queued,
 .text-yellow{
-  color: #F89406;
+  color: #F89406 !important;
 }
 
 .text-reserved,
 .text-booting,
 .text-purple{
-  color: #7C3AAD;
+  color: #7C3AAD !important;
 }
 
 
@@ -155,25 +163,30 @@ body .modal {
 .text-installing,
 .text-running,
 .text-blue{
-  color: #3A87AD;
+  color: #3A87AD !important;
 }
 
 .text-unknown{
-  color: #999;
+  color: #999 !important;
 }
 
 .text-queue_failed,
 .text-failed,
 .text-critical,
 .text-red{
-  color: #B94A48;
+  color: #B94A48 !important;
+}
+
+.text-inverted{
+  color: white !important;
 }
 
 .label-online,
 .label-okay,
 .label-green,
+.label-succeeded,
 .label-enabled{
-  background-color: #468847;
+  background-color: #468847 !important;
 }
 
 .label-degraded,
@@ -181,7 +194,7 @@ body .modal {
 .label-maintenance,
 .label-warning,
 .label-yellow{
-  background-color: #F89406;
+  background-color: #F89406 !important;
 }
 
 .label-fault,
@@ -191,22 +204,22 @@ body .modal {
 .label-disabled,
 .label-red,
 .badge-critical{
-  background-color: #B94A48;
+  background-color: #B94A48 !important;
 }
 
 .label-reserved,
 .label-booting{
-  background-color: #7C3AAD;
+  background-color: #7C3AAD !important;
 }
 
 .label-allocatable,
 .label-installing,
 .label-blue{
-  background-color: #3A87AD;
+  background-color: #3A87AD !important;
 }
 
 .label-unknown{
-  background-color: #999;
+  background-color: #999 !important;
 }
 
 .cursor-pointer{
