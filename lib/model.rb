@@ -274,47 +274,62 @@ module App
         end
 
         def list(field, query=nil)
-          field = [*field]
+          field = [*field].collect{|i| resolve_field(i) }
+          rows = []
 
-        # yes, this is an edge case
-        # no, I don't like it.
-          if field.first == 'id'
-            self.ids(query)
+          es_query = {
+            :size    => Tensor::Model::DEFAULT_RESULTS_LIMIT,
+            :fields  => field,
+            :sort => field.collect{|i|
+              {
+                i => :asc
+              }
+            }
+          }
 
-          else
-            summary = summarize(field.first, field[1..-1].reverse(), query, {
-              :limit => 10000
+        # query all docuents
+          if query.nil?
+            results = search(es_query.merge({
+              :version => true,
+              :query => {
+                :match_all => {}
+              }
+            }), {
+              :raw => true
             })
+          else
+            results = urlquery(query, es_query, {
+              :raw => true
+            })
+          end
 
-            if field.length == 1
-              return summary.collect{|i| i[:id] }.compact
-            else
-              def get_ids(facets, rollup=nil)
-                rv = []
 
-                facets.each do |facet|
+          results.get('hits.hits', []).each do |hit|
+            column = []
 
-                  if facet[:children].is_a?(Array)
-                    if rollup.nil?
-                      rv += get_ids(facet[:children], [facet[:id]])
-                    else
-                      rv += get_ids(facet[:children], rollup.product([facet[:id]]))
-                    end
-                  else
-                    if rollup.nil?
-                      rv << [facet[:id]]
-                    else
-                      rv << rollup.product([facet[:id]])
-                    end
-                  end
+            field.each do |f|
+              case f
+              when 'id'
+                column << hit['_id']
+              else
+                value = (hit['fields'][f] rescue nil)
+
+                if value.respond_to?(:empty?) and value.empty?
+                  value = nil
                 end
 
-                return rv
+                column << value
               end
-
-              return get_ids(summary).map(&:flatten)
             end
+
+            rows << column
           end
+
+          if field.length == 1
+            rows = rows.flatten
+          end
+
+          rows.uniq
         end
 
         def resolve_field(field)

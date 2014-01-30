@@ -1,2 +1,2 @@
-git 'outbrain/onering-server-plugins'
-git 'ghetzel/onering-plugin-media'
+git 'https://github.com/outbrain/onering-server-plugins.git'
+git 'https://github.com/ghetzel/onering-plugin-media.git'

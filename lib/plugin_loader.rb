@@ -1,5 +1,7 @@
 module Onering
   class PluginLoader
+    require 'fileutils'
+
     def self.eval_ringfile(file, &block)
       if block_given?
         Onering::Logger.debug("Evaluating Ringfile from block", "Onering::PluginLoader")
@@ -12,6 +14,44 @@ module Onering
       if content
         eval(content, binding)
       end
+    end
+
+    def self.plugin(name, version)
+      if name.nil? or name.empty? or not version.to_s =~ /^\d\.\d\.\d$/
+        Onering::Logger.fatal("Plugin must specify a string name and a version in the format x.y.z")
+      end
+
+      @_plugins ||= {}
+
+      if @_plugins.has_key(name.to_sym)
+        plugin = @_plugins[name.to_sym]
+
+        if plugin[:version].delete('.').to_i > version.delete('.').to_i
+          Onering::Logger.fatal("Plugin #{name} is already registered and is newer than #{version} (currently: #{plugin[:version]})")
+        else
+          Onering::Logger.fatal("Plugin #{name} is already registered")
+        end
+      else
+        @_plugins[name.to_sym] = {
+          :version => version
+        }
+
+        return true
+      end
+
+      return false
+    end
+
+    def self.plugins()
+      @_plugins || {}
+    end
+
+    def self.plugin_root(name=nil)
+      File.expand_path(File.join(ENV['PROJECT_ROOT'], 'plugins', name.to_s)).gsub(/\/$/,'')
+    end
+
+    def self.temp_root(name=nil)
+      File.expand_path(File.join(ENV['PROJECT_ROOT'], 'tmp', name.to_s)).gsub(/\/$/,'')
     end
   end
 end
