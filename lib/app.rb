@@ -21,6 +21,7 @@ require 'metrics'
 require 'utils'
 require 'model'
 require 'controller'
+require 'plugin_loader'
 require 'eventmachine'
 require 'multi_json'
 require 'liquid_patches'
@@ -29,6 +30,14 @@ require 'core/models/configuration'
 
 # initialize model logging
 Tensor::Model.logger = Onering::Logger.logger()
+
+if File.exists?(root_ringfile = File.join(ENV['PROJECT_ROOT'], "Ringfile"))
+  Onering::PluginLoader.eval_ringfile(root_ringfile)
+end
+
+Dir[File.join(ENV['PROJECT_ROOT'],'plugins', '*', 'Ringfile')].each do |ringfile|
+  Onering::PluginLoader.eval_ringfile(ringfile)
+end
 
 # initialize database settings
 App::Model::Elasticsearch.configure(App::Config.get('database.elasticsearch', {}))

@@ -400,7 +400,10 @@ module App
           return 404 unless user
           return 404 unless user.client_keys.keys.include?(params[:name])
 
-          user.client_keys = user.client_keys.delete(params[:name])
+          user.client_keys = user.client_keys.reject{|k,v|
+            k.to_s == params[:name].to_s
+          }
+
           user.save()
 
           200

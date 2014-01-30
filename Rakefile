@@ -9,6 +9,13 @@ desc "Run API backend integration tests"
   t.cucumber_opts = "features plugins/*/features"
 end
 
+namespace :plugins do
+  desc "Downloads and updates the plugins listed in Ringfile to the specified versions"
+  task :sync do
+
+  end
+end
+
 namespace :launch do
   desc "Prepares the checked out copy for first run"
   task :prep do
