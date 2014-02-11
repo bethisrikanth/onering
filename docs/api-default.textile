@@ -1,0 +1,62 @@
+---
+---
+<div class="section-title">API Reference</div>
+
+All interaction with the Onering middleware layer, either directly (via curl, wget, etc.) or indirectly (via the web interface) happens using a REST-style API.  It uses JSON as its primary serialization format, optionally returning plain text or YAML for certain endpoints.  Authentication options include HTTP Basic Authentication over SSL, pregenerated tokens, and SSL client certificates.
+
+
+h2. Making a request
+
+
+All URLs start with _https://onering/api/_.  Unauthenticated requests can use HTTP _or_ HTTPS, but authenticated requests can only use HTTPS.  It is recommended to always use HTTPS for all transactions.
+
+All API requests happen using the standard HTTP verbs @GET@, @POST@, and @DELETE@.  For example, to view a list of all assets by ID, issue the following request:
+<pre>curl -H 'User-Agent: MyApp (yourname@example.com)' https://onering/api/devices/list/id</pre>
+
+
+To create or update something, the process is similar except that you MUST use the HTTPS protocol with your authentication, and you have to include the @Content-Type@ header with your JSON data :
+
+
+<pre>curl \
+  -H 'Content-Type: application/json' \
+  -H 'User-Agent: MyApp (yourname@example.com)' \
+  -d '{ "id": "abc123" }' \
+  https://onering/api/devices</pre>
+
+
+h2. Authentication
+
+
+There are several authentication methods supported by the backend:
+* An API access token may be generated to be included in subsequent requests.
+* You may generate a SSL client certificate (as PEM or PKCS #12) for use with cURL or in your browser.
+* HTTP Basic Authentication over SSL
+
+If the credentials supplied are not valid, the server will return a @401 Unauthorized@ status code.  If the credentials are not allowed to invoke a particular API endpoint, the server will return a @403 Forbidden@ response.  All other successful responses will be answered with either @200 OK@ or @204 No Content@.
+
+If the server itself is having trouble, it will issue a 500-series HTTP status and you should try your request later.
+
+
+h2. Identify your app
+
+
+You should include a @User-Agent@ header with the name of your application and a link to it or your email address so it can be identified:
+<pre>User-Agent: Awesome Nagios Integrator (bob@example.com)</pre>
+
+
+If you are using the API for anything other than one-off queries, please specify a custom User Agent to make tracking down sources of load easier on the application administrators.
+
+
+h2. Supports Plaintext, Where Applicable
+
+
+JSON is the default serialization format for all responses, and is the ONLY acceptable format for submissions.  Other formats can be returned for convenience in parsing the output.  These formats are specified using the @format=@ query string.  They include:
+
+* @format=yaml@ : Returns the requested endpoint as a YAML document with the mimetype of @text/x-yaml@.
+* @format=txt@  : Returns the requested endpoint as @snake_case_key: value@ pairs, one per line as mimetype @text/plain@.
+* @format=csv@  : For certain endpoints, CSV output is supported and can be controlled using additional query string parameters:
+** @fs=[string|TAB|NL|CR|LF]@: The string that is used as a _field separator_ (default: comma).
+** @rs=[string|TAB|NL|CR|LF]@: The string that is used as a _record separator_ (default: NL [newline]).
+
+For all other @format=@ values, JSON objects or arrays will be returned with a mimetype of @application/json@.
+

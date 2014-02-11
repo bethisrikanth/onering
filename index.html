@@ -23,11 +23,22 @@
 
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li ng-repeat="nav in navbar" ng-class="{active: getActive(nav.path), disabled: nav.disabled }">
-                <a href="{{ site.url_prefix }}/#[[ nav.path ]]">
+              <li ng-repeat="nav in navbar" ng-class="{active: getActive(nav.path), disabled: nav.disabled, dropdown: nav.items }">
+                <a href="{{ site.url_prefix }}/#[[ nav.path ]]" ng-hide="nav.items">
                   <i ng-show="nav.icon" class="[[ nav.iconType || 'glyphicon' ]] [[ nav.iconType || 'glyphicon' ]]-[[ nav.icon ]]"> </i>
                   [[ nav.title ]]
                 </a>
+
+                <a href="{{ site.url_prefix }}/#[[ nav.path ]]" ng-show="nav.items" class="dropdown-toggle" data-toggle="dropdown">
+                  <i ng-show="nav.icon" class="[[ nav.iconType || 'glyphicon' ]] [[ nav.iconType || 'glyphicon' ]]-[[ nav.icon ]]"> </i>
+                  [[ nav.title ]]
+                  <b class="caret"></b>
+                </a>
+
+
+                <ul class="dropdown-menu" role="menu" ng-show="nav.items">
+                  <li ng-repeat="item in nav.items" role="presentation"><a role="menuitem" tabindex="-1" href="#[[ item.path ]]">[[ item.title ]]</a></li>
+                </ul>
               </li>
             </ul>
           </div>

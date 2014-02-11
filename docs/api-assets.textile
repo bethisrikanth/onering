@@ -1,0 +1,158 @@
+---
+layout: api
+api:
+  '/devices/:id':
+    description: 'Get or manage a specific asset by ID.'
+    methods:
+      GET:
+        description: 'Retrieve the asset at :id'
+        returns:     'An object representing the asset'
+
+      POST:
+        description: 'Create or update an asset at :id.'
+---
+
+The assets plugin is responsible for managing all of the items that are tracked in Onering.
+
+The term "asset" is defined very loosely.  With the exception of a few fixed, top-level fields (mainly timestamps and generic properties), there is no set schema for an asset in Onering.  Any field that is present when an asset is created becomes part of that object.  These fields are first-class citizens in Onering and no special configuration is required to search on them.  Typically new fields are available as soon as the asset is saved.
+
+A asset can be anything.  How your assets are grouped and organized depends largely on their fields and the values of those fields.  The assets plugin offers an extensive set of API endpoints for finding, managing, alerting, and aggregating assets and asset fields.  A typical asset might look something like this:
+
+<pre>
+{
+  "id":         "abc123",
+  "name":       "my-cool-laptop.example.net",
+  "tags":       ["awesome", "radical", "laptops"],
+  "created_at": "2013-11-18 04:23:14 -0000",
+  "updated_at": "2014-02-10 18:15:54 -0000",
+  "properties": {
+    "make":    "Lenovo",
+    "model":   "W410",
+    "network": {
+      "gateway": "192.168.1.1",
+      "netmask": "255.255.255.0",
+      "ip":      "192.168.1.104"
+    }
+  }
+}
+</pre>
+
+When this object is POSTed to Onering, certain fields like @created_at@ and @id@ are expected.  However, there is also a @properties@ field.  This field is completely open-ended, and can accept any JSON-compatible data type, including deeply-nested objects.
+
+h3. URL Query
+
+URL Query is a somewhat-unimaginatively named query language for finding Onering assets.  Most endpoints in the assets plugin (as well as many from other plugins) accept URL Query filters that are used to narrow the scope of operations.  For example, the default behavior of the @/api/devices/list@ endpoint is to list the value(s) of all named fields across all assets in the database.  If you wanted to limit that to only listing values from a subset of assets (perhaps only ones that have a @make@ field with the value "Lenovo"), you would supply the URL Query @make/Lenovo@ as a query string on the list endpoint: **https://onering/api/devices/list/name?q=_make/Lenovo_**
+
+This is the breakdown of a URL Query expression:
+
+<pre>
+[type:]field[/[comparator:]value][.. ]
+</pre>
+
+<dl class="dl-horizontal">
+  <dt>field</dt>
+  <dd>The name of the field to query on. Nested fields are dot-separated (e.g.: _this.is.a.field_). For fields under the _properties_ object, the _properties._ prefix can be omitted.</dd>
+
+  <dt>value _(optional)_</dt>
+  <dd>The value of _field_ to test for.  If omitted, only the presence of _field_ is tested (regardless of its value)</dd>
+
+  <dt>type _(optional)_</dt>
+  <dd>Explictly specifies the data type of _field_, ensuring that _value_ is converted to that type before a comparison is made</dd>
+
+  <dt>comparator _(optional)_</dt>
+  <dd>What method to use when comparing the values of potential matches to _value_.  Default is _contains_</dd>
+</dl>
+
+h4. Type Conversions
+
+The _type_ modifier is used to explicitly specify what data type the _field_ you have specified is stored as.  This is useful because there is a difference between @true@ (a boolean value) and "<tt>true</tt>" (a string).  Onering makes a best-guess effort to automatically choose the correct data type for incoming values, both during asset inventory and automatically when parsing the URL Query.  This modifier can be used to force a specific type.
+
+<dl class="dl-horizontal">
+  <dt>string</dt>
+  <dd>Convert _value_ to a string</dd>
+
+  <dt>int</dt>
+  <dd>Convert _value_ to an integer</dd>
+
+  <dt>float</dt>
+  <dd>Convert _value_ to a floating-point decimal number</dd>
+
+  <dt>bool</dt>
+  <dd>Convert _value_ to a boolean value ("true", 1, "on", "yes" becomes @true@; everything else becomes @false@)</dd>
+
+  <dt>date</dt>
+  <dd>Attempt to convert _value_ to a valid date/time</dd>
+
+  <dt>bytes</dt>
+  <dd>A special form that converts _value_ to from a string representation of data sizes to the number of bytes that represents. (e.g.: 1K becomes the integer 1024, 1M becomes 1048576, etc.)</dd>
+</dl>
+
+
+h4. Comparators
+
+The _comparator_ modifier is used to specify how the _value_ you have specified should be compared to the values of _field_ for the assets being tested.
+
+<dl class="dl-horizontal">
+  <dt>contains _(default)_</dt>
+  <dd>Test whether _field_ contains _value_ as a substring.  The \* wildcard is accepted. For non-string fields, this behaves identically to _is_</dd>
+
+  <dt>is</dt>
+  <dd>Test whether _field_ is equivalent to _value_</dd>
+
+  <dt>not</dt>
+  <dd>Test if _field_ is _not_ equivalent to _value_</dd>
+
+  <dt>gt</dt>
+  <dd>Test if _field_ is strictly greater than _value_</dd>
+
+  <dt>gte</dt>
+  <dd>Test if _field_ is greater than or equal to _value_</dd>
+
+  <dt>lt</dt>
+  <dd>Test if _field_ is strictly less than _value_</dd>
+
+  <dt>lte</dt>
+  <dd>Test if _field_ is less than or equal to _value_</dd>
+
+  <dt>regex</dt>
+  <dd>Test if _field_ matches the Perl-compatible regular expression _value_</dd>
+
+  <dt>before</dt>
+  <dd>A special form that treats _value_ as a relative date offset and performs a less-than comparison on it (e.g.: '1d' becomes current time minus 1 day. Only return assets whose _field_ date is **before** this)</dd>
+
+  <dt>since</dt>
+  <dd>A special form that treats _value_ as a relative date offset and performs a greater-than comparison on it (e.g.: '1d' becomes current time minus 1 day. Only return assets whose _field_ date is **after** this)</dd>
+</dl>
+
+h4. Query Examples
+
+<table>
+  <tr>
+    <th class="col-md-3"><tt>make/Lenovo</tt></th>
+    <td>Select all assets with a _make_ field whose value contains "Lenovo"</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>make/is:Lenovo</tt></th>
+    <td>Select all assets with a _make_ field whose value is exactly "Lenovo"</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>make/Lenovo/model/W</tt></th>
+    <td>Select all assets with a _make_ field containing "Lenovo" _AND_ a model field containing "W"</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>created_at/before:1d</tt></th>
+    <td>Select all assets that were created a day ago or before</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>created_at/since:1d</tt></th>
+    <td>Select all assets that were created within the past day</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>config.dns</tt></th>
+    <td>Select all assets that have a config.dns _field_ present, regardless of value</td>
+  </tr>
+  <tr>
+    <th class="col-md-3"><tt>bool:monitor/true</tt></th>
+    <td>Select all assets with a monitor _field_ whose value is a boolean @true@</td>
+  </tr>
+</table>

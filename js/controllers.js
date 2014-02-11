@@ -12,7 +12,14 @@ function NavigationController($scope, $location){
   },{
     title: 'Documentation',
     path:  '/docs',
-    icon:  'book'
+    icon:  'book',
+    items: [{
+      title: 'Getting Started',
+      path:  '/docs'
+    },{
+      title: 'API Reference',
+      path:  '/docs/reference'
+    }]
   },{
     title: 'Download',
     path:  '/download',
@@ -64,4 +71,8 @@ function PageDocsController($scope, $http, $location, $anchorScroll){
 
     return name.toLowerCase().replace(/[ ]+/g, '-');
   }
+}
+
+function PageReferenceController($scope, $routeParams){
+  $scope.plugin = $routeParams.plugin;
 }

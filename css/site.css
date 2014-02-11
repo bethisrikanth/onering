@@ -64,6 +64,13 @@ body{
   padding-left: 1em;
 }
 
+.or-sidebar .nav > li.nav-title{
+  color:          #888;
+  font-size:      smaller;
+  font-weight:    bold;
+  text-transform: uppercase;
+}
+
 
 .topic-nav .topic-header{
   color:          #AAA;
@@ -85,7 +92,8 @@ body{
 }
 
 .topics > .topic-section > .topic-body > .topic-header,
-.topics .topic-body h1{
+.topics .topic-body h1,
+.section-title{
   font-size: 30px;
   border-bottom: 1px solid #E7E7E7;
   margin-bottom: 0.5em;
@@ -127,6 +135,40 @@ body{
   color:         #AAA;
   border-bottom: 0px !important;
   text-align:    right;
+}
+
+.endpoint-header{
+  margin-bottom: 2em;
+}
+
+.endpoint-definition tt{
+  font-weight:    bold;
+  font-size:      16px;
+  line-height:    18px;
+  vertical-align: middle;
+}
+
+.endpoint-definition .methods{
+  margin-left:    0.5em;
+}
+
+.endpoint-definition .methods span{
+  color:          #888;
+  font-weight:    bold;
+  font-size:      12px;
+  line-height:    18px;
+}
+
+.endpoint-description{
+  margin-top: 1em;
+}
+
+.endpoint-methods{
+  margin-top: 2em;
+}
+
+.endpoint-methods .tab-pane{
+  margin-top: 0.5em;
 }
 
 

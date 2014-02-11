@@ -1,0 +1,28 @@
+---
+plugins:
+  assets:
+    title: 'Assets'
+---
+<div class="row">
+  <div class="col-lg-2">
+    <div class="well well-sm or-sidebar topic-nav">
+      <ul class="nav">
+        <li ng-class="{active: !plugin}">
+          <a href="#/docs/reference">Overview</a>
+        </li>
+
+        <li class="nav-title">Plugins</li>
+        {% for plugin in page.plugins %}
+        <li ng-class="{active: (plugin == '{{ plugin[0] }}')">
+          <a href="#/docs/reference/{{ plugin[0] }}">{{ plugin[1].title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-lg-8 topics">
+    <div class="topic-section" ng-include="'{{ site.url_prefix }}/docs/api-'+(plugin || 'default')+'.html'">
+    </div>
+  </div>
+</div>

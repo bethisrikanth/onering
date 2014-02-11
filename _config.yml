@@ -1,3 +1,19 @@
 ---
 copyright:  '2013'
 url_prefix: '/onering'
+topics:
+- link: 'Getting Started'
+  path: gs
+  topics:
+  - prefix: gs
+    link:   Requirements
+
+  - prefix: gs
+    link:   Installation
+
+  - prefix: gs
+    link:   'Client Setup'
+    title:  'Client Setup & Receiving Data'
+
+- link: 'Using the Frontend'
+  path: fe

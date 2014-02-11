@@ -18,6 +18,14 @@
   margin-right: 4px;
 }
 
+.bold{
+  font-weight: bold !important;
+}
+
+.dl-labels-left dt{
+  text-align:  left;
+}
+
 .animated.spinner{
   -webkit-animation: rotate360 0.5s infinite linear;
 }
