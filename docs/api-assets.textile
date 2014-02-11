@@ -10,6 +10,32 @@ api:
 
       POST:
         description: 'Create or update an asset at :id.'
+
+      DELETE:
+        description: 'Delete the asset at :id'
+
+  '/devices/list/:field[/:fieldN ..]':
+    description: 'List the distinct values for the named field or fields.'
+    methods:
+      GET:
+        returns: 'An array of values (if a single field was specified), or an array of arrays (each sub-array containing distinct values) if multiple fields were specified.'
+        parameters:
+          q:
+            description: 'A query used to limit the subset of assets whose values will be listed. Default is to list values from all assets.'
+            type:        'urlquery'
+            values:      'A valid URL Query expression'
+
+        examples:
+        - path:        '/api/devices/list/id'
+          description: 'List the ID of every asset in the database.'
+          output: |
+            [
+               "abc001",
+               "abc002",
+               "abc003",
+               ...
+            ]
+
 ---
 
 The assets plugin is responsible for managing all of the items that are tracked in Onering.

@@ -22,6 +22,18 @@
   font-weight: bold !important;
 }
 
+.underline{
+  text-decoration: underline !important;
+}
+
+.margin-top-1{
+  margin-top: 1em !important;
+}
+
+.margin-bottom-1{
+  margin-top: 1em !important;
+}
+
 .dl-labels-left dt{
   text-align:  left;
 }

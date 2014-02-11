@@ -1,7 +1,10 @@
 ---
 ---
-function GlobalController($scope){
-
+function GlobalController($scope, $location, $anchorScroll){
+  $scope.scrollTo = function(id) {
+    $location.hash(id);
+    $anchorScroll();
+  }
 }
 
 function NavigationController($scope, $location){
@@ -46,15 +49,10 @@ function PageIndexController($scope){
 
 }
 
-function PageDocsController($scope, $http, $location, $anchorScroll){
+function PageDocsController($scope, $http, $location){
   $http.get('{{ site.url_prefix }}/api/docs/topics.json').success(function(data){
     $scope.topic = data;
   });
-
-  $scope.scrollTo = function(id) {
-    $location.hash(id);
-    $anchorScroll();
-  }
 
   $scope.hasChildren = function(topic){
     if(angular.isArray(topic.topics)){
@@ -74,5 +72,12 @@ function PageDocsController($scope, $http, $location, $anchorScroll){
 }
 
 function PageReferenceController($scope, $routeParams){
-  $scope.plugin = $routeParams.plugin;
+  $scope.plugin   = $routeParams.plugin;
+  $scope.endpoint = $routeParams.endpoint;
+
+  $scope.$watch('endpoint', function(i){
+    if(angular.isDefined(i)){
+      $scope.scrollTo('endpoint-'+i);
+    }
+  })
 }

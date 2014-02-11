@@ -1,13 +1,22 @@
 <div class="section-title">API Reference: [[ plugin ]]</div>
 
+<div class="endpoint-header">
+  {{ content }}
+</div>
+
+<h3>Endpoints</h3>
+
+<ul class="list-unstyled well well-sm">
+  {% for endpoint in page.api %}
+  <li>
+    <a href="#/docs/reference/[[ plugin ]]/{{ endpoint[0] | replace:'/':'-' | remove:'[' | remove:']' }}">/api{{ endpoint[0] }}</a>
+  </li>
+  {% endfor %}
+</ul>
+
 {% for endpoint in page.api %}
 <div class="endpoint">
-  <div class="endpoint-header">
-    {{ content }}
-  </div>
-
-  <h3>Endpoints</h3>
-
+  <a name="endpoint-{{ endpoint[0] | replace:'/':'-' | remove:'[' | remove:']' }}"></a>
   <div class="endpoint-definition">
     <tt>/api{{ endpoint[0] }}</tt>
     <span class="methods pull-right">
@@ -25,48 +34,65 @@
   <tabset class="endpoint-methods">
     {% for method in endpoint[1].methods %}
     <tab heading="{{ method[0] }}" class="{% if forloop.index0 == 0 %}active{% endif %}">
-      <div class="row-fluid">
-        <div class="col-md-6">
-          <p>{{ method[1].description }}</p>
-        </div>
+      <div class="margin-bottom-1">
+        <p>{{ method[1].description }}</p>
+      </div>
 
-        <div class="col-md-6">
-          {% if method[1].returns %}
-          <div>
-            <b>Returns: </b> {{ method[1].returns }}
-            <br />
-            <br />
+      {% if method[1].returns %}
+      <div class="margin-bottom-1">
+        <b>Returns</b>
+        <br />
+        {{ method[1].returns }}
+      </div>
+      {% endif %}
+
+      {% if method[1].parameters %}
+      <div class="margin-bottom-1">
+        <div class="bold">Query Strings</div>
+        <table class="table table-condensed pull-right">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Values</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for param in method[1].parameters %}
+            <tr>
+              <th ng-class="{'text-red': ('{{ param[1].required }}' == 'true')}">{{ param[0] }}</th>
+              <td>{{ param[1].description }}</td>
+              <td>{{ param[1].type }}</td>
+              <td>{{ param[1].values }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      {% if method[1].examples %}
+      <div class="endpoint-examples">
+        <h4>Examples</h4>
+      {% for example in method[1].examples %}
+        <div class="panel panel-default">
+          <div class="panel-heading bold">
+            Example {{ forloop.index }}: {{ example.description }}
           </div>
-          {% endif %}
-        </div>
-      </div>
+          <div class="panel-body">
+            <b>Request: </b>
+            <tt>{{ method[0] | upcase }} {{ example.path }}</tt>
+            <br />
 
-      <div class="row-fluid">
-        {% if method[1].parameters %}
-        <div class="col-md-12">
-          <div class="bold">Query Strings</div>
-          <table class="table table-condensed pull-right">
-            <thead>
-              <tr>
-                <th>Key</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Values</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for param in method[1].parameters %}
-              <tr>
-                <th>{{ param[0] }}</th>
-                <td>{{ param[1].type }}</td>
-                <td>{{ param[1].values }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+            <b>Output:</b> Array of values of the ID field for each asset in the database.
+            <br />
+            <pre>{{ example.output }}</pre>
+          </div>
         </div>
-        {% endif %}
+      {% endfor %}
       </div>
+      {% endif %}
     </tab>
     {% endfor %}
   </tabset>
