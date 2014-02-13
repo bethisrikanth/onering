@@ -83,7 +83,7 @@
                   <a tabindex="-1"><i class="icon-ok-circle"></i>&nbsp;&nbsp;Status</a>
                   <ul class="dropdown-menu" style="min-width: 220px;">
                     <li ng-repeat="status in statuses | orderBy:'count':true">
-                      <a href="#/search/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status:null' }}">
+                      <a href="#/search/{{ (status.id &amp;&amp; 'status:'+status.id) || 'status==null' }}">
                         <img ng-src="/img/status/{{ status.id || 'unknown' }}.png" />
                         <span ng-show="status.id=='online'">Active</span>
                         <span ng-hide="status.id=='online'">{{ (status.id || 'unknown') | titleize }}</span>

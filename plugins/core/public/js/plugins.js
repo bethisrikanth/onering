@@ -65,6 +65,10 @@ run(['$rootScope', '$window', '$http', '$modal', '$location', 'toaster', functio
 
     //  add comparator (if present)
         switch(q.comparator){
+    //  strict equality
+        case '==':
+          rv += 'is:'; break;
+
     //  greater than
         case '>':
           rv += 'gt:'; break;
