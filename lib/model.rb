@@ -279,12 +279,7 @@ module App
 
           es_query = {
             :size    => Tensor::Model::DEFAULT_RESULTS_LIMIT,
-            :fields  => field,
-            :sort => field.collect{|i|
-              {
-                i => :asc
-              }
-            }
+            :fields  => field
           }
 
         # query all docuents

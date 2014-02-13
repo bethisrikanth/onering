@@ -140,9 +140,31 @@ module App
 
           if value_modifier_unary
             vmu = value_modifier_unary.to_elasticsearch_query(rv, options)
+            operator = (vmu.first.first rescue nil)
 
           # handle not operator
-            if vmu.first.first == :not
+            case operator
+            when :is
+              if vmu.first.last.nil?
+                return {
+                  :bool => {
+                    :must => {
+                      :missing => {
+                        :field      => field,
+                        :existence  => true,
+                        :null_value => true
+                      }
+                    }
+                  }
+                }
+              else
+                return {
+                  :term => {
+                    field => vmu.first.last
+                  }
+                }
+              end
+            when :not
             # handle not:null test
               if vmu.first.last.nil?
                 return {
@@ -165,7 +187,8 @@ module App
                   }
                 }
               end
-            elsif vmu.first.first == :matches
+            
+            when :matches
               rv.gsub!(/^~/,'')
               rv.gsub!(/^\^/,'')
               rv.gsub!(/[\$]$/,'')
@@ -264,6 +287,9 @@ module App
             end
 
             return Hash[(value_function_unary.to_sym === :before ? :lte : :gte), value]
+
+          when :is
+            return Hash[:is, value]
 
           when :not
             return Hash[:not, value]
