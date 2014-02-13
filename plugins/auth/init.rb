@@ -54,6 +54,7 @@ module App
           
               if bsuser.length == 1
                 if bsuser.first.id == Config.get('global.authentication.bootstrap.user') and not bsuser.first.id.nil?
+                  Onering::Logger.debug("Bootstrap credentials being used for path #{request.path}")
                   @bootstrapUser = true
                 else
                   halt 401, "No bootstrap user configured, cannot autogenerate user"
@@ -275,6 +276,7 @@ module App
           if user.nil? and @bootstrapUser === true and not id === 'current'
             machine_klass = Config.get('global.authentication.machine_user_type', 'DeviceUser').constantize()
 
+            Onering::Logger.warn("Bootstrapping user #{id}")
             machine_klass.create({
               :id => id
             })
@@ -294,116 +296,6 @@ module App
           return 404 unless user
 
           user.tokens.delete_if{|i| i['name'] == params[:name] }
-          user.save()
-
-          200
-        end
-
-      # generate a new client key for this user
-        get '/:id/keys/:name' do
-          halt 404
-          id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
-
-        # this is also where pre-validated devices go to retrieve their API key
-          if @bootstrapUser === true and not id === 'current'
-            machine_klass = Config.get('global.authentication.machine_user_type', 'DeviceUser').constantize()
-
-            machine_klass.create({
-              :id => id
-            })
-          end
-
-
-          #allowed_to? :generate_api_key, id
-
-          user = User.find(id)
-          return 404 unless user
-
-          if user.client_keys[params[:name]].nil?
-            keyfile = Config.get!('global.authentication.methods.ssl.ca.key')
-            crtfile = Config.get!('global.authentication.methods.ssl.ca.cert')
-            client_subject = "/C=US/O=Outbrain/OU=Onering/OU=Users/CN=#{user.id}"
-
-            halt 500, "OpenSSL is required to generate keys" unless defined?(OpenSSL)
-            halt 500, "Cannot find server CA key" unless File.readable?(keyfile)
-            halt 500, "Cannot find server CA certificate" unless File.readable?(crtfile)
-
-          # server cert details
-            cacert = OpenSSL::X509::Certificate.new(File.read(crtfile))
-
-          # new client pkey
-            key = OpenSSL::PKey::RSA.new(File.read(keyfile))
-
-          # fill in new cert details
-            client_cert = OpenSSL::X509::Certificate.new
-            client_cert.subject = OpenSSL::X509::Name.parse(client_subject)
-            client_cert.issuer = cacert.issuer
-            client_cert.not_before = Time.now
-            client_cert.not_after = Time.now + ((Integer(Config.get('global.authentication.methods.ssl.client.max_age')) rescue 365) * 24 * 60 * 60)
-            client_cert.public_key = key.public_key
-            client_cert.serial = 0x0
-            client_cert.version = 2
-
-
-          # add extensions (don't entirely know what these do)
-            ef = OpenSSL::X509::ExtensionFactory.new
-            ef.subject_certificate = client_cert
-            ef.issuer_certificate = cacert
-
-            client_cert.extensions = [
-              ef.create_extension("basicConstraints","CA:TRUE", true),
-              ef.create_extension("subjectKeyIdentifier", "hash")
-            ]
-
-          # sign it
-            client_cert.sign(key, OpenSSL::Digest::SHA256.new)
-
-          # save this key
-          # TODO: Oh man this is some sad stuff right here...
-          #       Need to refactor Tensor such that fields are actually classes
-          #       instead of some weird type tracking thing
-          #
-            user.client_keys = user.client_keys.stringify_keys.merge({
-              params[:name] => {
-                :name       => params[:name],
-                :public_key => client_cert.to_pem,
-                :created_at => Time.now
-              }
-            })
-
-            user.save()
-
-            content_type 'text/plain'
-
-          # allow saving the certificate in various container formats
-            case params[:cert]
-            when 'pkcs12'
-            # optionally return the cert inline (default is to download)
-              headers 'Content-Disposition' => "attachment; filename=#{user.id}-#{params[:name]}.p12" unless params[:download].to_bool
-              return OpenSSL::PKCS12.create(params[:name], params[:name], key, client_cert).to_der rescue nil
-            else
-            # optionally download the PEM (default is to display)
-              headers 'Content-Disposition' => "attachment; filename=#{user.id}-#{params[:name]}.pem" if params[:download].to_bool
-              return key.to_pem + "\n\n" + client_cert.to_pem
-            end
-          else
-            halt 403, "Cannot download previously-generated key"
-          end
-        end
-
-        delete '/:id/keys/:name' do
-          id = (params[:id] == 'current' ? @user.id : params[:id])
-
-          #allowed_to? :remove_api_key, id
-
-          user = User.find(id)
-          return 404 unless user
-          return 404 unless user.client_keys.keys.include?(params[:name])
-
-          user.client_keys = user.client_keys.reject{|k,v|
-            k.to_s == params[:name].to_s
-          }
-
           user.save()
 
           200
