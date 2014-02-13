@@ -48,44 +48,20 @@ module App
         unless anonymous?(request.path)
           @bootstrapUser = false
 
-        # attempt SSL client key auth (if present)
-          if ssl_verified?
-            subject = ssl_hash(:subject)
-            issuer =  ssl_hash(:issuer)
-
-          # subject and issuer are required
-            if subject and issuer
-            # make sure issuer Organization's match
-              #subject.select{|i| i[0] == 'O'} === issuer.select{|i| i[0] == 'O'}
-
-            # get OU, CN
-              ou = (subject.select{|i| i[0] == 'OU'}.first.last) rescue nil
-              cn = (subject.select{|i| i[0] == 'CN'}.first.last) rescue nil
-
-            # if SSL subject is .../OU=System/CN=Validation
-              if cn
-                if ou == 'System'
-                  if cn == 'Validation'
-                    @bootstrapUser = true
-                  else
-                    halt 403, "Invalid system certificate presented"
-                  end
-                else
-                # get user named by CN
-                  @user = User.find(cn) rescue nil
-                end
+          if (bstoken = (params[:bootstrap] || request.env['HTTP_X_AUTH_BOOTSTRAP_TOKEN'])).to_s =~ /[0-9a-f]{32,64}/
+            bsuser = User.urlquery("tokens.key/#{bstoken}").to_a
+          
+            if bsuser.length == 1
+              if bsuser.first.id == Config.get('global.authentication.bootstrap.user') and not bsuser.first.id.nil?
+                @bootstrapUser = true
               else
-                halt 403, "Invalid client certificate presented"
+                halt 401, "No bootstrap user configured, cannot autogenerate user"
               end
-
-            # TODO
-            # ensure the key submitted matches the like-named key for this user
-            # does this mean i have to store the private key and sign this cert to "properly" verify it?
-            #
+            else
+              halt 401, "Bootstrap user not found, cannot autogenerate user"
             end
           end
 
-        # if SSL client key was not present...
           if not @user and not @bootstrapUser
             mechanism = (request.env['HTTP_X_AUTH_MECHANISM'] || (params[:token].nil? ? nil : 'token')).to_s.downcase
 
@@ -107,8 +83,18 @@ module App
               end
 
             when 'token'
+            # token specified in the URL itself
               if params[:token] =~ /[0-9a-f]{32,64}/
-                user = User.urlquery("tokens.key/#{params[:token]}").to_a
+                token = params[:token]
+            # token specified in the X-Auth-Token HTTP request header
+              elsif not request.env['HTTP_X_AUTH_TOKEN'].nil?
+                token = request.env['HTTP_X_AUTH_TOKEN']
+              else
+                halt 401, "Invalid API token specified"
+              end
+
+              if not token.nil?
+                user = User.urlquery("tokens.key/#{token}").to_a
 
                 if user.length == 1
                   @user = user.first
@@ -116,10 +102,8 @@ module App
                   halt 401, "Invalid API token specified"
                 end
               else
-                halt 401, "Invalid API token specified"
+                halt 401, "Token authentication mechanism specified but no token given"
               end
-
-
             else
               session_start!
               session! unless session?
