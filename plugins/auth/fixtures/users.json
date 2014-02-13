@@ -2,4 +2,8 @@
   "_id":   "onering",
   "_type": "PamUser",
   "name":  "Onering Administrator"
+},{
+  "_id":   "bootstrap",
+  "_type": "User",
+  "name":  "Onering Auto-generate User"
 }]

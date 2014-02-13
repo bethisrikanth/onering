@@ -48,17 +48,21 @@ module App
         unless anonymous?(request.path)
           @bootstrapUser = false
 
-          if (bstoken = (params[:bootstrap] || request.env['HTTP_X_AUTH_BOOTSTRAP_TOKEN'])).to_s =~ /[0-9a-f]{32,64}/
-            bsuser = User.urlquery("tokens.key/#{bstoken}").to_a
+          if not (bstoken = (params[:bootstrap] || request.env['HTTP_X_AUTH_BOOTSTRAP_TOKEN'])).nil?
+            if bstoken.to_s =~ /[0-9a-f]{32,64}/
+              bsuser = User.urlquery("tokens.key/#{bstoken}").to_a
           
-            if bsuser.length == 1
-              if bsuser.first.id == Config.get('global.authentication.bootstrap.user') and not bsuser.first.id.nil?
-                @bootstrapUser = true
+              if bsuser.length == 1
+                if bsuser.first.id == Config.get('global.authentication.bootstrap.user') and not bsuser.first.id.nil?
+                  @bootstrapUser = true
+                else
+                  halt 401, "No bootstrap user configured, cannot autogenerate user"
+                end
               else
-                halt 401, "No bootstrap user configured, cannot autogenerate user"
+                halt 401, "Bootstrap user not found, cannot autogenerate user"
               end
             else
-              halt 401, "Bootstrap user not found, cannot autogenerate user"
+              halt 401, "Invalid bootstrap token specified, cannot autogenerate user"
             end
           end
 
@@ -266,6 +270,17 @@ module App
         get '/:id/tokens/:name' do
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
           user = User.find(id)
+
+        # this is also where pre-validated devices go to retrieve their API key
+          if user.nil? and @bootstrapUser === true and not id === 'current'
+            machine_klass = Config.get('global.authentication.machine_user_type', 'DeviceUser').constantize()
+
+            machine_klass.create({
+              :id => id
+            })
+          end
+
+          user = User.find(id)
           return 404 unless user
 
           content_type 'text/plain'
@@ -286,6 +301,7 @@ module App
 
       # generate a new client key for this user
         get '/:id/keys/:name' do
+          halt 404
           id = (params[:id] == 'current' ? (@user ? @user.id : params[:id]) : params[:id])
 
         # this is also where pre-validated devices go to retrieve their API key

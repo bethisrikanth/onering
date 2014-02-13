@@ -1,0 +1,4 @@
+---
+authentication:
+  bootstrap:
+    user: bootstrap

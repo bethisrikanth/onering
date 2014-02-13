@@ -98,7 +98,7 @@ class User < App::Model::Elasticsearch
           if self.tokens.select{|i| i['name'] == name }.empty?
             self.tokens << {
               :name => name,
-              :field  => token
+              :key  => token
             }
             self.save()
             return token

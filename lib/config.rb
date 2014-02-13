@@ -49,7 +49,7 @@ module App
 
           if not data.nil? and not data === false and not (data.respond_to?(:empty?) and data.empty?)
             confpath = [conf.split('/')[1]]+[*conf.split('/')[4..-1]]
-            confpath = (confpath[0..-2]+[File.basename(confpath[-1], '.yaml')]).join('.')
+            confpath = (confpath[1..-2]+[File.basename(confpath[-1], '.yaml')]).join('.')
 
             Onering::Logger.debug("Loading configuration file #{conf} into #{confpath}")
             apply(confpath, data)
