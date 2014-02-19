@@ -50,8 +50,8 @@ module App
 
           if not (bstoken = (params[:bootstrap] || request.env['HTTP_X_AUTH_BOOTSTRAP_TOKEN'])).nil?
             if bstoken.to_s =~ /[0-9a-f]{32,64}/
-              bsuser = User.urlquery("tokens.key/#{bstoken}").to_a
-          
+              bsuser = User.urlquery("str:tokens.key/#{bstoken}").to_a
+
               if bsuser.length == 1
                 if bsuser.first.id == Config.get('global.authentication.bootstrap.user') and not bsuser.first.id.nil?
                   Onering::Logger.debug("Bootstrap credentials being used for path #{request.path}")
@@ -99,7 +99,7 @@ module App
               end
 
               if not token.nil?
-                user = User.urlquery("tokens.key/#{token}").to_a
+                user = User.urlquery("str:tokens.key/#{token}").to_a
 
                 if user.length == 1
                   @user = user.first
