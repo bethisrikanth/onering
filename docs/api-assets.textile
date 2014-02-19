@@ -94,7 +94,7 @@ h4. Type Conversions
 The _type_ modifier is used to explicitly specify what data type the _field_ you have specified is stored as.  This is useful because there is a difference between @true@ (a boolean value) and "<tt>true</tt>" (a string).  Onering makes a best-guess effort to automatically choose the correct data type for incoming values, both during asset inventory and automatically when parsing the URL Query.  This modifier can be used to force a specific type.
 
 <dl class="dl-horizontal">
-  <dt>string</dt>
+  <dt>str</dt>
   <dd>Convert _value_ to a string</dd>
 
   <dt>int</dt>
@@ -140,7 +140,7 @@ The _comparator_ modifier is used to specify how the _value_ you have specified 
   <dt>lte</dt>
   <dd>Test if _field_ is less than or equal to _value_</dd>
 
-  <dt>regex</dt>
+  <dt>match</dt>
   <dd>Test if _field_ matches the Perl-compatible regular expression _value_</dd>
 
   <dt>before</dt>
