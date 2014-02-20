@@ -96,25 +96,25 @@ class String
         when 'tomorrow'
           return (Time.now + 1.days)
 
-        when /([\-0-9]+)s$/i
+        when /([\-0-9]+)(s|secs?|seconds?)$/i
           return (Time.at(Time.now.to_i - Integer($1) ))
 
-        when /([\-0-9]+)m$/
+        when /([\-0-9]+)(m|mins?|minutes?)$/
           return (Time.at(Time.now.to_i - (Integer($1) * 60) ))
 
-        when /([\-0-9]+)h$/i
+        when /([\-0-9]+)(h|hrs?|hours?)$/i
           return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60) ))
 
-        when /([\-0-9]+)d$/i
+        when /([\-0-9]+)(d|dys?|days?)$/i
           return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24) ))
 
-        when /([\-0-9]+)w$/i
+        when /([\-0-9]+)(w|wks?|weeks?)$/i
           return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 7) ))
 
-        when /([\-0-9]+)M$/
+        when /([\-0-9]+)(M|mns?|mons?|months?)$/
           return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 30) ))
 
-        when /([\-0-9]+)y$/i
+        when /([\-0-9]+)(y|yrs?|years?)$/i
           return (Time.at(Time.now.to_i - (Integer($1) * 60 * 60 * 24 * 365) ))
 
         else
@@ -178,8 +178,8 @@ class String
 
   # dates :-(
   #   ruby will readily just parse ANYTHING that contains numbers, so:
-  #   strings must be at least 60% numeric to be parsed as a date
-    if ((self.gsub(/\D+/,'').length.to_f / self.length.to_f) > 0.6)
+  #   strings must be at least 75% numeric to be parsed as a date
+    if ((self.gsub(/\D+/,'').length.to_f / self.length.to_f) > 0.75)
       rv = (Time.parse(self) rescue nil)
       return rv unless rv.nil?
     end

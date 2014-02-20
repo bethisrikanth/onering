@@ -187,7 +187,7 @@ module App
                   }
                 }
               end
-            
+
             when :matches
               rv.gsub!(/^~/,'')
               rv.gsub!(/^\^/,'')
