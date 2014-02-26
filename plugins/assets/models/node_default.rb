@@ -21,6 +21,7 @@ class NodeDefault < App::Model::Elasticsearch
 
   field :name,       :string
   field :group,      :string
+  field :order,      :integer
   field :match,      :object,    :array => true
   field :apply,      :object
   field :force,      :boolean,   :default => false

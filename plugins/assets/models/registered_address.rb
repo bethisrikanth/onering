@@ -53,6 +53,10 @@ class RegisteredAddress < App::Model::Elasticsearch
     self.claimed
   end
 
+  def get_pool_addresses()
+    RegisteredAddress.get_pool_addresses(self.pool)
+  end
+
   class<<self
     def get_pool_addresses(pool)
     # map all possible IPs in all ranges to their pool names

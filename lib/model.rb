@@ -311,8 +311,10 @@ module App
             results = urlquery(query, es_query, {
               :raw => true
             })
+
           end
 
+          results = {} if results.empty?
 
           results.get('hits.hits', []).each do |hit|
             column = []

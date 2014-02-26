@@ -698,7 +698,12 @@ module Tensor
         })
       end
 
-      return _mappings
+    # handle post-1.0 case
+      if _mappings['mappings'].is_a?(Hash)
+        _mappings['mappings']
+      else
+        return _mappings
+      end
     end
 
     def self.all_mappings()
