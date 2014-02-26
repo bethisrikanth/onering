@@ -21,7 +21,7 @@ class NodeDefault < App::Model::Elasticsearch
 
   field :name,       :string
   field :group,      :string
-  field :order,      :integer
+  field :order,      :integer,   :default => 0
   field :match,      :object,    :array => true
   field :apply,      :object
   field :force,      :boolean,   :default => false
@@ -142,6 +142,7 @@ class NodeDefault < App::Model::Elasticsearch
       rv = []
 
       NodeDefault.search({
+        :sort => [{:order => :asc}],
         :filter => {
           :term => {
             :enabled => true
