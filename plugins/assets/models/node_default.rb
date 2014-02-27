@@ -146,7 +146,6 @@ class NodeDefault < App::Model::Elasticsearch
       rv = []
 
       NodeDefault.search({
-        :sort => [{:order => :asc}],
         :filter => {
           :term => {
             :enabled => true
