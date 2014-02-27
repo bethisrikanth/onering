@@ -52,6 +52,10 @@ class NodeDefault < App::Model::Elasticsearch
     Asset.ids(query.join('/'))
   end
 
+  def enabled?()
+    return (self.enabled == true)
+  end
+
   def asset_matches?(node)
     self.match.each do |m|
       m = m.symbolize_keys()

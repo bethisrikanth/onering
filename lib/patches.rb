@@ -26,6 +26,10 @@ class Object
   def deep_clone()
     Marshal.load(Marshal.dump(self))
   end
+
+  def autotype()
+    self
+  end
 end
 
 class TrueClass
@@ -152,15 +156,15 @@ class String
       return self
 
     when :bits
-      if self =~ /^([0-9]+)([bkmgtpezy])$/
-        return Integer($1) * (1024 ** (SI_UNITS.index($2).to_i))
+      if self =~ /^([0-9]+)([bkmgtpezy])?$/
+        return Integer($1) * (1024 ** (SI_UNITS.index($2 || 'b').to_i))
       else
         return nil
       end
 
     when :bytes
-      if self =~ /^([0-9]+)([BKMGTPEZY])$/
-        return Integer($1) * (1024 ** (SI_UNITS.index($2.downcase).to_i))
+      if self =~ /^([0-9]+)([BKMGTPEZY])?$/
+        return Integer($1) * (1024 ** (SI_UNITS.index(($2 || 'B').downcase).to_i))
       else
         return nil
       end

@@ -38,8 +38,6 @@ class Asset < App::Model::Elasticsearch
   field :status,                  :string
   field :tags,                    :string,   :array => true
   field :updated_at,              :date,     :default => Time.now
-  field :rules,                   :object,   :default => {:premerge => [], :postmerge => []}
-
 
   field_prefix                    :properties
 
@@ -140,41 +138,10 @@ class Asset < App::Model::Elasticsearch
   #before_save                   :_ensure_id
   before_save                   :_compact
   before_save                   :_confine_status
+  before_save                   :_apply_defaults
   before_save                   :_resolve_references
-  before_save                   :_detect_defaults
   #before_save                   :_print_hash
 
-
-  def to_hash()
-    rv = {}
-
-  # conflicting values in premerge will *be overridden by* local properties
-    self.rules.get('premerge',[]).each do |rule_id|
-      self.merge_rule(rule_id, rv)
-    end
-
-  # merge in local properties
-    rv = rv.deep_merge(super())
-
-  # conflicting values in postmerge will *override* local properties
-    self.rules.get('postmerge',[]).each do |rule_id|
-      self.merge_rule(rule_id, rv)
-    end
-
-    return rv
-  end
-
-  def merge_rule(rule_id, properties={})
-    rule = NodeDefault.find(rule_id)
-
-    unless rule.nil?
-      rule.apply.each do |k,v|
-        properties.rset("properties.#{k}", v)
-      end
-    end
-
-    return properties
-  end
 
   def parent()
     (self.parent_id ? Asset.find(self.parent_id) : nil)
@@ -231,16 +198,51 @@ private
     end
   end
 
-  def _detect_defaults()
+  def _apply_defaults()
+    device = self.to_hash()
+    except = %w{
+      id
+      name
+      updated_at
+      created_at
+      collected_at
+    }
+
   # get all defaults that apply to this node
     NodeDefault.defaults_for(self).each do |m|
-      if m.force == true
-        self.rules['postmerge'].push_uniq(m.id)
+    # remove fields that cannot/should not be set by a rule
+      apply = m.apply.reject{|k,v|
+        except.include?(k.to_s)
+      }
+
+    # prefix non-top-level keys with field_prefix
+      apply = Hash[apply.select{|k,v|
+        App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+      }].merge({
+        Asset.field_prefix() => Hash[apply.reject{|k,v|
+          App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+        }]
+      })
+
+    # autotype the properties being applied
+      apply = apply.each_recurse do |k,v,p,dhm|
+        if v.is_a?(Array)
+          dhm.set(p, v.collect{|i| i.autotype() })
+        else
+          dhm.set(p, v.autotype())
+        end
+      end
+
+    # force determines whether the applied default overrides the new object
+    # being save or can be overridden by it
+      if m.force === true
+        device = device.deep_merge(apply)
       else
-        self.rules['premerge'].push_uniq(m.id)
+        device = apply.deep_merge(device)
       end
     end
 
+    self.from_hash(device)
     self
   end
 

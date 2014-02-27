@@ -81,7 +81,7 @@ module App
             if json['apply']
               apply = json['apply'].clone
               json['apply'] = {}
-              apply.each{|k,v| json['apply'].set(k, v) }
+              apply.each{|k,v| json['apply'].rset(k, v.autotype()) }
             end
 
             default = NodeDefault.new(json)
@@ -518,7 +518,7 @@ module App
           :replication => :sync
         })
 
-        output(device)
+        output(device.to_hash())
       end
 
     # get device property
