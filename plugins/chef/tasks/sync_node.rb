@@ -27,7 +27,7 @@ module Automation
           keyfield = App::Config.get('chef.nodes.keyfield', 'id')
           debug("Using asset field #{keyfield} to locate associated Chef node")
 
-          chef = Ridley.new({
+          @_chef ||= Ridley.new({
             :server_url   => config.get(:server_url),
             :client_name  => config.get(:username),
             :client_key   => config.get(:keyfile),
@@ -42,7 +42,7 @@ module Automation
           key = asset.get(keyfield)
           fail("Asset field #{keyfield} is missing, skipping...") if key.nil?
 
-          chef_node = chef.node.find(key)
+          chef_node = @_chef.node.find(key)
           fail("Chef node #{key} could not be found for asset #{id}") if chef_node.nil?
 
           info("Updating Chef node #{key}...")
