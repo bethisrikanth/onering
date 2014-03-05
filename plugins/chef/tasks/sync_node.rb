@@ -24,7 +24,7 @@ module Automation
           config = App::Config.get!('chef.client')
           fail("Malformed Chef client configuration; expected Hash but got #{config.class.name}") unless config.is_a?(Hash)
 
-          keyfield = App::Config.get('chef.node.keyfield', 'id')
+          keyfield = App::Config.get('chef.nodes.keyfield', 'id')
           debug("Using asset field #{keyfield} to locate associated Chef node")
 
           chef = Ridley.new({
