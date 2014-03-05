@@ -18,7 +18,7 @@ module Automation
   module Tasks
     module Chef
       class SyncNode < Task
-        def self.perform(id)
+        def self.perform(id, *args)
           require 'ridley'
 
           config = App::Config.get!('chef.client')
@@ -45,11 +45,22 @@ module Automation
           chef_node = chef.node.find(key)
           fail("Chef node #{key} could not be found for asset #{id}") if chef_node.nil?
 
-          
+          info("Updating Chef node #{key}...")
 
-
-          info("Deleting Chef client #{client.name}")
-          chef.client.delete(client)
+          %w{
+            chef_environment
+            run_list
+            default
+            normal
+            override
+          }.each do |a|
+            if not (field = config.get("nodes.template.#{a}")).nil?
+              if not (value = asset.get(field)).nil?
+                chef_node.send(:"#{a}=", value)
+                debug("-> #{a} with #{value.class.name}")
+              end
+            end
+          end
         end
       end
     end
