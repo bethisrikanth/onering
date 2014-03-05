@@ -28,25 +28,9 @@ module Automation
           keyfield = App::Config.get('chef.nodes.keyfield', 'id')
           debug("Using asset field #{keyfield} to locate associated Chef node")
 
-          chef = Ridley.new({
-            :server_url   => config.get(:server_url),
-            :client_name  => config.get(:username),
-            :client_key   => config.get(:keyfile),
-            :ssl => {
-              :verify => false
-            }
-          })
-
           asset = Asset.find(id)
           fail("Asset #{id} not found") if asset.nil?
-
-          key = asset.get(keyfield)
-          fail("Asset field #{keyfield} is missing, skipping...") if key.nil?
-
-          chef_node = chef.node.find(key)
-          fail("Chef node #{key} could not be found for asset #{id}") if chef_node.nil?
-
-          info("Updating Chef node #{key}...")
+          template = {}
 
           %w{
             chef_environment
@@ -57,11 +41,40 @@ module Automation
           }.each do |a|
             if not (field = config.get("nodes.template.#{a}")).nil?
               if not (value = asset.get(field)).nil?
-                chef_node.send(:"#{a}=", value)
-                debug("-> #{a} with #{value.class.name}")
+                template[a] = value
               end
             end
           end
+
+          if template.reject{|i|
+            i[1].nil?
+          }.empty?
+            warn("Asset #{id} does not contain any Chef data to sync, skipping...")
+            return false
+          end
+
+          chef = Ridley.new({
+            :server_url   => config.get(:server_url),
+            :client_name  => config.get(:username),
+            :client_key   => config.get(:keyfile),
+            :ssl => {
+              :verify => false
+            }
+          })
+
+          key = asset.get(keyfield)
+          fail("Asset field #{keyfield} is missing, skipping...") if key.nil?
+
+          chef_node = chef.node.find(key)
+          fail("Chef node #{key} could not be found for asset #{id}") if chef_node.nil?
+
+          template.each do |node_key, asset_value|
+            chef_node.send(:"#{node_key}=", asset_value)
+            debug("-> #{node_key} with #{asset_value.class.name}")
+          end
+
+          info("Updating Chef node #{key}...")
+          chef_node.save()
         end
       end
     end
