@@ -69,6 +69,10 @@ module Automation
         run_task(:normal, name, *args)
       end
 
+      def self.run_priority(name, priority, *args)
+        run_task(priority, name, *args)
+      end
+
       def self.run_critical(name, *args)
         run_task(:critical, name, *args)
       end

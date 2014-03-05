@@ -3,7 +3,13 @@
 <ul class="nav nav-list well">
   <li class="nav-header">Lifecycle</li>
   <li>
-    <a ng-click="openDialog('maintenanceStatus', this)"><i class="icon-wrench"></i> Set Maintenance Status</a>
+    <a ng-show="node.status=='maintenance'" rest="/api/devices/{{node.id}}/status/unknown" rest-success="reload()">
+      <i class="icon-circle-blank"> </i> Clear Maintenance Status
+    </a>
+
+    <a ng-hide="node.status=='maintenance'" rest="/api/devices/{{node.id}}/status/maintenance" rest-success="reload()">
+      <i class="icon-wrench"></i> Set Maintenance Status
+    </a>
   </li>
   <li>
     <a rest="/api/devices/{{node.id}}/decomission" rest-confirm="Are you sure you want to decomission this node?  This is a DESTRUCTIVE action that will remove data from external systems and execute commands remotely on this machine."><i class="icon-trash"></i> Decomission Node</a>

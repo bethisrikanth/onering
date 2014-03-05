@@ -597,7 +597,10 @@ module App
         when 'unknown', 'clear', 'null'
           device.status = nil
         else
-          device.status = params[:status]
+        # either the current status is not immutable or it is but we're forcing the issue...
+          if not Asset.states(true).include?(device.status) or params[:force] == true
+            device.status = params[:status]
+          end
         end
 
         device.save({

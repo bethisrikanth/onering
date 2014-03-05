@@ -39,7 +39,11 @@ module App
             when :low
               Automation::Tasks::Task.run_low(name, *args)
             else
-              Automation::Tasks::Task.run(name, *args)
+              if params[:priority].nil?
+                Automation::Tasks::Task.run(name, *args)
+              else
+                Automation::Tasks::Task.run_priority(name, params[:priority].to_sym, *args)
+              end
             end
 
             return 200

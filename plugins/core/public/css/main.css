@@ -147,6 +147,7 @@ body .modal {
 .text-degraded,
 .text-warning,
 .text-provisioning,
+.text-maintenance,
 .text-queued,
 .text-yellow{
   color: #F89406 !important;

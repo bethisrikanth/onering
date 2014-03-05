@@ -173,6 +173,18 @@ class Asset < App::Model::Elasticsearch
     return true
   end
 
+  def self.states(immutable=false)
+    rv = App::Config.get('assets.status.states',{})
+
+    if immutable
+      rv = rv.select{|i|
+        i.get(:immutable, false)
+      }
+    end
+
+    rv.keys.map(&:to_s)
+  end
+
 private
   def _compact()
     unless self.properties.nil?
@@ -192,8 +204,8 @@ private
   end
 
   def _confine_status()
-    if not VALID_STATUS.include?(self.status)
-      errors.add(:status, "Status must be one of #{VALID_STATUS.join(', ')}")
+    if not Asset.states().include?(self.status)
+      errors.add(:status, "Status must be one of #{Asset.states().join(', ')}")
       self.status = nil
     end
   end

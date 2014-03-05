@@ -169,6 +169,18 @@ class String
         return nil
       end
 
+    when :ip4
+      if self =~ /^([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(\/[0-3]?[0-9])?$/
+      # how to handle this:
+      #   somehow convert the network portion of the IP into a crazy regex that will prefix match the test IP
+      #
+      #   e.g.:  10.10.68.122 -> 10.10.64.0/20 := /^10\.10\.(64|65|66|67|68|69|70|71|72|73|74|75|76|77|78|79)\./
+      #
+      #
+        return self
+      else
+        return nil
+      end
     else
       return self
     end
