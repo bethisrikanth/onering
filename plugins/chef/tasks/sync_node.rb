@@ -17,9 +17,10 @@
 module Automation
   module Tasks
     module Chef
+      require 'ridley'
+
       class SyncNode < Task
         def self.perform(id, *args)
-          require 'ridley'
 
           config = App::Config.get!('chef.client')
           fail("Malformed Chef client configuration; expected Hash but got #{config.class.name}") unless config.is_a?(Hash)
@@ -27,7 +28,7 @@ module Automation
           keyfield = App::Config.get('chef.nodes.keyfield', 'id')
           debug("Using asset field #{keyfield} to locate associated Chef node")
 
-          @_chef ||= Ridley.new({
+          chef = Ridley.new({
             :server_url   => config.get(:server_url),
             :client_name  => config.get(:username),
             :client_key   => config.get(:keyfile),
@@ -42,7 +43,7 @@ module Automation
           key = asset.get(keyfield)
           fail("Asset field #{keyfield} is missing, skipping...") if key.nil?
 
-          chef_node = @_chef.node.find(key)
+          chef_node = chef.node.find(key)
           fail("Chef node #{key} could not be found for asset #{id}") if chef_node.nil?
 
           info("Updating Chef node #{key}...")

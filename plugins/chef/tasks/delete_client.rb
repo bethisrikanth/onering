@@ -21,9 +21,10 @@ I_KNOW_THAT_OPENSSL_VERIFY_PEER_EQUALS_VERIFY_NONE_IS_WRONG = nil
 module Automation
   module Tasks
     module Chef
+      require 'ridley'
+      
       class DeleteClient < Task
         def self.perform(id, node={}, *args)
-          require 'ridley'
 
           config = App::Config.get!('chef.client')
           fail("Malformed Chef client configuration; expected Hash but got #{config.class.name}") unless config.is_a?(Hash)
