@@ -79,7 +79,7 @@ namespace :worker do
   desc "Starts a Resque backend job worker"
   task :start, :queues do |t, args|
 
-    ENV['QUEUE']      = (args[:queues].split(':') || ['critical', 'high', 'normal', 'low'].join(','))
+    ENV['QUEUE']      = (args[:queues] || ['critical', 'high', 'normal', 'low'].join(','))
     ENV['TERM_CHILD'] = '1'
     ENV['INTERVAL']   = '0.2'
 
