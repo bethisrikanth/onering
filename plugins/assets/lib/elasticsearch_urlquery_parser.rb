@@ -210,7 +210,10 @@ module App
 
               return {
                 :regexp => {
-                  field => vmu.first.last
+                  field => {
+                    :value => vmu.first.last,
+                    :flags => :ALL
+                  }
                 }
               }
 
@@ -244,7 +247,10 @@ module App
 
               return {
                 :regexp => {
-                  field => rv
+                  field => {
+                    :value => rv,
+                    :flags => :ALL
+                  }
                 }
               }
             else
@@ -258,12 +264,10 @@ module App
               else
             # DEFAULT: use a phrase_prefix match query
                 return {
-                  :query => {
-                    :match => {
-                      field => {
-                        :query => rv,
-                        :type  => :phrase_prefix
-                      }
+                  :regexp => {
+                    field => {
+                      :value => ".*#{rv}.*",
+                      :flags => :ALL
                     }
                   }
                 }
