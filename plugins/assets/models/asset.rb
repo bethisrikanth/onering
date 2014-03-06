@@ -177,8 +177,8 @@ class Asset < App::Model::Elasticsearch
     rv = App::Config.get('assets.status.states',{})
 
     if immutable
-      rv = rv.select{|i|
-        i.get(:immutable, false)
+      rv = rv.select{|k,v|
+        v.get(:immutable, false)
       }
     end
 
