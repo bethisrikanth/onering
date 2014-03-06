@@ -13,11 +13,6 @@
 # limitations under the License.
 #
 
-
-
-# LISTEN I'M NOT GONNA FIGHT YOU ON THIS BUT SOMETIMES DECISIONS GET MADE AND WE GOTTA LIVE WITH THEM
-I_KNOW_THAT_OPENSSL_VERIFY_PEER_EQUALS_VERIFY_NONE_IS_WRONG = nil
-
 module Automation
   module Tasks
     module Chef
@@ -32,10 +27,7 @@ module Automation
           chef = Ridley.new({
             :server_url   => config.get(:server_url),
             :client_name  => config.get(:username),
-            :client_key   => config.get(:keyfile),
-            :ssl => {
-              :verify => false
-            }
+            :client_key   => config.get(:keyfile)
           })
 
           client = nil

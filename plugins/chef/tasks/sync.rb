@@ -24,13 +24,12 @@ module Automation
         def self.perform(*args)
           config = App::Config.get('chef.nodes',{})
           filter = (args.first || config.get(:filter))
+          filter = ([filter]+[App::Config.get('chef.nodes.template',{}).collect{|k,v| v }.join('|')]).flatten.compact.join('/')
+
+          debug("Syncing assets to Chef that match #{filter}")
 
         # if no filter was specified (either in the call or in the config), default to all assets
-          if filter.nil?
-            assets = Asset.ids()
-          else
-            assets = Asset.list(:id, filter)
-          end
+          assets = Asset.list(:id, filter)
 
           assets.each do |id|
             run_low('chef/sync_node', id)
