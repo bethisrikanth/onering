@@ -78,6 +78,7 @@ module Tensor
 
   class Model
     include ::ActiveModel::Model
+    include ::ActiveModel::Dirty
     extend  ::ActiveModel::Callbacks
 
     attr_accessor :id
@@ -146,7 +147,7 @@ module Tensor
           end
 
         # hack to temporarily disable "dirty" flagging in attr setter
-          @_permaclean = true
+          @_permaclean = (options[:clean] || false)
           send("#{key}=", value)
           @_permaclean = false
 
@@ -390,6 +391,9 @@ module Tensor
         end
       }.merge(options)
 
+    # track old dirty values
+      define_attribute_methods(@_fields.keys)
+
     # define getter
       define_method(name) do
         if not instance_variables.include?(:"@#{name}")
@@ -407,8 +411,10 @@ module Tensor
       # normalize the value according to type/default rules for this field
         value = self.class._normalize_value(value, fields(name))
 
+        self.send(:"#{name}_will_change!") unless @_permaclean
         instance_variable_set(:"@#{name}", value)
         @attributes[name.to_s] = value
+
 
       # flag instance as dirty unless we've stopped doing that because it's not cool anymore...
         @_dirty = true unless @_permaclean

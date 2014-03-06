@@ -19,9 +19,6 @@ require 'assets/lib/helpers'
 
 
 class Asset < App::Model::Elasticsearch
-  VALID_STATUS = %w{online allocatable installing booting}
-  NO_AUTOCLEAR_STATUS = %w{installing booting}
-
   index_options do
     {
       :replication => :async
@@ -204,9 +201,10 @@ private
   end
 
   def _confine_status()
+  # validate that this is a valid status
     if not Asset.states().include?(self.status)
       errors.add(:status, "Status must be one of #{Asset.states().join(', ')}")
-      self.status = nil
+      self.status = self.status_was
     end
   end
 
