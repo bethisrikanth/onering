@@ -153,6 +153,7 @@ module App
             end
           end
 
+          Onering::Logger.info("Connection to Elasticsearch at #{(options.get(:hosts) || ['localhost:9200']).join(',')}")
           Tensor::ConnectionPool.connect(options)
         end
 
