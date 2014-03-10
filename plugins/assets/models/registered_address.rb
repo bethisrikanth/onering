@@ -58,7 +58,7 @@ class RegisteredAddress < App::Model::Elasticsearch
   end
 
   class<<self
-    def get_pool_addresses(pool)
+    def get_pool_addresses(pool, exclude=true)
     # map all possible IPs in all ranges to their pool names
       ranges = App::Config.get("assets.ipam.pools.#{pool}", [])
       range_ips = []
@@ -66,14 +66,14 @@ class RegisteredAddress < App::Model::Elasticsearch
     # for each range rule in this pool...
       ranges.each do |range|
       # EXCLUDE
-        if range[0].chr == '-'
+        if exclude and range[0].chr == '-'
         # explicitly remove certain addresses/ranges
           range_ips = (range_ips - IPAddress::IPv4.new(range[1..-1]).to_a.map(&:to_s))
 
       # INCLUDE
         else
         # add all possible IPs in the given subnet, less the network and broadcast IPs
-          net = IPAddress::IPv4.new(range)
+          net = IPAddress::IPv4.new(range.delete('-'))
           range_ips += (net.to_a.map(&:to_s) - [net.network.to_s] - [net.broadcast.to_s])
         end
 

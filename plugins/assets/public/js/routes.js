@@ -45,6 +45,10 @@ config(['$routeProvider', function($routeProvider){
     templateUrl: 'views/devices.html',
     controller: QueryController
   }).
+  when('/assets/ipam', {
+    templateUrl: 'views/ipam-manager.html',
+    controller:  IpamManagerController
+  }).
   when('/assets/manage', {
     templateUrl: 'views/asset-manager.html',
     controller:  AssetManagerController

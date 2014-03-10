@@ -56,6 +56,10 @@ class NilClass
   def coerce(*args)
     self
   end
+
+  def <=>(*args)
+    return 1
+  end
 end
 
 class String

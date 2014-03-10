@@ -118,7 +118,36 @@ module App
         end
 
         get '/pools/list' do
-          output(RegisteredAddress.list(:pool).sort)
+          output(RegisteredAddress.list(:pool).compact.sort)
+        end
+
+        get '/pools/:pool/?' do
+          pool_addresses = RegisteredAddress.get_pool_addresses(params[:pool])
+          return 404 if pool_addresses.empty?
+
+          all_addresses = RegisteredAddress.get_pool_addresses(params[:pool], false)
+          reserved_addresses = (all_addresses - pool_addresses)
+          claimed_addresses = Hash[RegisteredAddress.urlquery("pool/#{params[:pool]}").collect{|i|
+            [i.value, i]
+          }]
+
+          output({
+            :pool      => params[:pool],
+            :count     => {
+              :total      => all_addresses.length,
+              :claimed    => claimed_addresses.length,
+              :assignable => pool_addresses.length,
+              :reserved   => reserved_addresses.length
+            },
+            :addresses => all_addresses.collect{|i|
+              {
+                :address  => i,
+                :claimed  => (claimed_addresses.include?(i) ? claimed_addresses[i].claimed : false),
+                :reserved => (reserved_addresses.include?(i)),
+                :details  => (claimed_addresses.include?(i) ? claimed_addresses[i] : nil)
+              }.compact()
+            }
+          })
         end
 
         get '/address/:pool/?' do

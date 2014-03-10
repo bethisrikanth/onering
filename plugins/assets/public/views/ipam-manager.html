@@ -1,0 +1,44 @@
+<div class="container">
+  <div class="row">
+    <div class="span12">
+      <h1>IP Address Management</h1>
+      <br />
+
+      <tabset>
+        <tab ng-repeat="pool in pools" active="pool==selected_pool" select="selected_pool=pool">
+          <tab-heading>{{ pool }}</tab-heading>
+
+          <div ng-show="current_pool">
+            <h4>Pool {{ pool }} <small class="text-grey">({{ current_pool.count.assignable }} usable addresses)</small></h4>
+            <span class="pull-right margin-bottom-2">
+              <span class="label label-blue">{{ current_pool.count.reserved }}</span>
+              <b>Network &amp; DHCP</b>
+              &nbsp;
+              &nbsp;
+              &nbsp;
+
+              <span class="label label-important">{{ current_pool.count.claimed }}</span>
+              <b>Claimed</b>
+              &nbsp;
+              &nbsp;
+              &nbsp;
+
+              <span class="label">{{ current_pool.count.assignable }}</span>
+              <b>Available</b>
+              &nbsp;
+              &nbsp;
+              &nbsp;
+            </span>
+
+            <div class="clearfix ipam-display" style="word-wrap:break-word; cursor:pointer;" ng-bind-html="generatePoolText(current_pool.addresses)">
+            </div>
+          </div>
+
+          <div ng-hide="current_pool" class="center">
+            <img src="/img/loading.gif" title="Current Setting: Medium-Dark" />
+            <h3>Loading...</h3>
+          </div>
+        </tab>
+      </tabset>
+  </div>
+</div>

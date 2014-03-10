@@ -39,6 +39,10 @@ address{
   font-size: larger !important;
 }
 
+.inline-block{
+  display: inline-block !important;
+}
+
 
 .margin-top-1{
   margin-top: 1em !important;
@@ -70,6 +74,11 @@ address{
 
 .margin-bottom-4{
   margin-bottom: 4em !important;
+}
+
+a.unstyled{
+  color:           inherit;
+  text-decoration: none    !important;
 }
 
 body .modal {
@@ -942,4 +951,14 @@ a.disabled i{
   -moz-transition-duration:    250ms !important;
   -ms-transition-duration:     250ms !important;
   -o-transition-duration:      250ms !important;
+}
+
+
+.ipam-display{
+  color: #999;
+  font-size: 16px !important;
+}
+
+.ipam-display > span:hover{
+  background-color: #CCC;
 }

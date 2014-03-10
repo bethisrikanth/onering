@@ -610,3 +610,53 @@ function NodeCompareController($scope, $routeParams, Query){
   $scope.$watch('query', $scope.reload);
   $scope.$watch('fields', $scope.reload);
 }
+
+
+function IpamManagerController($scope, $interval, $http, $sce){
+  $http.get('/api/devices/ipam/pools/list').success(function(data){
+    $scope.pools = data;
+
+    if($scope.pools.length > 0){
+      console.log($scope.pools)
+      $scope.selected_pool = $scope.pools[0];
+    }
+  });
+
+  $scope.getPool = function(pool){
+    if(angular.isDefined(pool) && pool != null){
+      $scope.current_pool = null;
+
+      $http.get('/api/devices/ipam/pools/'+pool).success(function(data){
+        $scope.current_pool = data;
+      });
+    }
+  }
+
+  $scope.generatePoolText = function(addresses){
+    var rv = '';
+
+    if(addresses != null){
+      for(var i = 0; i < addresses.length; i++){
+        var address = addresses[i]; 
+
+        if(address.hasOwnProperty('address')){
+          if(address.reserved){
+            rv += '<span title="'+address.address+' (reserved)" class="text-blue">&#9648;</span>';
+          }else if(address.claimed){
+            rv += '<span title="'+address.address+' (claimed by '+address.details.asset_id+')" class="text-red">'+
+              '<a class="unstyled" href="#/node/'+address.details.asset_id+'" target="_blank">&#9648;</a>'+
+            '</span>';
+          }else{
+            rv += '<span title="Available: '+address.address+'">&#9649;</span>';
+          }
+        }
+      }
+    }
+
+    return $sce.trustAsHtml(rv);
+  }
+
+  $scope.$watch('selected_pool', function(){
+    $scope.getPool($scope.selected_pool);
+  });
+}
