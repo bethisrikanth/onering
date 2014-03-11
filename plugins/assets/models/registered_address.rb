@@ -79,7 +79,7 @@ class RegisteredAddress < App::Model::Elasticsearch
 
       end
 
-      return range_ips
+      return range_ips.uniq
     end
 
     def next_unclaimed_address(pool, asset=nil, options={})

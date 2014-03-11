@@ -959,6 +959,21 @@ a.disabled i{
   font-size: 16px !important;
 }
 
-.ipam-display > span:hover{
-  background-color: #CCC;
+.ipam-display svg > rect{
+  fill:            transparent;
+  stroke:          #CCC;
+  stroke-width:    2;
+}
+
+.ipam-display svg > rect:hover,
+.ipam-display svg > rect.selected{
+  fill:            #33CC00 !important;
+}
+
+.ipam-display svg > rect.reserved{
+  fill:         #3A87AD;
+}
+
+.ipam-display svg > rect.claimed{
+  fill:         #B94A48;
 }

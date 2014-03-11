@@ -15,5 +15,6 @@ angular.module('app', [
   'harbormasterPlugin',
   'slider',
   'ngAnimate',
-  'toaster'
+  'toaster',
+  'once'
 ]);

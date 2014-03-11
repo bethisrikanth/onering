@@ -172,6 +172,11 @@ filter('fix', function(){
     return parseFloat(number).toFixed(parseInt(fixTo));
   }
 }).
+filter('integer', function(){
+  return function(number){
+    return parseInt(number);
+  }
+}).
 filter('timeAgo', function(){
   return function(date){
     return moment(Date.parse(date)).fromNow();

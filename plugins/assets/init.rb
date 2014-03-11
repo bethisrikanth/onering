@@ -136,7 +136,7 @@ module App
             :count     => {
               :total      => all_addresses.length,
               :claimed    => claimed_addresses.length,
-              :assignable => pool_addresses.length,
+              :assignable => (pool_addresses.length - claimed_addresses.length),
               :reserved   => reserved_addresses.length
             },
             :addresses => all_addresses.collect{|i|

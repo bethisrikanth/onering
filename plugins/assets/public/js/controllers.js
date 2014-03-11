@@ -612,7 +612,9 @@ function NodeCompareController($scope, $routeParams, Query){
 }
 
 
-function IpamManagerController($scope, $interval, $http, $sce){
+function IpamManagerController($scope, $interval, $http, $sce, $compile){
+  $scope.selected_address = null;
+
   $http.get('/api/devices/ipam/pools/list').success(function(data){
     $scope.pools = data;
 
@@ -632,28 +634,12 @@ function IpamManagerController($scope, $interval, $http, $sce){
     }
   }
 
-  $scope.generatePoolText = function(addresses){
-    var rv = '';
+  $scope.block_width  = 12;
+  $scope.block_height = 12;
+  $scope.grid_width   = 64;
 
-    if(addresses != null){
-      for(var i = 0; i < addresses.length; i++){
-        var address = addresses[i]; 
-
-        if(address.hasOwnProperty('address')){
-          if(address.reserved){
-            rv += '<span title="'+address.address+' (reserved)" class="text-blue">&#9648;</span>';
-          }else if(address.claimed){
-            rv += '<span title="'+address.address+' (claimed by '+address.details.asset_id+')" class="text-red">'+
-              '<a class="unstyled" href="#/node/'+address.details.asset_id+'" target="_blank">&#9648;</a>'+
-            '</span>';
-          }else{
-            rv += '<span title="Available: '+address.address+'">&#9649;</span>';
-          }
-        }
-      }
-    }
-
-    return $sce.trustAsHtml(rv);
+  $scope.showAddress = function(address){
+    $scope.selected_address = address;
   }
 
   $scope.$watch('selected_pool', function(){
