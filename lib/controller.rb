@@ -83,6 +83,7 @@ module App
         response.body << "-- END PROFILE --"
       else
         App::Metrics.increment("api.requests.status.#{response.status}")
+        App::Metrics.increment("api.requests.method.#{request.env['REQUEST_METHOD'].downcase}")
         App::Metrics.increment("api.requests.all.count")
         App::Metrics.timing("api.requests.all.time", ( (Time.now.to_f*1000.0).to_i - (@_start.to_f * 1000.0).to_i))
       end
