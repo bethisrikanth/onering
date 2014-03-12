@@ -71,7 +71,7 @@ class RegisteredAddress < App::Model::Elasticsearch
 
     # if specified, exclude given ranges from output
       if exclude
-        pool.get('exclude',[]).each do |ex|
+        pool.get('exclude',[]).compact.each do |ex|
           range_ips = (range_ips - IPAddress::IPv4.new(ex).to_a.map(&:to_s))
         end
       end
