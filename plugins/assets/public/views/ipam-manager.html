@@ -3,100 +3,110 @@
     <div class="span12">
       <h1>IP Address Management</h1>
       <br />
+    </div>
+  </div>
 
-      <tabset>
-        <tab ng-repeat="pool in pools" active="pool==selected_pool" select="getPool(pool)">
-          <tab-heading>{{ pool }}</tab-heading>
+  <div class="row">
+    <div class="span2">
+      <ul class="nav nav-pills nav-stacked">
+        <li ng-repeat="pool in pools" ng-class="{'active': (pool.name==current_pool.pool) }" rest="/api/devices/ipam/pools/{{ pool.name }}" rest-success="setCurrentPool(data)">
+          <a>{{ pool.title || pool.name }}</a>
+        </li>
+      </ul>
+    </div>
 
-          <div ng-show="current_pool" class="container">
-            <div class="row">
-              <div class="span12">
-                <h4 class="pull-left">Pool {{ pool }} <small class="text-grey">({{ current_pool.count.assignable }} usable addresses)</small></h4>
-                <span class="pull-right margin-top-1 margin-bottom-2">
-                  <span class="label label-blue">{{ current_pool.count.reserved }}</span>
-                  <b>Network &amp; DHCP</b>
-                  &nbsp;
-                  &nbsp;
-                  &nbsp;
+    <div class="span10">
+      <div ng-show="current_pool" class="row">
+        <div class="span12">
+          <h4 class="pull-left">
+            {{ current_pool.title || current_pool.name }}
+            <span ng-show="current_pool.description">: {{ current_pool.description }}</span>
+            <small class="text-grey">({{ current_pool.count.assignable }} usable addresses)</small>
+          </h4>
+          <span class="pull-right margin-top-1 margin-bottom-2">
+            <span class="label label-blue">{{ current_pool.count.reserved }}</span>
+            <b>Network &amp; DHCP</b>
+            &nbsp;
+            &nbsp;
+            &nbsp;
 
-                  <span class="label label-important">{{ current_pool.count.claimed }}</span>
-                  <b>Claimed</b>
-                  &nbsp;
-                  &nbsp;
-                  &nbsp;
+            <span class="label label-important">{{ current_pool.count.claimed }}</span>
+            <b>Claimed</b>
+            &nbsp;
+            &nbsp;
+            &nbsp;
 
-                  <span class="label">{{ current_pool.count.assignable }}</span>
-                  <b>Available</b>
-                  &nbsp;
-                  &nbsp;
-                  &nbsp;
-                </span>
-              </div>
-            </div>
+            <span class="label">{{ current_pool.count.assignable }}</span>
+            <b>Available</b>
+            &nbsp;
+            &nbsp;
+            &nbsp;
+          </span>
+        </div>
+      </div>
 
-            <div class="row">
-              <div class="span9">
-                <div class="clearfix ipam-display center">
-                  <svg ng-attr-height="{{ ((current_pool.addresses.length / block_width)  * block_height) + 2 }}" ng-attr-width="{{ (grid_width * block_width) + 2 }}">
-                    <rect
-                      ng-repeat="address in current_pool.addresses"
-                      ng-click="showAddress(address)"
-                      ng-attr-width="{{ block_width }}"
-                      ng-attr-height="{{ block_height }}"
-                      ng-attr-x="{{ ((block_width * $index) % (grid_width * block_width)) + 1 }}"
-                      ng-attr-y="{{ (((block_width * $index) / (grid_width * block_width) | integer) * block_height) + 1 }}"
-                      ng-class="{
-                        'selected': (selected_address==address),
-                        'reserved': address.reserved,
-                        'claimed':  address.claimed
-                      }"
-                    />
-                  </svg> 
-                </div>
-              </div>
-
-              <div class="span3">
-                <div ng-show="selected_address">
-                  <h4>
-                    Selected IP: {{ selected_address.address }}
-                  </h4>
-
-                  <table class="table">
-                    <tbody>
-                      <tr>
-                        <th>Address</th>
-                        <td>{{ selected_address.address }}</td>
-                      </tr>
-
-                      <tr>
-                        <th>Status</th>
-                        <td>
-                          <span ng-if="selected_address.reserved" class="label label-info">Reserved</span>
-                          <span ng-if="selected_address.claimed" class="label label-important">Claimed</span>
-                          <span ng-if="!(selected_address.reserved || selected_address.claimed)" class="label">Available</span>
-                        </td>
-                      </tr>
-
-                      <tr ng-if="selected_address.details.asset_id">
-                        <th>Asset</th>
-                        <td><a href="#/node/{{ selected_address.details.asset_id }}" target="_blank">{{ selected_address.address }}</a></td>
-                      </tr>                      
-                    </tbody>
-                  </table>
-                </div>  
-
-                <div ng-hide="selected_address">
-                  <h4>No address selected</h4>
-                </div>
-              </div>
-            </div>
+      <div ng-show="current_pool" class="row">
+        <div class="span9">
+          <div class="clearfix ipam-display center">
+            <!-- <svg ng-attr-height="{{ ((current_pool.addresses.length / block_width)  * block_height) + 2 }}" ng-attr-width="{{ (grid_width * block_width) + 2 }}">
+              <rect
+                ng-repeat="address in current_pool.addresses"
+                ng-click="showAddress(address)"
+                ng-attr-width="{{ block_width }}"
+                ng-attr-height="{{ block_height }}"
+                ng-attr-x="{{ ((block_width * $index) % (grid_width * block_width)) + 1 }}"
+                ng-attr-y="{{ (((block_width * $index) / (grid_width * block_width) | integer) * block_height) + 1 }}"
+                ng-class="{
+                  'selected': (selected_address==address),
+                  'reserved': address.reserved,
+                  'claimed':  address.claimed
+                }"
+              />
+            </svg>  -->
           </div>
+        </div>
 
-          <div ng-hide="current_pool" class="center">
-            <img src="/img/loading.gif" title="Current Setting: Medium-Dark" />
-            <h3>Loading...</h3>
+        <div class="span3">
+          <div ng-show="selected_address">
+            <h4>
+              Selected IP: {{ selected_address.address }}
+            </h4>
+
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th>Address</th>
+                  <td>{{ selected_address.address }}</td>
+                </tr>
+
+                <tr>
+                  <th>Status</th>
+                  <td>
+                    <span ng-if="selected_address.reserved" class="label label-info">Reserved</span>
+                    <span ng-if="selected_address.claimed" class="label label-important">Claimed</span>
+                    <span ng-if="!(selected_address.reserved || selected_address.claimed)" class="label">Available</span>
+                  </td>
+                </tr>
+
+                <tr ng-if="selected_address.details.asset_id">
+                  <th>Asset</th>
+                  <td><a href="#/node/{{ selected_address.details.asset_id }}" target="_blank">{{ selected_address.address }}</a></td>
+                </tr>                      
+              </tbody>
+            </table>
+          </div>  
+
+          <div ng-hide="selected_address">
+            <h4>No address selected</h4>
           </div>
-        </tab>
-      </tabset>
+        </div>
+      </div>
+
+      <div ng-hide="current_pool" class="center">
+        <img src="/img/loading.gif" title="Current Setting: Medium-Dark" />
+        <h3>Loading...</h3>
+      </div>
+    </div>
+
   </div>
 </div>

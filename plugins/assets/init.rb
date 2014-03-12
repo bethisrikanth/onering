@@ -118,7 +118,13 @@ module App
         end
 
         get '/pools/list' do
-          output(RegisteredAddress.list(:pool).compact.sort)
+          output(RegisteredAddress.list(:pool).compact.sort.collect{|i|
+            {
+              :name         => i,
+              :title        => App::Config.get("assets.ipam.pools.#{i}.title"),
+              :description  => App::Config.get("assets.ipam.pools.#{i}.description"),              
+            }
+          })
         end
 
         get '/pools/:pool/?' do
@@ -132,8 +138,10 @@ module App
           }]
 
           output({
-            :pool      => params[:pool],
-            :count     => {
+            :pool         => params[:pool],
+            :title        => App::Config.get("assets.ipam.pools.#{params[:pool]}.title"),
+            :description  => App::Config.get("assets.ipam.pools.#{params[:pool]}.description"),
+            :count        => {
               :total      => all_addresses.length,
               :claimed    => claimed_addresses.length,
               :assignable => (pool_addresses.length - claimed_addresses.length),

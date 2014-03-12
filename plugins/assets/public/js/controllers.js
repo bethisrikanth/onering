@@ -619,19 +619,14 @@ function IpamManagerController($scope, $interval, $http, $sce, $compile){
     $scope.pools = data;
 
     if($scope.pools.length > 0){
-      console.log($scope.pools)
-      $scope.selected_pool = $scope.pools[0];
+      $http.get('/api/devices/ipam/pools/'+$scope.pools[0].name).success(function(data){
+        $scope.setCurrentPool(data);
+      });
     }
   });
 
-  $scope.getPool = function(pool){
-    if(angular.isDefined(pool) && pool != null){
-      $scope.current_pool = null;
-
-      $http.get('/api/devices/ipam/pools/'+pool).success(function(data){
-        $scope.current_pool = data;
-      });
-    }
+  $scope.setCurrentPool = function(data){
+    $scope.current_pool = data;
   }
 
   $scope.block_width  = 12;
@@ -641,8 +636,4 @@ function IpamManagerController($scope, $interval, $http, $sce, $compile){
   $scope.showAddress = function(address){
     $scope.selected_address = address;
   }
-
-  $scope.$watch('selected_pool', function(){
-    $scope.getPool($scope.selected_pool);
-  });
 }

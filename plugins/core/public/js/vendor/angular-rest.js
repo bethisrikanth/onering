@@ -78,7 +78,7 @@ angular.module('rest', ['ui.bootstrap'])
     }
   };
 })
-.directive('rest', function($modal) {
+.directive('rest', function($modal, $timeout, $interpolate) {
   return {
     restrict: 'A',
     controller: function($scope, $element, $attrs, $http){
@@ -139,18 +139,19 @@ angular.module('rest', ['ui.bootstrap'])
             $element.toggleClass('disabled', false);
             $element.unbind('click', disabler);
 
-            if(angular.isUndefined($attrs.restSuccess)) return false;
+        //  if specified, eval the code in scope
+            if(angular.isDefined($attrs.restSuccess)){
+              $scope.$evalAsync(function(){
+                var response = {
+                  data:    data,
+                  status:  status,
+                  headers: headers,
+                  config:  config
+                };
 
-            $scope.$evalAsync(function(){
-              var response = {
-                data:    data,
-                status:  status,
-                headers: headers,
-                config:  config
-              };
-
-              $scope.$eval($attrs.restSuccess);
-            });
+                $scope.$eval($attrs.restSuccess, response);
+              });
+            }
           }).error(function(data, status, headers, config){
             $element.toggleClass('disabled', false);
             $element.unbind('click', disabler);
@@ -165,7 +166,7 @@ angular.module('rest', ['ui.bootstrap'])
                 config:  config
               };
 
-              $scope.$eval($attrs.restError);
+              $scope.$eval($attrs.restError, response);
             })
           });
         }

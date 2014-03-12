@@ -58,6 +58,8 @@ module Automation
             # claim this IP for a specific asset
               info("Claiming IP #{ip} for asset #{asset.id}")
               address.claim(asset.id)
+              asset.set('ipam.pool', pool)
+              asset.save()
             end
 
             debug("Saving IP #{ip}, #{address.claimed? ? 'claimed' : 'unclaimed'} #{address.asset_id ? 'for asset '+address.asset_id : ''}")
