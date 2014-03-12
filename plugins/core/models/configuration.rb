@@ -112,6 +112,11 @@ class Configuration < App::Model::Elasticsearch
 
         if header['_version'].to_i > @_keyversions[header['_id']]
           c = Configuration.find(header['_id'])
+          if c.nil?
+            Onering::Logger.warn("Configuration item #{header['_id']} not found, skipping...")
+            next
+          end
+
           next if c.value.nil?
 
           @_keyversions[c.id] = c.metadata(:version)

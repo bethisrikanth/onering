@@ -60,26 +60,38 @@ class RegisteredAddress < App::Model::Elasticsearch
   class<<self
     def get_pool_addresses(pool, exclude=true)
     # map all possible IPs in all ranges to their pool names
-      ranges = App::Config.get("assets.ipam.pools.#{pool}", [])
+      pool = App::Config.get("assets.ipam.pools.#{pool}", {})
       range_ips = []
 
-    # for each range rule in this pool...
-      ranges.each do |range|
-      # EXCLUDE
-        if exclude and range[0].chr == '-'
-        # explicitly remove certain addresses/ranges
-          range_ips = (range_ips - IPAddress::IPv4.new(range[1..-1]).to_a.map(&:to_s))
+    # add IPs to ranges
+      pool.get('ranges',[]).each do |range|
+        net = IPAddress::IPv4.new(range)
+        range_ips += (net.to_a.map(&:to_s) - [net.network.to_s] - [net.broadcast.to_s])
+      end
 
-      # INCLUDE
-        else
-        # add all possible IPs in the given subnet, less the network and broadcast IPs
-          net = IPAddress::IPv4.new(range.delete('-'))
-          range_ips += (net.to_a.map(&:to_s) - [net.network.to_s] - [net.broadcast.to_s])
+    # if specified, exclude given ranges from output
+      if exclude
+        pool.get('exclude',[]).each do |ex|
+          range_ips = (range_ips - IPAddress::IPv4.new(ex).to_a.map(&:to_s))
         end
-
       end
 
       return range_ips.uniq
+    end
+
+    def ip_available?(ip)
+    # verify it cannot be pinged
+      if not Net::Ping::ICMP.new(ip, nil, 3).ping?
+      # verify we can't resolve this IP in DNS
+        begin
+          Resolv.getname(ip)
+          
+        rescue Resolv::ResolvError
+          return true
+        end
+      end
+
+      return false
     end
 
     def next_unclaimed_address(pool, asset=nil, options={})
@@ -122,27 +134,16 @@ class RegisteredAddress < App::Model::Elasticsearch
           :replication => :sync
         })
 
-      # verify it cannot be pinged
-        if not Net::Ping::ICMP.new(ip, nil, 3).ping?
-        # verify we can't resolve this IP in DNS
-          begin
-            Resolv.getname(ip)
-            throw :retry
-
-          rescue Resolv::ResolvError
-          # proceed to claim this IP for the given asset
-            if not asset.nil?
-              address.claim(asset)
-              address.save({
-                :replication => :sync
-              })
-            end
-
-          # the only successful path to a valid address
-            return address
+        if ip_available?(ip)
+          if not asset.nil?
+            address.claim(asset)
+            address.save({
+              :replication => :sync
+            })
           end
-        else
-          throw :retry
+
+        # the only successful path to a valid address
+          return address
         end
       end
 

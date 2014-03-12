@@ -73,6 +73,16 @@ end
 Onering::Logger.debug("Loading configuration from database", "Onering")
 Configuration.sync_remote_with_local()
 
+
+# connect to work queue
+resque_redis = App::Config.get('global.queue.connection',(
+  App::Config.get('global.queue.host', 'localhost')+':'+App::Config.get('global.queue.port', 6379).to_s
+))
+
+Resque.redis = resque_redis
+
+Onering::Logger.info("Connection to Redis at #{resque_redis}", "Onering")
+
 module App
   class Base < Controller
     def initialize
