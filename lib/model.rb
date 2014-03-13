@@ -186,9 +186,17 @@ module App
         #
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
-              x.split('|').collect{|j|
-                [j, j+'.'+App::Config.get('database.options.querying.multifield_suffix', '_analyzed')]
-              }.flatten.join('|')
+                x.split('|').collect{|j|
+                  mapping_path = (j.split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
+                  mapping_type = self.all_mappings[self.document_type].get(mapping_path)
+
+                # only add the multifield suffix for actual multi_fields
+                  if mapping_type == 'multi_field'
+                    [j, j+'.'+App::Config.get('database.options.querying.multifield_suffix', '_analyzed')]
+                  else
+                    [j]
+                  end
+                }.flatten.join('|')
             else
               x
             end
