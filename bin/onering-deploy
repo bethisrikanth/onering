@@ -1,0 +1,45 @@
+#!/bin/bash
+set -o errexit
+BASEDIR=${1:-/opt/onering}
+RELEASE=$(date -u +%Y%m%d%H%M%S)
+
+# exits 0 if remote and local revs are the same
+# git remote update > /dev/null && test "$(git rev-parse --short HEAD)" == "$(git rev-parse --short origin)"
+
+for i in git openssl; do
+  which $i > /dev/null 2>&1
+  [ $? -gt 0 ] && (echo "Command not found: $i, cannot continue" && exit 1)
+done
+
+# create default everything
+[ ! -d $BASEDIR ]                           && mkdir -p $BASEDIR
+[ ! -d $BASEDIR/releases ]                  && mkdir -p $BASEDIR/releases
+[ ! -d $BASEDIR/shared ]                    && mkdir -p $BASEDIR/shared/config/conf.d
+[ ! -f $BASEDIR/shared/config/session.key ] && echo "Generating Sinatra session secret at $BASEDIR/shared/config/session.key" && openssl rand 8192 | tr -dc A-Za-z0-9 | head -c64 > $BASEDIR/shared/config/session.key
+[ ! -f $BASEDIR/shared/config/config.yaml ] && echo "Generating default configuration at $BASEDIR/shared/config/config.yaml" && cat > $BASEDIR/shared/config/config.yaml <<EOF
+---
+database:
+  elasticsearch:
+    log:    false
+    logger: stderr
+    hosts:
+    - 'localhost:9200'
+
+EOF
+
+git clone https://github.com/outbrain/onering.git $BASEDIR/releases/$RELEASE
+cd $BASEDIR/releases/$RELEASE
+
+for i in config plugins/_local; do
+  if [ -d $BASEDIR/shared/$i ]; then
+    rm -rf $BASEDIR/releases/$RELEASE/$i
+    ln -s $BASEDIR/shared/$i $BASEDIR/releases/$RELEASE/$i
+  fi
+done
+
+echo "Preparing static resources..."
+rake launch:prep
+
+rm -f $BASEDIR/current
+ln -s $BASEDIR/releases/$RELEASE $BASEDIR/current
+
