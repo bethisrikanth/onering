@@ -147,17 +147,19 @@ module App
     # process test value and modifiers
       rule :value, :value_modifier_unary?, :value_value? do
         def to_elasticsearch_query(field, coerce=nil, options={})
-          if coerce.nil?
-            rv = value_value.to_s.autotype()
-          else
-            rv = value_value.to_s.convert_to(coerce)
-          end
+          rv = value_value.to_s
 
         # pre-analyze the value if it is scalar
           if options[:value_analyzer].is_a?(Method)
             if rv.respond_to?(:scalar?) and rv.scalar?
               rv = options[:value_analyzer].call(rv)
             end
+          end
+
+          if coerce.nil?
+            rv = rv.autotype()
+          else
+            rv = rv.convert_to(coerce)
           end
 
           if value_modifier_unary
