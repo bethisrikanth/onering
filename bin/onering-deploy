@@ -5,7 +5,7 @@ RELEASE=$(date -u +%Y%m%d%H%M%S)
 # exits 0 if remote and local revs are the same
 # git remote update > /dev/null && test "$(git rev-parse --short HEAD)" == "$(git rev-parse --short origin)"
 
-for i in git openssl ruby rake; do
+for i in git openssl ruby rake gem; do
   which $i > /dev/null 2>&1
   if [ $? -gt 0 ]; then
     echo "Command not found: $i, cannot continue" 1>&2
@@ -40,6 +40,10 @@ for i in config plugins/_local; do
     ln -s $BASEDIR/shared/$i $BASEDIR/releases/$RELEASE/$i
   fi
 done
+
+(gem list bundler | grep '^bundler') || gem install --no-rdoc --no-ri bundler
+cd $BASEDIR/releases/$RELEASE
+bundle install
 
 echo "Preparing static resources..."
 rake launch:prep
