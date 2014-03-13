@@ -182,36 +182,88 @@ filter('timeAgo', function(){
     return moment(Date.parse(date)).fromNow();
   };
 }).
-filter('timeDuration', function(){
-  return function(date,unit,delim){
-    var rv = [];
-    var start = moment(date);
-    var now = moment();
-
-    if(!angular.isArray(unit)){
-      unit = [unit];
+filter('timeAgoHuman', function(){
+  return function(time,format,start){
+    if(angular.isUndefined(format)){
+      format = '[%Y years, ][%M months, ][%D days, ]%02h:%02m:%02s';
     }
 
-    for(var i = 0; i < unit.length; i++){
-      var upair = unit[i];
-      var u = unit[i];
+    if(angular.isDefined(start)){
+      var start = moment(start);
+    }else{
+      var start = moment();
+    }
 
-      if(u.indexOf(':') > 0){
-        u = upair.split(':').splice(-1,1)[0];
-        unit[i] = upair.split(':')[0];
+    var millisecondsAgo = start.diff(time);
+    var units = {
+      years:   (1000 * 60 * 60 * 24 * 365),
+      months:  (1000 * 60 * 60 * 24 * 30),
+      days:    (1000 * 60 * 60 * 24),
+      hours:   (1000 * 60 * 60),
+      minutes: (1000 * 60),
+      seconds: 1000
+    };
+
+    var processingOrder = [
+      ['Y',  'years'],
+      ['M',  'months'],
+      ['D',  'days'],
+      ['h',  'hours'],
+      ['m',  'minutes'],
+      ['s',  'seconds'],
+      ['ms', 'msec']
+    ];
+
+    var rv = [];
+
+
+//  loop through the processing order of supported units of time
+//  for each unit, find and replace the relevant part of the format
+//  string (if any) with the formatted unit of time, then reduce the
+//  current time difference by that unit so the next iteration does not
+//  include it in the calculation
+//
+//  e.g.:  3,650,000 milliseconds
+//
+//    years?   0
+//    months?  0
+//    days?    0
+//    hours?   :=  INT(3,650,000 / 3,600,000) (# milliseconds in an hour) == 1
+//                 set current count to (3,650,000 - (3,600,000 * 1))     -> 50,000
+//    minutes? 0 (50,000 is less than 1000*60 [60,000])
+//    seconds? :=  INT(50,000 / 1000) (# of milliseconds is one seconds)  == 50
+//
+//    RESULT:  1 hour, 50 seconds
+//
+    for(var i = 0; i < processingOrder.length; i++){
+      var token = processingOrder[i][0];
+      var unit  = units[processingOrder[i][1]];
+      var rx    = new RegExp('\\[?%(.[0-9]+)?'+token+'(?:(.*?)\\])?');
+      var match = format.match(rx);
+
+
+      if(match && millisecondsAgo >= unit){
+        var number = parseInt(millisecondsAgo / unit);
+
+        if(angular.isDefined(number)){
+      //  padding to n places with given character
+          if(angular.isString(match[1]) && match[1].length >= 2){
+            var spaces = parseInt(match[1].slice(1));
+            var padchar = match[1].slice(0,1);
+            number = String(Array(spaces).join(padchar)+number.toString()).slice(-1*spaces);
+          }
+
+      //  replace matched part of format string with the formatted version
+          format = format.replace(rx, number.toString()+(match[2] || ''));
+        }
+
+        millisecondsAgo = millisecondsAgo - (parseInt(millisecondsAgo / unit)*unit);
       }
 
-      var v = now.diff(start, unit[i]);
-
-      if(v == 0)
-        continue;
-
-      rv.push(v.toString()+u);
-      start.add(unit[i], v-1);
     }
 
-    return rv.join(delim || ' ');
-  };
+    return format.replace(/\[.*?\]/g,'');
+  }
 }).
 filter('section', function(){
   return function(str, delim, start, len){

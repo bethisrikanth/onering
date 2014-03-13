@@ -30,17 +30,29 @@ class Object
   def autotype()
     self
   end
+
+  def scalar?()
+    false
+  end
 end
 
 class TrueClass
   def to_bool
     self
   end
+
+  def scalar?()
+    true
+  end
 end
 
 class FalseClass
   def to_bool
     self
+  end
+
+  def scalar?()
+    true
   end
 end
 
@@ -59,6 +71,12 @@ class NilClass
 
   def <=>(*args)
     return 1
+  end
+end
+
+class Numeric
+  def scalar?()
+    true
   end
 end
 
@@ -84,6 +102,10 @@ class String
 
   def to_bool
     !(self.chomp.strip =~ /^(?:true|on|yes|y|1)$/i).nil?
+  end
+
+  def scalar?()
+    true
   end
 
   def as_date(format=nil)

@@ -165,9 +165,9 @@ module App
         #
         # What is this?
         #  It deconstructs the urlquery string and adds a second field to every field
-        #  being search for.  So for example:
+        #  being searched for.  So for example:
         #    I search for:   mac/abc123
-        #    This yields:    mac|mac._search/abc123
+        #    This yields:    mac|mac._analyzed/abc123
         #
         # Why am I doing this?
         #   To support multi-fields in ES that store both the analyzed and non-analyzed
@@ -176,9 +176,13 @@ module App
         #
         #   Since we're generating queries in a highly generic manner, and because
         #   not every field will have this multi-field property, the kludgy way around
-        #   it is to just throw both cases into an OR and call it a day
+        #   it is to just throw both cases into an OR and call it a day.
         #
-        #   I welcome an alternate approach.
+        #   I'm also certain that there is a way to do this directly in ES without said hack,
+        #   but I'm only one person, the documentation can only take me so far, and the
+        #   training costs ~$~$~mad billz~$~$~ that *someone* doesn't want to spend...
+        #        
+        #   I welcome an alternate approach. PM me: gary@outbrain.com a/s/l
         #
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
@@ -193,8 +197,9 @@ module App
           @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
 
           rv = @_parser.parse(query).to_elasticsearch_query({
-            :prefix   => self.field_prefix(),
-            :fields   => self.fields.keys()
+            :prefix         => self.field_prefix(),
+            :fields         => self.fields.keys(),
+            :value_analyzer => (self.method(:analyze) rescue nil)
           })
 
           rv

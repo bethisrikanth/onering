@@ -958,6 +958,20 @@ module Tensor
       })
     end
 
+
+    def self.analyze(text, field=nil, analyzer=:default)
+      rv = (self.connection.perform_request(:get, [self.index_name(), '_analyze'].join('/'), {
+        :analyzer => analyzer,
+        :text     => text,
+        :field    => field
+      }.compact()).body.get(:tokens,[]).collect{|i|
+        i['token']
+      } rescue [])
+
+      return rv if rv.length > 1
+      return rv.first
+    end
+
   private
     def self._normalize_value(value, field)
       raise "Field type is required for value #{value}" if field[:type].nil?

@@ -153,9 +153,24 @@ module App
             rv = value_value.to_s.convert_to(coerce)
           end
 
+        # pre-analyze the value if it is scalar
+          if options[:value_analyzer].is_a?(Method)
+            if rv.respond_to?(:scalar?) and rv.scalar?
+              rv = options[:value_analyzer].call(rv)
+            end
+          end
+
           if value_modifier_unary
             vmu = value_modifier_unary.to_elasticsearch_query(rv, options)
             operator = (vmu.first.first rescue nil)
+            value = analyzed_value = (vmu.first.last rescue nil)
+
+
+            if options[:value_analyzer].is_a?(Method)
+              if value.respond_to?(:scalar?) and value.scalar?
+                analyzed_value = options[:value_analyzer].call(value)
+              end
+            end
 
           # handle not operator
             case operator
@@ -175,7 +190,7 @@ module App
               else
                 return {
                   :term => {
-                    field => vmu.first.last
+                    field => analyzed_value
                   }
                 }
               end
@@ -197,7 +212,7 @@ module App
                 return {
                   :not => {
                     :term => {
-                      field => vmu.first.last
+                      field => analyzed_value
                     }
                   }
                 }
@@ -211,7 +226,7 @@ module App
               return {
                 :regexp => {
                   field => {
-                    :value => vmu.first.last,
+                    :value => analyzed_value,
                     :flags => :ALL
                   }
                 }
