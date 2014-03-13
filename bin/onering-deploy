@@ -1,5 +1,4 @@
 #!/bin/bash
-set -o errexit
 BASEDIR=${1:-/opt/onering}
 RELEASE=$(date -u +%Y%m%d%H%M%S)
 
@@ -9,10 +8,12 @@ RELEASE=$(date -u +%Y%m%d%H%M%S)
 for i in git openssl ruby rake; do
   which $i > /dev/null 2>&1
   if [ $? -gt 0 ]; then
-    echo "Command not found: $i, cannot continue"
+    echo "Command not found: $i, cannot continue" 1>&2
     exit 1
   fi
 done
+
+set -o errexit
 
 # create default everything
 [ ! -d $BASEDIR ]                           && mkdir -p $BASEDIR
