@@ -6,7 +6,7 @@ RELEASE=$(date -u +%Y%m%d%H%M%S)
 # exits 0 if remote and local revs are the same
 # git remote update > /dev/null && test "$(git rev-parse --short HEAD)" == "$(git rev-parse --short origin)"
 
- for i in git openssl ruby; do
+for i in git openssl ruby rake; do
   which $i > /dev/null 2>&1
   [ $? -gt 0 ] && (echo "Command not found: $i, cannot continue" && exit 1)
 done
