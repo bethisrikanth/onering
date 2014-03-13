@@ -713,9 +713,16 @@ module Tensor
     end
 
     def self.all_mappings()
-      mappings(nil, {
+      @_mappings ||= mappings(nil, {
         :remote => true
       })
+
+      return @_mappings
+    end
+
+    def self.cache_mappings()
+      @_mappings = nil
+      return self.all_mappings()
     end
 
     # retrieve/declare explicit settings for this model

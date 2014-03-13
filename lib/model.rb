@@ -187,8 +187,17 @@ module App
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
                 x.split('|').collect{|j|
-                  mapping_path = (j.split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
+                # turn the current field into a path for extracting the ES type of the field
+                  mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
+
+                # attempt to get the type for this field
                   mapping_type = self.all_mappings[self.document_type].get(mapping_path)
+
+                # field had no type, attempt to refresh the mapping cache and try again
+                  if mapping_type.nil?
+                    STDERR.puts(":( #{mapping_path}")
+                    mapping_type = self.cache_mappings[self.document_type].get(mapping_path)
+                  end
 
                 # only add the multifield suffix for actual multi_fields
                   if mapping_type == 'multi_field'
