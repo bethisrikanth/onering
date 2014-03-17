@@ -195,7 +195,6 @@ module App
 
                 # field had no type, attempt to refresh the mapping cache and try again
                   if mapping_type.nil?
-                    STDERR.puts(":( #{mapping_path}")
                     mapping_type = self.cache_mappings[self.document_type].get(mapping_path)
                   end
 

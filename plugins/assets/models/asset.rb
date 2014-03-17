@@ -266,7 +266,7 @@ private
         #   {{ field_name }}
         #   {{ field_name:^regular.*expression[0-9]? }}  // optional regex capture
         #
-          dhm.set(p, v.gsub(/\{\{\s*(\w+)(?:\:(.*?))?\s*\}\}/){
+          dhm.set(p, v.gsub(/\{\{\s*([\w\.]+)(?:\:(.*?))?\s*\}\}/){
             x = self.properties.rget($1)
             x = (x.match(Regexp.new($2)).captures.first rescue nil) unless $2.to_s.empty?
             x
