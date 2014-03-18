@@ -122,6 +122,16 @@ module App
         rv.compact.to_json
       end
 
+      get '/boot/profile/show/:profile/?' do
+        rv = Config.get("provisioning.boot.profiles",[]).select{|i|
+          i.get('id') == params[:profile]
+        }    
+
+        return 404 if rv.nil? or rv.empty?
+
+        rv.first.to_json()
+      end
+
       get '/:id/boot/profile/list' do
         asset = Asset.find(params[:id])
         return 404 unless asset

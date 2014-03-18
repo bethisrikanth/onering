@@ -225,13 +225,7 @@ function NodeController($scope, $http, $location, $rootScope, $interval, $routeP
     editPhysical:      false,
     provision: {
       formHelp: {},
-      families: [{
-        label: 'CentOS 5.9',
-        value: 'centos-59'
-      },{
-        label: 'Ubuntu 12.04',
-        value: 'ubuntu-1204'
-      }],
+      families: null,
       diskStrategies: [{
         label: 'Mirrored',
         value: 'mirror'
@@ -275,6 +269,13 @@ function NodeController($scope, $http, $location, $rootScope, $interval, $routeP
 //  pane configuration
   $http.get('/api/devices/'+$routeParams.id+'/panes').success(function(data){
     $scope.panes = data;
+  });
+
+// ugly
+  $http.get('/api/provision/boot/profile/show/install').success(function(data){
+    if(angular.isObject(data) && angular.isArray(data.subprofiles)){
+      $scope.opt.provision.families = data.subprofiles;
+    }
   });
 
   $scope.hiddenPanes = function(pane){
