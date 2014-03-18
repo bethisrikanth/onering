@@ -15,33 +15,21 @@
 
 require 'set'
 require 'assets/models/asset'
-require 'assets/models/node_default'
 
 module Automation
   module Tasks
     module Assets
-      class UnsetField < Task
-        def self.perform(field, query=nil)
-          if query.nil?
-            nodes = Asset.ids()
-          else
-            nodes = Asset.ids(query)
-            abort("No nodes found for query #{query}") if nodes.empty?
-          end
+      class BulkUpdate < Task
+        def self.perform(query, operation, *args)
+          fail("UNTESTED")
 
-          field = field.split('.')
-          field[-1] = '@'+field[-1]
-          field = (['properties']+field).join('.')
+          assets = Asset.ids(query)
+          return nil if assets.empty?
 
-          nodes.each do |id|
-          # queue this node
-            # run_low('assets/update', {
-            #   'id' => id
-            # }.set(field, nil))
+          info("Performing bulk operation #{operation} on #{assets.length} assets")
 
-            info({
-              'id' => id
-            }.set(field, nil).inspect)
+          assets.each do |i|
+            run_low('assets/perform_operation', i, operation, *args)
           end
         end
       end

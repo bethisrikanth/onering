@@ -176,6 +176,26 @@ module App
         end
       end
 
+      %w{
+        /find/*/get/:field/?
+        /find/*/get/:field/:default/?
+      }.each do |r|
+        get r do
+          assets = Asset.urlquery(params[:splat].first)
+
+          output(assets.collect{|i|
+            [i.id, i.get(params[:field], params[:default])]
+          })
+        end
+      end
+
+      get '/find/*/set/:field/:value/?' do
+
+      end
+
+      get '/find/*/unset/:field/?' do
+
+      end
 
       # /devices/find
       # search for devices by fields
