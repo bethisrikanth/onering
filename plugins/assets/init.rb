@@ -128,32 +128,19 @@ module App
         end
 
         get '/pools/:pool/?' do
-          pool_addresses = RegisteredAddress.get_pool_addresses(params[:pool])
-          return 404 if pool_addresses.empty?
-
-          all_addresses = RegisteredAddress.get_pool_addresses(params[:pool], false)
-          reserved_addresses = (all_addresses - pool_addresses)
-          claimed_addresses = Hash[RegisteredAddress.urlquery("pool/#{params[:pool]}").collect{|i|
-            [i.value, i]
-          }]
+          addresses = RegisteredAddress.urlquery("pool/#{params[:pool]}")
+          return 404 if addresses.empty?
 
           output({
             :pool         => params[:pool],
             :title        => App::Config.get("assets.ipam.pools.#{params[:pool]}.title"),
             :description  => App::Config.get("assets.ipam.pools.#{params[:pool]}.description"),
+            :addresses    => addresses,
             :count        => {
-              :total      => all_addresses.length,
-              :claimed    => claimed_addresses.length,
-              :assignable => (pool_addresses.length - claimed_addresses.length),
-              :reserved   => reserved_addresses.length
-            },
-            :addresses => all_addresses.collect{|i|
-              {
-                :address  => i,
-                :claimed  => (claimed_addresses.include?(i) ? claimed_addresses[i].claimed : false),
-                :reserved => (reserved_addresses.include?(i)),
-                :details  => (claimed_addresses.include?(i) ? claimed_addresses[i] : nil)
-              }.compact()
+              :total      => addresses.length,
+              :claimed    => addresses.select{|i| i.claimed? }.length,
+              :reserved   => addresses.select{|i| i.reserved? }.length,
+              :assignable => addresses.select{|i| i.available? }.length,
             }
           })
         end

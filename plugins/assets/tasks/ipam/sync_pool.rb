@@ -27,7 +27,7 @@ module Automation
             config = App::Config.get("assets.ipam.pools.#{pool}")
             return nil if config.nil?
 
-            range_ips = RegisteredAddress.get_pool_addresses(pool)
+            range_ips = RegisteredAddress.get_pool_addresses(pool, false)
 
             if range_ips.empty?
               warn("Pool #{pool} returned no addresses, skipping...")

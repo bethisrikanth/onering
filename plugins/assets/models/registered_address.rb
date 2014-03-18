@@ -29,6 +29,7 @@ class RegisteredAddress < App::Model::Elasticsearch
   field :value,       :string,    :index => :not_analyzed
   field :asset_id,    :string,    :index => :not_analyzed
   field :claimed,     :boolean,   :default => false
+  field :reserved,    :boolean,   :default => false
   field :created_at,  :date,      :default => Time.now
   field :updated_at,  :date,      :default => Time.now
   field :claimed_at,  :date
@@ -51,6 +52,14 @@ class RegisteredAddress < App::Model::Elasticsearch
 
   def claimed?
     self.claimed
+  end
+
+  def reserved?
+    self.reserved
+  end
+
+  def available?
+    not (self.claimed or self.reserved)
   end
 
   def get_pool_addresses()

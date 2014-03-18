@@ -32,6 +32,8 @@ module Automation
             claim_fields = App::Config.get('assets.ipam.claim_fields', ['ip'])
             debug("Fields that contain IP addresses that an asset exclusively owns: #{claim_fields.join(',')}")
 
+            reserved_ips = (RegisteredAddress.get_pool_addresses(pool, false) - RegisteredAddress.get_pool_addresses(pool))
+
           # attempt to find an asset that owns this IP address
             asset = Asset.urlquery("#{claim_fields.join('|')}/is:#{ip}").first
 
@@ -42,6 +44,10 @@ module Automation
 
           # set the address pool
             address.pool = pool
+
+          # if the address appears within a reserved range, say so
+            address.reserved = (reserved_ips.include?(ip))
+            debug("IP #{ip} is within a reserved range") if address.reserved
 
           # IP does not belong to an asset, perform low level tests to see if it is available
             if asset.nil?
