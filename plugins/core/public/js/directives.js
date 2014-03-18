@@ -22,7 +22,7 @@ directive('focusWhen', function() {
 directive('ngModelOnenter', function() {
   return {
     restrict: 'A',
-    require: 'ngModel',
+    require: '^ngModel',
     link: function(scope, element, attr, ngModel) {
       if (attr.type === 'radio' || attr.type === 'checkbox') return;
 

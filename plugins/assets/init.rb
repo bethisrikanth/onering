@@ -15,6 +15,7 @@
 
 require 'set'
 require 'controller'
+require 'ipaddr'
 require 'assets/lib/helpers'
 require 'assets/models/asset'
 require 'assets/models/node_default'
@@ -135,7 +136,14 @@ module App
             :pool         => params[:pool],
             :title        => App::Config.get("assets.ipam.pools.#{params[:pool]}.title"),
             :description  => App::Config.get("assets.ipam.pools.#{params[:pool]}.description"),
-            :addresses    => addresses,
+            :addresses    => addresses.collect{|i|
+              i = i.to_hash()
+              i.delete('id')
+              i.delete('type')
+              i
+            }.sort{|a,b|
+              IPAddr.new(a.get(:value)) <=> IPAddr.new(b.get(:value))
+            },
             :count        => {
               :total      => addresses.length,
               :claimed    => addresses.select{|i| i.claimed? }.length,
@@ -145,7 +153,7 @@ module App
           })
         end
 
-        get '/address/:pool/?' do
+        get '/address/claim/:pool/?' do
           address = RegisteredAddress.next_unclaimed_address(params[:pool], params[:asset], {
             :retries   => params[:retries],
             :selection => params[:selection]
@@ -153,6 +161,18 @@ module App
 
           halt 404 if address.nil?
           output(address.to_hash)
+        end
+
+        get '/address/release/:ip' do
+          address = RegisteredAddress.urlquery("str:value/is:#{params[:ip]}")
+          return 404 if address.empty?
+          address = address.first
+          address.release()
+          address.save({
+            :replication => :sync
+          })
+
+          return 204
         end
       end
 

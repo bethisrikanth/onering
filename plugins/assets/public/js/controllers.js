@@ -632,7 +632,7 @@ function IpamManagerController($scope, $interval, $http, $sce, $compile){
 
   $scope.block_width  = 12;
   $scope.block_height = 12;
-  $scope.grid_width   = 64;
+  $scope.grid_width   = 56;
 
   $scope.showAddress = function(address){
     $scope.selected_address = address;

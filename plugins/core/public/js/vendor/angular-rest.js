@@ -178,7 +178,49 @@ angular.module('rest', ['ui.bootstrap'])
         if($scope.$eval($attrs.restDisable) != true){
           $element.run($attrs);
         }else{
-          console.error('Not callling REST endpoint '+$attrs.rest+', element is disabled')
+          console.error('Not calling REST endpoint '+$attrs.rest+', element is disabled')
+        }
+      });
+    }
+  }
+})
+.directive('restModel', function($interpolate, $http) {
+  return {
+    restrict: 'A',
+    link:     function($scope, $element, $attrs){
+      var fallback = $attrs.restDefault;
+
+      if(angular.isDefined($attrs.restDefault)){
+        fallback = $interpolate(fallback)($scope);
+        $element.text(fallback);
+      }else{
+        $element.text('');
+      }
+      
+      $scope.$watch('restModel', function(){
+        var params = {};
+
+        angular.forEach($attrs, function(val, key){
+          if(key.match(/^restParam/)){
+            params[key.replace(/^restParam/,'').toLowerCase()] = val;
+          }
+        });
+
+        if(angular.isString($attrs.restModel)){
+          $http({
+            method: ($attrs.restMethod ? $attrs.restMethod.toUpperCase() : 'GET'),
+            url:    $interpolate($attrs.restModel)($scope),
+            params: params
+          }).success(function(data){
+            if(data.length == 0){
+              data = fallback;
+            }
+            
+            $element.text(data);
+
+          }).error(function(data){
+            $element.text(fallback);
+          });
         }
       });
     }
