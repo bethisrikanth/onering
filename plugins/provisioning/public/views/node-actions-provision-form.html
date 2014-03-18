@@ -4,39 +4,53 @@
       <th>Hostname</th>
       <td>
         <input required type="text" class="input-medium" ng-model="node.properties.provisioning.hostname" ui-validate="validateDotless(node.properties.provisioning.hostname)">
-        <span class="help-inline">{{ opt.provision.formHelp.hostname }}</span>
+      </td>
+      <td style="min-width: 72px">
+        &nbsp;
       </td>
     </div>
 
     <tr>
       <th>IP Address</th>
       <td>
-        <input required type="text" class="input-medium" ng-model="node.properties.provisioning.network.ip" ui-validate="validateIpAddress($value)">
-        <span class="help-inline">{{ opt.provision.formHelp.network_ip }}</span>
+        <input required type="text" class="input-medium" ng-model="node.properties.provisioning.network.ip" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.ip">
+      </td>
+      <td>
+        <input name="_overrideEditIP" type="checkbox" ng-model="opt.provision.formEdit.ip" class="pull-left margin-right-1">
+        <label for="_overrideEditIP">Override?</label>
       </td>
     </tr>
 
     <tr>
       <th>Netmask</th>
       <td>
-        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.netmask" ui-validate="validateIpAddress($value)">
-        <span class="help-inline">{{ opt.provision.formHelp.network_netmask }}</span>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.netmask" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.netmask">
+      </td>
+      <td>
+        <input name="_overrideEditNetmask" type="checkbox" ng-model="opt.provision.formEdit.netmask" class="pull-left margin-right-1">
+        <label for="_overrideEditNetmask">Override?</label>
       </td>
     </tr>
 
     <tr>
       <th>Gateway</th>
       <td>
-        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.gateway" ui-validate="validateIpAddress($value)">
-        <span class="help-inline">{{ opt.provision.formHelp.network_gateway }}</span>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.gateway" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.gateway">
+      </td>
+      <td>
+        <input name="_overrideEditGateway" type="checkbox" ng-model="opt.provision.formEdit.gateway" class="pull-left margin-right-1">
+        <label for="_overrideEditGateway">Override?</label>
       </td>
     </tr>
 
     <tr>
       <th>DNS</th>
       <td>
-        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.dns" ui-validate="validateIpAddress($value)">
-        <span class="help-inline">{{ opt.provision.formHelp.network_dns }}</span>
+        <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.dns" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.dns">
+      </td>
+      <td>
+        <input name="_overrideEditDNS" type="checkbox" ng-model="opt.provision.formEdit.dns" class="pull-left margin-right-1">
+        <label for="_overrideEditDNS">Override?</label>
       </td>
     </tr>
 
@@ -49,6 +63,7 @@
           ng-options="v.id as v.name for v in opt.provision.families">
         </select>
       </td>
+      <td>&nbsp;</td>
     </tr>
 
     <tr>
@@ -60,6 +75,7 @@
           ng-options="v.value as v.label for v in opt.provision.diskStrategies">
         </select>
       </td>
+      <td>&nbsp;</td>
     </tr>
   </tbody>
 </table>

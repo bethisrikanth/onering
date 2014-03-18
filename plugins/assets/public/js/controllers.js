@@ -224,6 +224,7 @@ function NodeController($scope, $http, $location, $rootScope, $interval, $routeP
     editProvisioning:  false,
     editPhysical:      false,
     provision: {
+      formEdit: {},
       formHelp: {},
       families: null,
       diskStrategies: [{
