@@ -75,11 +75,11 @@ namespace :server do
 end
 
 namespace :worker do
+  require 'resque/tasks'
 
   desc "Starts a Resque backend job worker"
   task :start, :queues do |t, args|
     require './lib/app'
-    require 'resque/tasks'
 
     if ENV['QUEUE'].nil?
       ENV['QUEUE']    = (args[:queues] || ['critical', 'high', 'normal', 'low'].join(','))
@@ -256,7 +256,7 @@ namespace :db do
   desc "Change the data index the given alias points to"
   task :ln, :from, :to do |t, args|
     require './lib/app'
-    
+
     if args[:from] and args[:to]
       puts "Linking #{args[:to]} -> #{args[:from]}..."
       Tensor::Model.alias_index({

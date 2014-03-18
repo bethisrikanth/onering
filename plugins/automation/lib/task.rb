@@ -106,6 +106,10 @@ module Automation
         App::Metrics.increment("worker.tasks.all.started")
       end
 
+      def self.before_perform_aab_sync_config(*args)
+        Configuration.sync_remote_with_local()
+      end
+
       def self.after_perform_aaa_log_metrics(*args)
         @_end = Time.now
         time = (@_end - @_start)
