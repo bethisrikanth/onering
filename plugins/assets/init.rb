@@ -123,7 +123,7 @@ module App
             {
               :name         => i,
               :title        => App::Config.get("assets.ipam.pools.#{i}.title"),
-              :description  => App::Config.get("assets.ipam.pools.#{i}.description"),              
+              :description  => App::Config.get("assets.ipam.pools.#{i}.description"),
             }
           })
         end

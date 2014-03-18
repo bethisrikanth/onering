@@ -196,7 +196,7 @@ angular.module('rest', ['ui.bootstrap'])
       }else{
         $element.text('');
       }
-      
+
       $scope.$watch('restModel', function(){
         var params = {};
 
@@ -215,7 +215,7 @@ angular.module('rest', ['ui.bootstrap'])
             if(data.length == 0){
               data = fallback;
             }
-            
+
             $element.text(data);
 
           }).error(function(data){

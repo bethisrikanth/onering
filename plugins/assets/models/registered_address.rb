@@ -19,7 +19,10 @@ require 'model'
 require 'assets/models/asset'
 require 'net/ping'
 
+class AddressPoolFullError < Exception; end
+
 class RegisteredAddress < App::Model::Elasticsearch
+
   DEFAULT_MAX_ADDRESS_RETRIES = 5
 
   index_name "registered_addresses"
@@ -34,6 +37,7 @@ class RegisteredAddress < App::Model::Elasticsearch
   field :updated_at,  :date,      :default => Time.now
   field :claimed_at,  :date
   field :released_at, :date
+  field :comments,    :string
 
   def claim(asset=nil)
     self.claimed = true
@@ -94,7 +98,7 @@ class RegisteredAddress < App::Model::Elasticsearch
       # verify we can't resolve this IP in DNS
         begin
           Resolv.getname(ip)
-          
+
         rescue Resolv::ResolvError
           return true
         end
@@ -108,7 +112,7 @@ class RegisteredAddress < App::Model::Elasticsearch
       address = nil
 
       catch(:retry) do
-        raise "Could not find a free address after #{tries} attempts" if tries >= options.get(:retries, DEFAULT_MAX_ADDRESS_RETRIES)
+        raise AddressPoolFullError.new("Could not find a free address after #{tries} attempts") if tries >= options.get(:retries, DEFAULT_MAX_ADDRESS_RETRIES)
 
         all_pool_addresses = get_pool_addresses(pool)
         return nil if all_pool_addresses.empty?
