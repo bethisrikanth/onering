@@ -21,7 +21,7 @@ module Automation
   module Tasks
     module Nagios
       class Sync < Task
-        def self.perform(alerts)
+        def self.perform(alerts, *args)
           fail("Alert data is required to run this task") if alerts.nil?
           fail("Malformed alert data: expected Hash, got #{alerts.class.name}") unless alerts.is_a?(Hash)
 
@@ -71,8 +71,8 @@ module Automation
             end
           end
 
-        # cleanup slate alerts
-          cleanup = (alerting_ids - new_alerts.to_a)
+        # cleanup stale alerts
+          cleanup = (alerting_ids - new_alerts.to_a).uniq()
 
           log("Marking #{cleanup.length} nodes as healthy")
 

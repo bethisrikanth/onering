@@ -1,4 +1,4 @@
-function NagiosAlertListController($scope, $http, $route, $window, $routeParams, NagiosAlerts){
+function NagiosAlertListController($scope, $http, $route, $window, $routeParams){
   $scope.query = $routeParams.query;
   $scope.params = $route.current.$route.params;
   $scope.sortField = 'last_alert_at'
@@ -6,7 +6,7 @@ function NagiosAlertListController($scope, $http, $route, $window, $routeParams,
   $scope.load_age = 0;
 
   $scope.reload = function(){
-    NagiosAlerts.query({}, function(data){
+    $http.get('/api/nagios/alerts').success(function(data){
       $scope.results = data;
       $scope.load_age = 0;
     });
@@ -23,13 +23,13 @@ function NagiosAlertListController($scope, $http, $route, $window, $routeParams,
 }
 
 
-function WidgetNagios($scope, $http, $window, NagiosAlerts){
+function WidgetNagios($scope, $http, $window){
   $scope.sortField = 'last_alert_at';
   $scope.sortReverse = true;
   $scope.resultsLimit = 4;
 
   $scope.reload = function(){
-    NagiosAlerts.query({}, function(data){
+    $http.get('/api/nagios/alerts').success(function(data){
       $scope.results = data.sort(function(a,b){
         return ((a.last_alert_at < a.last_alert_at) ? -1 : ((a.last_alert_at > b.last_alert_at) ? 1 : 0));
       }).splice(0, $scope.resultsLimit);

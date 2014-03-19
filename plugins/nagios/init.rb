@@ -23,7 +23,7 @@ module App
     namespace '/api/nagios' do
       post '/sync' do
         data = (MultiJson.load(request.env['rack.input'].read) rescue nil)
-        return 400 unless json
+        return 400 unless data
 
         queued = Automation::Tasks::Task.run('nagios/sync', data)
         return 500 unless queued
@@ -31,42 +31,37 @@ module App
       end
 
       get '/alerts' do
-        nagios_hosts = NagiosHost.search({
-          'alerts.current_state' => {
-            '$regex' => '^(warning|critical)$'
-          }
-        }).to_a
-
+        nagios_hosts = NagiosHost.urlquery("alerts.current_state/warning|critical")
         return 404 if nagios_hosts.empty?
 
         rv = []
 
-        devices = Asset.find(nagios_hosts.collect{|i| i['_id'] })
+        assets = Asset.find(nagios_hosts.collect{|i| i.id })
 
         nagios_hosts.each do |nagios|
-          device_i = devices.find_index{|i| i['_id'] == nagios['_id'] }
+          asset_index = devices.find_index{|i| i.id == nagios.id }
 
-          if device_i
-            nagios['alerts'].each do |alert|
+          if asset_index
+            nagios.alerts.each do |alert|
               alert['device'] = {
-                'id'           => devices[device_i]['_id'],
-                'name'         => devices[device_i]['name'],
-                'aliases'      => devices[device_i]['aliases'],
-                'tags'         => devices[device_i]['tags'],
-                'status'       => devices[device_i]['status'],
-                'collected_at' => devices[device_i]['collected_at']
+                'id'           => assets[asset_index].id,
+                'name'         => assets[asset_index].name,
+                'aliases'      => assets[asset_index].aliases,
+                'tags'         => assets[asset_index].tags,
+                'status'       => assets[asset_index].status,
+                'collected_at' => assets[asset_index].collected_at
               }
 
               alert['device']['properties'] = {
-                'notes' => devices[device_i]['properties']['notes']
-              } if devices[device_i] and devices[device_i]['properties']
+                'notes' => assets[asset_index]['properties']['notes']
+              } if assets[asset_index] and assets[asset_index]['properties']
 
               rv << alert
             end
           end
         end
 
-        rv.to_json
+        output(rv.to_json())
       end
 
       get '/:id' do
@@ -80,7 +75,7 @@ module App
             type = (alert['type'] == 'service' ? 2 : 1)
             ext  = (alert['type'] == 'service' ? '&service='+URI::encode(alert['name']) : '')
 
-            rv['alerts'][i]['url'] = "#{Config.get('nagios.url')}/nagios/cgi-bin/extinfo.cgi?type=#{type}&host=#{name}#{ext}"
+            rv['alerts'][i]['url'] = "#{App::Config.get('nagios.url')}/nagios/cgi-bin/extinfo.cgi?type=#{type}&host=#{name}#{ext}"
           end
         end
 
