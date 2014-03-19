@@ -125,7 +125,7 @@ module App
       get '/boot/profile/show/:profile/?' do
         rv = Config.get("provisioning.boot.profiles",[]).select{|i|
           i.get('id') == params[:profile]
-        }    
+        }
 
         return 404 if rv.nil? or rv.empty?
 
@@ -176,17 +176,7 @@ module App
             iface = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').first.strip.chomp rescue 'eth0')
             mac = (request.env['HTTP_X_RHN_PROVISIONING_MAC_0'].split(' ').last rescue param[:mac]).strip.chomp
 
-            asset = Asset.first({
-              '$and' => [
-                {'properties.network.interfaces.name' => iface},
-                {'properties.network.interfaces.mac'  =>
-                  {
-                    '$regex'   => "^#{mac}$",
-                    '$options' => 'i'
-                  }
-                }
-              ]
-            }) if mac
+            asset = Asset.urlquery("properties.network.interfaces.name/#{iface}/properties.network.interfaces.mac/#{mac}").first if mac
           end
 
           return 404 unless asset
@@ -200,10 +190,14 @@ module App
           raise "Property 'provisioning.boot.subprofile' is required" unless script_type.is_a?(String)
           script_type.gsub!(/[\-]/,'/')
 
-          liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
-            :device => (asset.to_hash() rescue {}),
-            :config => Config.get('provisioning.boot')
-          }
+          begin
+            liquid "provisioning/#{script_type.downcase}/#{params[:script] || 'base'}".to_sym, :locals => {
+              :device => (asset.to_hash() rescue {}),
+              :config => App::Config.get('provisioning.boot')
+            }
+          rescue Errno::ENOENT
+            return 404
+          end
         end
       end
 
