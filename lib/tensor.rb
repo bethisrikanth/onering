@@ -24,6 +24,8 @@ rescue LoadError
 end
 
 module Tensor
+  class NonUniqueValueError < Exception; end
+
   class NullLogger
     def method_missing(meth, *args, &block)
       return false

@@ -133,10 +133,11 @@ class Asset < App::Model::Elasticsearch
   end
 
   #before_save                   :_ensure_id
-  before_save                   :_compact
+  #before_save                   :_compact
   before_save                   :_confine_status
   before_save                   :_apply_defaults
   before_save                   :_resolve_references
+  before_save                   :_ensure_uniqueness
   #before_save                   :_print_hash
 
 
@@ -189,17 +190,6 @@ private
     end
   end
 
-  def _ensure_id()
-    if self.id.nil?
-      begin
-        require 'securerandom'
-        self.id = SecureRandom.hex(12)
-      rescue LoadError
-        self.id = Array.new(24){rand(16).to_s(16)}.join
-      end
-    end
-  end
-
   def _confine_status()
   # validate that this is a valid status
     if not Asset.states().include?(self.status)
@@ -209,10 +199,10 @@ private
   end
 
   def _apply_defaults()
+    top_level_fields = (Asset.fields.keys.map(&:to_s) - [Asset.field_prefix])
     device = self.to_hash()
     except = %w{
       id
-      name
       updated_at
       created_at
       collected_at
@@ -227,10 +217,10 @@ private
 
     # prefix non-top-level keys with field_prefix
       apply = Hash[apply.select{|k,v|
-        App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+        top_level_fields.include?(k)
       }].merge({
         Asset.field_prefix() => Hash[apply.reject{|k,v|
-          App::Helpers::TOP_LEVEL_FIELDS.include?(k)
+          top_level_fields.include?(k)
         }]
       })
 
@@ -277,6 +267,30 @@ private
 
     self
   end
+
+
+  def _ensure_uniqueness()
+    App::Config.get('database.options.unique.asset', []).each do |field_name|
+      if not self.get(field_name).nil?
+      # find all assets with a field value equal to our own
+        results = Asset.search({
+          :query => {
+            :match_phrase => {
+              field_name => self.get(field_name)
+            }
+          }
+        })
+
+      # if the list of IDs in the results (less our own) is not empty, then someone else is already using this value. throw an error (yeah, it's that bad)
+        if not (dup_ids = results.collect{|i| i.id }.compact.sort - [self.id]).empty?
+          raise Tensor::NonUniqueValueError.new("Cannot save asset #{self.id}: The #{self.get(field_name)} is not a unique value for field #{field_name}. Value is shared with asset #{dup_ids.join(', ')}")
+        end
+      end
+    end
+
+    return true
+  end
+
 
   def _print_hash()
     pp self.to_hash().reject{|k,v|
