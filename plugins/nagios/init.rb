@@ -53,8 +53,8 @@ module App
               }
 
               alert['device']['properties'] = {
-                'notes' => assets[asset_index]['properties']['notes']
-              } if assets[asset_index] and assets[asset_index]['properties']
+                'notes' => assets[asset_index].get('notes')
+              } if assets[asset_index]
 
               rv << alert
             end
