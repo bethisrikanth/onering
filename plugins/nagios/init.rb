@@ -39,7 +39,7 @@ module App
         assets = Asset.find(nagios_hosts.collect{|i| i.id })
 
         nagios_hosts.each do |nagios|
-          asset_index = devices.find_index{|i| i.id == nagios.id }
+          asset_index = assets.find_index{|i| i.id == nagios.id }
 
           if asset_index
             nagios.alerts.each do |alert|
