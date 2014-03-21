@@ -42,8 +42,10 @@ module Automation
 
             # if this host has alerts
               unless states['alerts'].empty?
-                node = Asset.urlquery("name:aliases:dns.name/#{host}").first
+                node = Asset.urlquery("name|aliases|dns.name/#{host}").first
                 next unless node
+
+                debug("Found node #{node.id} for Nagios host #{host}")
 
                 nagios_host = NagiosHost.find(node.id)
                 nagios_host = NagiosHost.new({
@@ -51,9 +53,9 @@ module Automation
                 }) unless nagios_host
 
                 begin
-                  nagios_host.from_hash(states, false).save()
+                  nagios_host.update(states).save()
                 rescue Exception => e
-                  error("Failed to save check data for host #{node.id}")
+                  error("Failed to save check data for host #{node.id}: #{e.class.name} - #{e.message}")
                   next
                 end
 
