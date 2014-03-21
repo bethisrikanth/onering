@@ -274,7 +274,8 @@ private
       if not self.get(field_name).nil?
       # find all assets with a field value equal to our own
         results = Asset.search({
-          :query => {
+          :fields => ['_id', field_name],
+          :query  => {
             :match_phrase => {
               field_name => self.get(field_name)
             }
