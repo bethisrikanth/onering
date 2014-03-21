@@ -82,6 +82,9 @@ end
 
 class String
   SI_UNITS=%w{b k m g t p e z y}
+  DATE_DETECT_REGEX = [
+    /^(?:(?<year>[1-9][0-9]{3})-(?<month>[0-1][0-9])-(?<day>[0-3][0-9]))?(?:[T\ ]?(?<hour>[0-2][0-9]):(?<minute>[0-5][0-9])(?::(?<second>[0-6][0-9]))?(?:\.(?<millisecond>[0-9]{1,3}))?(?:[Z\ ]?(?<tznum>[\-\+][0-1][0-9]:?[0-9]{2})|(?<tzstr>[\-\ ][A-Z]{3}))?)?$/
+  ]
 
   def underscore()
     self.gsub(/::/, '/').
@@ -233,12 +236,13 @@ class String
       return nil
     end
 
-  # dates :-(
-  #   ruby will readily just parse ANYTHING that contains numbers, so:
-  #   strings must be at least 75% numeric to be parsed as a date
-    if ((self.gsub(/\D+/,'').length.to_f / self.length.to_f) > 0.75)
-      rv = (Time.parse(self) rescue nil)
-      return rv unless rv.nil?
+  # dates
+  # use an aggressive battery of regular expressions to validate date formats
+    DATE_DETECT_REGEX.each do |rx|
+      if self =~ rx
+        rv = (Time.parse(self) rescue nil)
+        return rv unless rv.nil?
+      end
     end
 
     return self

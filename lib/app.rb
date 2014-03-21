@@ -20,18 +20,17 @@ $: << File.join(ENV['PROJECT_ROOT'], 'plugins')
 require 'rubygems'
 require 'oj'
 require 'onering'
+require 'patches'
 
 Onering::Logger.setup({
   :destination => 'STDERR',
-  :threshold   => (ENV['LOGLEVEL'] || 'INFO').downcase.to_sym
+  :threshold   => (ENV['DEBUG'].to_bool() == true ? :debug : (ENV['ONERING_LOGLEVEL'] || 'INFO').downcase.to_sym())
 })
 
 
 require './lib/config'
 App::Config.load(ENV['PROJECT_ROOT'])
 
-
-require 'patches'
 require 'metrics'
 require 'utils'
 require 'model'

@@ -62,6 +62,10 @@ module Tensor
           options = default_options()
         end
 
+        if (ENV['DEBUG'].to_bool() == true)
+          options[:log] = true
+        end
+
         @_connections ||= {}
 
       # initiate connection if new or being forced
