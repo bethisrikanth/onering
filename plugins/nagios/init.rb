@@ -61,7 +61,7 @@ module App
           end
         end
 
-        output(rv.to_json())
+        output(rv)
       end
 
       get '/:id' do
