@@ -4,7 +4,7 @@
   <div class="row">
     <div class="span12">
       <span class="pull-right">
-        <button class="btn" ng-click="add()"><i class="icon-plus"></i>&nbsp;Add Rule</button>
+        <button class="btn" ng-click="go('/assets/rule')"><i class="icon-plus"></i>&nbsp;Add Rule</button>
         <button class="btn btn-success" rest="/api/devices/defaults/sync"><i class="icon-refresh"></i>&nbsp;Sync All</button>
       </span>
     </div>
@@ -14,7 +14,7 @@
     <div class="span12" ng-hide="node_defaults | isEmpty">
       <tabset>
         <tab ng-repeat="(group, defaults) in node_defaults" heading="{{ group | titleize }}" active="opt.tab_active[group]" select="setActiveTab(group)">
-          <button class="btn" ng-click="add(group)"><i class="icon-plus"></i>&nbsp;Add Rule</button>
+          <button class="btn" ng-click="go('/assets/rule/group/'+group)"><i class="icon-plus"></i>&nbsp;Add Rule</button>
           <br />
           <br />
 

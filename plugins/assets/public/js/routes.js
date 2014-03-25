@@ -53,6 +53,14 @@ config(['$routeProvider', function($routeProvider){
     templateUrl: 'views/asset-manager.html',
     controller:  AssetManagerController
   }).
+  when('/assets/rule', {
+    templateUrl: 'views/asset-rule-editor.html',
+    controller:  AssetRuleEditorController
+  }).
+  when('/assets/rule/group/:group', {
+    templateUrl: 'views/asset-rule-editor.html',
+    controller:  AssetRuleEditorController
+  }).
   when('/assets/rule/:id', {
     templateUrl: 'views/asset-rule-editor.html',
     controller:  AssetRuleEditorController

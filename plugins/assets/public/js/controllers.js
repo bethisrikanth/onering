@@ -649,9 +649,18 @@ function AssetRuleEditorController($scope, $routeParams, $http){
       $scope.autocomplete = data;
     });
 
-    $http.get('/api/devices/defaults/'+$scope.id).success(function(data){
-      $scope.rule = data;
-    });
+    if(angular.isDefined($scope.id)){
+      $http.get('/api/devices/defaults/'+$scope.id).success(function(data){
+        $scope.rule = data;
+      });
+    }else{
+      $scope.rule = {
+        name:   null,
+        group:  $routeParams.group,
+        match:  [],
+        apply:  {}
+      }
+    }
   }
 
   $scope.setApplyProperty = function(key, value){
