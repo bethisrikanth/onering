@@ -546,10 +546,6 @@ function AssetDefaultsController($scope, $http, $timeout){
 
       $scope.current = null;
     });
-
-    $http.get('/api/devices/schema/fields').success(function(data){
-      $scope.autocomplete = data;
-    });
   }
 
   $scope.addNewProperty = function(key){
@@ -638,4 +634,37 @@ function IpamManagerController($scope, $interval, $http, $sce, $compile){
   $scope.showAddress = function(address){
     $scope.selected_address = address;
   }
+}
+
+
+function AssetRuleEditorController($scope, $routeParams, $http){
+  $scope.reload = function(){
+    $scope.id = $routeParams.id;
+
+    $http.get('/api/devices/defaults/groups').success(function(data){
+      $scope.node_groups = data;
+    });
+
+    $http.get('/api/devices/schema/fields').success(function(data){
+      $scope.autocomplete = data;
+    });
+
+    $http.get('/api/devices/defaults/'+$scope.id).success(function(data){
+      $scope.rule = data;
+    });
+  }
+
+  $scope.setApplyProperty = function(key, value){
+    if(key == null){
+      delete $scope.rule.apply[key];
+    }else{
+      $scope.rule.apply[key] = value;
+    }
+
+    $scope.newApplyKey = null;
+    $scope.newApplyValue = null;
+    $scope.addNewKey = false;
+  }  
+
+  $scope.reload();  
 }

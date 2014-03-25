@@ -52,5 +52,9 @@ config(['$routeProvider', function($routeProvider){
   when('/assets/manage', {
     templateUrl: 'views/asset-manager.html',
     controller:  AssetManagerController
-  });
+  }).
+  when('/assets/rule/:id', {
+    templateUrl: 'views/asset-rule-editor.html',
+    controller:  AssetRuleEditorController
+  });  
 }]);

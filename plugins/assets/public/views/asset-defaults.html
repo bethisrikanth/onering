@@ -1,4 +1,4 @@
-<h3>Default Properties</h3>
+<h3>Asset Rules</h3>
 
 <div class="container" ng-controller="AssetDefaultsController">
   <div class="row">
@@ -32,16 +32,16 @@
 
             <tbody>
               <tr ng-repeat="default in defaults | orderBy:sortField:sortReverse">
-                <td ng-click="edit(default)">
+                <td ng-click="go('/assets/rule/'+default.id)">
                   {{ default.name }}
                 </td>
 
-                <td ng-click="edit(default)">
+                <td ng-click="go('/assets/rule/'+default.id)">
                   <span ng-repeat="rule in default.match | orderBy:['field','value']">
                     <b>{{ rule.field }}</b> {{ rule.test || '=' }} {{ rule.value }}<br />
                   </span>
                 </td>
-                <td ng-click="edit(default)">
+                <td ng-click="go('/assets/rule/'+default.id)">
                   <span ng-repeat="(key,value) in default.apply">
                     <b>{{ key }}</b> = {{ value }}<br />
                   </span>

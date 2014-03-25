@@ -1,0 +1,147 @@
+
+<div class="container" ng-controller="AssetRuleEditorController">
+  <div class="row">
+    <div class="span12" ng-show="rule">
+      <h3>Asset Rule Editor</h3>
+      <form>
+        <fieldset>
+          <input type="text" class="input-small" placeholder="Group" typeahead="g for g in node_groups" ng-model="rule.group">
+          <input type="text" class="input-large" placeholder="Rule name" ng-model="rule.name">
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            <span>Search Criteria</span>
+            <a class="pull-right" ng-click="rule.match.push({})"><i class="icon-plus"> </i></a>
+          </legend>
+
+          <span class="help-block">
+            Only assets whose properties match these criteria will have this rule applied to them.
+            <br />
+            <br />
+          </span>
+
+          <table ng-show="rule.match.length > 0">
+            <thead>
+              <tr>
+                <th>
+                  <abbr title="Specify a specific data type to interpret values as.">Type</abbr>
+                </th>
+                <th>Field Name</th>
+                <th> </th>
+                <th>Value</th>
+                <th> </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="match in rule.match">
+                <td>
+                  <select ng-model="match.type" class="input-small">
+                    <option value="">(auto)</option>
+                    <option value="bits">bits</option>
+                    <option value="bytes">bytes</option>
+                    <option value="bool">boolean</option>
+                    <option value="date">date</option>
+                    <option value="epoch">epoch</option>
+                    <option value="float">decimal</option>
+                    <option value="int">integer</option>
+                    <option value="str">string</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input type="text" class="input-large" placeholder="field" ng-model="match.field" typeahead="f as f for f in autocomplete | filter:$viewValue | limitTo:25">
+                </td>
+
+                <td>
+                  <select ng-model="match.test" class="input-small">
+                    <option value="">=</option>
+                    <option value="not">&ne;</option>
+                    <option value="gt">&gt;</option>
+                    <option value="lt">&lt;</option>
+                    <option value="gte">&ge;</option>
+                    <option value="lte">&le;</option>
+                    <option value="before">before</option>
+                    <option value="since">since</option>
+                    <option value="matches">matches</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input type="text" class="input-medium" placeholder="value" ng-model="match.value">
+                </td>
+
+                <td>
+                  <a ng-click="rule.match.splice($index,1)"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Apply Properties
+            <a class="pull-right" ng-click="newApplyKey='(new)'; newApplyValue=null; addNewKey=true"><i class="icon-plus"> </i></a>
+          </legend>
+
+          <span class="help-block">
+            Represents the object that will be merged with all matching assets whenever the asset is updated.
+            <br />
+            <br />
+          </span>
+
+          <table>
+            <tbody>
+              <tr ng-repeat="(key, value) in rule.apply | compact">
+                <td>
+                  <label class="input-medium">{{ key }}</label>
+                </td>
+
+                <td>
+                  <input type="text" class="input-medium" placeholder="value" ng-model="rule.apply[key]">
+                </td>
+
+                <td>
+                  <a ng-click="rule.apply[key]=null"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+
+              <tr ng-show="addNewKey">
+                <td>
+                  <input type="text" class="input-medium" placeholder="key.name" ng-model="newApplyKey" typeahead="f as f for f in autocomplete | filter:$viewValue | limitTo:25">
+                </td>
+
+                <td>
+                  <input type="text" class="input-medium" placeholder="(value)" ng-model="newApplyValue" ui-keypress="{'enter': 'setApplyProperty(newApplyKey, newApplyValue)'}">
+                </td>
+                <td>
+                  <a ng-click="setApplyProperty(newApplyKey, newApplyValue)"><i class="icon-ok"> </i></a>
+                  <a ng-click="newApplyKey=null;newApplyValue=null"><i class="icon-remove"> </i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12 margin-top-3">
+      <a class="btn btn-danger" data-dismiss="modal" ng-click="go('/assets/manage')">Cancel</a>
+
+      <span class="pull-right">
+        <button
+          type="button"
+          class="btn btn-primary"
+          rest="/api/devices/defaults"
+          rest-method="post"
+          rest-data="rule"
+          rest-success="toast('success', 'Rule Saved', 'Successfully saved rule \''+rule.name+'\''); reload()"
+        >Save</button>
+      </span>
+    </div>
+  </div>
+</div>
