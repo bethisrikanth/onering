@@ -40,10 +40,14 @@ module Automation
 
                 if current.nil?
                   begin
+                  # attempt to find an existing address
+                    address = RegisteredAddress.urlquery("bool:reserved/false/str:asset_id/#{asset.id}").first
+
+                  # get a new IP if none already exists
                     address = RegisteredAddress.next_unclaimed_address(asset.get('ipam.pool'), asset.id, {
                       :selection => config.get(:strategy),
                       :retries   => config.get(:retries)
-                    })
+                    }) if address.nil?
                   rescue AddressPoolFullError => e
                     warn(e.message)
                     fail("Could not auto-assign address for asset #{asset.id} in pool #{asset.get('ipam.pool')}: Pool has no available addresses remaining")

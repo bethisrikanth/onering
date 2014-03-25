@@ -563,7 +563,7 @@ module App
         device = Asset.find(params[:id])
         return 404 if not device
 
-        device.properties.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
+        device.set(params[:key], params[:value].convert_to(params[:coerce] || :auto))
 
         device.save({},{
           :replication => :sync
@@ -576,7 +576,7 @@ module App
         device = Asset.find(params[:id])
         return 404 if not device
 
-        device.properties.delete(params[:key])
+        device.unset(params[:key])
 
         device.save({},{
           :replication => :sync
@@ -591,7 +591,7 @@ module App
         return 404 if not device
         rv = []
         params[:splat].first.split('/').each do |key|
-          rv << device.properties.get(key)
+          rv << device.get(key)
         end
 
         if rv.length == 1
