@@ -54,14 +54,28 @@ end
 
 desc "Start an IRB shell with the Onering environment loaded"
 task :shell do
-  exec("bundle exec racksh")
+  require_relative 'lib/app'
+  require 'racksh/init'
+  
+  begin
+    require 'pry'
+    Interpreter = Pry
+  rescue LoadError
+    require 'irb'  
+    require 'irb/completion'
+    Interpreter = IRB
+  end
+
+  Onering::Logger.info("Onering Interactive Shell Environment")
+  Rack::Shell.init()
+  Interpreter.start()
 end
 
 
 namespace :server do
   desc "Starts a local development server"
   task :start, :port, :env do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     port = Integer(args[:port] || 9393)
     env  = (args[:env] || 'development')
@@ -79,7 +93,7 @@ namespace :worker do
 
   desc "Starts a Resque backend job worker"
   task :start, :queues do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     if ENV['QUEUE'].nil?
       ENV['QUEUE']    = (args[:queues] || ['critical', 'high', 'normal', 'low'].join(','))
@@ -114,7 +128,7 @@ end
 namespace :db do
   desc "Deletes all indices and recreates them empty.  EXTREMELY DANGEROUS!"
   task :nuke, :model do |t,args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     load "irb.ru"
     puts "Nuking database..."
@@ -147,7 +161,7 @@ namespace :db do
 
   desc "Syncs the db with the schema defined in the models"
   task :sync, :model do |t,args|
-    require './lib/app'
+    require_relative 'lib/app'
     load "irb.ru"
     puts "Syncing database..."
 
@@ -164,7 +178,7 @@ namespace :db do
 
   desc "Loads the default fixture data from all plugins into the database"
   task :load, :facet do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     fixtures = Dir[File.join([ENV['PROJECT_ROOT'], "plugins", "*", "fixtures", args[:facet], "*.json"].compact)]
 
@@ -198,7 +212,7 @@ namespace :db do
 
   desc "Initialize a new index based on the latest generated mapping and move data into it"
   task :reindex, :model, :cleanup do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     klass = args[:model].camelize.constantize()
     Onering::Logger.info("Reindexing model #{klass.name}...")
@@ -212,7 +226,7 @@ namespace :db do
 
   desc "Remove all closed indices for a given model or across all models"
   task :prune, :model do |t,args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     args.with_defaults({
       :model => nil
@@ -244,7 +258,7 @@ namespace :db do
 
   desc "Duplicates an index"
   task :backup, :source, :dest do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     if args[:source] and args[:dest]
       puts "Copying #{args[:source]} to #{args[:dest]}..."
@@ -255,7 +269,7 @@ namespace :db do
 
   desc "Change the data index the given alias points to"
   task :ln, :from, :to do |t, args|
-    require './lib/app'
+    require_relative 'lib/app'
 
     if args[:from] and args[:to]
       puts "Linking #{args[:to]} -> #{args[:from]}..."

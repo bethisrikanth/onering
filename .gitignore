@@ -18,3 +18,4 @@ setup.sh
 _site
 _docs
 plugins/_*
+Gemfile.lock
