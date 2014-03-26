@@ -1,0 +1,9 @@
+if ENV['ONERING_SKIP_PAM'].to_i == 0
+  case RUBY_VERSION
+  when /^1\.8/
+    gem "rpam"
+  else
+    gem "rpam-ruby19"
+  end
+end
+
