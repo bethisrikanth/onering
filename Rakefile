@@ -14,14 +14,9 @@
 #
 
 require 'rubygems'
-require 'rainbow'
-require 'cucumber'
-require 'cucumber/rake/task'
+require 'bundler/setup'
 
-# Cucumber::Rake::Task.new(:test) do |t|
-# desc "Run API backend integration tests"
-#   t.cucumber_opts = "features plugins/*/features"
-# end
+Bundler.setup(:default)
 
 namespace :plugins do
   desc "Downloads and updates the plugins listed in Ringfile to the specified versions"

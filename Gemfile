@@ -9,7 +9,7 @@ gem "net-ldap"
 gem "babel_bridge"
 gem "eventmachine"
 gem "msgpack"
-gem "cucumber"
+gem "rspec"
 gem "git"
 gem "faraday", "~> 0.8.4"
 
