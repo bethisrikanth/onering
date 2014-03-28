@@ -18,6 +18,8 @@ require 'bundler/setup'
 
 Bundler.setup(:default)
 
+require 'rainbow'
+
 namespace :plugins do
   desc "Downloads and updates the plugins listed in Ringfile to the specified versions"
   task :sync do
