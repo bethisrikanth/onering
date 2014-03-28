@@ -273,7 +273,7 @@ function NodeController($scope, $http, $location, $rootScope, $interval, $routeP
   });
 
 // ugly
-  $http.get('/api/provision/boot/profile/show/install').success(function(data){
+  $http.get('/api/provision/boot/profile/show/install?severity=ignore').success(function(data){
     if(angular.isObject(data) && angular.isArray(data.subprofiles)){
       $scope.opt.provision.families = data.subprofiles;
     }
@@ -673,7 +673,7 @@ function AssetRuleEditorController($scope, $routeParams, $http){
     $scope.newApplyKey = null;
     $scope.newApplyValue = null;
     $scope.addNewKey = false;
-  }  
+  }
 
-  $scope.reload();  
+  $scope.reload();
 }

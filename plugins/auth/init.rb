@@ -35,7 +35,7 @@ module App
 
     # get session secret from config
     # TODO: should this rotate at all?
-      set :session_secret, File.read(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key'))
+      set :session_secret, File.read(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key')) if File.exists?(File.join(ENV['PROJECT_ROOT'], 'config', 'session.key'))
       set :session_domain, Config.get('global.authentication.session.domain')
       set :session_path,   Config.get('global.authentication.session.path', '/api')
     end

@@ -1,0 +1,31 @@
+---
+global:
+  metrics:
+  # this string will be prepended to statsd counters/metrics that are emitted from
+  # the api and worker processes
+    prefix: "test.my-server.onering."
+
+  authentication:
+  # user to automatically login as (useful for testing)
+    autologin: onering
+
+  # authentication method configuration
+    methods:
+    # uses system PAM for authentication
+      pam:
+      # the name of the PAM service (in /etc/pam.d) to expose to PAM
+      # this file will contain the rules that dictate whether a username/pasword
+      # valid
+        service: onering
+
+# Elasticsearch database configuration
+# - elasticsearch.log:    turn on debug logging for all ES queries
+# - elasticsearch.logger: file to log to (default: STDERR)
+# - hosts[]:              array of ES nodes to connect to
+#
+# database:
+#   elasticsearch:
+#     log:    false
+#     logger: stderr
+#     hosts:
+#     - 'localhost:9200'

@@ -2,3 +2,14 @@
 authentication:
   bootstrap:
     user: bootstrap
+
+  public_paths:
+  - '/'
+  - '/api/?'
+  - '/api/users/login/?'
+  - '/api/users/machine/?.*'
+  - '/api/provision/?'
+  - '/api/provision/(?!request)/?'
+  - '/api/provision/(?!request)/boot/?.*'
+  - '/api/rundeck/nodes/?.*'
+  - '/api/ipxe/boot/?.*'
