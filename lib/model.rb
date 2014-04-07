@@ -187,6 +187,9 @@ module App
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
                 x.split('|').collect{|j|
+                # only take the actual field name and no modifiers
+                  j = j.split(':').last
+
                 # turn the current field into a path for extracting the ES type of the field
                   mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
 
