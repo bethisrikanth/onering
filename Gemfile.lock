@@ -148,6 +148,7 @@ GEM
       retryable
       solve (>= 0.4.4)
       varia_model (~> 0.3)
+    rpam-ruby19 (1.2.1)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -175,6 +176,7 @@ GEM
     snmp (1.1.1)
     solve (0.8.2)
     statsd-ruby (1.2.1)
+    taglib-ruby (0.6.0)
     thin (1.6.2)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
@@ -223,6 +225,7 @@ DEPENDENCIES
   rdiscount (= 1.6.8)
   resque
   ridley
+  rpam-ruby19
   rspec
   rubyipmi
   sinatra
@@ -231,4 +234,5 @@ DEPENDENCIES
   sinatra-session
   snmp
   statsd-ruby
+  taglib-ruby
   thin

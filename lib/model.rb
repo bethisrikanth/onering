@@ -178,11 +178,11 @@ module App
         #   not every field will have this multi-field property, the kludgy way around
         #   it is to just throw both cases into an OR and call it a day.
         #
-        #   I'm also certain that there is a way to do this directly in ES without said hack,
-        #   but I'm only one person, the documentation can only take me so far, and the
-        #   training costs ~$~$~mad billz~$~$~ that *someone* doesn't want to spend...
-        #        
-        #   I welcome an alternate approach. PM me: gary@outbrain.com a/s/l
+        #   I'm also certain that there is a way to do this directly in ES without said hack.
+        #   If you're reading this and know how to pull that off, open an issue in GitHub or submit
+        #   a pull request.
+        #
+        #   ty xoxo ^_^
         #
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
