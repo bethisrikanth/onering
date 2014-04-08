@@ -93,15 +93,27 @@ class RegisteredAddress < App::Model::Elasticsearch
     end
 
     def ip_available?(ip)
-    # verify it cannot be pinged
-      if not Net::Ping::ICMP.new(ip, nil, 3).ping?
-      # verify we can't resolve this IP in DNS
-        begin
-          Resolv.getname(ip)
+      claim_fields = App::Config.get('assets.ipam.claim_fields', [])
 
-        rescue Resolv::ResolvError
-          return true
+    # verify no other assets own this field (if field ownership is configured)
+      if claim_fields.empty? or (assets = Asset.urlquery("#{claim_fields.join('|')}/is:#{ip}").empty?)
+
+      # verify it cannot be pinged
+        if not Net::Ping::ICMP.new(ip, nil, 3).ping?
+
+        # verify we can't resolve this IP in DNS
+          begin
+            name = Resolv.getname(ip)
+            Onering::Logger.debug("Candidate IP address #{ip} PTR record exists, points to #{name}")
+
+          rescue Resolv::ResolvError
+            return true
+          end
+        else
+          Onering::Logger.debug("Candidate IP address #{ip} is pingable, skipping")
         end
+      else
+        Onering::Logger.debug("Candidate IP address #{ip} is already owned by asset(s) #{assets.collect{|i| i.id }.join(', ')}") if defined?(assets)
       end
 
       return false
