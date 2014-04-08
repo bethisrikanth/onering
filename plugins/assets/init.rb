@@ -166,11 +166,13 @@ module App
         get '/address/release/:ip' do
           address = RegisteredAddress.urlquery("str:value/is:#{params[:ip]}")
           return 404 if address.empty?
+
           address = address.first
-          address.release()
+          address.release(params[:release_asset])
           address.save({
             :replication => :sync
           })
+
 
           return 204
         end

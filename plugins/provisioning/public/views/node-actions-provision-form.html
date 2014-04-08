@@ -5,6 +5,7 @@
       <td>
         <input required type="text" class="input-medium" ng-model="node.properties.provisioning.hostname" ui-validate="validateDotless(node.properties.provisioning.hostname)">
       </td>
+      <td>&nbsp;</td>
       <td style="min-width: 72px">
         &nbsp;
       </td>
@@ -14,6 +15,9 @@
       <th>IP Address</th>
       <td>
         <input required type="text" class="input-medium" ng-model="node.properties.provisioning.network.ip" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.ip">
+      </td>
+      <td>
+        <a class="pull-left btn btn-mini btn-danger" rest="/api/devices/ipam/address/release/{{ node.properties.provisioning.network.ip }}?release_asset=true" rest-success="node.properties.provisioning.network.ip=null">Release</a>
       </td>
       <td>
         <input name="_overrideEditIP" type="checkbox" ng-model="opt.provision.formEdit.ip" class="pull-left margin-right-1">
@@ -26,6 +30,7 @@
       <td>
         <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.netmask" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.netmask">
       </td>
+      <td>&nbsp;</td>
       <td>
         <input name="_overrideEditNetmask" type="checkbox" ng-model="opt.provision.formEdit.netmask" class="pull-left margin-right-1">
         <label for="_overrideEditNetmask">Override?</label>
@@ -37,6 +42,7 @@
       <td>
         <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.gateway" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.gateway">
       </td>
+      <td>&nbsp;</td>
       <td>
         <input name="_overrideEditGateway" type="checkbox" ng-model="opt.provision.formEdit.gateway" class="pull-left margin-right-1">
         <label for="_overrideEditGateway">Override?</label>
@@ -48,6 +54,7 @@
       <td>
         <input type="text" class="input-medium" ng-model="node.properties.provisioning.network.dns" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.dns">
       </td>
+      <td>&nbsp;</td>
       <td>
         <input name="_overrideEditDNS" type="checkbox" ng-model="opt.provision.formEdit.dns" class="pull-left margin-right-1">
         <label for="_overrideEditDNS">Override?</label>
@@ -64,6 +71,7 @@
         </select>
       </td>
       <td>&nbsp;</td>
+      <td>&nbsp;</td>
     </tr>
 
     <tr>
@@ -75,6 +83,7 @@
           ng-options="v.value as v.label for v in opt.provision.diskStrategies">
         </select>
       </td>
+      <td>&nbsp;</td>
       <td>&nbsp;</td>
     </tr>
   </tbody>
