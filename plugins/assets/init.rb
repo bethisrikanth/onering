@@ -168,7 +168,7 @@ module App
           return 404 if address.empty?
 
           address = address.first
-          address.release(params[:release_asset])
+          address.release(params[:release_asset].to_bool())
           address.save({
             :replication => :sync
           })

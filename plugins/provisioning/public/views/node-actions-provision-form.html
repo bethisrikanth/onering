@@ -17,7 +17,7 @@
         <input required type="text" class="input-medium" ng-model="node.properties.provisioning.network.ip" ui-validate="validateIpAddress($value)" ng-disabled="!opt.provision.formEdit.ip">
       </td>
       <td>
-        <a class="pull-left btn btn-mini btn-danger" rest="/api/devices/ipam/address/release/{{ node.properties.provisioning.network.ip }}?release_asset=true" rest-success="node.properties.provisioning.network.ip=null">Release</a>
+        <a ng-show="node.properties.provisioning.network.ip" ng-disabled="opt.provision.formEdit.ip" class="pull-left btn btn-mini btn-danger" rest="/api/devices/ipam/address/release/{{ node.properties.provisioning.network.ip }}?release_asset=true" rest-success="node.properties.provisioning.network.ip=null">Release</a>
       </td>
       <td>
         <input name="_overrideEditIP" type="checkbox" ng-model="opt.provision.formEdit.ip" class="pull-left margin-right-1">
