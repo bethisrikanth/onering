@@ -217,7 +217,7 @@ module App
 
           rv = @_parser.parse(query).to_elasticsearch_query({
             :prefix         => self.field_prefix(),
-            :fields         => self.fields.keys(),
+            :_source        => self.fields.keys(),
             :value_analyzer => (self.method(:analyze) rescue nil)
           })
 
@@ -225,18 +225,16 @@ module App
         end
 
         def urlquery(query, query_options={}, tensor_options={})
+          fields = (query_options.delete(:fields) || (self.fields.keys.collect{|i| i.to_s }))
+
           query = {
-            :filter => self.to_elasticsearch_query(query),
-            :fields => (self.fields.keys.collect{|i| i.to_s }),
+            :filter  => self.to_elasticsearch_query(query),
+            :_source => fields.collect{|i|
+              self.resolve_field(i)
+            },
           }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
-
-          unless query_options[:fields].nil?
-            query[:fields] = query_options[:fields].collect{|i|
-              self.resolve_field(i)
-            }
-          end
 
           return self.search(query, tensor_options)
         end
@@ -319,7 +317,7 @@ module App
 
           es_query = {
             :size    => Tensor::Model::DEFAULT_RESULTS_LIMIT,
-            :fields  => field
+            :_source => field
           }
 
         # query all docuents

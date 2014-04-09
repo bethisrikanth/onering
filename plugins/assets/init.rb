@@ -224,7 +224,7 @@ module App
                 :type => i['_type']
               }
 
-              i['fields'].each{|k,v|
+              i['_source'].each{|k,v|
                 data.set(k,v)
               }
 
