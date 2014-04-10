@@ -191,18 +191,18 @@ module App
                   j = j.split(':').last
 
                 # turn the current field into a path for extracting the ES type of the field
-                  mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
+                  mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten).join('.')
 
                 # attempt to get the type for this field
                   mapping_type = self.all_mappings[self.document_type].get(mapping_path)
 
                 # field had no type, attempt to refresh the mapping cache and try again
-                  if mapping_type.nil?
+                  if mapping_type.nil? or mapping_type['type'].nil?
                     mapping_type = self.cache_mappings[self.document_type].get(mapping_path)
                   end
 
                 # only add the multifield suffix for actual multi_fields
-                  if mapping_type == 'multi_field'
+                  if not mapping_type.get('fields._analyzed').nil?
                     [j, j+'.'+App::Config.get('database.options.querying.multifield_suffix', '_analyzed')]
                   else
                     [j]
