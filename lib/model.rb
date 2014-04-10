@@ -217,7 +217,7 @@ module App
 
           rv = @_parser.parse(query).to_elasticsearch_query({
             :prefix         => self.field_prefix(),
-            :_source        => self.fields.keys(),
+            :fields         => self.fields.keys(),
             :value_analyzer => (self.method(:analyze) rescue nil)
           })
 
