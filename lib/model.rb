@@ -202,8 +202,10 @@ module App
                   end
 
                 # only add the multifield suffix for actual multi_fields
-                  if not mapping_type.get('fields._analyzed').nil?
-                    [j, j+'.'+App::Config.get('database.options.querying.multifield_suffix', '_analyzed')]
+                  multifield_suffix = App::Config.get('database.options.querying.multifield_suffix', '_analyzed')
+
+                  if not mapping_type.nil? and not mapping_type.get("fields.#{multifield_suffix}").nil?
+                    [j, j+'.'+multifield_suffix]
                   else
                     [j]
                   end
