@@ -376,6 +376,7 @@ module App
           return field if (@_field_prefix_skip || []).include?(field)
           return field if field.to_s.empty? or @_field_prefix.to_s.empty?
           return field if field =~ Regexp.new("^#{@_field_prefix}\.")
+          return field if field == @_field_prefix
           return @_field_prefix.to_s+'.'+field
         end
 
