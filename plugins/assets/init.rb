@@ -276,7 +276,12 @@ module App
         /list/*
       }.each do |r|
         get r do#ne
-          output(Asset.list(params[:splat].first.split('/'), params[:q].autotype()))
+          rv = Asset.list_values(params[:splat].first.split('/'), {
+            :query  => params[:q].autotype(),
+            :unique => (params[:unique].nil? ? true : params[:unique])
+          })
+
+          output(rv)
         end
       end
 

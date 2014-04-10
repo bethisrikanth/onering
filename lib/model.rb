@@ -313,7 +313,7 @@ module App
           return rv
         end
 
-        def list(field, query=nil)
+        def list_values(field, options={})
           field = [*field].collect{|i| resolve_field(i) }
           rows = []
 
@@ -323,7 +323,7 @@ module App
           }
 
         # query all docuents
-          if query.nil?
+          if options[:query].nil?
             results = search(es_query.merge({
               :version => true,
               :query => {
@@ -333,7 +333,7 @@ module App
               :raw => true
             })
           else
-            results = urlquery(query, es_query, {
+            results = urlquery(options[:query], es_query, {
               :raw => true
             })
 
@@ -349,7 +349,7 @@ module App
               when 'id'
                 column << hit['_id']
               else
-                value = (hit['fields'][f] rescue nil)
+                value = hit.get("_source.#{self.resolve_field(f)}")
 
                 if value.respond_to?(:empty?) and value.empty?
                   value = nil
@@ -366,7 +366,15 @@ module App
             rows = rows.flatten
           end
 
-          rows.uniq
+          return rows.uniq if options[:unique] == true
+          return rows
+        end
+
+        def list(field, query=nil)
+          return self.list_values(field, {
+            :query  => query,
+            :unique => true
+          })
         end
 
         def resolve_field(field)
