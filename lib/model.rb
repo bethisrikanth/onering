@@ -178,15 +178,18 @@ module App
         #   not every field will have this multi-field property, the kludgy way around
         #   it is to just throw both cases into an OR and call it a day.
         #
-        #   I'm also certain that there is a way to do this directly in ES without said hack,
-        #   but I'm only one person, the documentation can only take me so far, and the
-        #   training costs ~$~$~mad billz~$~$~ that *someone* doesn't want to spend...
-        #        
-        #   I welcome an alternate approach. PM me: gary@outbrain.com a/s/l
+        #   I'm also certain that there is a way to do this directly in ES without said hack.
+        #   If you're reading this and know how to pull that off, open an issue in GitHub or submit
+        #   a pull request.
+        #
+        #   ty xoxo ^_^
         #
           query = query.split('/').collect.with_index{|x,i|
             if i.even?
                 x.split('|').collect{|j|
+                # only take the actual field name and no modifiers
+                  j = j.split(':').last
+
                 # turn the current field into a path for extracting the ES type of the field
                   mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten + ['type']).join('.')
 
@@ -214,7 +217,7 @@ module App
 
           rv = @_parser.parse(query).to_elasticsearch_query({
             :prefix         => self.field_prefix(),
-            :fields         => self.fields.keys(),
+            :_source        => self.fields.keys(),
             :value_analyzer => (self.method(:analyze) rescue nil)
           })
 
@@ -222,18 +225,16 @@ module App
         end
 
         def urlquery(query, query_options={}, tensor_options={})
+          fields = (query_options.delete(:fields) || (self.fields.keys.collect{|i| i.to_s }))
+
           query = {
-            :filter => self.to_elasticsearch_query(query),
-            :fields => (self.fields.keys.collect{|i| i.to_s }),
+            :filter  => self.to_elasticsearch_query(query),
+            :_source => fields.collect{|i|
+              self.resolve_field(i)
+            },
           }.deeper_merge!(query_options, {
             :merge_hash_arrays => true
           })
-
-          unless query_options[:fields].nil?
-            query[:fields] = query_options[:fields].collect{|i|
-              self.resolve_field(i)
-            }
-          end
 
           return self.search(query, tensor_options)
         end
@@ -316,7 +317,7 @@ module App
 
           es_query = {
             :size    => Tensor::Model::DEFAULT_RESULTS_LIMIT,
-            :fields  => field
+            :_source => field
           }
 
         # query all docuents

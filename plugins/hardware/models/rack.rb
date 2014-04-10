@@ -37,17 +37,23 @@ module Hardware
 
       rv = []
 
-
+    # for each U in this rack
       (1..self.height).to_a.reverse.collect do |u|
+      # find the node(s) that are present at this U
         nodes = devices.select{|i| [*i.properties.get(:unit, 0)].map(&:to_i).include?(u) }
+
+      # get the physical layout details from the node
         physical = (nodes.reject{|i| i.properties.get(:physical).nil? }.first.to_hash rescue {}).get('properties.physical',{})
 
+
+      # determine how many U this node occupies
         if physical.get('layout.height')
           node_units = ((u - physical.get('layout.height').to_i + 1)..u).to_a
         else
           node_units = nodes.collect{|i| [*i.properties.get(:unit, 0)] }.flatten.collect{|i| i.to_i }
         end
 
+      # only do this once per multi-U node
         unless seen.include?(u)
           seen += node_units
 

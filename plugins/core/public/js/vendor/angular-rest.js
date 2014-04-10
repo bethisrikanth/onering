@@ -175,10 +175,10 @@ angular.module('rest', ['ui.bootstrap'])
 
     link: function($scope, $element, $attrs) {
       $element.bind('click', function(){
-        if($scope.$eval($attrs.restDisable) != true){
-          $element.run($attrs);
-        }else{
+        if($scope.$eval($attrs.restDisable) == true || $element.is(':disabled') || $element.attr('disabled') == 'disabled'){
           console.error('Not calling REST endpoint '+$attrs.rest+', element is disabled')
+        }else{
+          $element.run($attrs);
         }
       });
     }
