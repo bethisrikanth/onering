@@ -188,10 +188,10 @@ module App
             if i.even?
                 x.split('|').collect{|j|
                 # only take the actual field name and no modifiers
-                  j = j.split(':').last
+                  j_field = j.split(':').last
 
                 # turn the current field into a path for extracting the ES type of the field
-                  mapping_path = (self.resolve_field(j).split('.').collect{|i| ['properties', i] }.flatten).join('.')
+                  mapping_path = (self.resolve_field(j_field).split('.').collect{|i| ['properties', i] }.flatten).join('.')
 
                 # attempt to get the type for this field
                   mapping_type = self.all_mappings[self.document_type].get(mapping_path)
@@ -214,6 +214,8 @@ module App
               x
             end
           }.join('/')
+
+Onering::Logger.warn(query.pretty_inspect)
 
           @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
 

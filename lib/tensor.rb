@@ -131,6 +131,9 @@ module Tensor
           end
         end
       end
+
+      yield @attributes, self if block_given?
+      self
     end
 
     # populates model attributes from a given hash object
@@ -1077,7 +1080,6 @@ module Tensor
         when :search
           return nil unless defined?(response['hits']['hits'])
           return response['hits']['hits'].collect{|i|
-            i['_source'] = i['fields'] if i['_source'].nil? and not i['fields'].nil?
             next if i['_source'].nil?
             next if i['_id'][0].chr == '_'
 
@@ -1103,9 +1105,20 @@ module Tensor
         klass = base.const_get(parts[-1])
       end
 
-      klass.new(document['_source'], {
+      instance = klass.new(document['_source'], {
         :metadata => document.reject{|k,v| k == '_source' }
-      })
+      }) do |attributes|
+      # if _source AND fields are present, merge the value(s) of the fields in
+      # on top of _source
+      #
+        if not document['_source'].nil? and not document['fields'].nil?
+          document['fields'].collect{|k,v|
+            attributes.rset(k, (v.length == 1 ? v.first : v))
+          }
+        end
+      end
+
+      return instance
     end
 
     def self._generate_mapping(options={})
