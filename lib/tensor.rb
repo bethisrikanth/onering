@@ -13,9 +13,10 @@
 # limitations under the License.
 #
 
-require 'deep_merge/rails_compat'
-require 'elasticsearch'
-require 'active_model'
+require          'deep_merge/rails_compat'
+require          'elasticsearch'
+require          'active_model'
+require_relative 'tensor_callbacks'
 
 begin
   require 'active_support/inflector'
@@ -85,6 +86,7 @@ module Tensor
   class Model
     include ::ActiveModel::Model
     include ::ActiveModel::Dirty
+    self.extend Tensor::ClassCallbacks
     extend  ::ActiveModel::Callbacks
 
     attr_accessor :id
@@ -92,7 +94,7 @@ module Tensor
     attr_reader   :_metadata
     attr_accessor :attributes
 
-    define_model_callbacks :save, :create, :destroy, :update
+    define_model_callbacks  :save, :create, :destroy, :update
 
     DEFAULT_INTERNAL_LIMIT = 1000
     DEFAULT_RESULTS_LIMIT  = 10000
@@ -469,20 +471,25 @@ module Tensor
       return @_fields
     end
 
-
     # execute a query directly on this index
     # +options+::  options for query execution
     # * :type::    the document type to query for (default: autodetect)
     #
     def self.search!(body, options={}, es_options={})
+      rv = nil
+
       query = ({
         :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
       }).merge(body)
 
-      return _wrap_response(:search, connection().search({
-        :index => (options[:index] || self.index_name()),
-        :body  => query
-      }.merge(es_options)), options)
+      class_callback :query, query do
+        rv =  _wrap_response(:search, connection().search({
+          :index => (options[:index] || self.index_name()),
+          :body  => query
+        }.merge(es_options)), options)
+      end
+
+      return rv
     end
 
 
@@ -506,27 +513,34 @@ module Tensor
     # * See _wrap_response for additional options
     #
     def self.find!(id, options={})
-      if id.is_a?(Array)
-        return _wrap_response(:search, connection().search({
-          :index => self.index_name(),
-          :body  => {
-            :version => true,
-            :size  => (options[:limit] || DEFAULT_INTERNAL_LIMIT),
-            :query => {
-              :ids => {
-                :type   => (options[:types].nil? ? nil : [*options[:types]]),
-                :values => id
+      cbquery = {}
+      rv = nil
+
+      class_callback :query, cbquery do
+        if id.is_a?(Array)
+          rv = _wrap_response(:search, connection().search({
+            :index => self.index_name(),
+            :body  => {
+              :version => true,
+              :size  => (options[:limit] || DEFAULT_INTERNAL_LIMIT),
+              :query => {
+                :ids => {
+                  :type   => (options[:types].nil? ? nil : [*options[:types]]),
+                  :values => id
+                }
               }
-            }
-          }
-        }), options)
-      else
-        _wrap_response(:get, connection().get({
-          :index => self.index_name(),
-          :type  => (options[:types].nil? ? nil : [*options[:types]]),
-          :id    => id
-        }), options)
+            }.merge(cbquery)
+          }), options)
+        else
+          rv = _wrap_response(:get, connection().get({
+            :index => self.index_name(),
+            :type  => (options[:types].nil? ? nil : [*options[:types]]),
+            :id    => id
+          }), options)
+        end
       end
+
+      return rv
     end
 
 

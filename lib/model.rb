@@ -13,7 +13,8 @@
 # limitations under the License.
 #
 
-require 'tensor'
+require          'tensor'
+require_relative 'urlquery'
 
 module App
   module Model
@@ -158,72 +159,41 @@ module App
         end
 
         def to_elasticsearch_query(query, options={})
-          return nil if query == 'null'
+          return Urlquery::Query.parse(query, {
+            :query => options,
+            :normalizer => proc{|value|
+            # pass scalar values back to elasticsearch to pre-analyze them
+            # TODO: figure out what's wrong with dynamic mappings so as to avoid this
+              if value.respond_to?(:scalar?) and value.scalar?
+                self.analyze(value)
+              else
+                value
+              end
+            },
+            :multi_field => proc{|field|
+              field = self.resolve_field(field)
 
-        #
-        # HACKS: Query pre-processor for searching on multi-fields
-        #
-        # What is this?
-        #  It deconstructs the urlquery string and adds a second field to every field
-        #  being searched for.  So for example:
-        #    I search for:   mac/abc123
-        #    This yields:    mac|mac._analyzed/abc123
-        #
-        # Why am I doing this?
-        #   To support multi-fields in ES that store both the analyzed and non-analyzed
-        #   version of a field.  In that case we have a situation where we want to
-        #   query on one part of the field but display another part.
-        #
-        #   Since we're generating queries in a highly generic manner, and because
-        #   not every field will have this multi-field property, the kludgy way around
-        #   it is to just throw both cases into an OR and call it a day.
-        #
-        #   I'm also certain that there is a way to do this directly in ES without said hack.
-        #   If you're reading this and know how to pull that off, open an issue in GitHub or submit
-        #   a pull request.
-        #
-        #   ty xoxo ^_^
-        #
-          query = query.split('/').collect.with_index{|x,i|
-            if i.even?
-                x.split('|').collect{|j|
-                # only take the actual field name and no modifiers
-                  j_field = j.split(':').last
+            # turn the current field into a path for extracting the ES type of the field
+              mapping_path = (field.split('.').collect{|i| ['properties', i] }.flatten).join('.')
 
-                # turn the current field into a path for extracting the ES type of the field
-                  mapping_path = (self.resolve_field(j_field).split('.').collect{|i| ['properties', i] }.flatten).join('.')
+            # attempt to get the type for this field
+              mapping_type = self.all_mappings[self.document_type].get(mapping_path)
 
-                # attempt to get the type for this field
-                  mapping_type = self.all_mappings[self.document_type].get(mapping_path)
+            # field had no type, attempt to refresh the mapping cache and try again
+              if mapping_type.nil? or mapping_type['type'].nil?
+                mapping_type = self.cache_mappings[self.document_type].get(mapping_path)
+              end
 
-                # field had no type, attempt to refresh the mapping cache and try again
-                  if mapping_type.nil? or mapping_type['type'].nil?
-                    mapping_type = self.cache_mappings[self.document_type].get(mapping_path)
-                  end
+            # only add the multifield suffix for actual multi_fields
+              multifield_suffix = App::Config.get('database.options.querying.multifield_suffix', '_analyzed')
 
-                # only add the multifield suffix for actual multi_fields
-                  multifield_suffix = App::Config.get('database.options.querying.multifield_suffix', '_analyzed')
-
-                  if not mapping_type.nil? and not mapping_type.get("fields.#{multifield_suffix}").nil?
-                    [j, j+'.'+multifield_suffix]
-                  else
-                    [j]
-                  end
-                }.flatten.join('|')
-            else
-              x
-            end
-          }.join('/')
-
-          @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
-
-          rv = @_parser.parse(query).to_elasticsearch_query({
-            :prefix         => self.field_prefix(),
-            :fields         => self.fields.keys(),
-            :value_analyzer => (self.method(:analyze) rescue nil)
-          })
-
-          rv
+              if not mapping_type.nil? and not mapping_type.get("fields.#{multifield_suffix}").nil?
+                [[field, field+'.'+multifield_suffix]]
+              else
+                [[field]]
+              end
+            }
+          }).to_hash()
         end
 
         def urlquery(query, query_options={}, tensor_options={})
@@ -319,7 +289,7 @@ module App
 
           es_query = {
             :size    => Tensor::Model::DEFAULT_RESULTS_LIMIT,
-            :_source => field
+            :fields  => field
           }
 
         # query all docuents
@@ -336,7 +306,6 @@ module App
             results = urlquery(options[:query], es_query, {
               :raw => true
             })
-
           end
 
           results = {} if results.empty?

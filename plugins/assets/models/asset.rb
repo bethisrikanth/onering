@@ -140,6 +140,19 @@ class Asset < App::Model::Elasticsearch
   before_save                   :_ensure_uniqueness
   #before_save                   :_print_hash
 
+  #define_class_callback         :before_query, :_inject_script_fields
+
+  # def self._inject_script_fields(*args)
+  #   args[1][:script_fields] = {
+  #     'properties.lolz' => {
+  #       :lang   => :python,
+  #       :script => "(doc['name'].value or 'NO') + ':LOLZ'"
+  #     }
+  #   }
+
+  #   nil
+  # end
+
 
   def parent()
     (self.parent_id ? Asset.find(self.parent_id) : nil)

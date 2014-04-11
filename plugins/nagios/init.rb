@@ -67,9 +67,9 @@ module App
       get '/:id' do
         nagios_host = NagiosHost.find(params[:id])
         return 404 unless nagios_host
-        rv = nagios_host.to_h
+        rv = nagios_host.to_hash()
 
-        if Config.get('nagios.url')
+        if App::Config.get('nagios.url')
           rv['alerts'].each_with_index do |alert, i|
             name = URI::encode(rv['name'])
             type = (alert['type'] == 'service' ? 2 : 1)
@@ -79,7 +79,7 @@ module App
           end
         end
 
-        rv.to_json
+        output(rv)
       end
     end
   end
