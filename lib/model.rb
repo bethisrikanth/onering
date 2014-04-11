@@ -215,8 +215,6 @@ module App
             end
           }.join('/')
 
-Onering::Logger.warn(query.pretty_inspect)
-
           @_parser ||= App::Helpers::ElasticsearchUrlqueryParser.new()
 
           rv = @_parser.parse(query).to_elasticsearch_query({
