@@ -233,5 +233,4 @@ DEPENDENCIES
   sinatra-session
   snmp
   statsd-ruby
-  taglib-ruby
   thin
