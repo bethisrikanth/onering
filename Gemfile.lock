@@ -148,7 +148,6 @@ GEM
       retryable
       solve (>= 0.4.4)
       varia_model (~> 0.3)
-    rpam-ruby19 (1.2.1)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -224,7 +223,6 @@ DEPENDENCIES
   rdiscount (= 1.6.8)
   resque
   ridley
-  rpam-ruby19
   rspec
   rubyipmi
   sinatra

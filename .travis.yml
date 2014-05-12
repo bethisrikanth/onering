@@ -1,8 +1,12 @@
 ---
 language: ruby
 script:   bundle exec rspec
+env:
+- ONERING_SKIP_PAM=1
+
 rvm:
   - 1.9.3
+
 services:
 - redis
 - elasticsearch
