@@ -176,7 +176,6 @@ GEM
     snmp (1.1.1)
     solve (0.8.2)
     statsd-ruby (1.2.1)
-    taglib-ruby (0.6.0)
     thin (1.6.2)
       daemons (>= 1.0.9)
       eventmachine (>= 1.0.0)
