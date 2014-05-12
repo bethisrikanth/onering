@@ -78,7 +78,6 @@ GEM
     liquid (2.6.1)
     log4r (1.1.10)
     maruku (0.7.1)
-    mime-types (2.2)
     minitest (4.7.5)
     mixlib-authentication (1.3.0)
       mixlib-log
@@ -213,7 +212,6 @@ DEPENDENCIES
   ipaddress
   jekyll
   liquid
-  mime-types
   msgpack
   multi_json (= 1.7.9)
   net-ldap

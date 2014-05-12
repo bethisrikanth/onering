@@ -16,7 +16,6 @@
 require          'deep_merge/rails_compat'
 require          'elasticsearch'
 require          'active_model'
-require_relative 'tensor_callbacks'
 
 begin
   require 'active_support/inflector'
@@ -86,7 +85,6 @@ module Tensor
   class Model
     include ::ActiveModel::Model
     include ::ActiveModel::Dirty
-    self.extend Tensor::ClassCallbacks
     extend  ::ActiveModel::Callbacks
 
     attr_accessor :id
@@ -228,9 +226,6 @@ module Tensor
             raise e
           end
         end
-
-      # failed save has failed
-        return false unless result['ok'] === true
 
         self.id = result['_id']
 
@@ -482,12 +477,10 @@ module Tensor
         :size  => (options[:limit].nil? ? DEFAULT_RESULTS_LIMIT : options[:limit]),
       }).merge(body)
 
-      class_callback :query, query do
-        rv =  _wrap_response(:search, connection().search({
-          :index => (options[:index] || self.index_name()),
-          :body  => query
-        }.merge(es_options)), options)
-      end
+      rv =  _wrap_response(:search, connection().search({
+        :index => (options[:index] || self.index_name()),
+        :body  => query
+      }.merge(es_options)), options)
 
       return rv
     end
@@ -516,28 +509,26 @@ module Tensor
       cbquery = {}
       rv = nil
 
-      class_callback :query, cbquery do
-        if id.is_a?(Array)
-          rv = _wrap_response(:search, connection().search({
-            :index => self.index_name(),
-            :body  => {
-              :version => true,
-              :size  => (options[:limit] || DEFAULT_INTERNAL_LIMIT),
-              :query => {
-                :ids => {
-                  :type   => (options[:types].nil? ? nil : [*options[:types]]),
-                  :values => id
-                }
+      if id.is_a?(Array)
+        rv = _wrap_response(:search, connection().search({
+          :index => self.index_name(),
+          :body  => {
+            :version => true,
+            :size  => (options[:limit] || DEFAULT_INTERNAL_LIMIT),
+            :query => {
+              :ids => {
+                :type   => (options[:types].nil? ? nil : [*options[:types]]),
+                :values => id
               }
-            }.merge(cbquery)
-          }), options)
-        else
-          rv = _wrap_response(:get, connection().get({
-            :index => self.index_name(),
-            :type  => (options[:types].nil? ? nil : [*options[:types]]),
-            :id    => id
-          }), options)
-        end
+            }
+          }.merge(cbquery)
+        }), options)
+      else
+        rv = _wrap_response(:get, connection().get({
+          :index => self.index_name(),
+          :type  => (options[:types].nil? ? nil : [*options[:types]]),
+          :id    => id
+        }), options)
       end
 
       return rv
@@ -716,7 +707,7 @@ module Tensor
 
       if block_given?
         @_definition ||= {
-          (options[:type] || :_default_) => yield
+          (options[:type] || document_type()) => yield
         }
       end
 
@@ -729,10 +720,12 @@ module Tensor
 
     # handle post-1.0 case
       if _mappings['mappings'].is_a?(Hash)
-        _mappings['mappings']
+        rv = _mappings['mappings']
       else
-        return _mappings
+        rv = _mappings
       end
+
+      return rv
     end
 
     def self.all_mappings()
@@ -783,7 +776,7 @@ module Tensor
       # })
 
     # update mappings
-      connection().indices.put_mapping({
+      return connection().indices.put_mapping({
         :index => (options[:index] || index_name()),
         :type  => (options[:type] || document_type()),
         :body  => mappings(nil, options[:mappings])
@@ -1137,7 +1130,7 @@ module Tensor
 
     def self._generate_mapping(options={})
       mapping = {
-        (options[:type] || :_default_).to_s => DEFAULT_MAPPING.deep_clone.deeper_merge({
+        (options[:type] || document_type()).to_s => DEFAULT_MAPPING.deep_clone.deeper_merge({
           'properties' => Hash[fields().reject{|k,v|
             v.get(:skip_mapping, false)
           }.collect{|name, definition|
