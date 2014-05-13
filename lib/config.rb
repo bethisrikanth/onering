@@ -122,7 +122,7 @@ module App
       def to_hash()
         @_externalconfig ||= {}
 
-        rv = @_config
+        rv = (@_config || {})
 
         @_externalconfig.each do |id, config|
           merge_config = {}

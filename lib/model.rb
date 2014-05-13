@@ -198,7 +198,7 @@ module App
 
         def urlquery(query, query_options={}, tensor_options={})
           fields = (query_options.delete(:fields) || (self.fields.keys.collect{|i| i.to_s }))
-
+          
           query = {
             :filter  => self.to_elasticsearch_query(query),
             :_source => fields.collect{|i|
@@ -208,7 +208,7 @@ module App
             :merge_hash_arrays => true
           })
 
-          return self.search(query, tensor_options)
+         return self.search(query, tensor_options)
         end
 
         def ids(urlquery=nil)
@@ -284,7 +284,7 @@ module App
         end
 
         def list_values(field, options={})
-          field = [*field].collect{|i| resolve_field(i) }
+          field = [*field].collect{|i| self.resolve_field(i) }
           rows = []
 
           es_query = {
@@ -306,7 +306,7 @@ module App
             results = urlquery(options[:query], es_query, {
               :raw => true
             })
-          end
+          end      
 
           results = {} if results.empty?
 
@@ -317,14 +317,32 @@ module App
               case f
               when 'id'
                 column << hit['_id']
-              else
-                value = hit.get("_source.#{self.resolve_field(f)}")
+              else 
+                if hit.get("_source").is_a?(Hash)
+                  value = hit.get("_source.#{self.resolve_field(f)}")
 
-                if value.respond_to?(:empty?) and value.empty?
-                  value = nil
+                  if value.respond_to?(:empty?) and value.empty?
+                    value = nil
+                  end
+
+                  column << value
+
+                elsif hit.get("fields").is_a?(Hash)
+                  value = hit['fields'][self.resolve_field(f)]
+
+                  if value.respond_to?(:empty?) and value.empty?
+                    value = nil
+                  end
+
+                  if value.respond_to?(:length) and  value.length == 1
+                    value = value.first
+                  end
+
+                  column << value
+
+                else
+                  column << nil
                 end
-
-                column << value
               end
             end
 

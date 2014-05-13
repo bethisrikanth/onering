@@ -89,7 +89,9 @@ module Urlquery
 
       # preprocess value before typing it
         if options[:normalizer].is_a?(Proc)
-          value = options[:normalizer].call(value)
+          if operator.nil? or not Urlquery::Operators.const_get("#{operator}_operator".camelize).skip_normalizer === true
+            value = options[:normalizer].call(value)
+          end
         end
 
       # convert value to correct data type

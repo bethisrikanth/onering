@@ -3,7 +3,7 @@ require 'elasticsearch'
 require 'patches'
 require 'tensor'
 
-class TestModel < Tensor::Model
+class TestTensorModel < Tensor::Model
   field :name,       :string
   field :status,     :string
   field :enabled,    :boolean, :default => false
@@ -27,36 +27,36 @@ describe Tensor::Model do
 
 
   it "should correctly derive index_name" do
-    TestModel.index_name.should == "test_models"
+    TestTensorModel.index_name.should == "test_tensor_models"
   end
 
   it "should correctly derive document_type" do
-    TestModel.document_type.should == "test_model"
+    TestTensorModel.document_type.should == "test_tensor_model"
   end
 
-  describe TestModel do
+  describe TestTensorModel do
     before(:each) do
-      TestModel.sync_schema()
+      TestTensorModel.sync_schema()
     end
 
     after(:each) do
-      TestModel.connection.indices.delete({
-        :index => TestModel.get_real_index()
+      TestTensorModel.connection.indices.delete({
+        :index => TestTensorModel.get_real_index()
       })
     end
 
 
     it "should be able to sync the schema" do
-      mapping = TestModel.all_mappings()
+      mapping = TestTensorModel.all_mappings()
       mapping.should                                                                be_kind_of(Hash)
-      mapping[TestModel.document_type()].should                                     be_kind_of(Hash)
-      mapping[TestModel.document_type()]['properties']['name']['type'].should       == 'string'
-      mapping[TestModel.document_type()]['properties']['enabled']['type'].should    == 'boolean'
-      mapping[TestModel.document_type()]['properties']['properties']['type'].should == 'object'
+      mapping[TestTensorModel.document_type()].should                                     be_kind_of(Hash)
+      mapping[TestTensorModel.document_type()]['properties']['name']['type'].should       == 'string'
+      mapping[TestTensorModel.document_type()]['properties']['enabled']['type'].should    == 'boolean'
+      mapping[TestTensorModel.document_type()]['properties']['properties']['type'].should == 'object'
     end
 
     it "create document and verify state pre-save" do
-      new_test = TestModel.new({
+      new_test = TestTensorModel.new({
         :name => "Test Document 1"
       })
 
@@ -67,7 +67,7 @@ describe Tensor::Model do
     end
 
     it "create document and verify state post-save" do
-      new_test = TestModel.new({
+      new_test = TestTensorModel.new({
         :name    => "Test Document 2",
         :enabled => true
       })
@@ -85,23 +85,23 @@ describe Tensor::Model do
 
   describe "Query testing" do
     before(:all) do
-      TestModel.sync_schema()
+      TestTensorModel.sync_schema()
 
       Dir[File.join(File.dirname(__FILE__), 'fixtures', 'tensor', '*.json')].each do |fixture|
         fixture = MultiJson.load(File.read(fixture))
-        TestModel.create(fixture)
+        TestTensorModel.create(fixture)
       end
     end
 
     after(:all) do
-      TestModel.connection.indices.delete({
-        :index => TestModel.get_real_index()
+      TestTensorModel.connection.indices.delete({
+        :index => TestTensorModel.get_real_index()
       })
     end
 
 
     it ".search()" do
-      results = TestModel.search({
+      results = TestTensorModel.search({
         :filter => {
           :term => { 
             :status => "online"

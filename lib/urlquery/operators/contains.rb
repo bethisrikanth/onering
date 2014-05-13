@@ -5,7 +5,7 @@ module Urlquery
         return ({
           :regexp => {
             field => {
-              :value => value,
+              :value => ".*#{value}.*",
               :flags => :ALL
             }
           }

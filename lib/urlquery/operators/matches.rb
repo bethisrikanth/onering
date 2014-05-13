@@ -11,6 +11,10 @@ module Urlquery
           }
         })
       end
+
+    def self.skip_normalizer()
+      true
+    end
     end
   end
 end
